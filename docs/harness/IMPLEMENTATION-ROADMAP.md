@@ -34,6 +34,7 @@ Status legend: **Done** (observed), **Written** (files exist, not observed live)
 |---|---|---|---|
 | R11 | Live test of context loading: give a specialist agent a task under each of three profiles and check the `Context:` line against what it actually read | Recorded results show whether agents follow the procedure; if not, a documented gap justifies a context-pack generator (ADR 0001) | Owner |
 | R12 | Live test of the review roles: run `design-reviewer` and `architecture-critic` on a new design in VS Code and compare with the gate | Recorded results show whether the roles follow the skills, avoid editing outside their folders, and never set Approved | Owner |
+| R14 | Authenticate human memory writers: require a signed approval record, verified by the memory store with the permission model's signing and registry, for approve, supersede and invalidate | Approver keys registered (T13); store change, tests with synthetic keys, ADR 0010 follow-up | Owner |
 | R13 | Sibling designs that DES-0001 depends on, in this order: certificate hosting and signing; edge security and platform; identity and roles; customer isolation; retention and recovery; non-production environments; evidence-package completeness and reconstruction; calculation and methodology distribution | Each has a design, a review and a Design ADR, and the gate result is recorded. None can be Approved until its M1 and M2 decisions are answered | Owner |
 
 ## Stage 3: Harness measurement and learning (only if needed)

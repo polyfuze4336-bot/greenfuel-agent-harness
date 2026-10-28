@@ -1,6 +1,6 @@
 # ADR 0010: Persistent memory for the coding harness
 
-- **Status:** Proposed (awaiting owner decision)
+- **Status:** Accepted (2026-10-28, programme owner, by instruction in chat: "accept and document it"; working values confirmed and T23 decided in the same reply)
 - **Type:** Governance
 - **Date:** 2026-10-28
 - **Deciders:** Programme owner
@@ -21,7 +21,8 @@
 5. **Strict JSON entries in Git, a hash-chained ledger, an in-memory keyword index, deterministic rules for who may write what, and read-only MCP tools (chosen).**
 
 ## Decision
-Proposed. Adopt, if the owner accepts:
+Accepted. The owner also confirmed the memory working values (T22: authority and status weights, recency weight and half-life, expiry periods, size limits, the interruption window) and asked the architect to decide how human writers are authenticated (T23). The decision on T23 is the last bullet.
+- Adopt:
 - The model in [MEMORY-MODEL](../memory/MEMORY-MODEL.md) and the rules in [MEMORY-GOVERNANCE](../memory/MEMORY-GOVERNANCE.md), implemented by [store.cjs](../../harness/memory/store.cjs) and [memory-policy.json](../../harness/policy/memory-policy.json), operated through [memory.mjs](../../harness/scripts/memory.mjs).
 - Authority that code verifies: an entry is approved only through a reference to an Accepted ADR, recorded by a human or the importer. A change to an approved entry is a new entry that supersedes it under a different Accepted ADR. A hash-chained ledger and a generated architecture snapshot make edits, deletions and rollbacks detectable.
 - Quarantine for tool output and documents, refusal (not redaction) of sensitive data, a strict schema, and a denial log that never records refused text.
@@ -29,6 +30,7 @@ Proposed. Adopt, if the owner accepts:
 - `memory/` as a control-plane path: agents cannot write it and read it only through `memory_search` (orchestrator, principal architect, architecture critic) and `memory_resume` (orchestrator).
 - [validate-memory.mjs](../../harness/scripts/validate-memory.mjs) in `npm run validate` and CI.
 - No SQLite and no vector database now, with the revisit conditions below.
+- **T23, human-writer authentication (decided by the architect on the owner's instruction "decide what's best").** Interim: the `human` and `importer` writer types stay self-declared, and the control is procedural plus detective: every change to `memory/` or `docs/adr/` is reviewed by the owner in the diff before it is pushed, the ledger is compared with Git history in CI, and an approved entry must be derived from its Accepted ADR. Target: when approver keys are registered (T13), approve, supersede and invalidate will require a signed approval record verified by the store, using the permission model's existing signing and registry, with no new mechanism. This is not built now because the registry is empty and enabling it would block every approval; it is roadmap item R14 and stays under T23 until T13 is done.
 
 ## Consequences
 - Approved architecture, the hard constraints and lessons from real incidents are now retrievable by every session, with their authority visible.

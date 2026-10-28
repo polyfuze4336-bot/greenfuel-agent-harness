@@ -2,7 +2,7 @@
   "kind": "decision",
   "title": "Persistent memory for the coding harness",
   "statement": "Persistent memory for the coding harness",
-  "body": "Proposed. Adopt, if the owner accepts: - The model in [MEMORY-MODEL](../memory/MEMORY-MODEL.md) and the rules in [MEMORY-GOVERNANCE](../memory/MEMORY-GOVERNANCE.md), implemented by [store.cjs](../../harness/memory/store.cjs) and [memory-policy.json](../../harness/policy/memory-policy.json), operated through [memory.mjs](../../harness/scripts/memory.mjs). - Authority that code verifies: an entry is approved only through a reference to an Accepted ADR, recorded by a human or the importer. A change to an approved entry is a new entry that supersedes it under a different Accepted ADR. A hash-chained ledger and a generated architecture snapshot make edits, deletions and rollbacks detectable. - Quarantine for tool output and documents, refusal (not redaction) of sensitive data, a strict schema, and a denial log that never records refused text. - Retrieval ranked by relevance and authority, with recency only as a tie-breaker; compact summaries that never drop a pinned constraint or a conflict. - `memory/` as a control-plane path: agents cannot write it and read it only through `memory_search` (orchestrator, principal architect, architecture critic) and `memory_resume` (orchestrator). - [validate-memory.mjs](../../harness/scripts/validate-memory.mjs) in `npm run validate` and CI. - No SQLite and no vector database now, with the revisit conditions below.",
+  "body": "Accepted. The owner also confirmed the memory working values (T22: authority and status weights, recency weight and half-life, expiry periods, size limits, the interruption window) and asked the architect to decide how human writers are authenticated (T23). The decision on T23 is the last bullet. - Adopt: - The model in [MEMORY-MODEL](../memory/MEMORY-MODEL.md) and the rules in [MEMORY-GOVERNANCE](../memory/MEMORY-GOVERNANCE.md), implemented by [store.cjs](../../harness/memory/store.cjs) and [memory-policy.json](../../harness/policy/memory-policy.json), operated through [memory.mjs](../../harness/scripts/memory.mjs). - Authority that code verifies: an entry is approved only through a reference to an Accepted ADR, recorded by a human or the importer. A change to an approved entry is a new entry that supersedes it under a different Accepted ADR. A hash-chained ledger and a generated architecture snapshot make edits, deletions and rollbacks detectable. - Quarantine for tool output and documents, refusal (not redaction) of sensitive data, a strict schema, and a denial log that never records refused text. - Retrieval ranked by relevance and authority, with recency only as a tie-breaker; compact summaries that never drop a pinned constraint or a conflict. - `memory/` as a control-plane path: agents cannot write it and read it only through `memory_search` (orchestrator, principal architect, architecture critic) and `memory_resume` (orchestrator). - [validate-memory.mjs](../../harness/scripts/validate-memory.mjs) in `npm run validate` and CI. - No SQLite and no vector database now, with the revisit conditions below. - **T23, human-writer authentication (decided by the architect on the owner's instruction \"decide what's best\").** Interim: the `human` and `importer` writer types stay self-declared, and the control is procedural plus detective: every change to `memory/` or `docs/adr/` is reviewed by the owner in the diff before it is pushed, the ledger is compared with Git history in CI, and an approved entry must be derived from its Accepted ADR. Target: when approver keys are registered (T13), approve, supersede and invalidate will require a signed approval record verified by the store, using the permission model's existing signing and registry, with no new mechanism. This is not built now because the registry is empty and enabling it would block every approval; it is roadmap item R14 and stays under T23 until T13 is done.",
   "refs": [
     "ADR-0010",
     "ADR-0009",
@@ -10,7 +10,7 @@
     "file:docs/adr/0010-persistent-memory.md"
   ],
   "subject": "adr.0010",
-  "position": "proposed",
+  "position": "accepted",
   "tags": [
     "adr"
   ],
@@ -20,26 +20,30 @@
     "evidence": [],
     "source": "adr",
     "ref": "file:docs/adr/0010-persistent-memory.md",
-    "sourceSha256": "b47aaec9e566697a50fb257984e9f0820948f205e406651fdaec28a94dd2884a",
-    "trust": "unreviewed",
+    "sourceSha256": "5beadf1166b1353b4f513e526706d6a942d493ca6912ea9d470468fc98844678",
+    "trust": "authoritative",
     "recordedBy": {
       "type": "importer",
       "name": "import-adr"
     }
   },
-  "approval": null,
+  "approval": {
+    "by": "programme-owner",
+    "at": "2026-10-28T12:09:04.240Z",
+    "ref": "ADR-0010"
+  },
   "validity": {
     "supersedes": [],
     "supersededBy": null,
-    "validUntil": "2026-12-27T11:57:32.951Z",
+    "validUntil": null,
     "reviewBy": null,
-    "status": "proposed",
+    "status": "approved",
     "validFrom": "2026-10-28T11:57:32.951Z"
   },
   "schema": "greenfuel.memory/v1",
   "category": "semantic",
   "createdAt": "2026-10-28T11:57:32.951Z",
-  "updatedAt": "2026-10-28T11:59:41.028Z",
+  "updatedAt": "2026-10-28T12:09:04.240Z",
   "classification": "internal",
   "review": null,
   "id": "DEC-0010"

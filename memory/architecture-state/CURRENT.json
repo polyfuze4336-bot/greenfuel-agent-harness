@@ -201,10 +201,20 @@
       "critical": false,
       "approvalRef": "ADR-0009",
       "coreHash": "1aa61f66d0cb443e4757ca5c6a67d6b93cdd29f55a822b7b22bcb79570819289"
+    },
+    {
+      "id": "DEC-0010",
+      "kind": "decision",
+      "subject": "adr.0010",
+      "position": "accepted",
+      "statement": "Persistent memory for the coding harness",
+      "critical": false,
+      "approvalRef": "ADR-0010",
+      "coreHash": "59f2b55fb4803399abb996c7b75ed35f86472ee6867949ff5b97d8abf6c82c93"
     }
   ],
   "counts": {
-    "approved": 20,
+    "approved": 21,
     "superseded": 0,
     "invalidated": 0
   }

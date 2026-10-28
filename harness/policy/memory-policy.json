@@ -33,7 +33,7 @@
     "recencyWeight": 0.05,
     "recencyHalfLifeDays": 180,
     "fieldWeights": { "title": 3, "statement": 2, "subject": 2, "tags": 2, "refs": 4, "body": 1 },
-    "note": "Relevance and authority decide the order. Recency is a small tie-breaker and can never lift an entry above a more authoritative, equally relevant one. These weights are working values chosen by this design."
+    "note": "Relevance and authority decide the order. Recency is a small tie-breaker and can never lift an entry above a more authoritative, equally relevant one. These weights are working values chosen by this design and confirmed by the owner on 2026-10-28 (T22); they are still not measured."
   },
   "writers": {
     "human": { "kinds": "*", "maxTrust": "authoritative", "may": ["create", "supersede", "invalidate", "review", "approve", "sweep", "task"], "note": "A person using the CLI. The type is self-declared by the caller; agents have no shell and cannot write memory files (control-plane path)" },
@@ -44,7 +44,7 @@
     "document": { "kinds": ["proposal"], "maxTrust": "untrusted", "may": ["create"], "quarantine": true }
   },
   "ttlDays": { "assumption": 90, "proposal": 60, "lesson": 365, "incident": 365, "test-failure": 180, "resolution": 365, "task-state": 14, "decision": null, "fact": null, "constraint": null },
-  "ttlNote": "Working values chosen by this design. An approved decision or constraint never expires by itself: it can become stale (reviewBy in the past) and a human can supersede or invalidate it.",
+  "ttlNote": "Working values chosen by this design and confirmed by the owner on 2026-10-28 (T22); not measured. An approved decision or constraint never expires by itself: it can become stale (reviewBy in the past) and a human can supersede or invalidate it.",
   "taskState": { "states": ["active", "interrupted", "completed", "abandoned"], "interruptedAfterMinutes": 60, "maxCheckpoints": 50, "maxContextRefs": 20 },
   "limits": { "titleMax": 120, "statementMax": 280, "bodyMax": 4000, "resolutionMax": 600, "tagsMax": 12, "refsMax": 30, "entriesMax": 2000, "searchQueryMax": 200, "summaryBudgetMin": 400, "summaryBudgetMax": 20000 },
   "refPatterns": [
