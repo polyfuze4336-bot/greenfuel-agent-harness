@@ -309,7 +309,12 @@ const fileSha = (f) => sha256(fs.readFileSync(f));
 function sameSha(f, recorded) {
   const buf = fs.readFileSync(f);
   const s = buf.toString('latin1'); const lf = s.replace(/\r\n/g, '\n');
-  return [buf, Buffer.from(lf, 'latin1'), Buffer.from(lf.replace(/\n/g, '\r\n'), 'latin1')].some((b) => sha256(b) === recorded);
+  // The fourth form is how a captured reply was stored before bodies were normalised: an LF header (ending in a blank line) above a CRLF body.
+  const cut = lf.indexOf('\n\n') + 2;
+  const mixed = cut >= 2 ? lf.slice(0, cut) + lf.slice(cut).replace(/\n/g, '\r\n') : lf;
+  // The fifth form is an LF file whose final newline became CRLF (a reply captured from a file written by a Windows shell).
+  const tailCrlf = lf.endsWith('\n') ? `${lf.slice(0, -1)}\r\n` : lf;
+  return [buf, Buffer.from(lf, 'latin1'), Buffer.from(lf.replace(/\n/g, '\r\n'), 'latin1'), Buffer.from(mixed, 'latin1'), Buffer.from(tailCrlf, 'latin1')].some((b) => sha256(b) === recorded);
 }
 
 function withLock(dir, fn) {
@@ -701,7 +706,9 @@ function submit(ctx0, runId, taskId, o = {}) {
     if (o.resultText !== undefined) {
       let body = String(o.resultText); let truncated = false;
       if (Buffer.byteLength(body) > lim.maxResultBytes) { body = body.slice(0, lim.maxResultBytes); truncated = true; }
+      // Stored with LF endings so the recorded hash is the same on every platform and checkout.
       red = { ...redact(ctx, body), truncated };
+      red.text = red.text.replace(/\r\n/g, '\n');
       const prior = t.artifacts.find((a) => a.kind === 'result' && a.attempt === t.attempts && a.bodySha256 === sha256(red.text));
       if (prior && ['VALIDATING', 'COMPLETED'].includes(t.status)) return { idempotent: true, status: t.status };
     }

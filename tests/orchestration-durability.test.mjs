@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
-import { readFileSync, writeFileSync, mkdirSync, utimesSync, existsSync, readdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, utimesSync, existsSync, readdirSync, cpSync } from 'node:fs';
 import path from 'node:path';
 import { engine, repo, setup, runTask, GOOD_T1, GOOD_T2, tmp, TEMPLATE } from './support/orchestration-fixtures.mjs';
 
@@ -152,4 +152,28 @@ test('concurrent submissions from many processes keep the chain intact', async (
   assert.equal(v.ok, true, v.problems.join('; '));
   const ev = engine.readEvents(engine.runDir(ctx, runId));
   assert.deepEqual(ev.map((e) => e.seq), ev.map((_, i) => i + 1), 'sequence numbers are contiguous');
+});
+
+test('a committed run still verifies after a checkout that rewrote line endings (the Windows to Linux case that failed in CI)', () => {
+  const src = path.join(repo, 'docs/state/runs');
+  const runs = readdirSync(src).filter((d) => /^RUN-[0-9a-f]{10}$/.test(d));
+  assert.ok(runs.length >= 1, 'the committed demonstration run is the fixture');
+  const dest = tmp('gf-eol-');
+  for (const id of runs) {
+    cpSync(path.join(src, id), path.join(dest, id), { recursive: true });
+    const walk = (d) => { for (const e of readdirSync(d, { withFileTypes: true })) { const p = path.join(d, e.name); if (e.isDirectory()) walk(p); else if (/\.(md|json|jsonl)$/.test(e.name)) writeFileSync(p, readFileSync(p, 'utf8').replace(/\r\n/g, '\n')); } };
+    walk(path.join(dest, id));
+    const ctx = engine.makeContext({ runsDir: dest });
+    const v = engine.verifyRun(ctx, id);
+    assert.equal(v.ok, true, `${id}: ${v.problems.join('; ')}`);
+  }
+});
+
+test('captured replies are stored with LF endings whatever the reply used, so their hash is platform independent', () => {
+  const h = setup();
+  engine.start(h.ctx, h.runId, 'T1', { agent: 'maritime-domain', promptSha256: P(1) });
+  engine.submit(h.ctx, h.runId, 'T1', { resultText: GOOD_T1.replace(/\n/g, '\r\n') });
+  const f = path.join(engine.runDir(h.ctx, h.runId), h.st('T1').artifacts[0].path);
+  assert.equal(readFileSync(f, 'utf8').includes('\r'), false);
+  assert.equal(engine.verifyRun(h.ctx, h.runId).ok, true);
 });
