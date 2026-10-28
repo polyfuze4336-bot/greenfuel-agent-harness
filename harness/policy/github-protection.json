@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "status": "SPECIFIED. On 2026-10-28 a read-only API check returned HTTP 403 for branch protection and rulesets on this private repository: 'Upgrade to GitHub Pro or make this repository public to enable this feature.' The protection below therefore cannot be applied on the current plan, and until it is, protected-branch rules depend on the owner's procedure and on agents holding no Git write access.",
+  "repository": "polyfuze4336-bot/greenfuel-agent-harness",
+  "branches": {
+    "main": {
+      "requirePullRequest": true,
+      "requiredApprovingReviews": 1,
+      "dismissStaleReviews": true,
+      "requireCodeOwnerReview": true,
+      "requiredStatusChecks": ["validate"],
+      "requireBranchesUpToDate": true,
+      "enforceAdmins": true,
+      "allowForcePushes": false,
+      "allowDeletions": false,
+      "requireLinearHistory": true,
+      "requireConversationResolution": true,
+      "restrictPushes": true
+    }
+  },
+  "repositorySettings": {
+    "secretScanning": true,
+    "pushProtection": true,
+    "actionsDefaultTokenPermissions": "read",
+    "actionsAllowedActions": "pinned to commit SHA (enforced by validate-harness)",
+    "agentGitIdentity": "A separate machine account with no merge or admin rights, used only for agent-created branches (specified; none exists)"
+  },
+  "codeownersPaths": [".github/", "harness/", "docs/adr/", "docs/approvals/", "docs/architecture/", "package.json", ".mcp.json", ".vscode/"],
+  "ciGates": ["validate (npm run validate and npm test) must pass before merge", "permission negative tests run inside npm test", "workflow actions pinned to commit SHA"],
+  "compensatingControlsNow": [
+    "No agent holds Git write access (tier ceilings; git.write and git.push.branch need a signed approval and none is registered)",
+    "git.protected.modify is never grantable to an agent",
+    "CI runs on every push and records a failure after the fact (detection, not prevention)",
+    "The owner pushes after reviewing, by procedure"
+  ],
+  "ownerOptions": ["Upgrade the account to a plan that supports branch protection on private repositories", "Make the repository public (exposes the harness; not recommended without review)", "Move to an organisation plan that supports rulesets"]
+}

@@ -1,0 +1,196 @@
+{
+  "version": 1,
+  "status": "Proposed (ADR 0008)",
+  "description": "Least-privilege permission model for the coding harness. Policy as code: read by agent-guard.cjs, policy-guard.cjs and tool-output-guard.cjs through permission-engine.cjs, checked by validate-permissions.mjs, and rendered into docs/security/PERMISSION-MODEL.md. A Markdown document alone enforces nothing; docs/security/ENFORCEMENT-STATUS.md says which statements are enforced and which still depend on human procedure.",
+  "tiers": {
+    "P0": { "rank": 0, "name": "Read local project files and approved documentation", "approval": "none" },
+    "P1": { "rank": 1, "name": "Modify local code and execute safe tests", "approval": "none; bounded by the agent's write scope and command allow-list" },
+    "P2": { "rank": 2, "name": "Modify Git branches and create pull requests", "approval": "signed approval, plus repository-policy compliance checked by CI", "workflow": "P2" },
+    "P3": { "rank": 3, "name": "Modify approved non-production Azure resources", "approval": "explicit signed approval naming an approved scope", "workflow": "P3" },
+    "P4": { "rank": 4, "name": "Sensitive infrastructure, data or security operations", "approval": "separate P4 authorization by distinct approvers; never satisfied by a generic approval", "workflow": "P4" }
+  },
+  "environments": {
+    "local-fs": { "description": "Files in the working copy and the local temp area" },
+    "local-exec": { "description": "Commands run on the developer machine" },
+    "git-local": { "description": "The local Git repository" },
+    "github-remote": { "description": "The GitHub repository, pull requests and workflow runs" },
+    "external-docs": { "description": "Approved public documentation hosts and servers" },
+    "azure-nonprod": { "description": "Approved non-production Azure subscription and resource groups (none exist; D-037 open)" },
+    "azure-prod": { "description": "Any production Azure scope. No agent may ever hold a ceiling here (HC-11)" }
+  },
+  "agentCeilings": {
+    "orchestrator": { "local-fs": 0 },
+    "maritime-domain": { "local-fs": 0 },
+    "security-reviewer": { "local-fs": 0 },
+    "architecture-critic": { "local-fs": 0 },
+    "principal-architect": { "local-fs": 1 },
+    "application-engineer": { "local-fs": 1 },
+    "ai-engineer": { "local-fs": 1 },
+    "data-engineer": { "local-fs": 1 },
+    "sre-engineer": { "local-fs": 1 },
+    "azure-platform": { "local-fs": 1, "external-docs": 0 },
+    "qa-engineer": { "local-fs": 1, "local-exec": 1, "git-local": 0, "github-remote": 0 },
+    "design-reviewer": { "local-fs": 1, "local-exec": 1, "git-local": 0 }
+  },
+  "agentCeilingNote": "An environment that is absent means no access at all. No agent has a ceiling for azure-nonprod or azure-prod, so every Azure operation is denied. The validator derives each ceiling from agent-policy.json (tools, commands, MCP grants) and fails if the two disagree.",
+  "unscopedSession": {
+    "description": "A Copilot session that is not a named specialist agent (for example the default agent used by a human). It has no agent identity, so tier ceilings and deny-unknown cannot be applied. The repository-wide guard still enforces the non-negotiable denials below. Use a specialist agent for any task that matters.",
+    "enforced": ["secret.read", "secret.write", "data.cross-shipowner", "data.cross-jurisdiction", "azure.delete", "azure.secret.read", "azure.rbac.write", "azure.policy.write", "azure.nonprod.deploy", "azure.nonprod.write", "regulatory.file", "commercial.settle", "shell.indirection"]
+  },
+  "operations": {
+    "fs.read": { "tier": 0, "env": "local-fs", "description": "Read a file or list a folder" },
+    "fs.search": { "tier": 0, "env": "local-fs", "description": "Search file contents or names" },
+    "meta": { "tier": 0, "env": "local-fs", "description": "Session housekeeping (intent, todo, skill, ask the user)" },
+    "agent.delegate": { "tier": 0, "env": "local-fs", "description": "Hand a task to another agent. Never transfers approvals or ceilings" },
+    "git.read": { "tier": 0, "env": "git-local", "description": "git status, diff, log, show" },
+    "gh.read": { "tier": 0, "env": "github-remote", "description": "gh pr and run list, view, checks" },
+    "docs.read": { "tier": 0, "env": "external-docs", "description": "Approved documentation host or documentation MCP server" },
+    "azure.nonprod.read": { "tier": 0, "env": "azure-nonprod", "description": "Read non-production Azure state. Needs a ceiling and a signed-in identity; neither exists" },
+    "fs.write": { "tier": 1, "env": "local-fs", "description": "Write a file inside the agent's own write scope" },
+    "exec.test": { "tier": 1, "env": "local-exec", "description": "Run the repository's own tests and validators" },
+    "git.write": { "tier": 2, "env": "git-local", "description": "Stage, commit, branch, tag, merge, rebase or reset locally" },
+    "git.push.branch": { "tier": 2, "env": "github-remote", "description": "Push a non-protected branch" },
+    "pr.write": { "tier": 2, "env": "github-remote", "description": "Create, edit, comment on or review a pull request" },
+    "azure.nonprod.write": { "tier": 3, "env": "azure-nonprod", "description": "Create or update a non-production Azure resource" },
+    "azure.nonprod.deploy": { "tier": 3, "env": "azure-nonprod", "description": "Deploy reviewed infrastructure to non-production (azd, deployment create, terraform apply)" },
+    "azure.delete": { "tier": 4, "env": "azure-nonprod", "description": "Delete, purge or destroy any Azure or cluster resource" },
+    "azure.rbac.write": { "tier": 4, "env": "azure-nonprod", "description": "Create or change role assignments, identities or directory objects" },
+    "azure.policy.write": { "tier": 4, "env": "azure-nonprod", "description": "Change policy, network security or firewall configuration" },
+    "azure.prod.any": { "tier": 4, "env": "azure-prod", "description": "Anything against a production scope" },
+    "secret.read": { "tier": 4, "env": "local-fs", "description": "Read a secret, key, token or credential file" },
+    "secret.write": { "tier": 4, "env": "local-fs", "description": "Create or change a secret or credential file" },
+    "azure.secret.read": { "tier": 4, "env": "azure-nonprod", "description": "Read or list Azure secrets, keys, tokens or connection strings" },
+    "data.cross-shipowner": { "tier": 4, "env": "local-fs", "description": "Read or disclose one shipowner's data while acting for another" },
+    "data.cross-jurisdiction": { "tier": 4, "env": "local-fs", "description": "Move, copy or send jurisdiction-bound data across a jurisdiction boundary or off the machine" },
+    "regulatory.file": { "tier": 4, "env": "github-remote", "description": "Submit a certification or regulatory filing" },
+    "commercial.settle": { "tier": 4, "env": "github-remote", "description": "Settle, pay or finalise a commercial dispute, claim or invoice" },
+    "git.protected.modify": { "tier": 4, "env": "github-remote", "description": "Push or merge to a protected branch, force-push, delete a branch or rewrite history" },
+    "control-plane.write": { "tier": 4, "env": "local-fs", "description": "Change hooks, policy, approvals, approver keys, audit logs, workflows or scripts" },
+    "fs.write.executable": { "tier": 4, "env": "local-fs", "description": "Write an executable or script file outside a phase-enabled code scope. Closes the write-then-run route" },
+    "shell.indirection": { "tier": 4, "env": "local-exec", "description": "A shell command built or hidden at run time (variables joined into a command name, Invoke-Expression, encoded commands, nested shells, inline interpreters, npx). Its real target cannot be classified, so it is refused" }
+  },
+  "neverGrantable": ["secret.read", "secret.write", "azure.secret.read", "data.cross-shipowner", "data.cross-jurisdiction", "regulatory.file", "commercial.settle", "git.protected.modify", "control-plane.write", "azure.prod.any", "shell.indirection"],
+  "neverGrantableNote": "No approval of any tier can authorise these for an agent. A human performs them directly, outside the agent, under the break-glass or release procedure. A P4 approval can authorise only the P4 operations that are not listed here: azure.delete, azure.rbac.write, azure.policy.write, fs.write.executable.",
+  "classifiers": [
+    { "op": "shell.indirection", "kind": "shell", "pattern": "\\b(invoke-expression|iex)\\b|(^|[\\s;(|])&\\s*[$(@\"']|-(enc|encodedcommand|ec)\\s+\\S{8,}|\\bfrombase64string\\b|\\bcmd(\\.exe)?\\s+/[ck]\\b|\\b(powershell|pwsh)(\\.exe)?\\s[^|;\\n]*-(c|command|enc|encodedcommand|e|ec)\\b|\\[char\\]\\s*\\d|\\[string\\]::join|\\bnode(\\.exe)?\\s+(-e|--eval|-p|--print)\\b|\\bpython3?(\\.exe)?\\s+-c\\b|\\b(npx|pnpx)\\b|\\bnpm\\s+exec\\b|\\b(ba)?sh\\s+-c\\b" },
+    { "op": "azure.secret.read", "kind": "shell", "pattern": "\\b(curl|wget|iwr|irm|invoke-webrequest|invoke-restmethod)(\\.exe)?\\b[^\\n]*(\\.vault\\.azure\\.net|login\\.microsoftonline\\.com|169\\.254\\.169\\.254|/oauth2/(v2\\.0/)?token|/list(keys|connectionstrings|secrets)\\b)|\\b(get-azaccesstoken|get-azkeyvault(secret|key|certificate)|get-azstorageaccountkey|get-azmanagedhsm\\w*key|connect-azaccount|save-azcontext)\\b" },
+    { "op": "azure.delete", "kind": "shell", "pattern": "^(?=.*\\b(curl|wget|iwr|irm|invoke-webrequest|invoke-restmethod)(\\.exe)?\\b)(?=.*(management\\.azure\\.com|management\\.core\\.windows\\.net))(?=.*(-X\\s*DELETE|--request\\s+DELETE|-Method\\s+DELETE)).*$|\\b(remove|stop|clear|revoke|unregister|disable)-az\\w+" },
+    { "op": "azure.nonprod.deploy", "kind": "shell", "pattern": "\\b(new-azresourcegroupdeployment|new-azsubscriptiondeployment|new-azdeployment|start-azdeployment|new-azmanagementgroupdeployment)\\b" },
+    { "op": "azure.nonprod.write", "kind": "shell", "pattern": "\\b(curl|wget|iwr|irm|invoke-webrequest|invoke-restmethod)(\\.exe)?\\b[^\\n]*(management\\.azure\\.com|management\\.core\\.windows\\.net|graph\\.microsoft\\.com)|\\b(new|set|update|add|start|restart|grant|register|publish|invoke|import|enable|move|restore)-az\\w+" },
+    { "op": "azure.nonprod.read", "kind": "shell", "pattern": "\\bget-az\\w+" },
+    { "op": "azure.secret.read", "kind": "shell", "pattern": "get-access-token|\\bkeys\\s+list\\b|\\blist-keys\\b|\\blistkeys\\b|\\bkeyvault\\s+(secret|key|certificate)\\s+(show|download|list|backup)\\b|\\blist-credentials\\b|\\bconnection-string\\s+(show|list)\\b|\\bappsettings\\s+list\\b|\\bcredential\\s+reset\\b|\\bcreate-for-rbac\\b|\\bpublishing-profile\\b|\\bregenerate-key\\b|\\b(list|show)-?(sas|connection-?strings?)\\b|\\bstorage\\s+account\\s+keys\\b" },
+    { "op": "azure.delete", "kind": "shell", "pattern": "\\baz\\b[^|;&\\n]*\\b(delete|purge|remove)\\b|\\bazd\\s+down\\b|\\b(terraform|tofu)\\s+destroy\\b|\\bpulumi\\s+destroy\\b|\\bkubectl\\s+delete\\b" },
+    { "op": "azure.rbac.write", "kind": "shell", "pattern": "\\baz\\s+role\\s+assignment\\s+(create|delete)\\b|\\baz\\s+ad\\s+\\S+\\s+(create|update|delete|add)\\b|\\baz\\s+identity\\s+\\S+\\s*(create|delete)\\b|\\baz\\s+keyvault\\s+set-policy\\b" },
+    { "op": "azure.policy.write", "kind": "shell", "pattern": "\\baz\\s+policy\\s+(assignment|definition|set-definition|exemption)\\s+(create|update|delete)\\b|\\baz\\s+network\\s+(nsg|firewall|vnet|private-endpoint|route-table)\\b[^|;&\\n]*\\b(create|update|delete|rule)\\b" },
+    { "op": "azure.nonprod.deploy", "kind": "shell", "pattern": "\\bazd\\s+(up|deploy|provision|pipeline|env\\s+set-secret)\\b|\\baz\\s+deployment\\s+(group|sub|mg|tenant)\\s+create\\b|\\baz\\s+bicep\\s+deploy\\b|\\b(terraform|tofu)\\s+apply\\b|\\bpulumi\\s+up\\b|\\bhelm\\s+(install|upgrade)\\b|\\bkubectl\\s+(apply|create|replace|patch|scale|rollout)\\b" },
+    { "op": "azure.nonprod.write", "kind": "shell", "pattern": "\\baz\\s+(?!account\\b|login\\b|logout\\b|configure\\b|cloud\\b|extension\\b|version\\b)[^|;&\\n]*\\b(create|update|set|add|start|stop|restart|scale|assign|upload|import|restore|swap|deploy)\\b" },
+    { "op": "azure.nonprod.read", "kind": "shell", "pattern": "^\\s*az\\s+(?!bicep\\b)" },
+    { "op": "git.protected.modify", "kind": "shell", "pattern": "\\bgit\\s+push\\b[^\\n;|&]*(--force\\b|--force-with-lease\\b|\\s-f\\b|--delete\\b|--mirror\\b|:\\s*refs/heads/|\\b(main|master|release/\\S*|HEAD:(main|master))\\b)|\\bgh\\s+pr\\s+merge\\b|\\bgit\\s+branch\\s+-[dD]\\s+\\S*(main|master)\\b|\\bgh\\s+api\\b[^\\n]*(-X|--method)\\s+(PUT|DELETE|PATCH)[^\\n]*(branches|protection|rulesets)|\\bgit\\s+(reset\\s+--hard|rebase|filter-branch|update-ref\\s+-d)\\b" },
+    { "op": "git.push.branch", "kind": "shell", "pattern": "\\bgit\\s+push\\b" },
+    { "op": "git.write", "kind": "shell", "pattern": "\\bgit\\s+(add|commit|branch|checkout|switch|tag|merge|stash|cherry-pick|restore|clean|rm|mv|config|apply|am|init|clone|fetch|pull|remote)\\b" },
+    { "op": "pr.write", "kind": "shell", "pattern": "\\bgh\\s+pr\\s+(create|edit|comment|review|ready|close|reopen)\\b|\\bgh\\s+(issue|release|repo|workflow)\\s+\\S+" },
+    { "op": "gh.read", "kind": "shell", "pattern": "^\\s*gh\\s+(pr|run)\\s+(list|view|checks)\\b" },
+    { "op": "git.read", "kind": "shell", "pattern": "^\\s*git\\s+(status|diff|log|show)\\b" },
+    { "op": "exec.test", "kind": "shell", "pattern": "^\\s*(node\\s+--test\\b|npm\\s+(test|run\\s+(validate|stats)\\b)|node\\s+harness/scripts/[\\w.-]+\\.mjs\\b)" },
+    { "op": "regulatory.file", "kind": "any", "pattern": "(submit|lodge|file|send)[-_ .]?(a[-_ ]?)?(filing|certification|certificate|declaration|bdn|regulatory)|regulatory[-_ .]?(filing|submission)|certification[-_ .]?filing" },
+    { "op": "commercial.settle", "kind": "any", "pattern": "settle[-_ .]?(invoice|claim|dispute|payment|account)|(pay|issue|approve)[-_ .]?(invoice|refund|credit[-_ ]?note|payment)|commercial[-_ .]?settlement" }
+  ],
+  "pathClasses": [
+    { "id": "secret", "pattern": "(^|/)\\.env($|\\.(?!example$|sample$|template$))|\\.(pfx|pem|key|p12|jks|keystore)$|(^|/)id_(rsa|ed25519|ecdsa)$|(^|/)local\\.settings\\.json$|(^|/)\\.azure/.*\\.env$|(^|/)\\.git-credentials$|(^|/)\\.npmrc$|(^|/)\\.netrc$|(^|/)simulated-secrets/" },
+    { "id": "control-plane", "pattern": "^(harness/|\\.github/|\\.vscode/|\\.mcp\\.json$|docs/approvals/|package\\.json$|\\.gitignore$)" },
+    { "id": "audit", "pattern": "(^|/)\\.harness-logs/" },
+    { "id": "shipowner", "pattern": "(^|/)tests/fixtures/shipowners/(?<owner>[^/]+)(/|$)" },
+    { "id": "jurisdiction", "pattern": "(^|/)tests/fixtures/jurisdictions/(?<jx>[^/]+)(/|$)" },
+    { "id": "isolated-root", "pattern": "(^|/)tests/fixtures/(shipowners|jurisdictions)/?$" }
+  ],
+  "executableExtensions": ["mjs", "cjs", "js", "ts", "tsx", "jsx", "ps1", "psm1", "psd1", "sh", "bash", "zsh", "bat", "cmd", "py", "rb", "pl", "exe", "dll", "jar", "vbs", "wsf", "msi", "com", "scr"],
+  "egressVerbs": "\\b(curl|wget|iwr|irm|invoke-webrequest|invoke-restmethod|scp|sftp|rsync|azcopy|nc|ncat|netcat|telnet|send-mailmessage|ftp)\\b|\\baz\\s+storage\\b|\\bgh\\s+api\\b|\\bgit\\s+push\\b|\\bnet\\.webclient\\b|\\bsystem\\.net\\b|\\b(http|tcp)client\\b",
+  "scopeEnvironment": { "shipowner": "HARNESS_SCOPE_SHIPOWNER", "jurisdiction": "HARNESS_SCOPE_JURISDICTION" },
+  "scopeNote": "The human sets these two variables in the shell before starting a session. An agent cannot change the environment of the process that runs the hooks. With a variable unset, every path of that class is denied.",
+  "defaults": [
+    { "id": "DEF-01", "statement": "Read-only unless additional access is justified", "enforcement": ["tool lists and write scopes (agent-policy.json)", "tier ceilings (agentCeilings)"] },
+    { "id": "DEF-02", "statement": "Deny unknown tools and unknown operations", "enforcement": ["agent-guard: unclassified tools denied", "engine: an unclassified command is an unknown operation and is denied for named agents"] },
+    { "id": "DEF-03", "statement": "Deny cross-jurisdiction data movement", "enforcement": ["engine: jurisdiction path class, session scope, two-jurisdiction rule, egress rule", "output filter"] },
+    { "id": "DEF-04", "statement": "Deny cross-shipowner information disclosure", "enforcement": ["engine: shipowner path class, session scope, two-owner rule", "output filter removes other owners' lines from search results"] },
+    { "id": "DEF-05", "statement": "Deny secret extraction and credential exposure", "enforcement": ["engine and policy-guard: secret path class, azure.secret.read", "output hook redaction"] },
+    { "id": "DEF-06", "statement": "Deny destructive cloud operations by default", "enforcement": ["engine and policy-guard: azure.delete is P4 and never reachable by a generic approval", "no agent has an Azure ceiling"] },
+    { "id": "DEF-07", "statement": "Deny modification of protected branches without the approved workflow", "enforcement": ["engine: git.protected.modify is never grantable to an agent", "no agent has git write"] },
+    { "id": "DEF-08", "statement": "Deny deployment of unreviewed infrastructure changes", "enforcement": ["engine: azure.nonprod.deploy needs a signed approval bound to the reviewed commit", "phase gate"] },
+    { "id": "DEF-09", "statement": "Deny autonomous regulatory filings and commercial settlements", "enforcement": ["engine: regulatory.file and commercial.settle are never grantable to an agent"] }
+  ],
+  "approvals": {
+    "schema": "greenfuel.approval/v1",
+    "algorithm": "Ed25519",
+    "registry": "harness/policy/approvers.json",
+    "recordsDir": "docs/approvals",
+    "usedLedger": ".harness-logs/approvals-used.jsonl",
+    "limits": {
+      "P2": { "minApprovers": 1, "maxLifetimeMinutes": 1440, "maxUses": 5 },
+      "P3": { "minApprovers": 1, "maxLifetimeMinutes": 480, "maxUses": 3 },
+      "P4": { "minApprovers": 2, "maxLifetimeMinutes": 60, "maxUses": 1 }
+    },
+    "limitsNote": "Lifetimes, use counts and approver counts are proposed values set by this design for the owner to confirm. They are not derived from any external requirement.",
+    "rules": [
+      "An approval names exact agents, exact operations and an environment. A wildcard is never accepted",
+      "An approval for a lower tier is never accepted for a higher-tier operation, even if it lists that operation",
+      "P4 approvals must name each operation explicitly and need signatures from distinct registered approvers who hold the P4 capability",
+      "An approval for one agent is not valid for another: delegation transfers nothing",
+      "P3 deployment approvals are bound to the reviewed Git commit; the request must run at that commit",
+      "An approval is rejected if it is unsigned, signed by an unregistered or revoked key, altered, expired, not yet valid, out of scope or used up",
+      "Agents cannot write the approvals folder or the approver registry (control-plane write is never grantable)"
+    ]
+  },
+  "workflows": {
+    "P2": {
+      "name": "Git branch and pull request changes",
+      "steps": [
+        "A human or CI-required reviewer states the branch pattern and operations in an approval request",
+        "A registered approver signs it (approval.mjs sign) after reading the request",
+        "The agent works only on branches matching the approval, never on a protected branch",
+        "A pull request is opened; CI must pass npm run validate and npm test (repository-policy compliance)",
+        "A human reviews and merges through GitHub. Agents never merge"
+      ],
+      "enforcedBy": ["signed approval verified by the hook", "CI gate on the pull request", "branch protection (specified; unavailable on this plan, see ENFORCEMENT-STATUS)"],
+      "humanSteps": ["review and merge"]
+    },
+    "P3": {
+      "name": "Non-production Azure change",
+      "steps": [
+        "The change exists as reviewed infrastructure code at a specific commit with a recorded what-if result",
+        "The approval request names the agent, operations, subscription and resource group, and the commit",
+        "A registered approver signs it; lifetime and use count are limited",
+        "The agent uses a scoped Azure identity whose Azure RBAC role and scope match the approval (specified, not created)",
+        "The result is recorded as evidence by the recorder; the denied and allowed actions are in the audit log"
+      ],
+      "enforcedBy": ["signed approval bound to HEAD", "phase gate (phase 0 allows nothing)", "Azure RBAC (specified, not created)"],
+      "humanSteps": ["review of the what-if", "identity creation", "subscription decision D-037"]
+    },
+    "P4": {
+      "name": "Sensitive infrastructure, data or security operation",
+      "steps": [
+        "A separate P4 request names each operation, the reason and the rollback plan",
+        "Two distinct registered approvers with the P4 capability sign it; a generic approval cannot substitute",
+        "Lifetime is short and single use",
+        "A post-action review is recorded within one working day (human procedure)"
+      ],
+      "enforcedBy": ["signature and tier checks in the engine"],
+      "humanSteps": ["the second approver", "post-action review"]
+    }
+  },
+  "breakGlass": {
+    "purpose": "Restore service or contain an incident when the normal workflow cannot be followed in time. Used by a human, not by an agent.",
+    "scope": "Only operations that are not neverGrantable. A human acting directly may do more, under their own credentials, outside the agent.",
+    "requires": ["a recorded reason and incident or change reference", "two distinct registered P4 approvers for any agent-run operation", "a lifetime no longer than the P4 limit", "audit marker breakGlass true on the approval"],
+    "afterwards": ["post-incident review within one working day", "revoke any credential issued", "add the denied and allowed actions from the audit log to the review", "decide whether the normal workflow needs to change"],
+    "enforcedBy": ["engine treats a break-glass approval as a P4 approval with extra checks"],
+    "humanSteps": ["declaring the emergency", "the review", "credential revocation"]
+  },
+  "audit": {
+    "schema": "greenfuel.denied-action/v1",
+    "file": ".harness-logs/denied-actions.jsonl",
+    "directoryOverride": "HARNESS_LOG_DIR",
+    "chained": true,
+    "fields": ["seq", "ts", "session", "agent", "mode", "tool", "operations", "tier", "environment", "decision", "rules", "reason", "paths", "scope", "argsSha256", "argsPreview", "approvals", "prevHash", "hash"],
+    "neverRecorded": ["file contents", "tool output", "full arguments", "secret-shaped strings (redacted in the preview)"]
+  }
+}

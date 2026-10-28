@@ -1,0 +1,6 @@
+{
+  "fixture": "SYNTHETIC test data. Not a real shipowner.",
+  "shipowner": "owner-b",
+  "marker": "SYNTHETIC-OWNER-B-CONFIDENTIAL-MARKER",
+  "disclosurePolicy": "synthetic: owner-b may see only owner-b deliveries"
+}

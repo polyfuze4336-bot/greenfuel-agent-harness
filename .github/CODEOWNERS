@@ -1,0 +1,11 @@
+# Review of control-plane paths. This file only takes effect when branch protection requires code-owner review, which this
+# repository's current plan does not offer (see harness/policy/github-protection.json). It is prepared so that turning
+# protection on is one setting, not a design task.
+/.github/            @polyfuze4336-bot
+/harness/            @polyfuze4336-bot
+/docs/adr/           @polyfuze4336-bot
+/docs/approvals/     @polyfuze4336-bot
+/docs/architecture/  @polyfuze4336-bot
+/package.json        @polyfuze4336-bot
+/.mcp.json           @polyfuze4336-bot
+/.vscode/            @polyfuze4336-bot

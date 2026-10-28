@@ -8,6 +8,7 @@ import { validateContext, contextStats } from './validate-context.mjs';
 import { validateArchitecture } from './validate-architecture.mjs';
 import { validateAgents } from './validate-agents.mjs';
 import { validateTools } from './validate-tools.mjs';
+import { validatePermissions } from './validate-permissions.mjs';
 
 export const PILLARS = [
   'Context & Instructions',
@@ -30,6 +31,10 @@ const REQUIRED = [
   'harness/tools/tool-registry.json', 'harness/tools/mcp-candidates.json', 'harness/policy/secret-patterns.json', 'harness/hooks/tool-output-guard.cjs',
   'harness/mcp/greenfuel-tools-server.mjs', 'harness/scripts/spec-validators.mjs', '.vscode/mcp.json', '.mcp.json',
   'docs/harness/TOOL-REGISTRY.md', 'docs/harness/MCP-SECURITY.md', 'docs/harness/TOOL-COMPATIBILITY.md', 'docs/specs/README.md',
+  'harness/policy/permissions.json', 'harness/policy/approvers.json', 'harness/policy/azure-identities.json', 'harness/policy/github-protection.json',
+  'harness/hooks/permission-engine.cjs', 'harness/scripts/approval.mjs', 'harness/scripts/audit-denials.mjs', 'harness/scripts/verify-github-protection.mjs',
+  '.github/CODEOWNERS', 'docs/approvals/README.md', 'tests/permission-negative.test.mjs',
+  ...['PERMISSION-MODEL', 'APPROVAL-WORKFLOWS', 'BREAK-GLASS', 'SECRETS-HANDLING', 'ENFORCEMENT-STATUS', 'DENIED-ACTION-AUDIT', 'NEGATIVE-TESTS'].map((n) => `docs/security/${n}.md`),
 ];
 const SKIP_DIRS = new Set(['.git', 'node_modules', '.harness-logs']);
 const FALLBACK_SECRET_PATTERNS = ['-----BEGIN [A-Z ]*PRIVATE KEY-----', 'AccountKey=[A-Za-z0-9+/=]{20,}', '\\bghp_[A-Za-z0-9]{30,}', '\\bgithub_pat_[A-Za-z0-9_]{30,}'];
@@ -151,7 +156,7 @@ export function validate(root) {
     for (const p of PILLARS) if (!text.includes(p)) fail('pillars', `${doc}: pillar '${p}' not represented`);
   }
 
-  return [...errors, ...validateContext(root), ...validateArchitecture(root), ...validateAgents(root), ...validateTools(root)];
+  return [...errors, ...validateContext(root), ...validateArchitecture(root), ...validateAgents(root), ...validateTools(root), ...validatePermissions(root)];
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

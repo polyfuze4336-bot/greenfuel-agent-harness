@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "status": "SPECIFIED, NOT CREATED. No Azure resource, identity, role definition or role assignment exists, and none was created or queried. Placeholders in angle brackets must be filled by the owner after decision D-037 (subscription and tenant) and the sign-in approval (TODO T11, T13). Role names and action strings must be verified against current Azure documentation before use; this file asserts nothing about what a role currently permits.",
+  "principles": [
+    "One identity per permission tier. A tier-0 reader can never write, and a deployer can never grant roles",
+    "No standing identity for P4. Sensitive operations are done by a named human with their own identity, under the P4 workflow",
+    "Scopes are resource groups in non-production only. Never a subscription, management group, tenant root or any production scope",
+    "No stored secret. Use short-lived tokens through workload identity federation or a managed identity",
+    "Destructive actions are removed from the custom role and also blocked by a resource lock, so one mistake in either layer is not enough",
+    "Role assignment writes, policy writes and secret reads are excluded from every agent identity"
+  ],
+  "identities": [
+    {
+      "id": "id-harness-p0-reader",
+      "tier": "P0",
+      "standing": true,
+      "purpose": "Read-only diagnostics of non-production resources (Azure Resource Graph, Monitor, Application Insights)",
+      "credential": "workload identity federation or managed identity; no stored secret",
+      "assignableScopes": ["/subscriptions/<SUBSCRIPTION_ID_NONPROD>/resourceGroups/<RESOURCE_GROUP_NONPROD>"],
+      "builtInRoles": ["Reader", "Monitoring Reader"],
+      "enabledBy": "owner approval of Azure sign-in (T11) and a per-agent ceiling change in permissions.json"
+    },
+    {
+      "id": "id-harness-p3-deployer",
+      "tier": "P3",
+      "standing": false,
+      "purpose": "Deploy reviewed infrastructure to non-production only while a signed P3 approval is valid",
+      "credential": "assigned for the approval's lifetime and removed afterwards; no stored secret",
+      "assignableScopes": ["/subscriptions/<SUBSCRIPTION_ID_NONPROD>/resourceGroups/<RESOURCE_GROUP_NONPROD>"],
+      "customRole": {
+        "Name": "Harness Nonprod Deployer",
+        "Description": "Deploy and update reviewed resources in one non-production resource group. Cannot delete, cannot change authorisation, cannot read secrets.",
+        "Actions": ["Microsoft.Resources/deployments/*", "Microsoft.Resources/subscriptions/resourceGroups/read", "<RESOURCE_PROVIDER_WRITE_ACTIONS_TBD_PER_APPROVED_SERVICE_LIST>"],
+        "NotActions": ["*/delete", "Microsoft.Authorization/*/write", "Microsoft.Authorization/*/delete", "Microsoft.Authorization/elevateAccess/Action", "Microsoft.KeyVault/vaults/secrets/*", "Microsoft.Resources/subscriptions/resourceGroups/delete"],
+        "DataActions": [],
+        "NotDataActions": ["Microsoft.KeyVault/vaults/secrets/getSecret/action", "Microsoft.KeyVault/vaults/secrets/readMetadata/action", "Microsoft.Storage/storageAccounts/blobServices/containers/blobs/read"],
+        "AssignableScopes": ["/subscriptions/<SUBSCRIPTION_ID_NONPROD>/resourceGroups/<RESOURCE_GROUP_NONPROD>"]
+      },
+      "enabledBy": "owner approval, a reviewed what-if for a specific commit, and a signed P3 approval (approval.mjs)"
+    },
+    {
+      "id": "p4-human-only",
+      "tier": "P4",
+      "standing": false,
+      "purpose": "Deletion, role changes, policy changes, secret access and anything in production",
+      "credential": "none for agents. A named human uses their own identity and the break-glass or P4 procedure",
+      "assignableScopes": [],
+      "enabledBy": "not an agent capability"
+    }
+  ],
+  "forbidden": {
+    "roles": ["Owner", "User Access Administrator", "Role Based Access Control Administrator", "Contributor", "Key Vault Administrator", "Key Vault Secrets User", "Key Vault Secrets Officer", "Storage Blob Data Owner", "Security Admin"],
+    "forbiddenNote": "Contributor is forbidden as a built-in role because it can delete. The P3 identity uses the custom role above instead.",
+    "scopes": ["/", "management group", "subscription scope", "any production scope", "tenant root"]
+  },
+  "guardrails": [
+    { "id": "AZG-01", "mechanism": "Azure Policy, deny effect: allowed locations", "purpose": "Keep resources of jurisdiction-bound data in the approved location (necessary, not sufficient: a region is not a residency control)", "status": "specified" },
+    { "id": "AZG-02", "mechanism": "Resource lock CanNotDelete on the non-production resource group", "purpose": "Second layer against deletion, independent of the role", "status": "specified" },
+    { "id": "AZG-03", "mechanism": "Azure Policy, deny effect: public network access disabled for data services", "purpose": "Reduce exposure of non-production data", "status": "specified" },
+    { "id": "AZG-04", "mechanism": "Diagnostic settings to an in-jurisdiction workspace", "purpose": "Record what the identities did; keeps telemetry in the jurisdiction (F-04)", "status": "specified" },
+    { "id": "AZG-05", "mechanism": "Time-bound role assignment (for example Privileged Identity Management or a scheduled removal)", "purpose": "Make the P3 identity exist only while an approval is valid", "status": "specified" }
+  ]
+}

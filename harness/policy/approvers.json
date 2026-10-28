@@ -1,0 +1,5 @@
+{
+  "version": 1,
+  "description": "Registry of PUBLIC keys that may sign approvals. Never put a private key, passphrase or token here. Adding or removing an entry is a control-plane change that a human makes and that must be reviewed. It is empty on purpose: until the owner registers an approver (TODO T3, T13), every operation at P2 or above is denied for agents.",
+  "approvers": []
+}

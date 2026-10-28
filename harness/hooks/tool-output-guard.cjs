@@ -12,6 +12,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { norm, matchMcp } = require('./mcp-names.cjs');
+const engine = require('./permission-engine.cjs');
 
 const ROOT = path.join(__dirname, '..', '..');
 const LOG_DIR = path.join(ROOT, '.harness-logs');
@@ -76,7 +77,7 @@ function cap(text, max) {
   return { text: cut + marker, truncated: true };
 }
 
-function process_(event, registry, patterns) {
+function process_(event, registry, patterns, opts = {}) {
   const tool = event.toolName ?? event.tool_name ?? '';
   const res = event.toolResult ?? event.tool_result ?? {};
   const original = typeof res.textResultForLlm === 'string' ? res.textResultForLlm : null;
@@ -94,6 +95,14 @@ function process_(event, registry, patterns) {
   }
   const r = redact(text, patterns);
   text = r.text;
+  // Search and listing results can contain lines from another shipowner's or jurisdiction's data, or from secret files.
+  let isolationRemoved = 0;
+  if (!opts.skipIsolation) {
+    const model = opts.model ?? engine.loadModel();
+    const scope = opts.scope ?? { shipowner: process.env[model.perm.scopeEnvironment.shipowner] ?? null, jurisdiction: process.env[model.perm.scopeEnvironment.jurisdiction] ?? null };
+    const f = engine.filterIsolated(text, scope, model);
+    if (f.removed) { isolationRemoved = f.removed; text = `[NOTICE: ${f.removed} line(s) removed because they belong to another shipowner or jurisdiction, or to a secret file, outside this session's scope]\n${f.text}`; }
+  }
   if (cls.maxBytes) ({ text, truncated } = cap(text, cls.maxBytes));
   if (cls.untrusted) {
     flags = INJECTION.filter((re) => re.test(text)).length;
@@ -104,7 +113,7 @@ function process_(event, registry, patterns) {
   const changed = text !== original;
   return {
     modified: changed ? { ...res, textResultForLlm: text } : null,
-    meta: { tool, resultType: res.resultType, bytesIn: Buffer.byteLength(original), bytesOut: Buffer.byteLength(text), redactions: r.count, strippedChars: stripped, injectionFlags: flags, truncated, untrusted: cls.untrusted, mcp: cls.mcp },
+    meta: { tool, resultType: res.resultType, bytesIn: Buffer.byteLength(original), bytesOut: Buffer.byteLength(text), redactions: r.count, isolationRemoved, strippedChars: stripped, injectionFlags: flags, truncated, untrusted: cls.untrusted, mcp: cls.mcp },
   };
 }
 

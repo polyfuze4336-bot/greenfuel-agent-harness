@@ -10,6 +10,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { matchMcp } = require('./mcp-names.cjs');
+const engine = require('./permission-engine.cjs');
 
 const ROOT = path.join(__dirname, '..', '..');
 const PATH_KEYS = new Set(['path', 'filepath', 'file_path', 'file', 'filename', 'uri']);
@@ -86,7 +87,41 @@ function webCheck(agentName, agent, pairs, policy) {
   return null;
 }
 
-function evaluate(event, agentName, policy, phase, registry = null) {
+// The guard has two layers. evaluateCore is the agent's own contract (tools, scopes, allow-lists). The permission engine then
+// applies the least-privilege model (tier ceilings, data scope, approvals, deny-unknown) and records every denial.
+// opts: { model, approvals, now, scope, logDir, audit, consume } (tests inject these; the hook process sets audit and consume).
+function evaluate(event, agentName, policy, phase, registry = null, opts = {}) {
+  let model = opts.model ?? null;
+  const finish = (verdict, decision) => {
+    if (verdict && opts.audit) {
+      try {
+        model ??= engine.loadModel();
+        engine.writeAudit(model, event, { ...(decision ?? { mode: 'agent', operations: [], rules: [], targets: [] }), rules: [...new Set([...(decision?.rules ?? []), ...(verdict.rules ?? ['AGENT-GUARD'])])], reasons: [verdict.reason, ...(decision?.reasons ?? [])] }, { agent: agentName, logDir: opts.logDir });
+      } catch { /* an audit failure must never turn a deny into an allow */ }
+    }
+    return verdict;
+  };
+  const core = evaluateCore(event, agentName, policy, phase, registry);
+  let decision = null;
+  try {
+    model ??= engine.loadModel();
+    const agent = policy.agents[agentName];
+    const codeGlobs = phase >= 1 && agent ? agent.writesPhase1.map(globToRe) : [];
+    decision = engine.decide({
+      agent: agentName, tool: event.toolName ?? event.tool_name, args: event.toolArgs ?? event.tool_input ?? {}, cwd: event.cwd, phase, model, registry: registry ?? loadRegistry(),
+      scope: opts.scope, approvals: opts.approvals, now: opts.now, logDir: opts.logDir, consume: Boolean(opts.consume) && !core, headCommit: opts.headCommit,
+      codeScopeOk: (rel) => codeGlobs.some((re) => re.test(rel)),
+    });
+  } catch (e) {
+    return finish(deny(`permission engine error (${e.message}); denying`), null);
+  }
+  if (core) return finish(core, decision);
+  if (decision.decision === 'deny') return finish({ decision: 'deny', reason: `${decision.reasons[0]} [${decision.rules.join(', ')}]`, rules: decision.rules }, decision);
+  return null;
+}
+
+// Core checks (tool list, write scope, command allow-list, delegation, web, MCP grants). Returns a deny verdict or null.
+function evaluateCore(event, agentName, policy, phase, registry = null) {
   const agent = policy.agents[agentName];
   if (!agent) return deny(`unknown agent '${agentName}'`);
   const tool = event.toolName ?? event.tool_name;
@@ -159,7 +194,7 @@ function main() {
     process.stderr.write(`agent-guard: unparseable event (${e.message}); denying.\n`); process.exit(2);
   }
   let verdict;
-  try { verdict = evaluate(event, agentName, load('harness/policy/agent-policy.json'), load('harness/policy/command-policy.json').phase ?? 0); } catch (e) {
+  try { verdict = evaluate(event, agentName, load('harness/policy/agent-policy.json'), load('harness/policy/command-policy.json').phase ?? 0, null, { audit: true, consume: true }); } catch (e) {
     process.stderr.write(`agent-guard: ${e.message}; denying.\n`); process.exit(2);
   }
   process.stdout.write(verdict ? JSON.stringify({ permissionDecision: 'deny', permissionDecisionReason: `[AGENT-GUARD ${agentName}] ${verdict.reason}` }) : '{}');

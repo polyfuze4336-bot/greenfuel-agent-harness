@@ -15,6 +15,9 @@
     "validate:certificate-integrity": "node harness/scripts/spec-validators.mjs certificate-integrity",
     "validate:deployment-readiness": "node harness/scripts/spec-validators.mjs deployment-readiness",
     "validate:tools": "node harness/scripts/validate-tools.mjs",
+    "validate:permissions": "node harness/scripts/validate-permissions.mjs",
+    "permissions:audit": "node harness/scripts/audit-denials.mjs verify",
+    "permissions:github": "node harness/scripts/verify-github-protection.mjs",
     "mcp:server": "node harness/mcp/greenfuel-tools-server.mjs",
     "stats": "node harness/scripts/validate-harness.mjs --stats",
     "test": "node --test"

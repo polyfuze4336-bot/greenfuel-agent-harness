@@ -11,13 +11,15 @@ import { record } from '../harness/scripts/record-evidence.mjs';
 const require = createRequire(import.meta.url);
 const { evaluate, loadPolicy } = require('../harness/hooks/policy-guard.cjs');
 
+const PROBE = fileURLToPath(new URL('./support/probe.mjs', import.meta.url));
+
 function tmp(fn) {
   const dir = mkdtempSync(path.join(os.tmpdir(), 'gf-evidence-'));
   try { return fn(dir); } finally { rmSync(dir, { recursive: true, force: true }); }
 }
 
 test('records exit code, hash and tail of a passing command', () => tmp((outDir) => {
-  const { rec, outPath } = record({ id: 'EV-0001', claim: 'prints ok', cmd: [process.execPath, '-e', 'console.log("ok")'], outDir });
+  const { rec, outPath } = record({ id: 'EV-0001', claim: 'prints ok', cmd: [process.execPath, PROBE, 'ok'], outDir });
   assert.equal(rec.exitCode, 0);
   assert.equal(rec.outputTail.trim(), 'ok');
   assert.match(rec.outputSha256, /^[0-9a-f]{64}$/);
@@ -25,18 +27,18 @@ test('records exit code, hash and tail of a passing command', () => tmp((outDir)
 }));
 
 test('records a failing command as failure, not as success', () => tmp((outDir) => {
-  const { rec } = record({ id: 'EV-0002', claim: 'exits 3', cmd: [process.execPath, '-e', 'process.exit(3)'], outDir });
+  const { rec } = record({ id: 'EV-0002', claim: 'exits 3', cmd: [process.execPath, PROBE, 'x', '3'], outDir });
   assert.equal(rec.exitCode, 3);
 }));
 
 test('redacts secret-shaped output', () => tmp((outDir) => {
-  const { rec } = record({ id: 'EV-0003', claim: 'redaction', cmd: [process.execPath, '-e', 'console.log("token=abcdef123456")'], outDir });
+  const { rec } = record({ id: 'EV-0003', claim: 'redaction', cmd: [process.execPath, PROBE, 'token=abcdef123456'], outDir });
   assert.ok(!rec.outputTail.includes('abcdef123456'));
   assert.ok(rec.outputTail.includes('[REDACTED]'));
 }));
 
 test('refuses to overwrite an existing record', () => tmp((outDir) => {
-  const args = { id: 'EV-0004', claim: 'x', cmd: [process.execPath, '-e', '0'], outDir };
+  const args = { id: 'EV-0004', claim: 'x', cmd: [process.execPath, PROBE, 'z'], outDir };
   record(args);
   assert.throws(() => record(args), /already exists/);
 }));

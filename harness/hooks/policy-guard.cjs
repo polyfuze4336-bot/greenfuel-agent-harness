@@ -15,6 +15,7 @@ const WRITE_TOOL = /^(edit|create|apply_patch|str_replace_editor|write|multi_edi
 const READ_TOOL = /^(view|read|readfile|read_file|grep|glob|rg|search)$/i;
 const MCP_TOOL = /azure|mcp/i;
 const { matchMcp } = require('./mcp-names.cjs');
+const engine = require('./permission-engine.cjs');
 let registryCache;
 // Any session, not just a specialist agent: a tool that looks like one of this repository's enabled MCP servers but is not
 // an exact tool in the registry is refused. This is the guard for clients that have no native tool allow-filter (VS Code).
@@ -105,7 +106,7 @@ function shellPaths(command, cwd) {
   return paths;
 }
 
-function evaluate(event, policy) {
+function evaluate(event, policy, opts = {}) {
   const toolName = event.toolName ?? event.tool_name;
   if (typeof toolName !== 'string' || !toolName) return { decision: 'deny', id: 'MALFORMED', reason: 'Hook event has no tool name.' };
   const args = normalizeArgs(event.toolArgs ?? event.tool_input);
@@ -129,8 +130,22 @@ function evaluate(event, policy) {
   const unlisted = unlistedMcpVerdict(toolName);
   if (unlisted) verdicts.push(unlisted);
 
+  // Least-privilege model, applied to every session: secrets, shipowner and jurisdiction isolation, destructive or
+  // unapproved Azure operations, regulatory filings and settlements. Named agents get the full model in agent-guard.
+  let decision = null;
+  try {
+    decision = engine.decide({ agent: null, tool: toolName, args: event.toolArgs ?? event.tool_input ?? {}, cwd, phase: policy.phase ?? 0, registry: registryCache ?? undefined, consume: Boolean(opts.consume), logDir: opts.logDir, scope: opts.scope, approvals: opts.approvals, now: opts.now, headCommit: opts.headCommit });
+    if (decision.decision === 'deny') verdicts.push({ decision: 'deny', id: decision.rules[0] ?? 'PERMISSION', reason: `${decision.reasons[0]} [${decision.rules.join(', ')}]` });
+  } catch (e) {
+    verdicts.push({ decision: 'deny', id: 'PERMISSION-ERROR', reason: `permission engine error (${e.message}); denying` });
+  }
+
   verdicts.sort((a, b) => RANK[b.decision] - RANK[a.decision]);
-  return verdicts[0] || null;
+  const top = verdicts[0] || null;
+  if (top && top.decision !== 'allow' && opts.audit) {
+    try { engine.writeAudit(engine.loadModel(), event, { ...(decision ?? { mode: 'session', operations: [], targets: [] }), rules: [...new Set([top.id, ...(decision?.rules ?? [])])], reasons: [top.reason] }, { agent: null, logDir: opts.logDir }); } catch { /* never let logging change the decision */ }
+  }
+  return top;
 }
 
 function main() {
@@ -142,7 +157,7 @@ function main() {
     process.stderr.write(`policy-guard: unparseable hook event (${err.message}); denying.\n`);
     process.exit(2);
   }
-  const verdict = evaluate(event, loadPolicy());
+  const verdict = evaluate(event, loadPolicy(), { audit: true, consume: true });
   process.stdout.write(verdict
     ? JSON.stringify({ permissionDecision: verdict.decision, permissionDecisionReason: `[HARNESS-POLICY ${verdict.id}] ${verdict.reason}` })
     : '{}');

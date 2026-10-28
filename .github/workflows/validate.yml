@@ -20,4 +20,5 @@ jobs:
         with:
           node-version: 22
       - run: node harness/scripts/validate-harness.mjs
+      - run: node harness/scripts/validate-permissions.mjs
       - run: node --test
