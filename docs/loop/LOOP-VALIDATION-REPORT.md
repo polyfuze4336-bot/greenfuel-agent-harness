@@ -40,7 +40,7 @@ Timeout kill and wall-clock budget; check-run budget; independent review (self-r
 ## Not shown
 
 - **No model-driven repair.** Test repairs are scripted copies, the live TypeScript repair was made by the assistant in this session, and an agent cannot run a loop yet (Phase 0, and the CLI is human-run). Nothing here measures how often a model repairs a failure within the budget.
-- **No unattended completion by Copilot.** The orchestrator and specialists were not driven through a loop. Whether to allow constrained loop commands for an agent is T24.
+- **No unattended completion by Copilot.** The orchestrator and specialists were not driven through a loop. After the report, the owner allowed `qa-engineer` to run `status`, `verify` and `verify-store` (T24); the grant is tested with the agent hook, but no agent has been run through a loop in a live session.
 - **No sandbox.** A check runs workspace code with the operator's rights; deliberate subversion of the runner by code under test is not prevented (see above).
 - **CI does not run the TypeScript scenario**: the compiler is installed outside the manifest and CI does not install it. The tests skip it there. The pinned lock integrity is a SHA-1 value from the package feed used here and could not be cross-checked against the public registry.
 - **No hook-captured critique**: the reviewer's identity is declared in the CLI call.

@@ -211,10 +211,20 @@
       "critical": false,
       "approvalRef": "ADR-0010",
       "coreHash": "59f2b55fb4803399abb996c7b75ed35f86472ee6867949ff5b97d8abf6c82c93"
+    },
+    {
+      "id": "DEC-0011",
+      "kind": "decision",
+      "subject": "adr.0011",
+      "position": "accepted",
+      "statement": "Bounded Plan, Execute, Verify, Critique, Repair loop",
+      "critical": false,
+      "approvalRef": "ADR-0011",
+      "coreHash": "7006b3e40835143a7961c4653b22d347e64c2937e07a4230dd209a10b7f59744"
     }
   ],
   "counts": {
-    "approved": 21,
+    "approved": 22,
     "superseded": 0,
     "invalidated": 0
   }

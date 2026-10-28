@@ -92,7 +92,17 @@ function check(root, fail) {
   const cp = perm.pathClasses.find((c) => c.id === 'control-plane');
   if (!cp || !new RegExp(cp.pattern).test('docs/state/loops/LOOP-0123456789/loop.json')) fail('permissions.json: docs/state/loops/ must be a control-plane path so agents cannot write it');
   if (!new RegExp(cp?.pattern ?? '$^').test('harness/loop/loop.cjs')) fail('permissions.json: harness/ must stay a control-plane path');
-  for (const [name, a] of Object.entries(ap.agents)) for (const cmd of ['node harness/scripts/loop.mjs verify --loop LOOP-0123456789', 'node harness/scripts/loop.mjs init --task t.json --workspace .harness-work/x']) if ((a.commands ?? []).some((c) => new RegExp(c).test(cmd))) fail(`agent ${name} may run the loop CLI; only a person may`);
+  const grants = P.agentCommands ?? {};
+  for (const [name, subs] of Object.entries(grants)) { if (!ap.agents[name]) fail(`agentCommands names unknown agent ${name}`); if (subs.some((s) => !['status', 'verify', 'verify-store'].includes(s))) fail(`agentCommands.${name}: only status, verify and verify-store may be run by an agent`); }
+  const SUBS = ['init', 'begin', 'end', 'verify', 'diagnose', 'critique', 'resume', 'cancel', 'status', 'list', 'verify-store', 'report'];
+  for (const [name, a] of Object.entries(ap.agents)) for (const sub of SUBS) {
+    const cmd = `node harness/scripts/loop.mjs ${sub} --loop LOOP-0123456789`;
+    const may = (a.commands ?? []).some((c) => new RegExp(c).test(cmd));
+    const allowed = (grants[name] ?? []).includes(sub);
+    if (may && !allowed) fail(`agent ${name} may run 'loop.mjs ${sub}', which loop-policy agentCommands does not grant`);
+    if (!may && allowed) fail(`loop-policy grants ${name} 'loop.mjs ${sub}' but its command allow-list does not permit it`);
+  }
+  for (const cmd of ['node harness/scripts/loop.mjs init --task t.json --workspace .harness-work/x', 'node harness/scripts/loop.mjs verify --loop LOOP-0123456789 --x', 'node harness/scripts/loop.mjs verify --loop ../x']) for (const [name, a] of Object.entries(ap.agents)) if ((a.commands ?? []).some((c) => new RegExp(c).test(cmd))) fail(`agent ${name} may run a loop command outside the granted form: ${cmd}`);
   if (!has(root, '.gitignore') || !/^\.harness-work\/$/m.test(readFileSync(path.join(root, '.gitignore'), 'utf8'))) fail('.gitignore must ignore .harness-work/ (loop workspaces)');
   if (!has(root, '.gitignore') || !/^\.harness-toolchain\/$/m.test(readFileSync(path.join(root, '.gitignore'), 'utf8'))) fail('.gitignore must ignore .harness-toolchain/');
 

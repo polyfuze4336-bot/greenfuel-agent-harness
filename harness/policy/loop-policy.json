@@ -97,6 +97,8 @@
   "opsNote": "An action classified into noAutoRetryOps is not idempotent: if the attempt then fails, the loop escalates instead of retrying. An action classified into forbiddenOps stops the loop even if some guard allowed it, because those operations are never part of an automatic loop.",
   "protectedClasses": ["control-plane", "audit", "secret", "shipowner", "jurisdiction", "isolated-root"],
   "sensitiveContent": ["CONFIDENTIAL-MARKER"],
+  "agentCommands": { "qa-engineer": ["status", "verify", "verify-store"] },
+  "agentCommandsNote": "T24, decided by the owner on 2026-10-28: only these subcommands, only for these agents. The loop runs its own declared checks and refuses to verify before an attempt has ended; begin, end, diagnose, critique, cancel, init and resume stay human-run.",
   "reviewerAgents": ["architecture-critic", "design-reviewer"],
   "bypassPhrases": ["skip (the )?(failing )?test", "disable (the )?(test|check|guard|hook|validation)", "delete (the )?(failing )?test", "relax (the )?(test|check|assertion)", "change (the )?expected", "edit (the )?expected", "weaken (the )?(test|check|assertion)", "ignore (the )?(failing )?(test|check)", "bypass (the )?(guard|hook|policy|permission|approval)", "comment out (the )?(test|assertion|check)"],
   "bypassNote": "A diagnosis that proposes changing the test, the expected result or a guard is refused. This is a heuristic on wording; the protected-path check on the files themselves is the real control.",

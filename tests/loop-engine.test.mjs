@@ -459,12 +459,16 @@ test('a failure has the same fingerprint when only times, line numbers and paths
 });
 
 // ---------------------------------------------------------------- who can run the loop
-test('agents cannot run or write the loop: it is a control-plane path and a command no agent may run', () => {
+test('agents may run only the granted loop commands: qa-engineer status, verify and verify-store, nothing else, and nobody may write the loop store', () => {
+  const GRANTED = { 'qa-engineer': ['status', 'verify', 'verify-store'] };
   for (const agent of AGENTS) {
-    for (const cmd of ['node harness/scripts/loop.mjs verify --loop LOOP-0123456789', 'node harness/scripts/loop.mjs init --task t.json --workspace .harness-work/x']) {
+    for (const sub of ['init', 'begin', 'end', 'diagnose', 'critique', 'resume', 'cancel', 'list', 'report', 'status', 'verify', 'verify-store']) {
+      const cmd = sub === 'init' ? 'node harness/scripts/loop.mjs init --task t.json --workspace .harness-work/x' : `node harness/scripts/loop.mjs ${sub} --loop LOOP-0123456789`;
       const r = agentHook(agent, 'powershell', { command: cmd });
-      assert.equal(r.denied, true, `${agent}: ${cmd}`);
+      const allowed = (GRANTED[agent] ?? []).includes(sub);
+      assert.equal(r.denied, !allowed, `${agent}: ${cmd} (${r.reason})`);
     }
+    for (const cmd of ['node harness/scripts/loop.mjs verify --loop LOOP-0123456789 --actor root', 'node harness/scripts/loop.mjs verify --loop ../../x', 'node harness/scripts/loop.mjs verify --loop LOOP-0123456789; node -e 1']) assert.equal(agentHook(agent, 'powershell', { command: cmd }).denied, true, `${agent}: ${cmd}`);
     const w = agentHook(agent, 'edit', { path: 'docs/state/loops/LOOP-0123456789/loop.json' });
     assert.equal(w.denied, true, `${agent} may not write the loop store`);
   }

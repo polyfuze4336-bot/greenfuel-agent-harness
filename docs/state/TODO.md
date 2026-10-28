@@ -27,13 +27,6 @@ Owner-facing list of pending answers and approvals. Items are removed only when 
 |---|---|---|---|
 | T23 | **Decided 2026-10-28 (architect, on the owner's instruction).** Interim: owner reviews every change to `memory/` and `docs/adr/` in the diff before it is pushed. Target: signed approvals for approve, supersede and invalidate once approvers are registered (roadmap R14). Open until T13 is done | [ADR 0010](../adr/0010-persistent-memory.md), [MEMORY-GOVERNANCE](../memory/MEMORY-GOVERNANCE.md) limits | Memory approvals being more than procedure |
 
-## Awaiting the owner (loop stage, 2026-10-28)
-
-| # | Item | Source | Blocks |
-|---|---|---|---|
-| T24 | Decide whether a constrained specialist agent may run loop commands (for example loop.mjs verify and status only) so Copilot can drive a loop itself. Today only a person can, which keeps verification out of the actor's hands. Needs Phase 1 for any agent to change code, and the sandbox in roadmap R15 | [LOOP](../loop/LOOP.md) limits, [ADR 0011](../adr/0011-bounded-repair-loop.md) | Unattended task completion by an agent |
-| T25 | Accept, change or reject [ADR 0011](../adr/0011-bounded-repair-loop.md); acknowledge that a pinned TypeScript 5.9.3 toolchain was installed outside the repository's manifest (with `--ignore-scripts`) for the build scenario, and decide whether CI should install it too (today CI skips that scenario); confirm the loop working values (timeouts, budgets, size caps, 30-minute lease) | [LOOP-VALIDATION-REPORT](../loop/LOOP-VALIDATION-REPORT.md), [loop-policy.json](../../harness/policy/loop-policy.json) | Treating the loop as approved harness capability |
-
 ## Decisions made
 
 | Date | Decision | Recorded in |
@@ -52,3 +45,4 @@ Owner-facing list of pending answers and approvals. Items are removed only when 
 | 2026-10-28 | Permission model accepted (ADR 0008) and pushed; CI succeeded on 3a3fcdf. Task-execution framework built and demonstrated; ADR 0009 is Proposed | [ADR 0009](../adr/0009-task-execution-framework.md) |
 | 2026-10-28 | Task-execution framework accepted (ADR 0009 Accepted); commits pushed. T18: owner reports the hook and tools were verified in VS Code chat (recorded as owner-reported, not observed by the assistant). T19: the owner accepted the critic's REWORK as the outcome of the demonstration run, which was closed (event 45); the proposal stays an unapproved draft. T20: the framework limits were confirmed as working values | [ADR 0009](../adr/0009-task-execution-framework.md), [DEMO-EVIDENCE-STORE](../orchestration/DEMO-EVIDENCE-STORE.md) |
 | 2026-10-28 | Persistent memory accepted (ADR 0010 Accepted); its memory entry approved by the importer. T22: memory working values confirmed (not measured). T23: decided by the architect on the owner's instruction (interim procedure; signed approvals after T13, roadmap R14). Memory commits pushed | [ADR 0010](../adr/0010-persistent-memory.md) |
+| 2026-10-28 | Repair loop accepted (ADR 0011 Accepted); T25: toolchain install acknowledged, loop working values confirmed (CI keeps skipping the TypeScript scenario; installing it in CI was not decided). T24: allowed, narrowly: qa-engineer may run loop status, erify and erify-store; everything else stays human-run. Loop commits pushed | [ADR 0011](../adr/0011-bounded-repair-loop.md) |

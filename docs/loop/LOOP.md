@@ -91,13 +91,13 @@ Each check run is a file with the argv, exit code, duration, output hash, a reda
 | Destructive or secret operations | Operations on the policy's never-in-a-loop list stop the loop even if a guard allowed them |
 | Commands | An anchored allow-list, an argv grammar with no options that load code, no `..`, no shell, a scrubbed environment (no `NODE_OPTIONS`) |
 | Budgets and timeouts | Per-check kill, wall-clock and check-run budgets, repair and identical-failure limits |
-| Agents cannot run or write the loop | The CLI is on no agent's command list and `docs/state/loops/` is a control-plane path; both tested for every agent |
+| Agents cannot write the loop, and run only what the owner granted | `docs/state/loops/` is a control-plane path. Only `qa-engineer` may run `loop.mjs status`, `verify` and `verify-store` on a loop id (T24); every other subcommand and every other agent is denied, tested for every agent and subcommand, and the grant is cross-checked by `validate-loop` |
 | The configuration cannot loosen unnoticed | `validate-loop` and its tests |
 
 ## Human procedure
 
 - Reading what a stopped or escalated loop requires, and deciding.
-- Running the CLI. An agent cannot start, end or verify a loop in this stage (see Limits).
+- Running `init`, `begin`, `end`, `diagnose`, `critique`, `resume` and `cancel`. An agent (`qa-engineer`) may only ask for `verify`, `status` and `verify-store`.
 - Choosing the checks, protected paths and acceptance criteria of a task. The loop enforces them; it cannot tell whether they are the right ones.
 - Recording a review, and promoting a loop result to an evidence record.
 
@@ -105,7 +105,7 @@ Each check run is a file with the argv, exit code, duration, output hash, a reda
 
 - **The loop screens; it does not sandbox.** A check runs the workspace's code with the operator's rights. Code under test that deliberately subverts the test runner it is loaded into (for example by replacing assertion functions) cannot be ruled out by the loop. What it does catch is a check that rewrites files, edits to protected files, a dependency folder, large or binary additions, and options that load code. For adversarial code the controls are a required independent review and, later, a sandbox (roadmap R15).
 - **Reported actions are self-reported.** The observed file changes and the denial log are not, but a command that an actor ran and did not report is not seen by the loop. In a hook-protected session the guards also deny it and the denial is found in the audit log during the attempt; in a session without hooks it is not.
-- In **Phase 0** no agent may change application or workspace code, so an agent actor is stopped at its first change. The live demonstrations use the person's own session as the actor. Whether to let an agent run constrained loop commands is an owner decision (T24).
+- In **Phase 0** no agent may change application or workspace code, so an agent actor is stopped at its first change. The live demonstrations use the person's own session as the actor. The owner allowed `qa-engineer` to run `status`, `verify` and `verify-store` (T24); the actor still cannot change what is checked.
 - The **reviewer's identity is declared** in the CLI call, not captured from a delegation hook.
 - The TypeScript check uses a pinned toolchain installed outside the repository's manifest. Its lock integrity is a SHA-1 value from the package feed used here, not cross-checked against the public registry, and the entry file's SHA-256 is pinned as well. **CI does not install it**, so the TypeScript scenario is skipped there.
 - Fingerprints are heuristic; two different failures with the same normalised text would be counted as identical, which errs toward escalating.
