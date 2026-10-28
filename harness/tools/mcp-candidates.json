@@ -1,0 +1,14 @@
+{
+  "_note": "CANDIDATES ONLY. No client reads this file. These servers are pending owner approval (see docs/harness/MCP-SECURITY.md, section 'Approving a candidate'). Do not merge an entry into .vscode/mcp.json or .mcp.json without that approval, an ADR, and a human-run, pinned, script-disabled install. Neither server has been installed, started or authenticated by this repository.",
+  "mcpServers": {
+    "azure-mcp": {
+      "command": "npx",
+      "args": ["@azure/mcp@3.0.0", "server", "start", "--read-only", "--namespace", "monitor", "--namespace", "applicationinsights", "--namespace", "bicepschema"],
+      "env": { "AZURE_MCP_COLLECT_TELEMETRY": "false" }
+    },
+    "github-mcp-server": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/readonly"
+    }
+  }
+}

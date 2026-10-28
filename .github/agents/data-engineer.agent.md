@@ -1,7 +1,7 @@
 ---
 name: data-engineer
 description: Owns evidence schemas, storage design, lineage and deterministic calculations for the green-fuel solution. Designs now; implements only after a human raises the phase. Edits only its own paths; cannot run commands.
-tools: ['read', 'search', 'edit']
+tools: ['read', 'search', 'edit', 'greenfuel-tools/validate_evidence_lineage', 'greenfuel-tools/validate_emissions_methods', 'greenfuel-tools/validate_certificate_integrity', 'greenfuel-tools/validate_sovereignty', 'greenfuel-tools/trace_requirement']
 user-invocable: true
 disable-model-invocation: false
 hooks:

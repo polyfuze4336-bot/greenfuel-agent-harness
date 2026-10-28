@@ -118,7 +118,71 @@ test('alternate spellings of write, shell and delegation tools are still control
 
 test('an unclassified tool is denied rather than allowed', () => {
   denied(run('architecture-critic', 'frobnicate_repo', {}), /not classified/);
-  denied(run('architecture-critic', 'github-mcp-server-get_file_contents', {}), /not classified/);
+  denied(run('architecture-critic', 'github-mcp-server-get_file_contents', {}), /MCP tool .* is not granted/);
+  denied(run('architecture-critic', 'Azure-MCP-monitor', {}), /MCP tool .* is not granted/);
+});
+
+test('read-type tools are allowed only by exact name, never by prefix', () => {
+  for (const ok of ['view', 'grep', 'glob', 'report_intent', 'read_agent', 'list_agents', 'skill', 'ask_user', 'sql', 'tool_search_tool', 'task_complete', 'exit_plan_mode']) assert.equal(run('architecture-critic', ok, {}), null, ok);
+  for (const bad of ['store_memory', 'store_secret', 'session_store_sql', 'session_delete', 'get_credentials', 'list_secrets', 'report_leak', 'ask_everyone', 'think_and_run', 'search_and_delete', 'todo_export', 'lsp_rename']) denied(run('architecture-critic', bad, {}), /not classified|may write only|read-only|cannot determine/, bad);
+  denied(run('azure-platform', 'store_memory', { content: 'persist externally' }), undefined);
+});
+
+test('MCP names are matched exactly: a lookalike server or a differently spelled tool is not the registered one', () => {
+  assert.equal(run('architecture-critic', 'greenfuel-tools-trace_requirement', { id: 'FR-009' }), null);
+  assert.equal(run('architecture-critic', 'greenfuel_tools_trace_requirement', { id: 'FR-009' }), null);
+  assert.equal(run('architecture-critic', 'mcp_greenfuel_tools_trace_requirement', { id: 'FR-009' }), null);
+  assert.equal(run('architecture-critic', 'GREENFUEL-TOOLS-TRACE_REQUIREMENT', { id: 'FR-009' }), null);
+  for (const lookalike of ['greenfueltools-trace_requirement', 'greenfuel.tools-trace_requirement', 'greenfuel-tools-trace-requirement', 'greenfuel-tools-trace_requirement2', 'greenfuel-toolstrace_requirement', 'x-greenfuel-tools-trace_requirement', 'greenfuel-tools--trace_requirement']) {
+    const v = run('architecture-critic', lookalike, { id: 'FR-009' });
+    assert.ok(v === null ? false : v.decision === 'deny', `${lookalike} should be denied`);
+  }
+});
+
+test('MCP tools: only the granted ones, per agent, however the name is spelled', () => {
+  assert.equal(run('architecture-critic', 'greenfuel-tools-trace_requirement', { id: 'FR-009' }), null);
+  assert.equal(run('architecture-critic', 'greenfuel_tools_trace_requirement', { id: 'FR-009' }), null);
+  denied(run('architecture-critic', 'greenfuel-tools-validate_sovereignty', {}), /not granted to architecture-critic/);
+  denied(run('architecture-critic', 'microsoft-learn-microsoft_docs_search', { query: 'x' }), /not granted/);
+  assert.equal(run('azure-platform', 'microsoft-learn-microsoft_docs_search', { query: 'x' }), null);
+  denied(run('data-engineer', 'microsoft-learn-microsoft_docs_fetch', { url: 'https://learn.microsoft.com/' }), /not granted/);
+  denied(run('principal-architect', 'azure-mcp-group_list', {}), /not granted/);
+  denied(run('qa-engineer', 'github-mcp-server-create_issue', { title: 'x' }), /not granted/);
+});
+
+test('an MCP tool name cannot masquerade as a write, shell or web tool', () => {
+  denied(run('security-reviewer', 'greenfuel-tools-edit_files', { path: 'docs/x.md' }), /not granted/);
+  denied(run('security-reviewer', 'greenfuel-tools-bash', { command: 'ls' }), /not granted/);
+  denied(run('security-reviewer', 'microsoft-learn-web_fetch_x', { url: 'https://learn.microsoft.com/' }), /not granted/);
+});
+
+test('every MCP grant in the policy is for a tool the registry knows and enables', () => {
+  const reg = JSON.parse(readFileSync(path.join(repo, 'harness/tools/tool-registry.json'), 'utf8'));
+  for (const [name, a] of Object.entries(policy.agents)) for (const g of a.mcp ?? []) {
+    const [s, t] = g.split('/');
+    assert.ok(reg.tools.some((x) => x.kind === 'mcp' && x.server === s && x.name === t && x.status === 'enabled'), `${name}: ${g}`);
+    assert.equal(run(name, `${s}-${t}`, {}), null, `${name} should be allowed ${g}`);
+  }
+});
+
+test('web fetch: approved https hosts only, no search, no credentials', () => {
+  assert.equal(run('azure-platform', 'web_fetch', { url: 'https://learn.microsoft.com/azure/x' }), null);
+  assert.equal(run('azure-platform', 'web_fetch', { url: 'https://azure.microsoft.com/en-us/pricing/' }), null);
+  denied(run('azure-platform', 'web_fetch', { url: 'https://example.com/' }), /not on the approved/);
+  denied(run('azure-platform', 'web_fetch', { url: 'https://learn.microsoft.com.evil.example/' }), /not on the approved/);
+  denied(run('azure-platform', 'web_fetch', { url: 'https://unreviewed.learn.microsoft.com/x' }), /exact host names only/);
+  denied(run('azure-platform', 'web_fetch', { url: 'https://www.azure.microsoft.com/x' }), /not on the approved/);
+  denied(run('azure-platform', 'web_fetch', { url: 'https://evil.example/learn.microsoft.com' }), /not on the approved/);
+  denied(run('azure-platform', 'web_fetch', { url: 'http://learn.microsoft.com/x' }), /https/);
+  denied(run('azure-platform', 'web_fetch', { url: 'https://user:pw@learn.microsoft.com/x' }), /https|credentials/);
+  denied(run('azure-platform', 'web_search', { query: 'azure' }), /without a URL/);
+  denied(run('azure-platform', 'web_fetch', { url: 'not a url' }), /valid URL/);
+});
+
+test('qa-engineer may read pull request and run status, never change it', () => {
+  for (const ok of ['gh pr list', 'gh pr view 12 --json state,title', 'gh run list --limit 5', 'gh pr checks 12']) assert.equal(run('qa-engineer', 'powershell', { command: ok }), null, ok);
+  for (const bad of ['gh pr merge 12', 'gh pr create --title x', 'gh pr view 12 --web', 'gh run watch 5', 'gh run list --watch', 'gh api -X POST repos/a/b', 'gh workflow run x.yml', 'gh pr list; gh pr merge 1']) denied(run('qa-engineer', 'powershell', { command: bad }), undefined);
+  denied(run('design-reviewer', 'powershell', { command: 'gh pr list' }), /allow-list/);
 });
 
 test('agents cannot write an Approved or Accepted status', () => {

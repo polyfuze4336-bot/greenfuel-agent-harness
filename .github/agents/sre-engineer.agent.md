@@ -1,7 +1,7 @@
 ---
 name: sre-engineer
 description: Owns observability, recovery, SLOs and operational readiness design for the green-fuel solution, including runbooks. Edits only operations documents (and ops code after the phase is raised); cannot run commands; invents no targets.
-tools: ['read', 'search', 'edit']
+tools: ['read', 'search', 'edit', 'greenfuel-tools/validate_deployment_readiness', 'greenfuel-tools/trace_requirement']
 user-invocable: true
 disable-model-invocation: false
 hooks:

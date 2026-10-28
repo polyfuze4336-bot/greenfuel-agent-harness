@@ -1,0 +1,67 @@
+{
+  "schema": "greenfuel.lineage/v0-candidate",
+  "id": "LN-SYNTHETIC-001",
+  "records": [
+    {
+      "id": "R1",
+      "kind": "raw",
+      "origin": "sensor",
+      "source": "SYNTHETIC-METER-1",
+      "sequence": 1,
+      "trustedTime": "2030-01-01T00:00:00Z",
+      "content": "synthetic reading 1",
+      "contentSha256": "e06139cde7473dd834cb12bf97304ff999c4926fc2f8dfbfdea5e611a7e596fa"
+    },
+    {
+      "id": "R2",
+      "kind": "raw",
+      "origin": "sensor",
+      "source": "SYNTHETIC-METER-1",
+      "sequence": 2,
+      "trustedTime": "2030-01-01T00:01:00Z",
+      "content": "synthetic reading 2",
+      "contentSha256": "17169066adecbb0875976627215db520b70a332d6dbcebeef51dff675d2b4890"
+    },
+    {
+      "id": "C1",
+      "kind": "calculation",
+      "origin": "deterministic-calc",
+      "inputs": [
+        "R1",
+        "R2"
+      ],
+      "methodologyVersion": "SM-001@0.1.0",
+      "factorSetVersion": "SF-001@0.1.0",
+      "build": "synthetic-build-1",
+      "result": {
+        "value": 1,
+        "unit": "synthetic-unit"
+      },
+      "resultSha256": "e8449246ca369cc61c90b5c8c2c661a08f53b42b15ec361d7a16eed629628004"
+    },
+    {
+      "id": "E1",
+      "kind": "evidence-package",
+      "origin": "deterministic-calc",
+      "inputs": [
+        "R1",
+        "R2",
+        "C1"
+      ]
+    },
+    {
+      "id": "K1",
+      "kind": "certificate",
+      "origin": "human",
+      "inputs": [
+        "E1"
+      ],
+      "approval": {
+        "role": "quality-manager",
+        "approverType": "human",
+        "approvedBy": "SYNTHETIC-APPROVER",
+        "approvedAt": "2030-01-02T00:00:00Z"
+      }
+    }
+  ]
+}

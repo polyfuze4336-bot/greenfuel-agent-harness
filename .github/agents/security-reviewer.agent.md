@@ -1,7 +1,7 @@
 ---
 name: security-reviewer
 description: Reviews designs and implementation claims for threats, identity, sovereignty and tenant isolation in the green-fuel solution. Read-only reviewer with authority to reject on hard-constraint grounds; returns findings; does not edit.
-tools: ['read', 'search']
+tools: ['read', 'search', 'greenfuel-tools/validate_agent_permissions', 'greenfuel-tools/validate_sovereignty', 'greenfuel-tools/validate_tools', 'greenfuel-tools/trace_requirement', 'greenfuel-tools/get_accepted_decisions']
 user-invocable: true
 disable-model-invocation: false
 hooks:

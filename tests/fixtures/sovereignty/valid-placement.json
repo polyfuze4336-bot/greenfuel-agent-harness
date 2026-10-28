@@ -1,0 +1,33 @@
+{
+  "schema": "greenfuel.placement/v0-candidate",
+  "id": "PL-SYNTHETIC-001",
+  "port": "SYNTHETIC-PORT-A",
+  "jurisdiction": "SYNTHETIC-JURISDICTION-A",
+  "placements": [
+    {
+      "component": "edge-buffer",
+      "dataClass": "DC-01",
+      "zone": "Z1",
+      "residencyBasis": "physical-location-in-port"
+    },
+    {
+      "component": "shore-evidence-store",
+      "dataClass": "DC-02",
+      "zone": "Z2",
+      "residencyBasis": "hosting-model-per-D-010"
+    },
+    {
+      "component": "certificate-store",
+      "dataClass": "DC-08",
+      "zone": "Z2",
+      "residencyBasis": "hosting-model-per-D-010"
+    },
+    {
+      "component": "customer-portal-view",
+      "dataClass": "DC-11",
+      "zone": "Z5",
+      "flowId": "F-14",
+      "residencyBasis": "customer-own-data-export-policy"
+    }
+  ]
+}

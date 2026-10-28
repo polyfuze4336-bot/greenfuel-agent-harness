@@ -1,0 +1,35 @@
+{
+  "schema": "greenfuel.emissions-method/v0-candidate",
+  "id": "SM-001",
+  "version": "0.1.0",
+  "status": "Draft",
+  "synthetic": true,
+  "schemeCandidate": "V-01",
+  "deterministic": true,
+  "usesModel": false,
+  "inputs": [
+    {
+      "name": "synthetic-input",
+      "unit": "synthetic-unit"
+    }
+  ],
+  "outputs": [
+    {
+      "name": "synthetic-output",
+      "unit": "synthetic-unit"
+    }
+  ],
+  "referenceData": {
+    "factorSetId": "SF-001",
+    "version": "0.1.0"
+  },
+  "factors": [
+    {
+      "name": "synthetic-factor",
+      "value": 1,
+      "unit": "synthetic-unit",
+      "source": "SYNTHETIC-FIXTURE: not a real factor"
+    }
+  ],
+  "definitionSha256": "491cea5256afecd6899aa1a8929bd493a7084ee1ba5fd5d08ef2dab1e08d762a"
+}

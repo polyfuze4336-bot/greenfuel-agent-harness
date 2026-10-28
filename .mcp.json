@@ -1,0 +1,30 @@
+{
+  "mcpServers": {
+    "greenfuel-tools": {
+      "command": "node",
+      "args": ["harness/mcp/greenfuel-tools-server.mjs"],
+      "tools": [
+        "validate_requirements",
+        "validate_architecture",
+        "validate_agent_permissions",
+        "validate_sovereignty",
+        "validate_evidence_lineage",
+        "validate_emissions_methods",
+        "validate_certificate_integrity",
+        "validate_deployment_readiness",
+        "validate_tools",
+        "trace_requirement",
+        "get_accepted_decisions",
+        "get_task_state",
+        "get_implementation_history"
+      ],
+      "timeout": 20000
+    },
+    "microsoft-learn": {
+      "type": "http",
+      "url": "https://learn.microsoft.com/api/mcp",
+      "tools": ["microsoft_docs_search", "microsoft_docs_fetch", "microsoft_code_sample_search"],
+      "timeout": 20000
+    }
+  }
+}

@@ -1,7 +1,7 @@
 ---
 name: maritime-domain
 description: Reviews bunkering, flow measurement, custody transfer, sampling, mass-balance and certification assumptions for the green-fuel solution. Read-only reviewer; treats every standard and scheme as an unverified candidate. Returns findings; does not edit.
-tools: ['read', 'search']
+tools: ['read', 'search', 'greenfuel-tools/trace_requirement', 'greenfuel-tools/get_accepted_decisions', 'greenfuel-tools/validate_emissions_methods', 'greenfuel-tools/validate_certificate_integrity']
 user-invocable: true
 disable-model-invocation: false
 hooks:

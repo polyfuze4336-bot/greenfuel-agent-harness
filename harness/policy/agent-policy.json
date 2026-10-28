@@ -24,71 +24,72 @@
   "toolAliases": ["execute", "read", "edit", "search", "agent", "web", "todo"],
   "maxBodyChars": 30000,
   "classes": {
-    "planner": { "purpose": "Plans, reviews and challenges. Cannot modify files or run commands", "allowedTools": ["read", "search", "todo", "agent"] },
-    "author": { "purpose": "Modifies files inside its own write scope. Cannot run commands", "allowedTools": ["read", "search", "edit", "web"] },
-    "executor": { "purpose": "Runs a short allow-list of commands and edits a narrow scope", "allowedTools": ["read", "search", "edit", "execute"] }
+    "planner": { "purpose": "Plans, reviews and challenges. Cannot modify files or run commands", "allowedTools": ["read", "search", "todo", "agent"], "mcpPrivileges": ["read-local"] },
+    "author": { "purpose": "Modifies files inside its own write scope. Cannot run commands", "allowedTools": ["read", "search", "edit", "web"], "mcpPrivileges": ["read-local", "read-external"] },
+    "executor": { "purpose": "Runs a short allow-list of commands and edits a narrow scope", "allowedTools": ["read", "search", "edit", "execute"], "mcpPrivileges": ["read-local"] }
   },
+  "webHosts": ["learn.microsoft.com", "azure.microsoft.com"],
   "requiredHeadings": ["Mission", "Allowed", "Prohibited", "Context", "Inputs", "Outputs", "Acceptance criteria", "Escalation", "Handoffs", "Evidence"],
   "readOnlyCommands": ["^git (status|diff|log|show)(?!.*--output)( [-\\w./:@^~=]+)*$"],
   "agents": {
     "orchestrator": {
       "class": "planner", "tools": ["read", "search", "todo", "agent"], "userInvocable": true, "disableModelInvocation": true,
       "delegatesTo": ["principal-architect", "maritime-domain", "azure-platform", "application-engineer", "ai-engineer", "data-engineer", "security-reviewer", "sre-engineer", "qa-engineer", "architecture-critic", "design-reviewer"],
-      "writes": [], "writesPhase1": [], "commands": [], "web": false, "profiles": ["orchestration"], "dependsOn": []
+      "writes": [], "writesPhase1": [], "commands": [], "web": false, "mcp": ["greenfuel-tools/get_task_state", "greenfuel-tools/get_implementation_history", "greenfuel-tools/get_accepted_decisions", "greenfuel-tools/validate_deployment_readiness"], "profiles": ["orchestration"], "dependsOn": []
     },
     "principal-architect": {
       "class": "author", "tools": ["read", "search", "edit"], "userInvocable": true, "disableModelInvocation": false, "delegatesTo": [],
       "writes": ["docs/architecture/designs/**", "docs/architecture/RISK-REGISTER.md", "docs/adr/**", "docs/state/**", "docs/design/system/**"], "writesPhase1": [],
-      "commands": [], "web": false, "profiles": ["architecture-governance", "business-framing"], "dependsOn": ["maritime-domain"]
+      "commands": [], "web": false, "mcp": ["greenfuel-tools/validate_requirements", "greenfuel-tools/validate_architecture", "greenfuel-tools/trace_requirement", "greenfuel-tools/get_accepted_decisions", "greenfuel-tools/get_task_state"], "profiles": ["architecture-governance", "business-framing"], "dependsOn": ["maritime-domain"]
     },
     "maritime-domain": {
       "class": "planner", "tools": ["read", "search"], "userInvocable": true, "disableModelInvocation": false, "delegatesTo": [],
-      "writes": [], "writesPhase1": [], "commands": [], "web": false, "profiles": ["compliance-verification", "capability-dea", "capability-mba"], "dependsOn": []
+      "writes": [], "writesPhase1": [], "commands": [], "web": false, "mcp": ["greenfuel-tools/trace_requirement", "greenfuel-tools/get_accepted_decisions", "greenfuel-tools/validate_emissions_methods", "greenfuel-tools/validate_certificate_integrity"], "profiles": ["compliance-verification", "capability-dea", "capability-mba"], "dependsOn": []
     },
     "azure-platform": {
       "class": "author", "tools": ["read", "search", "edit", "web"], "userInvocable": true, "disableModelInvocation": false, "delegatesTo": [],
       "writes": ["docs/design/azure/**"], "writesPhase1": ["infra/**"],
-      "commands": [], "web": true, "profiles": ["sovereignty-data", "nfr-architecture", "edge-connectivity"], "dependsOn": ["principal-architect"]
+      "commands": [], "web": true, "mcp": ["greenfuel-tools/validate_sovereignty", "greenfuel-tools/validate_deployment_readiness", "greenfuel-tools/trace_requirement", "microsoft-learn/microsoft_docs_search", "microsoft-learn/microsoft_docs_fetch", "microsoft-learn/microsoft_code_sample_search"], "profiles": ["sovereignty-data", "nfr-architecture", "edge-connectivity"], "dependsOn": ["principal-architect"]
     },
     "application-engineer": {
       "class": "author", "tools": ["read", "search", "edit"], "userInvocable": true, "disableModelInvocation": false, "delegatesTo": [],
       "writes": ["docs/design/application/**"], "writesPhase1": ["src/api/**", "src/web/**", "src/integration/**"],
-      "commands": [], "web": false, "profiles": ["nfr-architecture", "edge-connectivity", "security-identity"], "dependsOn": ["principal-architect", "data-engineer"]
+      "commands": [], "web": false, "mcp": ["greenfuel-tools/trace_requirement", "greenfuel-tools/get_accepted_decisions"], "profiles": ["nfr-architecture", "edge-connectivity", "security-identity"], "dependsOn": ["principal-architect", "data-engineer"]
     },
     "ai-engineer": {
       "class": "author", "tools": ["read", "search", "edit"], "userInvocable": true, "disableModelInvocation": false, "delegatesTo": [],
       "writes": ["docs/design/ai/**"], "writesPhase1": ["src/agents/**", "evals/**"],
-      "commands": [], "web": false, "profiles": ["agent-governance", "capability-cca", "capability-eaa"], "dependsOn": ["principal-architect", "data-engineer"]
+      "commands": [], "web": false, "mcp": ["greenfuel-tools/trace_requirement", "greenfuel-tools/get_accepted_decisions"], "profiles": ["agent-governance", "capability-cca", "capability-eaa"], "dependsOn": ["principal-architect", "data-engineer"]
     },
     "data-engineer": {
       "class": "author", "tools": ["read", "search", "edit"], "userInvocable": true, "disableModelInvocation": false, "delegatesTo": [],
       "writes": ["docs/design/data/**"], "writesPhase1": ["src/data/**", "src/calc/**", "db/**"],
-      "commands": [], "web": false, "profiles": ["capability-eaa", "capability-dea", "sovereignty-data"], "dependsOn": ["principal-architect", "maritime-domain"]
+      "commands": [], "web": false, "mcp": ["greenfuel-tools/validate_evidence_lineage", "greenfuel-tools/validate_emissions_methods", "greenfuel-tools/validate_certificate_integrity", "greenfuel-tools/validate_sovereignty", "greenfuel-tools/trace_requirement"], "profiles": ["capability-eaa", "capability-dea", "sovereignty-data"], "dependsOn": ["principal-architect", "maritime-domain"]
     },
     "security-reviewer": {
       "class": "planner", "tools": ["read", "search"], "userInvocable": true, "disableModelInvocation": false, "delegatesTo": [],
-      "writes": [], "writesPhase1": [], "commands": [], "web": false, "profiles": ["security-identity", "sovereignty-data", "agent-governance"], "dependsOn": ["principal-architect"]
+      "writes": [], "writesPhase1": [], "commands": [], "web": false, "mcp": ["greenfuel-tools/validate_agent_permissions", "greenfuel-tools/validate_sovereignty", "greenfuel-tools/validate_tools", "greenfuel-tools/trace_requirement", "greenfuel-tools/get_accepted_decisions"], "profiles": ["security-identity", "sovereignty-data", "agent-governance"], "dependsOn": ["principal-architect"]
     },
     "sre-engineer": {
       "class": "author", "tools": ["read", "search", "edit"], "userInvocable": true, "disableModelInvocation": false, "delegatesTo": [],
       "writes": ["docs/design/operations/**", "docs/runbooks/**"], "writesPhase1": ["ops/**"],
-      "commands": [], "web": false, "profiles": ["nfr-architecture", "edge-connectivity"], "dependsOn": ["azure-platform", "application-engineer"]
+      "commands": [], "web": false, "mcp": ["greenfuel-tools/validate_deployment_readiness", "greenfuel-tools/trace_requirement"], "profiles": ["nfr-architecture", "edge-connectivity"], "dependsOn": ["azure-platform", "application-engineer"]
     },
     "qa-engineer": {
       "class": "executor", "tools": ["read", "search", "edit", "execute"], "userInvocable": true, "disableModelInvocation": false, "delegatesTo": [],
       "writes": ["docs/design/test/**"], "writesPhase1": ["tests/product/**"],
-      "commands": ["^node --test( [\\w./][\\w./-]*\\.(m|c)?js)*$", "^npm (test|run validate|run stats)$",       "^node harness/scripts/(validate-harness|validate-agents|design-gate)\\.mjs( [-\\w./:=]+)*$", "^node harness/scripts/record-evidence\\.mjs --id EV-\\d{4} --claim \"[^\"`$]*\" -- (npm test|npm run validate|npm run stats|node --test( [\\w./][\\w./-]*\\.(m|c)?js)*|node harness/scripts/(validate-harness|validate-agents|design-gate)\\.mjs( [-\\w./:=]+)*|git (status|diff|log|show)(?!.*--output)( [-\\w./:@^~=]+)*)$", "^git (status|diff|log|show)(?!.*--output)( [-\\w./:@^~=]+)*$"],
-      "web": false, "profiles": ["assurance-review"], "dependsOn": ["application-engineer", "data-engineer", "ai-engineer"]
+      "commands": ["^gh (pr|run) (list|view|checks)(?!.*(--web|-w\\b|--watch))( [-\\w./:=#,]+)*$", "^node --test( [\\w./][\\w./-]*\\.(m|c)?js)*$", "^npm (test|run validate|run stats)$",       "^node harness/scripts/(validate-harness|validate-agents|design-gate)\\.mjs( [-\\w./:=]+)*$", "^node harness/scripts/record-evidence\\.mjs --id EV-\\d{4} --claim \"[^\"`$]*\" -- (npm test|npm run validate|npm run stats|node --test( [\\w./][\\w./-]*\\.(m|c)?js)*|node harness/scripts/(validate-harness|validate-agents|design-gate)\\.mjs( [-\\w./:=]+)*|git (status|diff|log|show)(?!.*--output)( [-\\w./:@^~=]+)*)$", "^git (status|diff|log|show)(?!.*--output)( [-\\w./:@^~=]+)*$"],
+      "web": false, "mcp": ["greenfuel-tools/validate_requirements", "greenfuel-tools/validate_architecture", "greenfuel-tools/validate_agent_permissions", "greenfuel-tools/validate_sovereignty", "greenfuel-tools/validate_evidence_lineage", "greenfuel-tools/validate_emissions_methods", "greenfuel-tools/validate_certificate_integrity", "greenfuel-tools/validate_deployment_readiness", "greenfuel-tools/validate_tools", "greenfuel-tools/trace_requirement", "greenfuel-tools/get_implementation_history"], "profiles": ["assurance-review"], "dependsOn": ["application-engineer", "data-engineer", "ai-engineer"]
     },
     "architecture-critic": {
       "class": "planner", "tools": ["read", "search"], "userInvocable": true, "disableModelInvocation": false, "delegatesTo": [],
-      "writes": [], "writesPhase1": [], "commands": [], "web": false, "profiles": ["architecture-governance"], "dependsOn": ["principal-architect"]
+      "writes": [], "writesPhase1": [], "commands": [], "web": false, "mcp": ["greenfuel-tools/validate_architecture", "greenfuel-tools/validate_requirements", "greenfuel-tools/trace_requirement", "greenfuel-tools/get_accepted_decisions"], "profiles": ["architecture-governance"], "dependsOn": ["principal-architect"]
     },
     "design-reviewer": {
       "class": "executor", "tools": ["read", "search", "edit", "execute"], "userInvocable": true, "disableModelInvocation": false, "delegatesTo": [],
       "writes": ["docs/architecture/reviews/**"], "writesPhase1": [],
       "commands": ["^node harness/scripts/(design-gate|validate-harness)\\.mjs( [-\\w./:=]+)*$", "^node harness/scripts/record-evidence\\.mjs --id EV-\\d{4} --claim \"[^\"`$]*\" -- (node harness/scripts/(validate-harness|design-gate)\\.mjs( [-\\w./:=]+)*|git (status|diff|log|show)(?!.*--output)( [-\\w./:@^~=]+)*)$", "^git (status|diff|log|show)(?!.*--output)( [-\\w./:@^~=]+)*$"],
-      "web": false, "profiles": ["architecture-governance"], "dependsOn": ["principal-architect", "architecture-critic", "security-reviewer"]
+      "web": false, "mcp": ["greenfuel-tools/validate_architecture", "greenfuel-tools/trace_requirement", "greenfuel-tools/get_accepted_decisions"], "profiles": ["architecture-governance"], "dependsOn": ["principal-architect", "architecture-critic", "security-reviewer"]
     }
   }
 }

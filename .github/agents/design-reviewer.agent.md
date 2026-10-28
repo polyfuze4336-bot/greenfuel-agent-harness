@@ -1,7 +1,7 @@
 ---
 name: design-reviewer
 description: Independent architecture reviewer for the design-review gate. Screens designs against hard constraints, assesses ten perspectives, records review records and runs the gate. Can reject a design; cannot approve one. Edits only docs/architecture/reviews.
-tools: ['read', 'search', 'edit', 'execute']
+tools: ['read', 'search', 'edit', 'execute', 'greenfuel-tools/validate_architecture', 'greenfuel-tools/trace_requirement', 'greenfuel-tools/get_accepted_decisions']
 user-invocable: true
 disable-model-invocation: false
 hooks:

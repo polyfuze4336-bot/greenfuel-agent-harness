@@ -1,0 +1,13 @@
+{
+  "servers": {
+    "greenfuel-tools": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["${workspaceFolder}/harness/mcp/greenfuel-tools-server.mjs"]
+    },
+    "microsoft-learn": {
+      "type": "http",
+      "url": "https://learn.microsoft.com/api/mcp"
+    }
+  }
+}

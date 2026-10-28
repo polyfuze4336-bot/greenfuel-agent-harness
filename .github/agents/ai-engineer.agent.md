@@ -1,7 +1,7 @@
 ---
 name: ai-engineer
 description: Owns production agent workflows, model usage, grounding and evaluations for the five business agents. Designs now; implements only after a human raises the phase. Edits only its own paths; cannot run commands.
-tools: ['read', 'search', 'edit']
+tools: ['read', 'search', 'edit', 'greenfuel-tools/trace_requirement', 'greenfuel-tools/get_accepted_decisions']
 user-invocable: true
 disable-model-invocation: false
 hooks:

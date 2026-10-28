@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { validateContext, contextStats } from './validate-context.mjs';
 import { validateArchitecture } from './validate-architecture.mjs';
 import { validateAgents } from './validate-agents.mjs';
+import { validateTools } from './validate-tools.mjs';
 
 export const PILLARS = [
   'Context & Instructions',
@@ -26,12 +27,19 @@ const REQUIRED = [
   ...['GOVERNANCE', 'HARD-CONSTRAINTS', 'REVIEW-PERSPECTIVES', 'REVIEW-CHECKPOINTS', 'DESIGN-REVIEW-GATE', 'DEFENSE-QUESTION-BANK', 'RISK-REGISTER'].map((n) => `docs/architecture/${n}.md`),
   'docs/architecture/templates/DESIGN.template.md', 'docs/architecture/templates/REVIEW-RECORD.template.md', 'docs/architecture/templates/ADR-DESIGN.template.md',
   'docs/agents/AGENT-ROSTER.md', 'harness/policy/agent-policy.json', 'harness/hooks/agent-guard.cjs',
+  'harness/tools/tool-registry.json', 'harness/tools/mcp-candidates.json', 'harness/policy/secret-patterns.json', 'harness/hooks/tool-output-guard.cjs',
+  'harness/mcp/greenfuel-tools-server.mjs', 'harness/scripts/spec-validators.mjs', '.vscode/mcp.json', '.mcp.json',
+  'docs/harness/TOOL-REGISTRY.md', 'docs/harness/MCP-SECURITY.md', 'docs/harness/TOOL-COMPATIBILITY.md', 'docs/specs/README.md',
 ];
-const SKIP_DIRS = new Set(['.git', 'node_modules']);
-const SECRET_PATTERNS = [
-  /-----BEGIN [A-Z ]*PRIVATE KEY-----/, /AccountKey=[A-Za-z0-9+/=]{20,}/, /\bghp_[A-Za-z0-9]{30,}/, /\bgithub_pat_[A-Za-z0-9_]{30,}/,
-  /\bAKIA[0-9A-Z]{16}\b/, /\bxox[baprs]-[A-Za-z0-9-]{10,}/, /\beyJ[A-Za-z0-9_-]{20,}\.eyJ[A-Za-z0-9_-]{10,}/, /[?&]sig=[A-Za-z0-9%+/=]{20,}/,
-];
+const SKIP_DIRS = new Set(['.git', 'node_modules', '.harness-logs']);
+const FALLBACK_SECRET_PATTERNS = ['-----BEGIN [A-Z ]*PRIVATE KEY-----', 'AccountKey=[A-Za-z0-9+/=]{20,}', '\\bghp_[A-Za-z0-9]{30,}', '\\bgithub_pat_[A-Za-z0-9_]{30,}'];
+
+// One list for the repository scan, the MCP configuration check and the output hook: harness/policy/secret-patterns.json.
+function secretPatterns(root) {
+  const p = path.join(root, 'harness', 'policy', 'secret-patterns.json');
+  const list = existsSync(p) ? JSON.parse(readFileSync(p, 'utf8')).repository : FALLBACK_SECRET_PATTERNS;
+  return list.map((s) => new RegExp(s));
+}
 
 function walk(dir, out = []) {
   for (const e of readdirSync(dir, { withFileTypes: true })) {
@@ -117,10 +125,11 @@ export function validate(root) {
   }
 
   const self = new Set(['harness/scripts/validate-harness.mjs', 'tests/validate-harness.test.mjs', 'tests/policy-guard.test.mjs']);
+  const secretRes = secretPatterns(root);
   for (const f of files) {
     if (self.has(rel(f)) || statSync(f).size > 1_000_000) continue;
     const text = readFileSync(f, 'utf8');
-    for (const re of SECRET_PATTERNS) if (re.test(text)) fail('secrets', `${rel(f)}: matches secret pattern ${re}`);
+    for (const re of secretRes) if (re.test(text)) fail('secrets', `${rel(f)}: matches secret pattern ${re}`);
   }
 
   if (existsSync(path.join(root, 'harness/policy/command-policy.json'))) {
@@ -142,7 +151,7 @@ export function validate(root) {
     for (const p of PILLARS) if (!text.includes(p)) fail('pillars', `${doc}: pillar '${p}' not represented`);
   }
 
-  return [...errors, ...validateContext(root), ...validateArchitecture(root), ...validateAgents(root)];
+  return [...errors, ...validateContext(root), ...validateArchitecture(root), ...validateAgents(root), ...validateTools(root)];
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

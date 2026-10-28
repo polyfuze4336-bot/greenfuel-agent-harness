@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "hooks": {
+    "postToolUse": [
+      {
+        "type": "command",
+        "command": "node harness/hooks/tool-output-guard.cjs",
+        "timeoutSec": 10
+      }
+    ]
+  }
+}

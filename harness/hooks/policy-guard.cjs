@@ -14,6 +14,18 @@ const SHELL_TOOL = /bash|powershell|pwsh|terminal|shell|^execute/i;
 const WRITE_TOOL = /^(edit|create|apply_patch|str_replace_editor|write|multi_edit|editfiles|createfile|insert_edit_into_file|replace_string_in_file|create_file)$/i;
 const READ_TOOL = /^(view|read|readfile|read_file|grep|glob|rg|search)$/i;
 const MCP_TOOL = /azure|mcp/i;
+const { matchMcp } = require('./mcp-names.cjs');
+let registryCache;
+// Any session, not just a specialist agent: a tool that looks like one of this repository's enabled MCP servers but is not
+// an exact tool in the registry is refused. This is the guard for clients that have no native tool allow-filter (VS Code).
+function unlistedMcpVerdict(toolName) {
+  try {
+    registryCache ??= JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'tools', 'tool-registry.json'), 'utf8'));
+  } catch { return null; }
+  const m = matchMcp(toolName, registryCache);
+  if (!m.server || m.builtIn || m.exact || registryCache.servers?.[m.server]?.status !== 'enabled') return null;
+  return { decision: 'deny', id: 'MCP-UNLISTED', reason: `'${toolName}' looks like a tool of the registered MCP server '${m.server}' but is not in the tool registry. Only reviewed tools may be used.` };
+}
 const PATH_KEYS = new Set(['path', 'filepath', 'file_path', 'file', 'filename', 'uri']);
 const WRITE_CMDLET = /\b(set-content|add-content|out-file|new-item|copy-item|move-item|rename-item|tee-object|tee|cp|mv|ni|sc)\b/i;
 
@@ -113,6 +125,9 @@ function evaluate(event, policy) {
   } else if (MCP_TOOL.test(toolName) && policy._mcp.test(JSON.stringify(args))) {
     verdicts.push({ decision: policy.azureMutationDecision, id: 'AZ-MCP-MUTATE', reason: `Azure/MCP tool '${toolName}' appears to request a mutating operation.` });
   }
+
+  const unlisted = unlistedMcpVerdict(toolName);
+  if (unlisted) verdicts.push(unlisted);
 
   verdicts.sort((a, b) => RANK[b.decision] - RANK[a.decision]);
   return verdicts[0] || null;

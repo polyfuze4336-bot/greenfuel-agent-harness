@@ -6,6 +6,16 @@
   "engines": { "node": ">=20" },
   "scripts": {
     "validate": "node harness/scripts/validate-harness.mjs",
+    "validate:requirements": "node harness/scripts/spec-validators.mjs requirements",
+    "validate:architecture": "node harness/scripts/spec-validators.mjs architecture",
+    "validate:sovereignty": "node harness/scripts/spec-validators.mjs sovereignty",
+    "validate:agent-permissions": "node harness/scripts/spec-validators.mjs agent-permissions",
+    "validate:evidence-lineage": "node harness/scripts/spec-validators.mjs evidence-lineage",
+    "validate:emissions-methods": "node harness/scripts/spec-validators.mjs emissions-methods",
+    "validate:certificate-integrity": "node harness/scripts/spec-validators.mjs certificate-integrity",
+    "validate:deployment-readiness": "node harness/scripts/spec-validators.mjs deployment-readiness",
+    "validate:tools": "node harness/scripts/validate-tools.mjs",
+    "mcp:server": "node harness/mcp/greenfuel-tools-server.mjs",
     "stats": "node harness/scripts/validate-harness.mjs --stats",
     "test": "node --test"
   }

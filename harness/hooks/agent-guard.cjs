@@ -1,13 +1,15 @@
 #!/usr/bin/env node
 // Per-agent preToolUse guard. Registered in each agent's own `hooks` frontmatter, so it runs only while that
 // agent is active: node harness/hooks/agent-guard.cjs <agent-name>
-// Enforces, from harness/policy/agent-policy.json: write scope, command allow-list, web access and delegation,
+// Enforces, from harness/policy/agent-policy.json and harness/tools/tool-registry.json: write scope, command allow-list,
+// per-agent MCP tool grants, web access limited to approved hosts, and delegation;
 // and refuses any agent-written "Status: Approved/Accepted". Unrecognised tools are denied (fail closed).
 // Fail-closed on unknown agent or unparseable input. This is a guardrail, not a sandbox: it narrows what a
 // correctly configured agent can do; it does not replace approvals, sandboxing or review.
 'use strict';
 const fs = require('node:fs');
 const path = require('node:path');
+const { matchMcp } = require('./mcp-names.cjs');
 
 const ROOT = path.join(__dirname, '..', '..');
 const PATH_KEYS = new Set(['path', 'filepath', 'file_path', 'file', 'filename', 'uri']);
@@ -21,7 +23,9 @@ const WEB = /(web|fetch|url|browser|http)/;
 const TASK = /^(task|agent|runsubagent|customagent|subagent)$/;
 const SEND_TO_AGENT = /^writeagent$/;
 const WRITE = /(edit|create|write|patch|replace|insert|delete|remove|rename|move|save|append|mkdir|touch|overwrite)/;
-const READ_SAFE = /^(view|read|grep|glob|search|ls|list|get|report|skill|ask|sql|todo|lsp|think|semantic|usages|problems|toolsearch|taskcomplete|exitplan|store|session)/;
+// Read-type tools are listed by exact name. Anything else that is not classified above is denied, so a new or
+// mutating tool (store_memory, session_*, a future write tool) is never allowed by a prefix match.
+const READ_SAFE = /^(view|read|grep|glob|search|ls|reportintent|readagent|listagents|skill|askuser|sql|toolsearchtool|taskcomplete|exitplanmode|lsp|readfile|listdir|filesearch|grepsearch|semanticsearch|usages|problems|managetodolist)$/;
 const APPROVAL = /\bstatus\b[\s:*_`|-]{0,12}(approved|accepted)\b/i;
 
 const load = (p) => JSON.parse(fs.readFileSync(path.join(ROOT, p), 'utf8'));
@@ -65,7 +69,24 @@ function strings(v, out = [], key = '') {
 
 const deny = (reason) => ({ decision: 'deny', reason });
 
-function evaluate(event, agentName, policy, phase) {
+let registryCache = null;
+const loadRegistry = () => (registryCache ??= load('harness/tools/tool-registry.json'));
+
+function webCheck(agentName, agent, pairs, policy) {
+  if (!agent.web) return deny(`${agentName} has no web access`);
+  const urls = pairs.filter(([k]) => k.toLowerCase() === 'url').map(([, v]) => v);
+  if (!urls.length) return deny('web search and requests without a URL are not permitted; fetch a specific page on an approved host');
+  for (const u of urls) {
+    let parsed;
+    try { parsed = new URL(u); } catch { return deny(`not a valid URL: ${u.slice(0, 80)}`); }
+    if (parsed.protocol !== 'https:' || parsed.username || parsed.password) return deny('only plain https URLs without credentials are permitted');
+    const host = parsed.hostname.toLowerCase();
+    if (!(policy.webHosts ?? []).includes(host)) return deny(`host '${host}' is not on the approved documentation host list (exact host names only)`);
+  }
+  return null;
+}
+
+function evaluate(event, agentName, policy, phase, registry = null) {
   const agent = policy.agents[agentName];
   if (!agent) return deny(`unknown agent '${agentName}'`);
   const tool = event.toolName ?? event.tool_name;
@@ -75,6 +96,12 @@ function evaluate(event, agentName, policy, phase) {
   if (typeof args === 'string') { try { args = JSON.parse(args); } catch { args = { command: args }; } }
   const pairs = strings(args);
 
+  const reg = registry ?? loadRegistry();
+  const mm = matchMcp(tool, reg);
+  if (mm.server) {
+    const granted = mm.exact && (agent.mcp ?? []).includes(`${mm.exact.server}/${mm.exact.tool}`);
+    return granted ? null : deny(`MCP tool '${tool}' is not granted to ${agentName}`);
+  }
   if (RUNNING_SHELL_SAFE.test(n)) return null;
   if (RUNNING_SHELL_INPUT.test(n)) return deny('input to a running shell cannot be checked against the allow-list');
 
@@ -99,7 +126,7 @@ function evaluate(event, agentName, policy, phase) {
     return null;
   }
 
-  if (WEB.test(n)) return agent.web ? null : deny(`${agentName} has no web access`);
+  if (WEB.test(n)) return webCheck(agentName, agent, pairs, policy);
 
   if (WRITE.test(n)) {
     const globs = [...agent.writes, ...(phase >= 1 ? agent.writesPhase1 : [])];

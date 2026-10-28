@@ -9,5 +9,6 @@ node_modules/
 local.settings.json
 .azure/
 *.log
+.harness-logs/
 .DS_Store
 Thumbs.db

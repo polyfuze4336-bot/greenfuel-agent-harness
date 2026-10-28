@@ -1,7 +1,7 @@
 ---
 name: architecture-critic
 description: Independently challenges designs and implementation claims in the green-fuel programme. Adversarial and read-only; finds the question a design cannot survive and returns ranked findings. Never fixes, never approves.
-tools: ['read', 'search']
+tools: ['read', 'search', 'greenfuel-tools/validate_architecture', 'greenfuel-tools/validate_requirements', 'greenfuel-tools/trace_requirement', 'greenfuel-tools/get_accepted_decisions']
 user-invocable: true
 disable-model-invocation: false
 hooks:

@@ -1,0 +1,57 @@
+{
+  "schema": "greenfuel.certificate/v0-candidate",
+  "certificates": [
+    {
+      "id": "CERT-SYNTHETIC-001",
+      "sequence": 1,
+      "status": "Issued",
+      "payload": {
+        "delivery": "SYNTHETIC-DELIVERY-1",
+        "quantity": "synthetic"
+      },
+      "jurisdiction": "SYNTHETIC-JURISDICTION-A",
+      "hosting": {
+        "zone": "Z2"
+      },
+      "methodology": {
+        "ref": "SM-001@0.1.0",
+        "definitionSha256": "491cea5256afecd6899aa1a8929bd493a7084ee1ba5fd5d08ef2dab1e08d762a"
+      },
+      "previousSha256": null,
+      "approval": {
+        "role": "quality-manager",
+        "approverType": "human",
+        "approvedBy": "SYNTHETIC-APPROVER",
+        "approvedAt": "2030-01-02T00:00:00Z"
+      },
+      "payloadSha256": "803bd8b3f5bb27cc6ec95a8d62e164e44f8fa16c37d8f3d8c356d516587702b2",
+      "recordSha256": "b07eeeb55ecc5ac209576ec95d32d0c64c2b9896d9ff9d7eb821b60896f52099"
+    },
+    {
+      "id": "CERT-SYNTHETIC-002",
+      "sequence": 2,
+      "status": "Filed",
+      "payload": {
+        "delivery": "SYNTHETIC-DELIVERY-2",
+        "quantity": "synthetic"
+      },
+      "jurisdiction": "SYNTHETIC-JURISDICTION-A",
+      "hosting": {
+        "zone": "Z2"
+      },
+      "methodology": {
+        "ref": "SM-001@0.1.0",
+        "definitionSha256": "491cea5256afecd6899aa1a8929bd493a7084ee1ba5fd5d08ef2dab1e08d762a"
+      },
+      "previousSha256": "b07eeeb55ecc5ac209576ec95d32d0c64c2b9896d9ff9d7eb821b60896f52099",
+      "approval": {
+        "role": "quality-manager",
+        "approverType": "human",
+        "approvedBy": "SYNTHETIC-APPROVER",
+        "approvedAt": "2030-01-02T00:00:00Z"
+      },
+      "payloadSha256": "cdf8d5d1d2f7115b80a5e1245ed3c563731ce3303735d1a56b84301d217eb3b2",
+      "recordSha256": "c889a2cc86440ea54703dcdf23f747c7a32a449f377daac1e0df362a17676b5e"
+    }
+  ]
+}

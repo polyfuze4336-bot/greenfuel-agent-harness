@@ -1,9 +1,9 @@
 # ADR 0006: Specialist custom-agent roster and enforcement model
 
-- **Status:** Proposed
+- **Status:** Accepted (2026-10-28, programme owner, by instruction in chat: "approved")
 - **Type:** Governance
 - **Date:** 2026-10-28
-- **Deciders:** Programme owner (not yet decided; see TODO T6)
+- **Deciders:** Programme owner
 - **Supersedes:** none. Replaces the earlier `architect`, `reviewer` and `design-challenger` agent files, which were consolidated into this roster.
 
 ## Context

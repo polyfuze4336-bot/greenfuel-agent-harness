@@ -39,7 +39,7 @@ test('parser reads inline lists, hook blocks and sections', () => {
 });
 
 test('a planner given the edit tool is rejected', () => {
-  const m = mutated({ [agent('security-reviewer')]: (t) => t.replace("tools: ['read', 'search']", "tools: ['read', 'search', 'edit']") });
+  const m = mutated({ [agent('security-reviewer')]: (t) => t.replace("tools: ['read', 'search',", "tools: ['read', 'search', 'edit',") });
   has(m, /security-reviewer\.agent\.md: tools .* differ from policy/);
 });
 
@@ -59,7 +59,7 @@ test('unrecognised tool alias is rejected', () => {
 
 test('specialist given delegation is rejected on both sides', () => {
   const m = mutated({
-    [agent('data-engineer')]: (t) => t.replace("tools: ['read', 'search', 'edit']", "tools: ['read', 'search', 'edit', 'agent']\nagents: ['qa-engineer']"),
+    [agent('data-engineer')]: (t) => t.replace("tools: ['read', 'search', 'edit',", "tools: ['read', 'search', 'edit', 'agent',").replace('user-invocable: true', "agents: ['qa-engineer']\nuser-invocable: true"),
   });
   has(m, /only the orchestrator may declare agents/);
   has(m, /data-engineer\.agent\.md: tools/);

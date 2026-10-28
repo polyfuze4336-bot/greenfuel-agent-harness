@@ -21,7 +21,8 @@ const DANGEROUS = [
   'az group create x', 'az deployment group create x', 'azd up', 'azd deploy', 'terraform apply', 'git push', 'git push origin main',
   'git commit -m x', 'git reset --hard', 'git checkout main', 'npm install x', 'npm publish', 'rm -rf x', 'Remove-Item x', 'node -e x',
   'node --eval x', 'node --test --eval x', 'node --test --import=x.mjs', 'git diff --output=x', 'git log --output=x', 'git status; rm x',
-  'npm test && rm x', 'npm test | tee x', 'npm run build', 'curl http://x', 'gh pr merge 1',
+  'npm test && rm x', 'npm test | tee x', 'npm run build', 'curl http://x', 'gh pr merge 1', 'gh pr create', 'gh pr view 1 --web', 'gh run watch 1',
+  'gh api -X POST repos/x/y', 'gh workflow run x', 'gh repo delete x', 'gh run view 1 --web',
   'node harness/scripts/record-evidence.mjs --id EV-0001 --claim "x" --out src/api -- npm test',
   'node harness/scripts/record-evidence.mjs --id EV-0001 --claim "x" -- node -e x',
   'node harness/scripts/record-evidence.mjs --id EV-0001 --claim "x" -- azd up',
@@ -155,7 +156,7 @@ export function validateAgents(root) {
       let re;
       try { re = new RegExp(c); } catch { fail(`${at}: command pattern is not a valid regex: ${c}`); continue; }
       if (!c.startsWith('^') || !c.endsWith('$')) fail(`${at}: command pattern must be anchored with ^ and $: ${c}`);
-      if (/\.\*/.test(c.replace(/\(\?!\.\*[^)]*\)/g, ''))) fail(`${at}: command pattern has an open-ended '.*'; list the permitted argument forms instead: ${c}`);
+      if (/\.\*/.test(c.replace(/\(\?!\.\*(?:[^()]|\([^()]*\))*\)/g, ''))) fail(`${at}: command pattern has an open-ended '.*'; list the permitted argument forms instead: ${c}`);
       for (const bad of DANGEROUS) if (re.test(bad)) fail(`${at}: command pattern ${c} permits a dangerous command: '${bad}'`);
     }
     for (const p of a.profiles) if (profiles.size && !profiles.has(p)) fail(`${at}: context profile '${p}' does not exist in the manifest`);
@@ -207,7 +208,7 @@ export function validateAgents(root) {
 
     const tools = parseList(values.tools);
     if (!tools) fail(`${at}: tools must be an explicit inline list, e.g. ['read', 'search'] (omitting tools grants all tools)`);
-    else if ([...tools].sort().join() !== [...a.tools].sort().join()) fail(`${at}: tools [${tools}] differ from policy [${a.tools}]`);
+    else if ([...tools].sort().join() !== [...a.tools, ...(a.mcp ?? [])].sort().join()) fail(`${at}: tools [${tools}] differ from policy tools plus MCP grants [${[...a.tools, ...(a.mcp ?? [])]}]`);
 
     const delegates = parseList(values.agents);
     if (a.delegatesTo.length) {

@@ -1,7 +1,7 @@
 ---
 name: application-engineer
 description: Owns backend APIs, frontend and integration design and, after a human raises the phase, their implementation for the green-fuel solution. Edits only its own paths; cannot run commands. Phase 0: design documents only.
-tools: ['read', 'search', 'edit']
+tools: ['read', 'search', 'edit', 'greenfuel-tools/trace_requirement', 'greenfuel-tools/get_accepted_decisions']
 user-invocable: true
 disable-model-invocation: false
 hooks:
