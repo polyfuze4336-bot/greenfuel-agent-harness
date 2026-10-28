@@ -18,7 +18,9 @@
         "get_task_state",
         "get_implementation_history",
         "check_plan",
-        "get_run_status"
+        "get_run_status",
+        "memory_search",
+        "memory_resume"
       ],
       "timeout": 20000
     },

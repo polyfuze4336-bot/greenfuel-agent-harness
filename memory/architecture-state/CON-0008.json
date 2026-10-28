@@ -1,0 +1,48 @@
+{
+  "kind": "constraint",
+  "title": "HC-08: The architecture supports evidence integrity, dispute resolution and audit reconstruction",
+  "statement": "The architecture supports evidence integrity, dispute resolution and audit reconstruction",
+  "subject": "constraint.hc-08",
+  "position": "in-force",
+  "tags": [
+    "hard-constraint"
+  ],
+  "refs": [
+    "HC-08",
+    "ADR-0005",
+    "file:docs/architecture/HARD-CONSTRAINTS.md"
+  ],
+  "owner": "programme-owner",
+  "critical": true,
+  "provenance": {
+    "evidence": [],
+    "source": "adr",
+    "ref": "file:docs/architecture/HARD-CONSTRAINTS.md",
+    "sourceSha256": "ce3a6ecf30a7698cf6ff3585a986e54751c0c6477df07cfc3ec21e5470c3529d",
+    "trust": "authoritative",
+    "recordedBy": {
+      "type": "importer",
+      "name": "import-adr"
+    }
+  },
+  "approval": {
+    "by": "programme-owner",
+    "at": "2026-10-28T00:00:00.000Z",
+    "ref": "ADR-0005"
+  },
+  "validity": {
+    "supersedes": [],
+    "supersededBy": null,
+    "validUntil": null,
+    "reviewBy": null,
+    "status": "approved",
+    "validFrom": "2026-10-28T11:57:33.526Z"
+  },
+  "schema": "greenfuel.memory/v1",
+  "category": "semantic",
+  "createdAt": "2026-10-28T11:57:33.526Z",
+  "updatedAt": "2026-10-28T11:57:33.526Z",
+  "classification": "internal",
+  "review": null,
+  "id": "CON-0008"
+}

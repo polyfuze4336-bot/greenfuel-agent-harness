@@ -1,7 +1,7 @@
 ---
 name: orchestrator
 description: Plans and coordinates work for the green-fuel bunkering engineering harness. Decomposes a request into tasks, delegates each to the right specialist agent, tracks checkpoints and reports status. Read-only; never edits files or runs commands. Use first for any multi-step or multi-discipline request.
-tools: ['read', 'search', 'todo', 'agent', 'greenfuel-tools/get_task_state', 'greenfuel-tools/get_implementation_history', 'greenfuel-tools/get_accepted_decisions', 'greenfuel-tools/validate_deployment_readiness', 'greenfuel-tools/check_plan', 'greenfuel-tools/get_run_status']
+tools: ['read', 'search', 'todo', 'agent', 'greenfuel-tools/get_task_state', 'greenfuel-tools/get_implementation_history', 'greenfuel-tools/get_accepted_decisions', 'greenfuel-tools/validate_deployment_readiness', 'greenfuel-tools/check_plan', 'greenfuel-tools/get_run_status', 'greenfuel-tools/memory_search', 'greenfuel-tools/memory_resume']
 agents: ['principal-architect', 'maritime-domain', 'azure-platform', 'application-engineer', 'ai-engineer', 'data-engineer', 'security-reviewer', 'sre-engineer', 'qa-engineer', 'architecture-critic', 'design-reviewer']
 user-invocable: true
 disable-model-invocation: true

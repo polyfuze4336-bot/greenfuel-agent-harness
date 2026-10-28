@@ -1,0 +1,48 @@
+{
+  "kind": "constraint",
+  "title": "HC-07: Edge-to-shore connectivity can be intermittent",
+  "statement": "Edge-to-shore connectivity can be intermittent",
+  "subject": "constraint.hc-07",
+  "position": "in-force",
+  "tags": [
+    "hard-constraint"
+  ],
+  "refs": [
+    "HC-07",
+    "ADR-0005",
+    "file:docs/architecture/HARD-CONSTRAINTS.md"
+  ],
+  "owner": "programme-owner",
+  "critical": true,
+  "provenance": {
+    "evidence": [],
+    "source": "adr",
+    "ref": "file:docs/architecture/HARD-CONSTRAINTS.md",
+    "sourceSha256": "894a3bac8d07ee79e97cedcefb8feaa7882f654c6cea1d162ff5dd61f9d32076",
+    "trust": "authoritative",
+    "recordedBy": {
+      "type": "importer",
+      "name": "import-adr"
+    }
+  },
+  "approval": {
+    "by": "programme-owner",
+    "at": "2026-10-28T00:00:00.000Z",
+    "ref": "ADR-0005"
+  },
+  "validity": {
+    "supersedes": [],
+    "supersededBy": null,
+    "validUntil": null,
+    "reviewBy": null,
+    "status": "approved",
+    "validFrom": "2026-10-28T11:57:33.434Z"
+  },
+  "schema": "greenfuel.memory/v1",
+  "category": "semantic",
+  "createdAt": "2026-10-28T11:57:33.434Z",
+  "updatedAt": "2026-10-28T11:57:33.434Z",
+  "classification": "internal",
+  "review": null,
+  "id": "CON-0007"
+}

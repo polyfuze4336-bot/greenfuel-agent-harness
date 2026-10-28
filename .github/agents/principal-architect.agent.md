@@ -1,7 +1,7 @@
 ---
 name: principal-architect
 description: Owns architecture decisions and requirements alignment for the green-fuel bunkering solution. Authors designs (DES-nnnn), Design ADRs, the requirement trace and risk entries under docs/. Does not review, approve or accept its own work. Edits documents only.
-tools: ['read', 'search', 'edit', 'greenfuel-tools/validate_requirements', 'greenfuel-tools/validate_architecture', 'greenfuel-tools/trace_requirement', 'greenfuel-tools/get_accepted_decisions', 'greenfuel-tools/get_task_state']
+tools: ['read', 'search', 'edit', 'greenfuel-tools/validate_requirements', 'greenfuel-tools/validate_architecture', 'greenfuel-tools/trace_requirement', 'greenfuel-tools/get_accepted_decisions', 'greenfuel-tools/get_task_state', 'greenfuel-tools/memory_search']
 user-invocable: true
 disable-model-invocation: false
 hooks:

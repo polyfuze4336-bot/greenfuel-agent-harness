@@ -1,0 +1,49 @@
+{
+  "kind": "decision",
+  "title": "Approve architecture governance capability v0.1",
+  "statement": "Approve architecture governance capability v0.1",
+  "body": "The owner approves the following as **architecture governance capability v0.1**, to be used for every major design: | Approved element | Where | |---|---| | Twelve hard constraints and the rule that none can be waived | [HARD-CONSTRAINTS](../architecture/HARD-CONSTRAINTS.md) | | Ten review perspectives and their verdicts (Pass, Concern, Fail, Not assessed) | [REVIEW-PERSPECTIVES](../architecture/REVIEW-PERSPECTIVES.md) | | Five review checkpoints CP1 to CP5 | [REVIEW-CHECKPOINTS](../architecture/REVIEW-CHECKPOINTS.md) | | Design-review gate rules (reject, block, approvable; structure rules ST-1 to ST-12; decision-status rule; figures lint) and its limits | [DESIGN-REVIEW-GATE](../architecture/DESIGN-REVIEW-GATE.md) | | Defence question bank (60 questions, 21 critical) | [DEFENSE-QUESTION-BANK](../architecture/DEFENSE-QUESTION-BANK.md) | | Risk register format and the fourteen risks in it | [RISK-REGISTER](../architecture/RISK-REGISTER.md) | | Design, review-record and ADR (template v2) templates | [templates/](../architecture/templates/) | | Governance roles, skills `design-authoring`, `design-review`, `design-defense`, and the rule that no agent can approve or accept | [GOVERNANCE](../architecture/GOVERNANCE.md) | | Automated checks: `design-gate.mjs`, `validate-architecture.mjs` | `harness/scripts/` | **Not approved by this decision:** - DES-0001 as a design, and ADR 0004. They remain Blocked and Proposed. DES-0001 and RV-0001 are approved only as a worked demonstration of the process. - Any waiver, any design approval, and the naming of a human decider. Naming deciders is deferred by the owner (TODO T3). Until a decider is named, the gate cannot produce a valid Approved status, so no design can be Approved. - The decision register (all 37 decisions stay open and deferred).",
+  "refs": [
+    "ADR-0005",
+    "ADR-0004",
+    "file:docs/adr/0005-approve-architecture-governance-v0-1.md"
+  ],
+  "subject": "adr.0005",
+  "position": "accepted",
+  "tags": [
+    "adr"
+  ],
+  "owner": "programme-owner",
+  "critical": false,
+  "provenance": {
+    "evidence": [],
+    "source": "adr",
+    "ref": "file:docs/adr/0005-approve-architecture-governance-v0-1.md",
+    "sourceSha256": "a886c1429b4fb75e06def8e4dc781f5b29289cb7a43497adb097064d151e3a89",
+    "trust": "authoritative",
+    "recordedBy": {
+      "type": "importer",
+      "name": "import-adr"
+    }
+  },
+  "approval": {
+    "by": "programme-owner",
+    "at": "2026-10-28T00:00:00.000Z",
+    "ref": "ADR-0005"
+  },
+  "validity": {
+    "supersedes": [],
+    "supersededBy": null,
+    "validUntil": null,
+    "reviewBy": null,
+    "status": "approved",
+    "validFrom": "2026-10-28T11:57:32.687Z"
+  },
+  "schema": "greenfuel.memory/v1",
+  "category": "semantic",
+  "createdAt": "2026-10-28T11:57:32.687Z",
+  "updatedAt": "2026-10-28T11:57:32.687Z",
+  "classification": "internal",
+  "review": null,
+  "id": "DEC-0005"
+}

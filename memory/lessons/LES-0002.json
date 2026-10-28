@@ -1,0 +1,38 @@
+{
+  "owner": "harness-maintainer",
+  "tags": [
+    "tests",
+    "node"
+  ],
+  "refs": [],
+  "critical": false,
+  "provenance": {
+    "evidence": [],
+    "source": "agent",
+    "ref": "chat:2026-10-28",
+    "trust": "unreviewed",
+    "recordedBy": {
+      "type": "agent",
+      "name": "copilot-harness-session"
+    }
+  },
+  "validity": {
+    "supersedes": [],
+    "supersededBy": null,
+    "validUntil": "2027-10-28T11:57:34.455Z",
+    "reviewBy": null,
+    "status": "active",
+    "validFrom": "2026-10-28T11:57:34.455Z"
+  },
+  "kind": "lesson",
+  "title": "Nested node --test hides failures",
+  "statement": "A node --test started inside another node --test inherits NODE_TEST_CONTEXT and can report success while hiding failures; strip that variable when a test or check spawns another test run.",
+  "schema": "greenfuel.memory/v1",
+  "category": "episodic",
+  "createdAt": "2026-10-28T11:57:34.455Z",
+  "updatedAt": "2026-10-28T11:57:34.455Z",
+  "classification": "internal",
+  "approval": null,
+  "review": null,
+  "id": "LES-0002"
+}

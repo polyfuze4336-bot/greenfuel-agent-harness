@@ -1,0 +1,41 @@
+{
+  "owner": "harness-maintainer",
+  "tags": [
+    "ci",
+    "tests"
+  ],
+  "refs": [
+    "commit:1990aae"
+  ],
+  "critical": false,
+  "provenance": {
+    "evidence": [],
+    "source": "agent",
+    "ref": "chat:2026-10-28",
+    "trust": "unreviewed",
+    "recordedBy": {
+      "type": "agent",
+      "name": "copilot-harness-session"
+    }
+  },
+  "validity": {
+    "supersedes": [],
+    "supersededBy": null,
+    "validUntil": "2027-04-26T11:57:34.334Z",
+    "reviewBy": null,
+    "status": "active",
+    "validFrom": "2026-10-28T11:57:34.334Z"
+  },
+  "kind": "test-failure",
+  "title": "A test assumed the CI environment variable was unset",
+  "statement": "A validation test assumed CI is unset, but GitHub Actions sets CI=true, so it failed only on the runner.",
+  "body": "The test now sets and deletes CI explicitly. Local runs should use CI=true to mimic Actions.",
+  "schema": "greenfuel.memory/v1",
+  "category": "episodic",
+  "createdAt": "2026-10-28T11:57:34.334Z",
+  "updatedAt": "2026-10-28T11:57:34.334Z",
+  "classification": "internal",
+  "approval": null,
+  "review": null,
+  "id": "TST-0001"
+}

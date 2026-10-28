@@ -67,9 +67,9 @@ The pillars are the programme's own list (confirmed by the owner when this stage
 ### 3.5 Memory & Resumability
 - **Purpose.** A new session, or a new person, resumes from facts rather than chat history.
 - **Native.** Copilot memory tool (user, repository and session scopes, stored locally and not shared); session history and resume.
-- **Custom.** None beyond a convention: `docs/state/STATE.md` is the committed resume point; ADRs are durable decisions; the `session-handoff` skill defines how to update it.
-- **Controls.** STATE.md separates "Done (with evidence)" from "Claimed, unverified". No secrets or personal data. Native memory is for personal preference and emerging notes only; anything the team depends on is promoted to git after review, as VS Code's own guidance recommends.
-- **Gap.** No automated check that STATE.md was updated. No cross-machine resume beyond git.
+- **Custom.** Added in Stage 8 ([ADR 0010](../adr/0010-persistent-memory.md), Proposed): strict JSON memory under `memory/` with a hash-chained ledger, a store that decides by writer type what may be written, read-only MCP tools `memory_search` and `memory_resume`, and `validate-memory` ([MEMORY-MODEL](../memory/MEMORY-MODEL.md), [MEMORY-GOVERNANCE](../memory/MEMORY-GOVERNANCE.md)). Still a convention: `docs/state/STATE.md` is the human-facing resume point; the `session-handoff` skill defines how to update it. The run store ([ADR 0009](../adr/0009-task-execution-framework.md)) remains the execution history.
+- **Controls.** STATE.md separates "Done (with evidence)" from "Claimed, unverified". No secrets, personal data or customer data in memory (refused, not redacted). Copilot's own memory is rejected as a source of authority because it cannot be reviewed or tied to evidence; anything the team depends on lives in Git.
+- **Gap.** No automated check that STATE.md was updated. No cross-machine resume beyond git. The `human` writer type of memory is self-declared, and retrieval quality has not been measured (see the memory governance limits). A VS Code restart was not tested.
 
 ### 3.6 Verification & Evidence
 - **Purpose.** "Done" means observed, not declared.

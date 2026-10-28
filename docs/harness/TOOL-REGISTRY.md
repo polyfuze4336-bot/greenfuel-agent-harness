@@ -32,7 +32,7 @@ Every tool has a purpose, inputs, outputs, a privilege class, a mutation class, 
 | azure-mcp | local-stdio | pending-approval | auth-read | @azure/mcp@3.0.0 | Azure Resource Manager and Azure Monitor APIs for the signed-in account; optional Microsoft telemetry unless disabled | az login (explicit human approval required; not performed) |
 | github-mcp-server | remote-http | pending-approval | auth-read | remote-service | GitHub API for the signed-in account | OAuth or a read-only token supplied by the host; never stored in a repository file |
 
-### Enabled read-only tools (28)
+### Enabled read-only tools (30)
 
 | ID | Category | Kind | Name | Privilege | Egress | Output untrusted | Granted to |
 |---|---|---|---|---|---|---|---|
@@ -62,6 +62,8 @@ Every tool has a purpose, inputs, outputs, a privilege class, a mutation class, 
 | mem-implementation-history | memory | mcp | get_implementation_history | read-local | none | no | orchestrator, qa-engineer |
 | arch-check-plan | architecture | mcp | check_plan | read-local | none | no | orchestrator |
 | mem-run-status | memory | mcp | get_run_status | read-local | none | no | orchestrator |
+| mem-search | memory | mcp | memory_search | read-local | none | no | orchestrator, principal-architect, architecture-critic |
+| mem-resume | memory | mcp | memory_resume | read-local | none | no | orchestrator |
 | eng-delegation | engineering | native | agent (task delegation) | read-local | none | no | orchestrator |
 | mem-session-todo | memory | native | todo | read-local | none | no | orchestrator |
 

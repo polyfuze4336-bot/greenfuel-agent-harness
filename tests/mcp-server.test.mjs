@@ -31,8 +31,8 @@ test('tools cannot be listed or called before initialize', () => {
 test('discovery: every tool is declared read-only, closed-world and has a closed input schema', () => {
   resetForTests(); init();
   const { tools } = handle({ jsonrpc: '2.0', id: 3, method: 'tools/list' }).result;
-  assert.equal(tools.length, 15);
-  assert.equal(new Set(tools.map((t) => t.name)).size, 15);
+  assert.equal(tools.length, 17);
+  assert.equal(new Set(tools.map((t) => t.name)).size, 17);
   for (const t of tools) {
     assert.equal(t.annotations.readOnlyHint, true, t.name);
     assert.equal(t.annotations.destructiveHint, false, t.name);
@@ -114,7 +114,7 @@ test('output is cleaned of invisible characters and capped', () => {
 test('every tool runs and returns well-formed JSON text within the cap', () => {
   resetForTests(); init();
   for (const t of TOOLS) {
-    const r = call(t.name, t.name === 'trace_requirement' ? { id: 'SEC-001' } : t.name === 'check_plan' ? { plan: '{}' } : {});
+    const r = call(t.name, t.name === 'trace_requirement' ? { id: 'SEC-001' } : t.name === 'check_plan' ? { plan: '{}' } : t.name === 'memory_search' ? { query: 'jurisdiction' } : {});
     assert.equal(r.result.isError, false, `${t.name}: ${r.result?.content?.[0]?.text}`);
     assert.ok(Buffer.byteLength(text(r)) <= MAX_OUTPUT_BYTES, t.name);
     JSON.parse(text(r).replace(/\n\[output truncated.*$/s, ''));

@@ -10,5 +10,7 @@ local.settings.json
 .azure/
 *.log
 .harness-logs/
+memory/.lock/
+memory/**/*.tmp-*
 .DS_Store
 Thumbs.db

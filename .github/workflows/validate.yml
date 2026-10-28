@@ -16,10 +16,12 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           persist-credentials: false
+          fetch-depth: 2 # validate-memory compares the memory ledger with the previous commit: it only ever grows
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 22
       - run: node harness/scripts/validate-harness.mjs
       - run: node harness/scripts/validate-permissions.mjs
       - run: node harness/scripts/validate-orchestration.mjs
+      - run: node harness/scripts/validate-memory.mjs
       - run: node --test

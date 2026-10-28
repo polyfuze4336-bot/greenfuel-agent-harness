@@ -1,0 +1,48 @@
+{
+  "kind": "constraint",
+  "title": "HC-11: No autonomous production deployment, no resource creation by an agent, and no application build befo",
+  "statement": "No autonomous production deployment, no resource creation by an agent, and no application build before the phase is raised by a human",
+  "subject": "constraint.hc-11",
+  "position": "in-force",
+  "tags": [
+    "hard-constraint"
+  ],
+  "refs": [
+    "HC-11",
+    "ADR-0005",
+    "file:docs/architecture/HARD-CONSTRAINTS.md"
+  ],
+  "owner": "programme-owner",
+  "critical": true,
+  "provenance": {
+    "evidence": [],
+    "source": "adr",
+    "ref": "file:docs/architecture/HARD-CONSTRAINTS.md",
+    "sourceSha256": "ef039357e697a1efa37c043a73bfdf39ca00423180f12520e1894a47a52ebea0",
+    "trust": "authoritative",
+    "recordedBy": {
+      "type": "importer",
+      "name": "import-adr"
+    }
+  },
+  "approval": {
+    "by": "programme-owner",
+    "at": "2026-10-28T00:00:00.000Z",
+    "ref": "ADR-0005"
+  },
+  "validity": {
+    "supersedes": [],
+    "supersededBy": null,
+    "validUntil": null,
+    "reviewBy": null,
+    "status": "approved",
+    "validFrom": "2026-10-28T11:57:33.806Z"
+  },
+  "schema": "greenfuel.memory/v1",
+  "category": "semantic",
+  "createdAt": "2026-10-28T11:57:33.806Z",
+  "updatedAt": "2026-10-28T11:57:33.806Z",
+  "classification": "internal",
+  "review": null,
+  "id": "CON-0011"
+}

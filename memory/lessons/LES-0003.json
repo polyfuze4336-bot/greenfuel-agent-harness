@@ -1,0 +1,38 @@
+{
+  "owner": "harness-maintainer",
+  "tags": [
+    "review",
+    "process"
+  ],
+  "refs": [],
+  "critical": false,
+  "provenance": {
+    "evidence": [],
+    "source": "agent",
+    "ref": "chat:2026-10-28",
+    "trust": "unreviewed",
+    "recordedBy": {
+      "type": "agent",
+      "name": "copilot-harness-session"
+    }
+  },
+  "validity": {
+    "supersedes": [],
+    "supersededBy": null,
+    "validUntil": "2027-10-28T11:57:34.509Z",
+    "reviewBy": null,
+    "status": "active",
+    "validFrom": "2026-10-28T11:57:34.508Z"
+  },
+  "kind": "lesson",
+  "title": "Independent adversarial review finds real defects",
+  "statement": "An independent adversarial review by a separate agent found real defects in every stage where it was used, so schedule one before the final commit of a stage.",
+  "schema": "greenfuel.memory/v1",
+  "category": "episodic",
+  "createdAt": "2026-10-28T11:57:34.508Z",
+  "updatedAt": "2026-10-28T11:57:34.508Z",
+  "classification": "internal",
+  "approval": null,
+  "review": null,
+  "id": "LES-0003"
+}

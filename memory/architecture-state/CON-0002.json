@@ -1,0 +1,48 @@
+{
+  "kind": "constraint",
+  "title": "HC-02: Customer compliance data is isolated per shipowner",
+  "statement": "Customer compliance data is isolated per shipowner",
+  "subject": "constraint.hc-02",
+  "position": "in-force",
+  "tags": [
+    "hard-constraint"
+  ],
+  "refs": [
+    "HC-02",
+    "ADR-0005",
+    "file:docs/architecture/HARD-CONSTRAINTS.md"
+  ],
+  "owner": "programme-owner",
+  "critical": true,
+  "provenance": {
+    "evidence": [],
+    "source": "adr",
+    "ref": "file:docs/architecture/HARD-CONSTRAINTS.md",
+    "sourceSha256": "38a7057e24ea1c759d7dbc1a2e6fcfccf0d3bf2368c046fee6e8bd7b2c7e2995",
+    "trust": "authoritative",
+    "recordedBy": {
+      "type": "importer",
+      "name": "import-adr"
+    }
+  },
+  "approval": {
+    "by": "programme-owner",
+    "at": "2026-10-28T00:00:00.000Z",
+    "ref": "ADR-0005"
+  },
+  "validity": {
+    "supersedes": [],
+    "supersededBy": null,
+    "validUntil": null,
+    "reviewBy": null,
+    "status": "approved",
+    "validFrom": "2026-10-28T11:57:33.066Z"
+  },
+  "schema": "greenfuel.memory/v1",
+  "category": "semantic",
+  "createdAt": "2026-10-28T11:57:33.066Z",
+  "updatedAt": "2026-10-28T11:57:33.066Z",
+  "classification": "internal",
+  "review": null,
+  "id": "CON-0002"
+}

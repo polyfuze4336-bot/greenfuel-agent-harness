@@ -35,12 +35,12 @@
     "orchestrator": {
       "class": "planner", "tools": ["read", "search", "todo", "agent"], "userInvocable": true, "disableModelInvocation": true,
       "delegatesTo": ["principal-architect", "maritime-domain", "azure-platform", "application-engineer", "ai-engineer", "data-engineer", "security-reviewer", "sre-engineer", "qa-engineer", "architecture-critic", "design-reviewer"],
-      "writes": [], "writesPhase1": [], "commands": [], "web": false, "mcp": ["greenfuel-tools/get_task_state", "greenfuel-tools/get_implementation_history", "greenfuel-tools/get_accepted_decisions", "greenfuel-tools/validate_deployment_readiness", "greenfuel-tools/check_plan", "greenfuel-tools/get_run_status"], "profiles": ["orchestration"], "dependsOn": []
+      "writes": [], "writesPhase1": [], "commands": [], "web": false, "mcp": ["greenfuel-tools/get_task_state", "greenfuel-tools/get_implementation_history", "greenfuel-tools/get_accepted_decisions", "greenfuel-tools/validate_deployment_readiness", "greenfuel-tools/check_plan", "greenfuel-tools/get_run_status", "greenfuel-tools/memory_search", "greenfuel-tools/memory_resume"], "profiles": ["orchestration"], "dependsOn": []
     },
     "principal-architect": {
       "class": "author", "tools": ["read", "search", "edit"], "userInvocable": true, "disableModelInvocation": false, "delegatesTo": [],
       "writes": ["docs/architecture/designs/**", "docs/architecture/RISK-REGISTER.md", "docs/adr/**", "docs/state/**", "docs/design/system/**"], "writesPhase1": [],
-      "commands": [], "web": false, "mcp": ["greenfuel-tools/validate_requirements", "greenfuel-tools/validate_architecture", "greenfuel-tools/trace_requirement", "greenfuel-tools/get_accepted_decisions", "greenfuel-tools/get_task_state"], "profiles": ["architecture-governance", "business-framing"], "dependsOn": ["maritime-domain"]
+      "commands": [], "web": false, "mcp": ["greenfuel-tools/validate_requirements", "greenfuel-tools/validate_architecture", "greenfuel-tools/trace_requirement", "greenfuel-tools/get_accepted_decisions", "greenfuel-tools/get_task_state", "greenfuel-tools/memory_search"], "profiles": ["architecture-governance", "business-framing"], "dependsOn": ["maritime-domain"]
     },
     "maritime-domain": {
       "class": "planner", "tools": ["read", "search"], "userInvocable": true, "disableModelInvocation": false, "delegatesTo": [],
@@ -83,7 +83,7 @@
     },
     "architecture-critic": {
       "class": "planner", "tools": ["read", "search"], "userInvocable": true, "disableModelInvocation": false, "delegatesTo": [],
-      "writes": [], "writesPhase1": [], "commands": [], "web": false, "mcp": ["greenfuel-tools/validate_architecture", "greenfuel-tools/validate_requirements", "greenfuel-tools/trace_requirement", "greenfuel-tools/get_accepted_decisions"], "profiles": ["architecture-governance"], "dependsOn": ["principal-architect"]
+      "writes": [], "writesPhase1": [], "commands": [], "web": false, "mcp": ["greenfuel-tools/validate_architecture", "greenfuel-tools/validate_requirements", "greenfuel-tools/trace_requirement", "greenfuel-tools/get_accepted_decisions", "greenfuel-tools/memory_search"], "profiles": ["architecture-governance"], "dependsOn": ["principal-architect"]
     },
     "design-reviewer": {
       "class": "executor", "tools": ["read", "search", "edit", "execute"], "userInvocable": true, "disableModelInvocation": false, "delegatesTo": [],

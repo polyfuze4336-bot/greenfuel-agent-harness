@@ -1,0 +1,49 @@
+{
+  "kind": "decision",
+  "title": "Least-privilege permission model for the coding harness",
+  "statement": "Least-privilege permission model for the coding harness",
+  "body": "Accepted. This includes the approval limits above as working values; the owner may change them under T13. - Adopt [permissions.json](../../harness/policy/permissions.json) as the policy-as-code source: tiers P0 to P4, environments, per-agent ceilings (P0 or P1 only, none for Azure), operations with tiers, classifiers, path classes, default rules DEF-01 to DEF-09 and extra rules CTL-01 and EXEC-01. - Enforce through [permission-engine.cjs](../../harness/hooks/permission-engine.cjs), called by the agent-scoped guard, the repository-wide guard and the output hook; deny unknown tools and operations for named agents; apply the always-on denials to every session. - P2 and above require a signed, expiring, scoped, use-limited approval naming exact agents and operations, verified with Ed25519 against a registry of public keys. The registry is empty, so every P2+ operation by an agent is denied until the owner registers approvers. P4 needs two distinct approvers and is never implied by a lower-tier approval. Some operations are never grantable to an agent. - Phase 0 permits no Azure or remote change whatever the approval. - Record every denial in a hash-chained, content-free audit log. - Specify, but do not create, Azure identities with a custom role excluding delete and authorization writes ([azure-identities.json](../../harness/policy/azure-identities.json)); specify GitHub protection with a read-only verifier and CODEOWNERS ([github-protection.json](../../harness/policy/github-protection.json)). Neither is applied. - Refuse shell commands built at run time as a never-grantable operation, classify direct ARM REST calls and Az PowerShell, and refuse egress in sessions scoped to isolated data. - Validate the model with `validate-permissions`, run negative tests in CI and treat [ENFORCEMENT-STATUS](../security/ENFORCEMENT-STATUS.md) as the authoritative list of what is enforced.",
+  "refs": [
+    "ADR-0008",
+    "D-037",
+    "file:docs/adr/0008-least-privilege-permission-model.md"
+  ],
+  "subject": "adr.0008",
+  "position": "accepted",
+  "tags": [
+    "adr"
+  ],
+  "owner": "programme-owner",
+  "critical": false,
+  "provenance": {
+    "evidence": [],
+    "source": "adr",
+    "ref": "file:docs/adr/0008-least-privilege-permission-model.md",
+    "sourceSha256": "020f6118e40c302bad6bd1bfdfe89e7136f320151ea0aeb9fa1c3a8e595b6e4d",
+    "trust": "authoritative",
+    "recordedBy": {
+      "type": "importer",
+      "name": "import-adr"
+    }
+  },
+  "approval": {
+    "by": "programme-owner",
+    "at": "2026-10-28T00:00:00.000Z",
+    "ref": "ADR-0008"
+  },
+  "validity": {
+    "supersedes": [],
+    "supersededBy": null,
+    "validUntil": null,
+    "reviewBy": null,
+    "status": "approved",
+    "validFrom": "2026-10-28T11:57:32.841Z"
+  },
+  "schema": "greenfuel.memory/v1",
+  "category": "semantic",
+  "createdAt": "2026-10-28T11:57:32.841Z",
+  "updatedAt": "2026-10-28T11:57:32.841Z",
+  "classification": "internal",
+  "review": null,
+  "id": "DEC-0008"
+}

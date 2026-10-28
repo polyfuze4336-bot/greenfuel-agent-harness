@@ -1,0 +1,48 @@
+{
+  "kind": "constraint",
+  "title": "HC-03: Certificates are tamper-evident and locally hosted",
+  "statement": "Certificates are tamper-evident and locally hosted",
+  "subject": "constraint.hc-03",
+  "position": "in-force",
+  "tags": [
+    "hard-constraint"
+  ],
+  "refs": [
+    "HC-03",
+    "ADR-0005",
+    "file:docs/architecture/HARD-CONSTRAINTS.md"
+  ],
+  "owner": "programme-owner",
+  "critical": true,
+  "provenance": {
+    "evidence": [],
+    "source": "adr",
+    "ref": "file:docs/architecture/HARD-CONSTRAINTS.md",
+    "sourceSha256": "2794fc2ed7c901b6543286cf24b30e330c3dd5979c7e94af2f213cf84027437c",
+    "trust": "authoritative",
+    "recordedBy": {
+      "type": "importer",
+      "name": "import-adr"
+    }
+  },
+  "approval": {
+    "by": "programme-owner",
+    "at": "2026-10-28T00:00:00.000Z",
+    "ref": "ADR-0005"
+  },
+  "validity": {
+    "supersedes": [],
+    "supersededBy": null,
+    "validUntil": null,
+    "reviewBy": null,
+    "status": "approved",
+    "validFrom": "2026-10-28T11:57:33.133Z"
+  },
+  "schema": "greenfuel.memory/v1",
+  "category": "semantic",
+  "createdAt": "2026-10-28T11:57:33.133Z",
+  "updatedAt": "2026-10-28T11:57:33.133Z",
+  "classification": "internal",
+  "review": null,
+  "id": "CON-0003"
+}

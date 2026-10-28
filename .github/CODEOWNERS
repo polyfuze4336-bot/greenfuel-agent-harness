@@ -5,6 +5,7 @@
 /harness/            @polyfuze4336-bot
 /docs/adr/           @polyfuze4336-bot
 /docs/approvals/     @polyfuze4336-bot
+/memory/             @polyfuze4336-bot
 /docs/architecture/  @polyfuze4336-bot
 /package.json        @polyfuze4336-bot
 /.mcp.json           @polyfuze4336-bot

@@ -1,0 +1,40 @@
+{
+  "owner": "harness-maintainer",
+  "tags": [
+    "ci",
+    "tests"
+  ],
+  "refs": [
+    "TST-0001"
+  ],
+  "critical": false,
+  "provenance": {
+    "evidence": [],
+    "source": "agent",
+    "ref": "chat:2026-10-28",
+    "trust": "unreviewed",
+    "recordedBy": {
+      "type": "agent",
+      "name": "copilot-harness-session"
+    }
+  },
+  "validity": {
+    "supersedes": [],
+    "supersededBy": null,
+    "validUntil": "2027-10-28T11:57:34.382Z",
+    "reviewBy": null,
+    "status": "active",
+    "validFrom": "2026-10-28T11:57:34.382Z"
+  },
+  "kind": "lesson",
+  "title": "Run the local suite with CI=true",
+  "statement": "Run the full local test suite with CI=true so environment-dependent behaviour matches GitHub Actions before pushing.",
+  "schema": "greenfuel.memory/v1",
+  "category": "episodic",
+  "createdAt": "2026-10-28T11:57:34.382Z",
+  "updatedAt": "2026-10-28T11:57:34.382Z",
+  "classification": "internal",
+  "approval": null,
+  "review": null,
+  "id": "LES-0001"
+}

@@ -1,0 +1,89 @@
+{
+  "schema": "greenfuel.memory-policy/v1",
+  "description": "Rules for persistent harness memory. Control plane: agents cannot change it. harness/memory/store.cjs reads it; validate-memory and the tests check the two agree.",
+  "root": "memory",
+  "categories": ["semantic", "episodic", "working"],
+  "kinds": {
+    "decision": { "category": "semantic", "dir": "decisions", "prefix": "DEC", "statuses": ["proposed", "approved", "superseded", "invalidated", "rejected", "expired"], "meaning": "A decision taken or proposed for the architecture or the harness" },
+    "proposal": { "category": "semantic", "dir": "decisions", "prefix": "PRO", "statuses": ["proposed", "rejected", "superseded", "invalidated", "expired"], "meaning": "A suggestion nobody has approved. Never authoritative" },
+    "assumption": { "category": "semantic", "dir": "decisions", "prefix": "ASM", "statuses": ["active", "superseded", "invalidated", "expired"], "meaning": "Something taken as true for now without proof, with an expiry so it is revisited" },
+    "fact": { "category": "semantic", "dir": "architecture-state", "prefix": "FCT", "statuses": ["active", "superseded", "invalidated", "expired"], "meaning": "An observed, evidenced statement about the system or its environment" },
+    "constraint": { "category": "semantic", "dir": "architecture-state", "prefix": "CON", "statuses": ["approved", "superseded", "invalidated"], "meaning": "A hard rule the architecture must satisfy. Pinned in every compact summary" },
+    "lesson": { "category": "episodic", "dir": "lessons", "prefix": "LES", "statuses": ["active", "superseded", "invalidated", "expired"], "meaning": "What was learned from an episode, and what to do differently" },
+    "incident": { "category": "episodic", "dir": "lessons", "prefix": "INC", "statuses": ["active", "superseded", "invalidated", "expired"], "meaning": "Something that went wrong, with its impact" },
+    "test-failure": { "category": "episodic", "dir": "lessons", "prefix": "TST", "statuses": ["active", "superseded", "invalidated", "expired"], "meaning": "A failing test or check, with its cause" },
+    "resolution": { "category": "episodic", "dir": "lessons", "prefix": "RES", "statuses": ["active", "superseded", "invalidated", "expired"], "meaning": "How an incident or failure was resolved" },
+    "task-state": { "category": "working", "dir": "task-state", "prefix": "TSK", "statuses": ["active", "expired", "invalidated"], "meaning": "The resumable state of a task: objective, checkpoints, dependencies and the context to reload" }
+  },
+  "owners": ["programme-owner", "harness-maintainer", "quality-manager"],
+  "ownersNote": "Roles. Every agent named in agent-policy.json is also an allowed owner. Personal names are rejected so memory never records a person.",
+  "trust": ["authoritative", "reviewed", "unreviewed", "untrusted"],
+  "trustMeaning": {
+    "authoritative": "Approved by a human decision that code can verify: an Accepted ADR",
+    "reviewed": "Confirmed by a named reviewer who is not the author, or derived by the engine from a hash-chained record",
+    "unreviewed": "Written by an agent or person and not yet reviewed",
+    "untrusted": "Came from a tool result or a document. Held in quarantine and never returned unless asked for"
+  },
+  "sources": ["human", "adr", "document", "agent", "tool-output", "engine", "test"],
+  "authorityWeights": { "authoritative": 1, "reviewed": 0.7, "unreviewed": 0.4, "untrusted": 0.1 },
+  "statusFactors": { "approved": 1, "active": 0.9, "proposed": 0.5, "superseded": 0, "invalidated": 0, "expired": 0, "rejected": 0 },
+  "retrieval": {
+    "defaultLimit": 8,
+    "maxLimit": 25,
+    "recencyWeight": 0.05,
+    "recencyHalfLifeDays": 180,
+    "fieldWeights": { "title": 3, "statement": 2, "subject": 2, "tags": 2, "refs": 4, "body": 1 },
+    "note": "Relevance and authority decide the order. Recency is a small tie-breaker and can never lift an entry above a more authoritative, equally relevant one. These weights are working values chosen by this design."
+  },
+  "writers": {
+    "human": { "kinds": "*", "maxTrust": "authoritative", "may": ["create", "supersede", "invalidate", "review", "approve", "sweep", "task"], "note": "A person using the CLI. The type is self-declared by the caller; agents have no shell and cannot write memory files (control-plane path)" },
+    "importer": { "kinds": ["decision", "constraint"], "maxTrust": "authoritative", "may": ["create", "approve"], "requiresVerifiedApproval": true, "note": "Derives entries from Accepted ADRs and the hard-constraints table; never invents a statement" },
+    "engine": { "kinds": ["incident", "test-failure", "resolution", "lesson", "task-state"], "maxTrust": "reviewed", "may": ["create", "task"], "requiresEvidence": true, "note": "Derived from the hash-chained run store or evidence records" },
+    "agent": { "kinds": ["proposal", "assumption", "lesson", "incident", "test-failure", "resolution", "task-state"], "maxTrust": "unreviewed", "may": ["create", "task"] },
+    "tool": { "kinds": ["proposal"], "maxTrust": "untrusted", "may": ["create"], "quarantine": true },
+    "document": { "kinds": ["proposal"], "maxTrust": "untrusted", "may": ["create"], "quarantine": true }
+  },
+  "ttlDays": { "assumption": 90, "proposal": 60, "lesson": 365, "incident": 365, "test-failure": 180, "resolution": 365, "task-state": 14, "decision": null, "fact": null, "constraint": null },
+  "ttlNote": "Working values chosen by this design. An approved decision or constraint never expires by itself: it can become stale (reviewBy in the past) and a human can supersede or invalidate it.",
+  "taskState": { "states": ["active", "interrupted", "completed", "abandoned"], "interruptedAfterMinutes": 60, "maxCheckpoints": 50, "maxContextRefs": 20 },
+  "limits": { "titleMax": 120, "statementMax": 280, "bodyMax": 4000, "resolutionMax": 600, "tagsMax": 12, "refsMax": 30, "entriesMax": 2000, "searchQueryMax": 200, "summaryBudgetMin": 400, "summaryBudgetMax": 20000 },
+  "refPatterns": [
+    "^(FR|BR|SEC|DATA|AGT|NFR)-\\d{3}$", "^HC-\\d{2}$", "^ADR-\\d{4}$", "^DES-\\d{4}$", "^D-\\d{3}$", "^EV-\\d{4}$", "^RUN-[0-9a-f]{10}(/T[A-Za-z0-9_-]{1,30})?$",
+    "^(DEC|PRO|ASM|FCT|CON|LES|INC|TST|RES|TSK)-\\d{4}$", "^commit:[0-9a-f]{7,40}$", "^ci:\\d{6,14}$", "^file:[A-Za-z0-9_./-]{1,160}$"
+  ],
+  "provenanceRefExtra": ["^chat:\\d{4}-\\d{2}-\\d{2}$", "^tool:[a-z0-9_-]{1,40}$", "^test:[A-Za-z0-9_./-]{1,80}$"],
+  "sensitive": {
+    "personal": [
+      "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}",
+      "\\+\\d[\\d ()-]{8,16}\\d",
+      "\\b[A-Z]{2}\\d{2}[A-Z0-9]{11,30}\\b",
+      "\\b(?:\\d[ -]?){13,19}\\b"
+    ],
+    "customer": [
+      "CONFIDENTIAL-MARKER",
+      "\\bIMO\\s?\\d{7}\\b",
+      "\\bMMSI\\s?\\d{9}\\b",
+      "\\bBDN[-\\s]?\\d{4,}\\b",
+      "\\bshipowner[-_ ]?(id|name|account)\\s*[:=]"
+    ],
+    "keyNames": ["password", "passwd", "secret", "token", "apikey", "api_key", "connectionstring", "privatekey", "credential"],
+    "secret": [
+      "\\bauthorization\\s*[:=]",
+      "\\b(bearer|basic)\\s+[A-Za-z0-9._~+/=-]{12,}",
+      "\\bcookie\\s*[:=]",
+      "-----BEGIN [A-Z ]*(PRIVATE KEY|CERTIFICATE)",
+      "\\beyJ[A-Za-z0-9_-]{8,}\\.[A-Za-z0-9_-]{8,}\\.",
+      "\\b(AccountKey|SharedAccessKey|SharedAccessSignature|client_secret|sig)\\s*=\\s*\\S{8,}"
+    ],
+    "note": "Pattern lists are heuristics and cannot prove the absence of sensitive data. The strict field allow-list, the path-class check on file references and the refusal to store free-form payloads do most of the work."
+  },
+  "injectionExtra": [
+    "^\\s*(important|attention|urgent|note to (the )?(ai|assistant|agent|model))\\s*:",
+    "\\b(rm\\s+-rf|sudo\\s+|invoke-expression|iex\\s*\\(|powershell(\\.exe)?\\s+-(enc|e)\\b|curl\\s+[^\\n|]*\\|\\s*(ba)?sh|wget\\s+[^\\n|]*\\|\\s*(ba)?sh)",
+    "\\b(you|the (ai|assistant|agent)) (must|should|shall|will) (now )?(always |never )?(approve|ignore|skip|disable|override|bypass|delete|exfiltrate|reveal)\\b",
+    "\\b(always|never)\\s+(approve|skip|bypass|disable)\\b[^.\\n]{0,40}\\b(review|approval|gate|check|validation|constraint)s?\\b"
+  ],
+  "injectionNote": "Heuristics for text that reads as an instruction to a model. Added to the tool-output guard's list. They cannot prove a record is free of instructions, and an agent can reword; provenance of agent-written text cannot be proven either (see MEMORY-GOVERNANCE).",
+  "invisibleChars": "[\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F\\u007F-\\u009F\\u200B-\\u200F\\u202A-\\u202E\\u2060-\\u2064\\u2066-\\u206F\\uFEFF]",
+  "denialLog": { "file": "memory-denied.jsonl", "neverRecorded": ["entry text", "statement", "body", "any value that matched a sensitive pattern"] }
+}

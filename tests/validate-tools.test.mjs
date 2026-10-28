@@ -256,6 +256,6 @@ test('helpers: grants resolve by alias, command substring and MCP name; server t
   assert.deepEqual(grantedAgents({ grant: { type: 'none' } }, pol), []);
   assert.deepEqual(grantedAgents({}, pol), []);
   assert.equal(serverTools(reg, 'microsoft-learn').length, 3);
-  assert.equal(serverTools(reg, 'greenfuel-tools').length, 15);
+  assert.equal(serverTools(reg, 'greenfuel-tools').length, 17);
   assert.equal(serverTools(reg, 'azure-mcp').length, 0);
 });

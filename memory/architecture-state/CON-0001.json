@@ -1,0 +1,48 @@
+{
+  "kind": "constraint",
+  "title": "HC-01: Delivery measurement data stays within its originating port jurisdiction. A region choice is not pro",
+  "statement": "Delivery measurement data stays within its originating port jurisdiction. A region choice is not proof",
+  "subject": "constraint.hc-01",
+  "position": "in-force",
+  "tags": [
+    "hard-constraint"
+  ],
+  "refs": [
+    "HC-01",
+    "ADR-0005",
+    "file:docs/architecture/HARD-CONSTRAINTS.md"
+  ],
+  "owner": "programme-owner",
+  "critical": true,
+  "provenance": {
+    "evidence": [],
+    "source": "adr",
+    "ref": "file:docs/architecture/HARD-CONSTRAINTS.md",
+    "sourceSha256": "ae77310e7409db77db009d38579f4fe235c0b5571b472ce506119951e5827521",
+    "trust": "authoritative",
+    "recordedBy": {
+      "type": "importer",
+      "name": "import-adr"
+    }
+  },
+  "approval": {
+    "by": "programme-owner",
+    "at": "2026-10-28T00:00:00.000Z",
+    "ref": "ADR-0005"
+  },
+  "validity": {
+    "supersedes": [],
+    "supersededBy": null,
+    "validUntil": null,
+    "reviewBy": null,
+    "status": "approved",
+    "validFrom": "2026-10-28T11:57:33.007Z"
+  },
+  "schema": "greenfuel.memory/v1",
+  "category": "semantic",
+  "createdAt": "2026-10-28T11:57:33.007Z",
+  "updatedAt": "2026-10-28T11:57:33.007Z",
+  "classification": "internal",
+  "review": null,
+  "id": "CON-0001"
+}

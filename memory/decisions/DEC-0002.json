@@ -1,0 +1,48 @@
+{
+  "kind": "decision",
+  "title": "Phase gating and human-approval enforcement via hooks",
+  "statement": "Phase gating and human-approval enforcement via hooks",
+  "body": "- Phase is a field in `harness/policy/command-policy.json`. In Phase 0 the hook denies writes to application and IaC paths and any Azure mutation. - Approvals are not stored in a file agents can write. A human approves by setting an ADR to `Accepted` and by editing the control-plane files, which the hook marks as requiring approval. - Hook, policy, workflows and recorder scripts are control-plane: agent edits need a human decision.",
+  "refs": [
+    "ADR-0002",
+    "file:docs/adr/0002-phase-gating-and-approval-enforcement.md"
+  ],
+  "subject": "adr.0002",
+  "position": "accepted",
+  "tags": [
+    "adr"
+  ],
+  "owner": "programme-owner",
+  "critical": false,
+  "provenance": {
+    "evidence": [],
+    "source": "adr",
+    "ref": "file:docs/adr/0002-phase-gating-and-approval-enforcement.md",
+    "sourceSha256": "1b3258c38c3c0d1266bfee077ac2258795a2e63c489c41ac16db0007c41bbe2d",
+    "trust": "authoritative",
+    "recordedBy": {
+      "type": "importer",
+      "name": "import-adr"
+    }
+  },
+  "approval": {
+    "by": "programme-owner",
+    "at": "2026-10-28T00:00:00.000Z",
+    "ref": "ADR-0002"
+  },
+  "validity": {
+    "supersedes": [],
+    "supersededBy": null,
+    "validUntil": null,
+    "reviewBy": null,
+    "status": "approved",
+    "validFrom": "2026-10-28T11:57:32.571Z"
+  },
+  "schema": "greenfuel.memory/v1",
+  "category": "semantic",
+  "createdAt": "2026-10-28T11:57:32.571Z",
+  "updatedAt": "2026-10-28T11:57:32.571Z",
+  "classification": "internal",
+  "review": null,
+  "id": "DEC-0002"
+}

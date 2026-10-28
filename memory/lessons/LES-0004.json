@@ -1,0 +1,40 @@
+{
+  "owner": "harness-maintainer",
+  "tags": [
+    "evidence",
+    "process"
+  ],
+  "refs": [
+    "HC-12"
+  ],
+  "critical": false,
+  "provenance": {
+    "evidence": [],
+    "source": "agent",
+    "ref": "chat:2026-10-28",
+    "trust": "unreviewed",
+    "recordedBy": {
+      "type": "agent",
+      "name": "copilot-harness-session"
+    }
+  },
+  "validity": {
+    "supersedes": [],
+    "supersededBy": null,
+    "validUntil": "2027-10-28T11:57:34.564Z",
+    "reviewBy": null,
+    "status": "active",
+    "validFrom": "2026-10-28T11:57:34.564Z"
+  },
+  "kind": "lesson",
+  "title": "Do not claim a restart or a verification that was not performed",
+  "statement": "Record what was observed and what the owner reported separately; an owner-reported check is not an observed one.",
+  "schema": "greenfuel.memory/v1",
+  "category": "episodic",
+  "createdAt": "2026-10-28T11:57:34.564Z",
+  "updatedAt": "2026-10-28T11:57:34.564Z",
+  "classification": "internal",
+  "approval": null,
+  "review": null,
+  "id": "LES-0004"
+}

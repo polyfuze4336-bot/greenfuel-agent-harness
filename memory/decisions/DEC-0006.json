@@ -1,0 +1,48 @@
+{
+  "kind": "decision",
+  "title": "Specialist custom-agent roster and enforcement model",
+  "statement": "Specialist custom-agent roster and enforcement model",
+  "body": "Proposed for approval: adopt the twelve-agent roster in [AGENT-ROSTER](../agents/AGENT-ROSTER.md): - Three classes: planners (read-only), authors (edit only their own folders, no commands), executors (anchored single-command allow-list plus a narrow edit scope). - Only the orchestrator delegates, one level deep. It cannot be selected by other agents. Specialists return to it. - `agent-policy.json` is the source of truth. Each agent file must match it. `validate-agents.mjs` and `agent-guard.cjs` carry the checks the platform does not. Both are covered by unit and mutation tests. - Product-code write scopes stay closed until a human raises the phase. - Features judged unsupported or not portable are rejected by the validator (handoffs, MCP servers, model pinning, and others).",
+  "refs": [
+    "ADR-0006",
+    "file:docs/adr/0006-specialist-agent-roster-and-enforcement.md"
+  ],
+  "subject": "adr.0006",
+  "position": "accepted",
+  "tags": [
+    "adr"
+  ],
+  "owner": "programme-owner",
+  "critical": false,
+  "provenance": {
+    "evidence": [],
+    "source": "adr",
+    "ref": "file:docs/adr/0006-specialist-agent-roster-and-enforcement.md",
+    "sourceSha256": "b6305d4375a1c9eac4989b885a9986b9c077cd016523763e2820a25a47bdf588",
+    "trust": "authoritative",
+    "recordedBy": {
+      "type": "importer",
+      "name": "import-adr"
+    }
+  },
+  "approval": {
+    "by": "programme-owner",
+    "at": "2026-10-28T00:00:00.000Z",
+    "ref": "ADR-0006"
+  },
+  "validity": {
+    "supersedes": [],
+    "supersededBy": null,
+    "validUntil": null,
+    "reviewBy": null,
+    "status": "approved",
+    "validFrom": "2026-10-28T11:57:32.740Z"
+  },
+  "schema": "greenfuel.memory/v1",
+  "category": "semantic",
+  "createdAt": "2026-10-28T11:57:32.740Z",
+  "updatedAt": "2026-10-28T11:57:32.740Z",
+  "classification": "internal",
+  "review": null,
+  "id": "DEC-0006"
+}

@@ -97,7 +97,7 @@
   ],
   "pathClasses": [
     { "id": "secret", "pattern": "(^|/)\\.env($|\\.(?!example$|sample$|template$))|\\.(pfx|pem|key|p12|jks|keystore)$|(^|/)id_(rsa|ed25519|ecdsa)$|(^|/)local\\.settings\\.json$|(^|/)\\.azure/.*\\.env$|(^|/)\\.git-credentials$|(^|/)\\.npmrc$|(^|/)\\.netrc$|(^|/)simulated-secrets/" },
-    { "id": "control-plane", "pattern": "^(harness/|\\.github/|\\.vscode/|\\.mcp\\.json$|docs/approvals/|docs/state/runs/|package\\.json$|\\.gitignore$)" },
+    { "id": "control-plane", "pattern": "^(harness/|\\.github/|\\.vscode/|\\.mcp\\.json$|docs/approvals/|docs/state/runs/|memory/|package\\.json$|\\.gitignore$)" },
     { "id": "audit", "pattern": "(^|/)\\.harness-logs/" },
     { "id": "shipowner", "pattern": "(^|/)tests/fixtures/shipowners/(?<owner>[^/]+)(/|$)" },
     { "id": "jurisdiction", "pattern": "(^|/)tests/fixtures/jurisdictions/(?<jx>[^/]+)(/|$)" },

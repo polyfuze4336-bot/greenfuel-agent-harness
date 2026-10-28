@@ -1,0 +1,48 @@
+{
+  "kind": "decision",
+  "title": "Native-first harness; custom code only for documented gaps",
+  "statement": "Native-first harness; custom code only for documented gaps",
+  "body": "Use native customization files for agents, instructions, skills, memory and approvals. Add custom code only where a documented requirement has no native answer. At this stage that is three small, dependency-free scripts: a `preToolUse` policy hook, an evidence recorder and a repository validator. Each is listed in the capability matrix with the requirement it satisfies.",
+  "refs": [
+    "ADR-0001",
+    "file:docs/adr/0001-native-first-harness.md"
+  ],
+  "subject": "adr.0001",
+  "position": "accepted",
+  "tags": [
+    "adr"
+  ],
+  "owner": "programme-owner",
+  "critical": false,
+  "provenance": {
+    "evidence": [],
+    "source": "adr",
+    "ref": "file:docs/adr/0001-native-first-harness.md",
+    "sourceSha256": "73439610c9438c27410e7836303c1861cd110982c0f030beea3a8adb9923ffa1",
+    "trust": "authoritative",
+    "recordedBy": {
+      "type": "importer",
+      "name": "import-adr"
+    }
+  },
+  "approval": {
+    "by": "programme-owner",
+    "at": "2026-10-28T00:00:00.000Z",
+    "ref": "ADR-0001"
+  },
+  "validity": {
+    "supersedes": [],
+    "supersededBy": null,
+    "validUntil": null,
+    "reviewBy": null,
+    "status": "approved",
+    "validFrom": "2026-10-28T11:57:32.517Z"
+  },
+  "schema": "greenfuel.memory/v1",
+  "category": "semantic",
+  "createdAt": "2026-10-28T11:57:32.517Z",
+  "updatedAt": "2026-10-28T11:57:32.517Z",
+  "classification": "internal",
+  "review": null,
+  "id": "DEC-0001"
+}

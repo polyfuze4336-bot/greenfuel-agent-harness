@@ -21,6 +21,14 @@ Owner-facing list of pending answers and approvals. Items are removed only when 
 | T16 | Name the break-glass declarer and second approver contacts, the owner and retention for the denied-action log, and whether to anchor the audit chain outside the machine. **Deferred by the owner on 2026-10-28** | [BREAK-GLASS](../security/BREAK-GLASS.md), [DENIED-ACTION-AUDIT](../security/DENIED-ACTION-AUDIT.md) | Using break-glass; audit assurance |
 | T17 | After the subscription decision (D-037): create the scoped Azure identities, custom role, `CanNotDelete` locks and policy from `azure-identities.json`, verify with the read-only tools, and record the evidence. Nothing has been created. **Deferred by the owner on 2026-10-28** | [azure-identities.json](../../harness/policy/azure-identities.json) | Any P3 operation; DEF-06 enforcement by Azure itself |
 
+## Awaiting the owner (memory stage, 2026-10-28)
+
+| # | Item | Source | Blocks |
+|---|---|---|---|
+| T21 | Accept, change or reject [ADR 0010](../adr/0010-persistent-memory.md) (persistent memory). On acceptance the ADR Status line changes and a human runs `node harness/scripts/memory.mjs import --as importer:import-adr`, which approves its memory entry; CI fails until that is done | [MEMORY-MODEL](../memory/MEMORY-MODEL.md), [MEMORY-GOVERNANCE](../memory/MEMORY-GOVERNANCE.md) | Treating memory as approved harness capability |
+| T22 | Confirm or change the memory working values: authority and status weights, recency weight and half-life, expiry periods, size limits, the interruption window. None is measured | [memory-policy.json](../../harness/policy/memory-policy.json) | Relying on the retrieval order and expiry rules |
+| T23 | Decide how human writers of memory are authenticated. Today the writer type is declared by the caller; the signed approvals of the permission model could authenticate approvals once approvers are registered (T13). Until then, review changes to `memory/` and `docs/adr/` by hand; code-owner review needs branch protection (T14) | [MEMORY-GOVERNANCE](../memory/MEMORY-GOVERNANCE.md) limits | Memory approvals being more than procedure |
+
 ## Decisions made
 
 | Date | Decision | Recorded in |

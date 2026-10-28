@@ -1,0 +1,48 @@
+{
+  "kind": "constraint",
+  "title": "HC-06: AI cannot invent sensor measurements, emissions factors, feedstock evidence or certification status",
+  "statement": "AI cannot invent sensor measurements, emissions factors, feedstock evidence or certification status",
+  "subject": "constraint.hc-06",
+  "position": "in-force",
+  "tags": [
+    "hard-constraint"
+  ],
+  "refs": [
+    "HC-06",
+    "ADR-0005",
+    "file:docs/architecture/HARD-CONSTRAINTS.md"
+  ],
+  "owner": "programme-owner",
+  "critical": true,
+  "provenance": {
+    "evidence": [],
+    "source": "adr",
+    "ref": "file:docs/architecture/HARD-CONSTRAINTS.md",
+    "sourceSha256": "9f2424b4216f6f7c79fb5dc9e178f095f81c7a9d4e1e5c5fe77ae6c0b9752fc8",
+    "trust": "authoritative",
+    "recordedBy": {
+      "type": "importer",
+      "name": "import-adr"
+    }
+  },
+  "approval": {
+    "by": "programme-owner",
+    "at": "2026-10-28T00:00:00.000Z",
+    "ref": "ADR-0005"
+  },
+  "validity": {
+    "supersedes": [],
+    "supersededBy": null,
+    "validUntil": null,
+    "reviewBy": null,
+    "status": "approved",
+    "validFrom": "2026-10-28T11:57:33.359Z"
+  },
+  "schema": "greenfuel.memory/v1",
+  "category": "semantic",
+  "createdAt": "2026-10-28T11:57:33.359Z",
+  "updatedAt": "2026-10-28T11:57:33.359Z",
+  "classification": "internal",
+  "review": null,
+  "id": "CON-0006"
+}

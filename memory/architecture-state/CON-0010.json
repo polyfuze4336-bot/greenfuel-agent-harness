@@ -1,0 +1,48 @@
+{
+  "kind": "constraint",
+  "title": "HC-10: Standards, schemes and regulations are candidates until verified",
+  "statement": "Standards, schemes and regulations are candidates until verified",
+  "subject": "constraint.hc-10",
+  "position": "in-force",
+  "tags": [
+    "hard-constraint"
+  ],
+  "refs": [
+    "HC-10",
+    "ADR-0005",
+    "file:docs/architecture/HARD-CONSTRAINTS.md"
+  ],
+  "owner": "programme-owner",
+  "critical": true,
+  "provenance": {
+    "evidence": [],
+    "source": "adr",
+    "ref": "file:docs/architecture/HARD-CONSTRAINTS.md",
+    "sourceSha256": "8b989c4dfa0241ed1a7671e846e3b26ad2b9c677aca7a8b9fd61e26011a7d532",
+    "trust": "authoritative",
+    "recordedBy": {
+      "type": "importer",
+      "name": "import-adr"
+    }
+  },
+  "approval": {
+    "by": "programme-owner",
+    "at": "2026-10-28T00:00:00.000Z",
+    "ref": "ADR-0005"
+  },
+  "validity": {
+    "supersedes": [],
+    "supersededBy": null,
+    "validUntil": null,
+    "reviewBy": null,
+    "status": "approved",
+    "validFrom": "2026-10-28T11:57:33.681Z"
+  },
+  "schema": "greenfuel.memory/v1",
+  "category": "semantic",
+  "createdAt": "2026-10-28T11:57:33.681Z",
+  "updatedAt": "2026-10-28T11:57:33.681Z",
+  "classification": "internal",
+  "review": null,
+  "id": "CON-0010"
+}

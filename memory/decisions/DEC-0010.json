@@ -1,0 +1,46 @@
+{
+  "kind": "decision",
+  "title": "Persistent memory for the coding harness",
+  "statement": "Persistent memory for the coding harness",
+  "body": "Proposed. Adopt, if the owner accepts: - The model in [MEMORY-MODEL](../memory/MEMORY-MODEL.md) and the rules in [MEMORY-GOVERNANCE](../memory/MEMORY-GOVERNANCE.md), implemented by [store.cjs](../../harness/memory/store.cjs) and [memory-policy.json](../../harness/policy/memory-policy.json), operated through [memory.mjs](../../harness/scripts/memory.mjs). - Authority that code verifies: an entry is approved only through a reference to an Accepted ADR, recorded by a human or the importer. A change to an approved entry is a new entry that supersedes it under a different Accepted ADR. A hash-chained ledger and a generated architecture snapshot make edits, deletions and rollbacks detectable. - Quarantine for tool output and documents, refusal (not redaction) of sensitive data, a strict schema, and a denial log that never records refused text. - Retrieval ranked by relevance and authority, with recency only as a tie-breaker; compact summaries that never drop a pinned constraint or a conflict. - `memory/` as a control-plane path: agents cannot write it and read it only through `memory_search` (orchestrator, principal architect, architecture critic) and `memory_resume` (orchestrator). - [validate-memory.mjs](../../harness/scripts/validate-memory.mjs) in `npm run validate` and CI. - No SQLite and no vector database now, with the revisit conditions below.",
+  "refs": [
+    "ADR-0010",
+    "ADR-0009",
+    "ADR-0008",
+    "file:docs/adr/0010-persistent-memory.md"
+  ],
+  "subject": "adr.0010",
+  "position": "proposed",
+  "tags": [
+    "adr"
+  ],
+  "owner": "programme-owner",
+  "critical": false,
+  "provenance": {
+    "evidence": [],
+    "source": "adr",
+    "ref": "file:docs/adr/0010-persistent-memory.md",
+    "sourceSha256": "b47aaec9e566697a50fb257984e9f0820948f205e406651fdaec28a94dd2884a",
+    "trust": "unreviewed",
+    "recordedBy": {
+      "type": "importer",
+      "name": "import-adr"
+    }
+  },
+  "approval": null,
+  "validity": {
+    "supersedes": [],
+    "supersededBy": null,
+    "validUntil": "2026-12-27T11:57:32.951Z",
+    "reviewBy": null,
+    "status": "proposed",
+    "validFrom": "2026-10-28T11:57:32.951Z"
+  },
+  "schema": "greenfuel.memory/v1",
+  "category": "semantic",
+  "createdAt": "2026-10-28T11:57:32.951Z",
+  "updatedAt": "2026-10-28T11:59:41.028Z",
+  "classification": "internal",
+  "review": null,
+  "id": "DEC-0010"
+}

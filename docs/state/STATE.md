@@ -3,7 +3,7 @@
 Resume point. Update with the `session-handoff` skill. Facts only; unverified items are labelled.
 
 ## Current phase and objective
-Phase 0. Baseline v0.1 is **approved** (ADR 0003); the 37 decisions stay open, deferred by the owner. The architecture-governance capability is **approved as a process** (ADR 0005); [DES-0001](../architecture/designs/DES-0001-delivery-measurement-storage-topology.md) is computed **Blocked** and is not approved. The twelve specialist agents are **approved** ([ADR 0006](../adr/0006-specialist-agent-roster-and-enforcement.md)), the tool layer is **approved** ([ADR 0007](../adr/0007-tool-layer-mcp-and-output-controls.md)) and the **least-privilege permission model is approved** ([ADR 0008](../adr/0008-least-privilege-permission-model.md), Accepted 2026-10-28, including the working approval limits): policy-as-code, a decision engine called by the hooks, signed approvals, a hash-chained denied-action log, Azure identity and GitHub protection specifications (not applied), a validator and negative tests. Its follow-ups T13 to T17 are deferred by the owner. This stage added the **task-execution framework** ([ADR 0009](../adr/0009-task-execution-framework.md), **Accepted** 2026-10-28): a deterministic engine, a delegation hook driving native `task` delegation, a human-run CLI, two read-only MCP tools, a durable hash-chained run store and a live demonstration ([DEMO-EVIDENCE-STORE](../orchestration/DEMO-EVIDENCE-STORE.md)). The demonstration run `RUN-afb2a0466e` was closed by the owner with the critic's REWORK as the outcome. Objective: persistent memory for the harness (this is the next stage). No application code and no Azure resources exist; no Azure or GitHub sign-in was used by any agent.
+Phase 0. Baseline v0.1 is **approved** (ADR 0003); the 37 decisions stay open, deferred by the owner. The architecture-governance capability is **approved as a process** (ADR 0005); [DES-0001](../architecture/designs/DES-0001-delivery-measurement-storage-topology.md) is computed **Blocked** and is not approved. The twelve specialist agents are **approved** ([ADR 0006](../adr/0006-specialist-agent-roster-and-enforcement.md)), the tool layer is **approved** ([ADR 0007](../adr/0007-tool-layer-mcp-and-output-controls.md)) and the **least-privilege permission model is approved** ([ADR 0008](../adr/0008-least-privilege-permission-model.md), Accepted 2026-10-28, including the working approval limits): policy-as-code, a decision engine called by the hooks, signed approvals, a hash-chained denied-action log, Azure identity and GitHub protection specifications (not applied), a validator and negative tests. Its follow-ups T13 to T17 are deferred by the owner. This stage added the **task-execution framework** ([ADR 0009](../adr/0009-task-execution-framework.md), **Accepted** 2026-10-28): a deterministic engine, a delegation hook driving native `task` delegation, a human-run CLI, two read-only MCP tools, a durable hash-chained run store and a live demonstration ([DEMO-EVIDENCE-STORE](../orchestration/DEMO-EVIDENCE-STORE.md)). The demonstration run `RUN-afb2a0466e` was closed by the owner with the critic's REWORK as the outcome. Objective: persistent memory for the harness, built this stage and **awaiting the owner's decision** ([ADR 0010](../adr/0010-persistent-memory.md), Proposed). No application code and no Azure resources exist; no Azure or GitHub sign-in was used by any agent.
 
 ## Done (with evidence)
 - Owner decisions 2026-10-28: ADR 0001 and 0002 accepted; baseline approved; governance capability approved; specialist roster approved (ADR 0006); M1 decisions, decider naming (T3) and the T9 agent checks deferred. All earlier commits are pushed; CI succeeded on `2f52908` (`EV-0006` and earlier CI: `EV-0003`).
@@ -33,6 +33,13 @@ Phase 0. Baseline v0.1 is **approved** (ADR 0003); the 37 decisions stay open, d
   - Defects found and fixed: four by the live run, and four by an independent model review (not an evidence record). Each has regression tests.
   - **Not exercised live:** the retry path, error classes, lease expiry, task approvals (the approver registry is empty) and VS Code. Tests cover the first four only.
 
+- **Persistent memory (this stage; committed locally, not pushed; ADR 0010 Proposed):**
+  - [MEMORY-MODEL](../memory/MEMORY-MODEL.md), [MEMORY-GOVERNANCE](../memory/MEMORY-GOVERNANCE.md), the store [store.cjs](../../harness/memory/store.cjs), policy [memory-policy.json](../../harness/policy/memory-policy.json), CLI [memory.mjs](../../harness/scripts/memory.mjs), validator `validate-memory`, MCP tools `memory_search` (orchestrator, principal architect, architecture critic) and `memory_resume` (orchestrator), and the data in [memory/](../../memory/README.md): 10 decisions imported from the ADRs (8 approved; ADR 0004 and ADR 0010 are proposals), the 12 hard constraints as pinned constraints, and 7 lessons from this project's real incidents written as an agent with unreviewed trust.
+  - Git-versioned JSON, a hash-chained ledger anchored against Git history, a generated architecture snapshot, an in-memory keyword index. No SQLite and no vector database (justified in the model, with revisit conditions).
+  - Tested: the seven requested scenarios, tamper, deletion and rollback detection, quarantine, review, expiry, invalidation, import and drift, compact summaries, a validator mutation matrix, the read-only tools, the control-plane denial for every agent, and the CLI's write rules. Recorded evidence IDs are listed below once recorded.
+  - An independent model review found eight issues; six were fixed with regression tests, one task-list filter was corrected, and two limits are stated in the governance document (the `human` writer type is self-declared; task-state edits are not detected). That review is not an evidence record.
+  - **Not done:** a VS Code restart was not performed. Resume was shown in a new process from files only. Retrieval quality was not measured (no recall figures exist). The memory tools were not exercised live in VS Code chat or Copilot CLI.
+
 ## Claimed, unverified
 - VS Code chat behaviour for agents, hooks, MCP server start and trust prompts, and `server/tool` in agent `tools:` (TODO T8, T12). Whether the CLI kills a server at its `timeout`.
 - Agent output quality and consistency: single runs. A write attempted inside a delegated subagent; native `agents` allow-list enforcement on its own (TODO T9, deferred).
@@ -42,7 +49,8 @@ Phase 0. Baseline v0.1 is **approved** (ADR 0003); the 37 decisions stay open, d
 - The example review was written by a model. No human has reviewed it.
 - The gate checks structure and consistency, not truth (DESIGN-REVIEW-GATE section 3). The approval-status guard matches text and cannot authenticate a human (roadmap R4).
 - Every standard and scheme name is a candidate. Placeholder NFR numbers are proposals.
-- Commits `e4a935e` and `eff5bc7` were pushed and CI succeeded on `3a3fcdf`. The task-execution commits are pushed and the CI result is recorded below once checked; their tests ran on Windows only (file-hash checks tolerate line-ending differences, which is the main cross-platform risk).
+- Commits `e4a935e` and `eff5bc7` were pushed and CI succeeded on `3a3fcdf`. The task-execution commits were pushed; CI failed twice on Linux for two portability bugs (a mixed line-ending hash check and a test that assumed `CI` was unset), both fixed, and **CI succeeded on `1990aae`**. Memory was built after that and has not been through CI yet; it adds file-hash and Git-comparison logic that has run on Windows only.
+- Memory: retrieval weights, expiry periods, size limits and the interruption window are working values, not measured. The sensitive-data and injection scans are heuristics. Authority rests on ADR files, and the `human` writer type is declared by the caller.
 - The framework proves structure and provenance, not truth. Model-written content (the sample proposal, the reviews) is unverified. Undeclared writes by an agent inside its write scope are not detected. Hooks for `task` were observed by the assistant only in Copilot CLI; the owner reports VS Code chat was verified (T18), which is recorded but not independently observed.
 - The permission screen is regular-expression based; new evasions are possible. The default session is screened, not sandboxed.
 - Approval limits (lifetimes, uses, approver counts) are proposals.
@@ -53,10 +61,11 @@ Phase 0. Baseline v0.1 is **approved** (ADR 0003); the 37 decisions stay open, d
 3. Owner names the deciders (T3) and answers or defers the M1 decisions; then run the governance gate on sibling designs.
 4. Finish R1 in VS Code and the VS Code tool checks (T12, T18); run R11, R12.
 5. Done: the demonstration run was closed (T19) and the framework limits confirmed (T20).
+6. Owner decides ADR 0010 (T21), the memory working values (T22) and how human writers should be authenticated (T23).
 
 ## Open approvals
-- none for the framework (ADR 0009 Accepted)
-- Pushing any commits after `709c941`
+- ADR 0010 (persistent memory; Proposed)
+- Pushing the memory commits
 - Azure and GitHub sign-in, and any pending MCP candidate (none approved)
 - ADR 0004 (Proposed; cannot be Accepted while RV-0001 is Blocked)
 - All 37 decisions (Open, deferred)

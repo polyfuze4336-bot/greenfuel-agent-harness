@@ -1,0 +1,42 @@
+{
+  "owner": "harness-maintainer",
+  "tags": [
+    "ci",
+    "line-endings"
+  ],
+  "refs": [
+    "INC-0001",
+    "commit:625142a"
+  ],
+  "critical": false,
+  "provenance": {
+    "evidence": [],
+    "source": "agent",
+    "ref": "chat:2026-10-28",
+    "trust": "unreviewed",
+    "recordedBy": {
+      "type": "agent",
+      "name": "copilot-harness-session"
+    }
+  },
+  "validity": {
+    "supersedes": [],
+    "supersededBy": null,
+    "validUntil": "2027-10-28T11:57:34.283Z",
+    "reviewBy": null,
+    "status": "active",
+    "validFrom": "2026-10-28T11:57:34.283Z"
+  },
+  "kind": "resolution",
+  "title": "Hash check tolerates line-ending variants; new captures stored as LF",
+  "statement": "The run-file hash comparison now accepts the raw, LF, CRLF and mixed variants, new captured replies are normalised to LF on storage, and a regression test rewrites the line endings of the real committed run.",
+  "resolution": "Fixed in commit 625142a. The change tolerates endings; it does not weaken the hash.",
+  "schema": "greenfuel.memory/v1",
+  "category": "episodic",
+  "createdAt": "2026-10-28T11:57:34.283Z",
+  "updatedAt": "2026-10-28T11:57:34.283Z",
+  "classification": "internal",
+  "approval": null,
+  "review": null,
+  "id": "RES-0001"
+}

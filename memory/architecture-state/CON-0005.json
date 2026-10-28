@@ -1,0 +1,48 @@
+{
+  "kind": "constraint",
+  "title": "HC-05: Emissions calculations are reproducible and traceable to the exact methodology version",
+  "statement": "Emissions calculations are reproducible and traceable to the exact methodology version",
+  "subject": "constraint.hc-05",
+  "position": "in-force",
+  "tags": [
+    "hard-constraint"
+  ],
+  "refs": [
+    "HC-05",
+    "ADR-0005",
+    "file:docs/architecture/HARD-CONSTRAINTS.md"
+  ],
+  "owner": "programme-owner",
+  "critical": true,
+  "provenance": {
+    "evidence": [],
+    "source": "adr",
+    "ref": "file:docs/architecture/HARD-CONSTRAINTS.md",
+    "sourceSha256": "c5e13cfb0406148a5cba3bbb545ed1954fb66399aacddf26468caadf203dffbb",
+    "trust": "authoritative",
+    "recordedBy": {
+      "type": "importer",
+      "name": "import-adr"
+    }
+  },
+  "approval": {
+    "by": "programme-owner",
+    "at": "2026-10-28T00:00:00.000Z",
+    "ref": "ADR-0005"
+  },
+  "validity": {
+    "supersedes": [],
+    "supersededBy": null,
+    "validUntil": null,
+    "reviewBy": null,
+    "status": "approved",
+    "validFrom": "2026-10-28T11:57:33.284Z"
+  },
+  "schema": "greenfuel.memory/v1",
+  "category": "semantic",
+  "createdAt": "2026-10-28T11:57:33.284Z",
+  "updatedAt": "2026-10-28T11:57:33.284Z",
+  "classification": "internal",
+  "review": null,
+  "id": "CON-0005"
+}

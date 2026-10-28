@@ -1,0 +1,41 @@
+{
+  "owner": "harness-maintainer",
+  "tags": [
+    "ci",
+    "line-endings"
+  ],
+  "refs": [
+    "commit:625142a"
+  ],
+  "critical": false,
+  "provenance": {
+    "evidence": [],
+    "source": "agent",
+    "ref": "chat:2026-10-28",
+    "trust": "unreviewed",
+    "recordedBy": {
+      "type": "agent",
+      "name": "copilot-harness-session"
+    }
+  },
+  "validity": {
+    "supersedes": [],
+    "supersededBy": null,
+    "validUntil": "2027-10-28T11:57:34.197Z",
+    "reviewBy": null,
+    "status": "active",
+    "validFrom": "2026-10-28T11:57:34.197Z"
+  },
+  "kind": "incident",
+  "title": "CI reported a stored run file as altered on Linux",
+  "statement": "After a push, CI failed on Linux because a committed run result file mixed LF line endings with one CRLF ending added by a Windows write, so its hash differed.",
+  "body": "The hash check accepted only all-LF or all-CRLF files. Local Windows runs passed; the Linux runner did not.",
+  "schema": "greenfuel.memory/v1",
+  "category": "episodic",
+  "createdAt": "2026-10-28T11:57:34.197Z",
+  "updatedAt": "2026-10-28T11:57:34.197Z",
+  "classification": "internal",
+  "approval": null,
+  "review": null,
+  "id": "INC-0001"
+}

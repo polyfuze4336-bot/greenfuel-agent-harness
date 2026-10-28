@@ -1,0 +1,50 @@
+{
+  "kind": "decision",
+  "title": "Task-execution framework",
+  "statement": "Task-execution framework",
+  "body": "Accepted. The owner also confirmed the limits in the policy as working values (T20) and reported that the hook and tools were verified in VS Code chat (T18; reported by the owner, not observed by the assistant). - Adopt [engine.cjs](../../harness/orchestration/engine.cjs) and [orchestration-policy.json](../../harness/policy/orchestration-policy.json): the task contract, nine states with an explicit transition table, plan validation (agents, tools, permissions, requirements, context, artifacts, acceptance, dependencies, risks, review), error classes with bounded retries and escalation, human approval pauses using the registered approver keys, and a durable, hash-chained run store under `docs/state/runs/`. - Drive it from [delegation-guard.cjs](../../harness/hooks/delegation-guard.cjs), registered repository-wide: before a `task` call it starts the attempt or denies the delegation; after it, it stores the reply and runs the acceptance tests. While a run is active, a delegation without a `TASK-REF` marker is denied. - Expose `check_plan` and `get_run_status` as read-only MCP tools to the orchestrator only. Create, retry, unblock, reopen, approve and cancel remain human or CI actions through [tasks.mjs](../../harness/scripts/tasks.mjs). - Treat `docs/state/runs/` and the orchestration policy as control plane that agents cannot write. - Do not give the orchestrator any new write or execute capability. - Validate with [validate-orchestration.mjs](../../harness/scripts/validate-orchestration.mjs) in `npm run validate` and CI; commit a run only when it is finished and its chain verifies.",
+  "refs": [
+    "ADR-0009",
+    "ADR-0006",
+    "ADR-0008",
+    "file:docs/adr/0009-task-execution-framework.md"
+  ],
+  "subject": "adr.0009",
+  "position": "accepted",
+  "tags": [
+    "adr"
+  ],
+  "owner": "programme-owner",
+  "critical": false,
+  "provenance": {
+    "evidence": [],
+    "source": "adr",
+    "ref": "file:docs/adr/0009-task-execution-framework.md",
+    "sourceSha256": "e2c393fabd1ed9d1cfd73771f4d451f501043897535af8da9be8f77f03a61f40",
+    "trust": "authoritative",
+    "recordedBy": {
+      "type": "importer",
+      "name": "import-adr"
+    }
+  },
+  "approval": {
+    "by": "programme-owner",
+    "at": "2026-10-28T00:00:00.000Z",
+    "ref": "ADR-0009"
+  },
+  "validity": {
+    "supersedes": [],
+    "supersededBy": null,
+    "validUntil": null,
+    "reviewBy": null,
+    "status": "approved",
+    "validFrom": "2026-10-28T11:57:32.894Z"
+  },
+  "schema": "greenfuel.memory/v1",
+  "category": "semantic",
+  "createdAt": "2026-10-28T11:57:32.894Z",
+  "updatedAt": "2026-10-28T11:57:32.894Z",
+  "classification": "internal",
+  "review": null,
+  "id": "DEC-0009"
+}

@@ -1,0 +1,64 @@
+{
+  "kind": "decision",
+  "title": "Hold delivery measurements in jurisdiction-local authoritative stores",
+  "statement": "Hold delivery measurements in jurisdiction-local authoritative stores",
+  "body": "Select option C as the proposed baseline topology. Nothing crosses a border by default. The hosting model per port is deliberately not chosen. Option E stays open for comparison after D-011.",
+  "refs": [
+    "ADR-0004",
+    "BR-002",
+    "BR-006",
+    "BR-007",
+    "SEC-001",
+    "SEC-004",
+    "FR-001",
+    "FR-006",
+    "NFR-005",
+    "NFR-016",
+    "SEC-002",
+    "SEC-013",
+    "SEC-003",
+    "NFR-019",
+    "HC-01",
+    "HC-07",
+    "HC-08",
+    "HC-06",
+    "HC-09",
+    "HC-10",
+    "HC-11",
+    "file:docs/adr/0004-delivery-measurement-storage-topology.md"
+  ],
+  "subject": "adr.0004",
+  "position": "proposed",
+  "tags": [
+    "adr"
+  ],
+  "owner": "programme-owner",
+  "critical": false,
+  "provenance": {
+    "evidence": [],
+    "source": "adr",
+    "ref": "file:docs/adr/0004-delivery-measurement-storage-topology.md",
+    "sourceSha256": "b5ae5da2d904ee7b5772c64d900367164d02a99a1e961d86eed2bafa9e9b008a",
+    "trust": "unreviewed",
+    "recordedBy": {
+      "type": "importer",
+      "name": "import-adr"
+    }
+  },
+  "approval": null,
+  "validity": {
+    "supersedes": [],
+    "supersededBy": null,
+    "validUntil": "2026-12-27T11:57:32.672Z",
+    "reviewBy": null,
+    "status": "proposed",
+    "validFrom": "2026-10-28T11:57:32.673Z"
+  },
+  "schema": "greenfuel.memory/v1",
+  "category": "semantic",
+  "createdAt": "2026-10-28T11:57:32.673Z",
+  "updatedAt": "2026-10-28T11:57:32.673Z",
+  "classification": "internal",
+  "review": null,
+  "id": "DEC-0004"
+}

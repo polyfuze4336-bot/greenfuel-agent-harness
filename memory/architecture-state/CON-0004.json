@@ -1,0 +1,48 @@
+{
+  "kind": "constraint",
+  "title": "HC-04: Certification filings require quality-manager approval",
+  "statement": "Certification filings require quality-manager approval",
+  "subject": "constraint.hc-04",
+  "position": "in-force",
+  "tags": [
+    "hard-constraint"
+  ],
+  "refs": [
+    "HC-04",
+    "ADR-0005",
+    "file:docs/architecture/HARD-CONSTRAINTS.md"
+  ],
+  "owner": "programme-owner",
+  "critical": true,
+  "provenance": {
+    "evidence": [],
+    "source": "adr",
+    "ref": "file:docs/architecture/HARD-CONSTRAINTS.md",
+    "sourceSha256": "9803241c6feb4841cd3dc19069cdcfe260daaebba844f5c288885f9eb9954357",
+    "trust": "authoritative",
+    "recordedBy": {
+      "type": "importer",
+      "name": "import-adr"
+    }
+  },
+  "approval": {
+    "by": "programme-owner",
+    "at": "2026-10-28T00:00:00.000Z",
+    "ref": "ADR-0005"
+  },
+  "validity": {
+    "supersedes": [],
+    "supersededBy": null,
+    "validUntil": null,
+    "reviewBy": null,
+    "status": "approved",
+    "validFrom": "2026-10-28T11:57:33.202Z"
+  },
+  "schema": "greenfuel.memory/v1",
+  "category": "semantic",
+  "createdAt": "2026-10-28T11:57:33.202Z",
+  "updatedAt": "2026-10-28T11:57:33.202Z",
+  "classification": "internal",
+  "review": null,
+  "id": "CON-0004"
+}

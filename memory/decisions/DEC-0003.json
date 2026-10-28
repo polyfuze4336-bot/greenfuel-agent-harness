@@ -1,0 +1,48 @@
+{
+  "kind": "decision",
+  "title": "Adopt requirements baseline v0.1 as the design input",
+  "statement": "Adopt requirements baseline v0.1 as the design input",
+  "body": "Baseline v0.1 is the approved input for design work. The 37 decisions stay open and deferred by the owner. The class labels, placeholders and candidate standards in it keep their stated status.",
+  "refs": [
+    "ADR-0003",
+    "file:docs/adr/0003-adopt-requirements-baseline-v0-1.md"
+  ],
+  "subject": "adr.0003",
+  "position": "accepted",
+  "tags": [
+    "adr"
+  ],
+  "owner": "programme-owner",
+  "critical": false,
+  "provenance": {
+    "evidence": [],
+    "source": "adr",
+    "ref": "file:docs/adr/0003-adopt-requirements-baseline-v0-1.md",
+    "sourceSha256": "7f0e77daff050f6a36cba1d3e67f7a0c00a9789c072df77ef9a65d2f83898fb2",
+    "trust": "authoritative",
+    "recordedBy": {
+      "type": "importer",
+      "name": "import-adr"
+    }
+  },
+  "approval": {
+    "by": "programme-owner",
+    "at": "2026-10-28T00:00:00.000Z",
+    "ref": "ADR-0003"
+  },
+  "validity": {
+    "supersedes": [],
+    "supersededBy": null,
+    "validUntil": null,
+    "reviewBy": null,
+    "status": "approved",
+    "validFrom": "2026-10-28T11:57:32.618Z"
+  },
+  "schema": "greenfuel.memory/v1",
+  "category": "semantic",
+  "createdAt": "2026-10-28T11:57:32.618Z",
+  "updatedAt": "2026-10-28T11:57:32.618Z",
+  "classification": "internal",
+  "review": null,
+  "id": "DEC-0003"
+}

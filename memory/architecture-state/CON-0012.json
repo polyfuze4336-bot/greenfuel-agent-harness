@@ -1,0 +1,48 @@
+{
+  "kind": "constraint",
+  "title": "HC-12: No fabricated performance, availability, cost or compliance figures",
+  "statement": "No fabricated performance, availability, cost or compliance figures",
+  "subject": "constraint.hc-12",
+  "position": "in-force",
+  "tags": [
+    "hard-constraint"
+  ],
+  "refs": [
+    "HC-12",
+    "ADR-0005",
+    "file:docs/architecture/HARD-CONSTRAINTS.md"
+  ],
+  "owner": "programme-owner",
+  "critical": true,
+  "provenance": {
+    "evidence": [],
+    "source": "adr",
+    "ref": "file:docs/architecture/HARD-CONSTRAINTS.md",
+    "sourceSha256": "23748aa9de0bad57b8fe5923d26bc0fc5ac2db34eaafcebcf08ea806c1a7156d",
+    "trust": "authoritative",
+    "recordedBy": {
+      "type": "importer",
+      "name": "import-adr"
+    }
+  },
+  "approval": {
+    "by": "programme-owner",
+    "at": "2026-10-28T00:00:00.000Z",
+    "ref": "ADR-0005"
+  },
+  "validity": {
+    "supersedes": [],
+    "supersededBy": null,
+    "validUntil": null,
+    "reviewBy": null,
+    "status": "approved",
+    "validFrom": "2026-10-28T11:57:33.932Z"
+  },
+  "schema": "greenfuel.memory/v1",
+  "category": "semantic",
+  "createdAt": "2026-10-28T11:57:33.932Z",
+  "updatedAt": "2026-10-28T11:57:33.932Z",
+  "classification": "internal",
+  "review": null,
+  "id": "CON-0012"
+}

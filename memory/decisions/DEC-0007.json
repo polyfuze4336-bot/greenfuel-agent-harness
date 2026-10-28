@@ -1,0 +1,49 @@
+{
+  "kind": "decision",
+  "title": "Tool layer, MCP configuration and output controls",
+  "statement": "Tool layer, MCP configuration and output controls",
+  "body": "Proposed for approval: - Adopt [tool-registry.json](../../harness/tools/tool-registry.json) as the single inventory. An enabled MCP tool must be read-only; a tool that mutates remote state or needs sign-in cannot be enabled for agents; a disabled tool must be reachable by no agent. These are checked by `validate-tools`. - Enable `greenfuel-tools` (local, zero dependencies, 13 read-only tools) and `microsoft-learn` (remote, no authentication, three read-only tools, `azure-platform` only). - Keep `azure-mcp` (pinned to 3.0.0 with its integrity hash) and `github-mcp-server` as **pending-approval candidates** in a file no client reads. Approving one follows the procedure in MCP-SECURITY. - Add `tool-output-guard.cjs` as a repository-wide `postToolUse` hook: redact secret-shaped text, strip hidden characters, cap size, mark external content untrusted, write a metadata-only audit log. - Extend `agent-guard.cjs` to deny any MCP tool not granted to the calling agent, matched by exact name (a lookalike server name or an unlisted tool is never the registered one), to allow read-type native tools by exact name only, and to limit web fetch to exact approved https hosts. Extend the repository-wide `policy-guard.cjs` to refuse, in any session, an unlisted tool of an enabled server (VS Code has no native tool filter). - Add nine deterministic validators over specifications, candidate contracts (`v0-candidate`) and synthetic fixtures. They report EMPTY when nothing exists to check. - No Azure or GitHub sign-in, no server installation and no remote change is part of this decision.",
+  "refs": [
+    "ADR-0007",
+    "D-013",
+    "file:docs/adr/0007-tool-layer-mcp-and-output-controls.md"
+  ],
+  "subject": "adr.0007",
+  "position": "accepted",
+  "tags": [
+    "adr"
+  ],
+  "owner": "programme-owner",
+  "critical": false,
+  "provenance": {
+    "evidence": [],
+    "source": "adr",
+    "ref": "file:docs/adr/0007-tool-layer-mcp-and-output-controls.md",
+    "sourceSha256": "a94eb851453a41c9c89d8c6db2b084da5a32b2d8d871507b58fc9b12c0f83894",
+    "trust": "authoritative",
+    "recordedBy": {
+      "type": "importer",
+      "name": "import-adr"
+    }
+  },
+  "approval": {
+    "by": "programme-owner",
+    "at": "2026-10-28T00:00:00.000Z",
+    "ref": "ADR-0007"
+  },
+  "validity": {
+    "supersedes": [],
+    "supersededBy": null,
+    "validUntil": null,
+    "reviewBy": null,
+    "status": "approved",
+    "validFrom": "2026-10-28T11:57:32.790Z"
+  },
+  "schema": "greenfuel.memory/v1",
+  "category": "semantic",
+  "createdAt": "2026-10-28T11:57:32.790Z",
+  "updatedAt": "2026-10-28T11:57:32.790Z",
+  "classification": "internal",
+  "review": null,
+  "id": "DEC-0007"
+}
