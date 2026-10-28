@@ -37,6 +37,15 @@ function gitHead() {
   return r.status === 0 ? r.stdout.trim() : null;
 }
 
+// npm is a .cmd shim on Windows and cannot be spawned directly (and a shell would widen injection risk), so run npm's own CLI script with node.
+function resolveCommand(cmd) {
+  if (cmd[0] !== 'npm') return [cmd[0], cmd.slice(1)];
+  const candidates = [process.env.npm_execpath, path.join(path.dirname(process.execPath), 'node_modules', 'npm', 'bin', 'npm-cli.js'), path.join(path.dirname(process.execPath), '..', 'lib', 'node_modules', 'npm', 'bin', 'npm-cli.js')];
+  const cli = candidates.find((c) => c && /npm-cli\.js$/.test(c) && existsSync(c));
+  if (cli) return [process.execPath, [cli, ...cmd.slice(1)]];
+  return [cmd[0], cmd.slice(1)];
+}
+
 export function record({ id, claim, cmd, outDir }) {
   const policy = loadPolicy();
   const verdict = evaluate({ toolName: 'powershell', toolArgs: { command: cmd.join(' ') }, cwd: root }, policy);
@@ -46,7 +55,8 @@ export function record({ id, claim, cmd, outDir }) {
   if (existsSync(outPath)) throw new Error(`${id} already exists; evidence records are append-only.`);
 
   const started = Date.now();
-  const run = spawnSync(cmd[0], cmd.slice(1), { cwd: root, encoding: 'utf8', timeout: 300_000, maxBuffer: 32 * 1024 * 1024 });
+  const [file, fileArgs] = resolveCommand(cmd);
+  const run = spawnSync(file, fileArgs, { cwd: root, encoding: 'utf8', timeout: 300_000, maxBuffer: 32 * 1024 * 1024 });
   const output = `${run.stdout ?? ''}${run.stderr ?? ''}`;
   const rec = {
     id, claim,

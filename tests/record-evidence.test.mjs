@@ -41,6 +41,13 @@ test('refuses to overwrite an existing record', () => tmp((outDir) => {
   assert.throws(() => record(args), /already exists/);
 }));
 
+test('can launch npm on every platform and records its exit code', () => tmp((outDir) => {
+  const { rec } = record({ id: 'EV-0006', claim: 'npm starts', cmd: ['npm', '--version'], outDir });
+  assert.equal(rec.spawnError, null);
+  assert.equal(rec.exitCode, 0);
+  assert.match(rec.outputTail, /\d+\.\d+\.\d+/);
+}));
+
 test('the command line cannot redirect where records are written', () => {
   const script = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'harness', 'scripts', 'record-evidence.mjs');
   const r = spawnSync(process.execPath, [script, '--id', 'EV-9998', '--claim', 'x', '--out', path.join(os.tmpdir(), 'gf-escape'), '--', 'npm', 'test'], { encoding: 'utf8' });
