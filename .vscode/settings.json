@@ -1,0 +1,14 @@
+{
+  "chat.tools.global.autoApprove": false,
+  "chat.useHooks": true,
+  "chat.tools.terminal.autoApprove": {
+    "azd": false,
+    "az": false,
+    "terraform": false,
+    "kubectl": false,
+    "git push": false,
+    "rm": false,
+    "Remove-Item": false
+  },
+  "files.eol": "\n"
+}

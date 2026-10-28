@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "phase": 0,
+  "phaseNote": "Phase 0 = harness foundation only. No application, IaC, or Azure mutation. Raising the phase is a human decision recorded in an ADR.",
+  "azureMutationDecision": "deny",
+  "azureReadVerbs": ["list", "show", "get", "exists", "check", "query", "what-if", "validate", "version", "find", "list-locations", "list-skus", "list-usage"],
+  "azureBicepSafeVerbs": ["build", "build-params", "lint", "format", "version", "list-versions", "decompile"],
+  "azureAlwaysAsk": ["login", "logout", "account set", "configure"],
+  "azureMcpMutationPattern": "\"(command|name|operation)\"\\s*:\\s*\"[^\"]*(create|delete|update|set|deploy|provision|assign|purge|upload|send|invoke|start|stop|restart|apply|write|remove|add)[^\"]*\"",
+  "shellRules": [
+    { "id": "AZD-MUTATE", "decision": "deny", "pattern": "\\bazd\\s+(up|deploy|provision|down|pipeline|env\\s+set-secret)\\b", "reason": "azd provisioning/deployment is a human-run action. No autonomous deployment." },
+    { "id": "IAC-APPLY", "decision": "deny", "pattern": "\\b(terraform|tofu)\\s+(apply|destroy|import|taint|force-unlock|state\\s+(rm|mv|push))\\b|\\bpulumi\\s+(up|destroy|refresh|cancel)\\b", "reason": "IaC apply/destroy is a human-run action." },
+    { "id": "K8S-MUTATE", "decision": "deny", "pattern": "\\bkubectl\\s+(apply|create|delete|replace|patch|scale|rollout|drain|cordon|exec|edit|set)\\b|\\bhelm\\s+(install|upgrade|uninstall|rollback)\\b", "reason": "Cluster mutation is a human-run action." },
+    { "id": "SECRET-EXFIL", "decision": "deny", "pattern": "get-access-token|\\bkeys\\s+list\\b|\\blist-keys\\b|\\blistkeys\\b|\\bkeyvault\\s+secret\\s+(show|download)\\b|\\blist-credentials\\b|\\bconnection-string\\s+show\\b", "reason": "Reading credentials, keys, or tokens into agent context is not permitted." },
+    { "id": "REMOTE-EXEC", "decision": "deny", "pattern": "\\b(curl|wget|iwr|irm|invoke-webrequest|invoke-restmethod)\\b[^|;\\n]*\\|\\s*(sh|bash|zsh|iex|invoke-expression|powershell|pwsh|python3?|node)\\b|\\b(iex|invoke-expression)\\b", "reason": "Downloading and executing remote code is not permitted." },
+    { "id": "GIT-FORCE", "decision": "deny", "pattern": "\\bgit\\s+push\\b[^\\n;|&]*\\s(--force\\b|--force-with-lease\\b|-f\\b)", "reason": "Force-push is not permitted." },
+    { "id": "GIT-PUSH", "decision": "ask", "pattern": "\\bgit\\s+push\\b|\\bgh\\s+(pr\\s+merge|repo\\s+(create|delete|edit)|release\\s+(create|delete)|workflow\\s+run)\\b|\\bgh\\s+api\\b[^\\n]*(-X|--method)\\s+(POST|PUT|PATCH|DELETE)", "reason": "Publishing or changing remote state requires explicit human approval." },
+    { "id": "GIT-DESTRUCTIVE", "decision": "ask", "pattern": "\\bgit\\s+(reset\\s+--hard|clean\\s+-[a-z]*f|branch\\s+-D|checkout\\s+--\\s+\\.|restore\\s+--source)", "reason": "Destructive local git operation requires explicit human approval." },
+    { "id": "FS-DESTRUCTIVE", "decision": "ask", "pattern": "\\b(rm|rmdir|del|erase|remove-item|ri)\\b[^\\n;|&]*(\\s-r\\b|\\s-rf\\b|\\s-fr\\b|\\s/s\\b|-recurse|-force)", "reason": "Recursive/forced deletion requires explicit human approval." },
+    { "id": "PKG-INSTALL", "decision": "ask", "pattern": "\\b(npm|pnpm|yarn|bun)\\s+(install|i|add|ci|update|upgrade)\\b|\\bpip3?\\s+install\\b|\\buv\\s+(add|pip\\s+install)\\b|\\bdotnet\\s+add\\s+package\\b|\\b(winget|choco|scoop)\\s+install\\b", "reason": "New dependencies must be justified and approved (supply-chain control)." },
+    { "id": "ENV-DUMP", "decision": "ask", "pattern": "\\bprintenv\\b|get-childitem\\s+env:|\\bgci\\s+env:|\\bdir\\s+env:|\\bls\\s+env:", "reason": "Dumping the environment can expose secrets." }
+  ],
+  "phaseGatedPaths": [
+    "^src/", "^infra/", "^\\.azure/", "^azure\\.yaml$", "^Dockerfile$", "\\.bicep$", "\\.bicepparam$", "\\.tf$", "\\.tfvars$"
+  ],
+  "controlPlanePaths": [
+    "^\\.github/hooks/", "^\\.github/workflows/", "^harness/policy/", "^harness/hooks/", "^harness/scripts/"
+  ],
+  "evidenceRecordPaths": ["^docs/evidence/records/"],
+  "secretFilePaths": [
+    "(^|/)\\.env($|\\.(?!example$|sample$|template$))", "\\.(pfx|pem|key|p12)$", "(^|/)id_(rsa|ed25519)$", "(^|/)local\\.settings\\.json$", "(^|/)\\.azure/.*\\.env$"
+  ]
+}

@@ -1,0 +1,147 @@
+#!/usr/bin/env node
+// Structural and policy validation for this repository. Zero dependencies.
+// Usage: node harness/scripts/validate-harness.mjs [--root <dir>] [--json]
+import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+export const PILLARS = [
+  'Context & Instructions',
+  'Tools & Azure Integration',
+  'Orchestration & Role Separation',
+  'Guardrails & Human Approval',
+  'Memory & Resumability',
+  'Verification & Evidence',
+];
+const REQUIRED = [
+  'README.md', 'AGENTS.md', 'package.json', 'harness/policy/command-policy.json',
+  'docs/harness/REFERENCE-ASSESSMENT.md', 'docs/harness/HARNESS-ARCHITECTURE.md', 'docs/harness/CAPABILITY-MATRIX.md',
+  'docs/harness/IMPLEMENTATION-ROADMAP.md', 'docs/harness/OPEN-QUESTIONS.md', 'docs/state/STATE.md',
+];
+const SKIP_DIRS = new Set(['.git', 'node_modules']);
+const SECRET_PATTERNS = [
+  /-----BEGIN [A-Z ]*PRIVATE KEY-----/, /AccountKey=[A-Za-z0-9+/=]{20,}/, /\bghp_[A-Za-z0-9]{30,}/, /\bgithub_pat_[A-Za-z0-9_]{30,}/,
+  /\bAKIA[0-9A-Z]{16}\b/, /\bxox[baprs]-[A-Za-z0-9-]{10,}/, /\beyJ[A-Za-z0-9_-]{20,}\.eyJ[A-Za-z0-9_-]{10,}/, /[?&]sig=[A-Za-z0-9%+/=]{20,}/,
+];
+
+function walk(dir, out = []) {
+  for (const e of readdirSync(dir, { withFileTypes: true })) {
+    if (SKIP_DIRS.has(e.name)) continue;
+    const p = path.join(dir, e.name);
+    if (e.isDirectory()) walk(p, out); else out.push(p);
+  }
+  return out;
+}
+
+export function frontmatter(text) {
+  const m = text.replace(/\r\n/g, '\n').match(/^---\n([\s\S]*?)\n---(\n|$)/);
+  if (!m) return null;
+  const fm = {};
+  for (const line of m[1].split('\n')) {
+    const kv = line.match(/^([A-Za-z][\w-]*):\s*(.*)$/);
+    if (kv) fm[kv[1]] = kv[2].trim();
+  }
+  return fm;
+}
+
+export function validate(root) {
+  const errors = [];
+  const fail = (check, msg) => errors.push({ check, msg });
+  const rel = (p) => path.relative(root, p).split(path.sep).join('/');
+  const read = (p) => readFileSync(path.join(root, p), 'utf8');
+  const files = walk(root);
+
+  for (const f of REQUIRED) if (!existsSync(path.join(root, f))) fail('required-files', `missing ${f}`);
+
+  const agentsDir = path.join(root, '.github', 'agents');
+  for (const f of existsSync(agentsDir) ? readdirSync(agentsDir).filter((n) => n.endsWith('.agent.md')) : []) {
+    const fm = frontmatter(read(`.github/agents/${f}`));
+    if (!fm) { fail('agents', `${f}: missing frontmatter`); continue; }
+    for (const k of ['name', 'description', 'tools']) if (!fm[k]) fail('agents', `${f}: frontmatter '${k}' is required (tools must be explicit, never implicit-all)`);
+  }
+
+  const skillsDir = path.join(root, '.github', 'skills');
+  for (const d of existsSync(skillsDir) ? readdirSync(skillsDir) : []) {
+    const p = `.github/skills/${d}/SKILL.md`;
+    if (!existsSync(path.join(root, p))) { fail('skills', `${d}: missing SKILL.md`); continue; }
+    const fm = frontmatter(read(p));
+    if (!fm || fm.name !== d || !fm.description) fail('skills', `${p}: frontmatter name must equal folder name and description is required`);
+  }
+
+  const instrDir = path.join(root, '.github', 'instructions');
+  for (const f of existsSync(instrDir) ? readdirSync(instrDir).filter((n) => n.endsWith('.instructions.md')) : []) {
+    const fm = frontmatter(read(`.github/instructions/${f}`));
+    if (!fm || !fm.applyTo) fail('instructions', `${f}: applyTo is required`);
+  }
+
+  const hooksDir = path.join(root, '.github', 'hooks');
+  for (const f of existsSync(hooksDir) ? readdirSync(hooksDir).filter((n) => n.endsWith('.json')) : []) {
+    try {
+      const cfg = JSON.parse(read(`.github/hooks/${f}`));
+      if (cfg.version !== 1 || typeof cfg.hooks !== 'object') fail('hooks', `${f}: expected { version: 1, hooks: {...} }`);
+      for (const list of Object.values(cfg.hooks ?? {})) for (const h of list) {
+        const script = String(h.command ?? '').split(/\s+/).find((t) => /\.(c|m)?js$/.test(t));
+        if (script && !existsSync(path.join(root, script))) fail('hooks', `${f}: script not found: ${script}`);
+      }
+    } catch (e) { fail('hooks', `${f}: invalid JSON (${e.message})`); }
+  }
+
+  if (existsSync(path.join(root, '.vscode', 'settings.json'))) {
+    try {
+      if (JSON.parse(read('.vscode/settings.json'))['chat.tools.global.autoApprove'] === true) fail('settings', 'chat.tools.global.autoApprove must not be true');
+    } catch (e) { fail('settings', `.vscode/settings.json invalid JSON (${e.message})`); }
+  }
+
+  for (const f of files.filter((p) => /[\\/]\.github[\\/]workflows[\\/].+\.ya?ml$/.test(p))) {
+    const text = readFileSync(f, 'utf8');
+    if (!/^permissions:/m.test(text)) fail('workflows', `${rel(f)}: top-level permissions block is required`);
+    for (const m of text.matchAll(/uses:\s*([^\s#]+)/g)) if (!m[1].startsWith('./') && !/@[0-9a-f]{40}$/.test(m[1])) fail('workflows', `${rel(f)}: ${m[1]} is not pinned to a commit SHA`);
+  }
+
+  for (const f of files.filter((p) => p.endsWith('.md'))) {
+    const text = readFileSync(f, 'utf8').replace(/```[\s\S]*?```/g, '').replace(/`[^`\n]*`/g, '');
+    for (const m of text.matchAll(/\[[^\]]*\]\(([^)\s]+)\)/g)) {
+      const target = m[1].split('#')[0];
+      if (!target || /^[a-z][a-z0-9+.-]*:/i.test(target)) continue;
+      if (!existsSync(path.resolve(path.dirname(f), decodeURIComponent(target)))) fail('links', `${rel(f)}: broken link -> ${m[1]}`);
+    }
+  }
+
+  const self = new Set(['harness/scripts/validate-harness.mjs', 'tests/validate-harness.test.mjs', 'tests/policy-guard.test.mjs']);
+  for (const f of files) {
+    if (self.has(rel(f)) || statSync(f).size > 1_000_000) continue;
+    const text = readFileSync(f, 'utf8');
+    for (const re of SECRET_PATTERNS) if (re.test(text)) fail('secrets', `${rel(f)}: matches secret pattern ${re}`);
+  }
+
+  if (existsSync(path.join(root, 'harness/policy/command-policy.json'))) {
+    const policy = JSON.parse(read('harness/policy/command-policy.json'));
+    if (policy.phase === 0) {
+      for (const p of ['src', 'infra', '.azure', 'azure.yaml', 'Dockerfile']) if (existsSync(path.join(root, p))) fail('phase-gate', `phase 0 forbids '${p}'`);
+      for (const f of files) if (/\.(bicep|bicepparam|tf|tfvars)$/.test(f)) fail('phase-gate', `phase 0 forbids ${rel(f)}`);
+    }
+  }
+
+  if (existsSync(path.join(root, 'package.json'))) {
+    const pkg = JSON.parse(read('package.json'));
+    for (const k of ['dependencies', 'devDependencies', 'optionalDependencies']) if (Object.keys(pkg[k] ?? {}).length) fail('dependencies', `package.json ${k} must be empty (zero-dependency harness)`);
+  }
+
+  for (const doc of ['docs/harness/HARNESS-ARCHITECTURE.md', 'docs/harness/CAPABILITY-MATRIX.md']) {
+    if (!existsSync(path.join(root, doc))) continue;
+    const text = read(doc);
+    for (const p of PILLARS) if (!text.includes(p)) fail('pillars', `${doc}: pillar '${p}' not represented`);
+  }
+
+  return errors;
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  const i = process.argv.indexOf('--root');
+  const root = path.resolve(i > 0 ? process.argv[i + 1] : path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..'));
+  const errors = validate(root);
+  if (process.argv.includes('--json')) console.log(JSON.stringify({ root, ok: !errors.length, errors }, null, 2));
+  else if (errors.length) { for (const e of errors) console.error(`FAIL [${e.check}] ${e.msg}`); console.error(`${errors.length} problem(s).`); }
+  else console.log('validate-harness: OK');
+  process.exit(errors.length ? 1 : 0);
+}

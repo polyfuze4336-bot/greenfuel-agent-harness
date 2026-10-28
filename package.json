@@ -1,0 +1,11 @@
+{
+  "name": "greenfuel-agent-harness",
+  "version": "0.1.0",
+  "private": true,
+  "description": "GitHub Copilot agent harness for designing an Azure-native agentic green-fuel bunkering certification solution. Harness only; contains no business application.",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "validate": "node harness/scripts/validate-harness.mjs",
+    "test": "node --test"
+  }
+}
