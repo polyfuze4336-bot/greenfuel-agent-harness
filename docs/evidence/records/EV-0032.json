@@ -1,0 +1,23 @@
+{
+  "id": "EV-0032",
+  "claim": "npm run validate is clean at the memory commit",
+  "argv": [
+    "npm",
+    "run",
+    "validate"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-28T12:04:03.805Z",
+  "durationMs": 2057,
+  "outputSha256": "6dc479b23a0c28892b0d18f8aaeb98def94227d1240df05881b24dfe57322894",
+  "outputBytes": 108,
+  "outputTail": "\n> greenfuel-agent-harness@0.1.0 validate\n> node harness/scripts/validate-harness.mjs\n\nvalidate-harness: OK\n",
+  "gitHead": "17fda31d972b3c075d0a2cfcd8c737ef04100576",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}

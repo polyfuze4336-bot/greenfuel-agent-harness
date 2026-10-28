@@ -1,0 +1,22 @@
+{
+  "id": "EV-0034",
+  "claim": "validate-memory reports OK at the memory commit",
+  "argv": [
+    "node",
+    "harness/scripts/validate-memory.mjs"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-28T12:05:09.235Z",
+  "durationMs": 931,
+  "outputSha256": "309c6233c5a2a332127be2d810858a60260ebaf8c7fcc52387b0353fb3140250",
+  "outputBytes": 20,
+  "outputTail": "validate-memory: OK\n",
+  "gitHead": "17fda31d972b3c075d0a2cfcd8c737ef04100576",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}
