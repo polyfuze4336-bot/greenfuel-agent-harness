@@ -1,0 +1,25 @@
+{
+  "id": "EV-0042",
+  "claim": "evaluate.mjs verify of EVRUN-ac57aba1cf: every status, gate and hard-constraint verdict re-derives from evidence",
+  "argv": [
+    "node",
+    "harness/scripts/evaluate.mjs",
+    "verify",
+    "--run",
+    "EVRUN-ac57aba1cf"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-28T14:18:05.625Z",
+  "durationMs": 210,
+  "outputSha256": "91508bd97ccb30de9bc706775effb3410f95c7950a11a8e0accc2646306f2f06",
+  "outputBytes": 81,
+  "outputTail": "{\n  \"ok\": true,\n  \"problems\": [],\n  \"runId\": \"EVRUN-ac57aba1cf\",\n  \"tests\": 66\n}\n",
+  "gitHead": "e80a5ffceee7f5ee4b3cdb417d3af0db9ae4c670",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}

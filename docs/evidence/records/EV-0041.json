@@ -1,0 +1,22 @@
+{
+  "id": "EV-0041",
+  "claim": "validate-evaluation OK: committed run EVRUN-ac57aba1cf re-derives from its evidence and the report matches it",
+  "argv": [
+    "node",
+    "harness/scripts/validate-evaluation.mjs"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-28T14:18:04.992Z",
+  "durationMs": 307,
+  "outputSha256": "b36a95d9df15d8902ae8cda199b49a999cc64fa8b27f877fcbc5d44f19a5b64a",
+  "outputBytes": 24,
+  "outputTail": "validate-evaluation: OK\n",
+  "gitHead": "e80a5ffceee7f5ee4b3cdb417d3af0db9ae4c670",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}
