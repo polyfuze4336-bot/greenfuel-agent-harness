@@ -1,9 +1,9 @@
 # ADR 0008: Least-privilege permission model for the coding harness
 
-- **Status:** Proposed
+- **Status:** Accepted (2026-10-28, programme owner, by instruction in chat: "accept and document it")
 - **Type:** Governance
 - **Date:** 2026-10-28
-- **Deciders:** Programme owner (not yet decided)
+- **Deciders:** Programme owner
 - **Supersedes:** none
 
 ## Context
@@ -21,7 +21,7 @@
 4. **A container or separate-account sandbox for all sessions.** Strongest and the only true boundary for shell access, but it needs owner decisions on tooling and a user account (T15); recorded as the next step rather than assumed.
 
 ## Decision
-Proposed for approval:
+Accepted. This includes the approval limits above as working values; the owner may change them under T13.
 - Adopt [permissions.json](../../harness/policy/permissions.json) as the policy-as-code source: tiers P0 to P4, environments, per-agent ceilings (P0 or P1 only, none for Azure), operations with tiers, classifiers, path classes, default rules DEF-01 to DEF-09 and extra rules CTL-01 and EXEC-01.
 - Enforce through [permission-engine.cjs](../../harness/hooks/permission-engine.cjs), called by the agent-scoped guard, the repository-wide guard and the output hook; deny unknown tools and operations for named agents; apply the always-on denials to every session.
 - P2 and above require a signed, expiring, scoped, use-limited approval naming exact agents and operations, verified with Ed25519 against a registry of public keys. The registry is empty, so every P2+ operation by an agent is denied until the owner registers approvers. P4 needs two distinct approvers and is never implied by a lower-tier approval. Some operations are never grantable to an agent.
