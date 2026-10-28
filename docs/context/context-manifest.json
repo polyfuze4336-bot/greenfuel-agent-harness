@@ -109,6 +109,13 @@
       "decisions": [],
       "schemes": []
     },
+    "orchestration": {
+      "purpose": "Plan, delegate and report: the roster, checkpoints and open decisions, without loading requirement detail",
+      "documents": ["docs/agents/AGENT-ROSTER.md", "docs/architecture/GOVERNANCE.md", "docs/architecture/REVIEW-CHECKPOINTS.md", "docs/context/DECISION-REGISTER.md"],
+      "requirements": { "include": [] },
+      "decisions": [],
+      "schemes": []
+    },
     "harness-engineering": {
       "purpose": "Change the coding harness (not the product design)",
       "documents": ["docs/harness/HARNESS-ARCHITECTURE.md", "docs/harness/CAPABILITY-MATRIX.md", "docs/harness/IMPLEMENTATION-ROADMAP.md", "docs/harness/OPEN-QUESTIONS.md", "docs/adr/0001-native-first-harness.md", "docs/adr/0002-phase-gating-and-approval-enforcement.md"],

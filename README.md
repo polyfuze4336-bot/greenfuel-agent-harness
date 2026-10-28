@@ -9,12 +9,12 @@ A GitHub Copilot harness for VS Code, built to help design, implement, test, dep
 | Area | Contents |
 |---|---|
 | Rules | [AGENTS.md](AGENTS.md), `.github/instructions/` |
-| Roles | `architect` (authors designs), `reviewer` (independent verification), `design-reviewer` (design reviews and the gate), `design-challenger` (adversarial) in `.github/agents/` |
+| Roles | Twelve specialist agents in `.github/agents/`: `orchestrator` (plans and delegates, read-only), `principal-architect`, `maritime-domain`, `azure-platform`, `application-engineer`, `ai-engineer`, `data-engineer`, `security-reviewer`, `sre-engineer`, `qa-engineer`, `architecture-critic`, `design-reviewer`. Roles, tools, write scopes and delegation: [AGENT-ROSTER](docs/agents/AGENT-ROSTER.md) |
 | Workflows | Skills `adr-authoring`, `session-handoff`, `evidence-validation`, `context-loading`, `design-authoring`, `design-review`, `design-defense` in `.github/skills/` |
 | Guardrails | `preToolUse` hook (`harness/hooks/policy-guard.cjs`) with data-driven policy (`harness/policy/command-policy.json`), registered by `.github/hooks/policy.json` |
 | Evidence | `harness/scripts/record-evidence.mjs`, `harness/scripts/validate-harness.mjs`, `harness/scripts/validate-context.mjs`, `harness/scripts/validate-architecture.mjs`, `harness/scripts/design-gate.mjs`, `tests/`, CI in `.github/workflows/validate.yml` |
 | Decisions and state | [docs/adr/](docs/adr/), [docs/state/STATE.md](docs/state/STATE.md), [docs/state/TODO.md](docs/state/TODO.md), [docs/evidence/](docs/evidence/) |
-| Architecture governance | [docs/architecture/](docs/architecture/): [hard constraints](docs/architecture/HARD-CONSTRAINTS.md), ten review perspectives, checkpoints, the [design-review gate](docs/architecture/DESIGN-REVIEW-GATE.md), a defence question bank, a risk register, templates, and a worked example ([DES-0001](docs/architecture/designs/DES-0001-delivery-measurement-storage-topology.md) reviewed in [RV-0001](docs/architecture/reviews/RV-0001-delivery-measurement-storage-topology.md)). Roles: `design-reviewer`, `design-challenger` |
+| Architecture governance | [docs/architecture/](docs/architecture/): [hard constraints](docs/architecture/HARD-CONSTRAINTS.md), ten review perspectives, checkpoints, the [design-review gate](docs/architecture/DESIGN-REVIEW-GATE.md), a defence question bank, a risk register, templates, and a worked example ([DES-0001](docs/architecture/designs/DES-0001-delivery-measurement-storage-topology.md) reviewed in [RV-0001](docs/architecture/reviews/RV-0001-delivery-measurement-storage-topology.md)). Roles: `design-reviewer`, `architecture-critic` |
 | Design of the harness | [docs/harness/](docs/harness/) |
 | Product context baseline | [PROBLEMSTATEMENT.md](PROBLEMSTATEMENT.md) and [docs/context/](docs/context/): business case, 99 requirements with traceability, data classification, sovereignty and autonomy matrices, candidate schemes, assumptions, [unresolved decision register](docs/context/DECISION-REGISTER.md), [context-loading strategy](docs/context/CONTEXT-LOADING-STRATEGY.md) |
 
@@ -36,7 +36,7 @@ Each is mapped to native Copilot features and any custom code in the [capability
 Prerequisites: VS Code with GitHub Copilot, Node.js 20 or later. No packages to install.
 
 1. Open this folder in VS Code and **trust the workspace**. Hooks are not loaded in an untrusted folder, and nothing warns you (observed in Copilot CLI; see [LIVE-TEST-R1](docs/harness/LIVE-TEST-R1.md)). For Copilot CLI, the folder must be in its trusted folders.
-2. Start a Copilot chat session, pick the `architect` or `reviewer` agent from the agent picker, and read [docs/state/STATE.md](docs/state/STATE.md) for where work stands.
+2. Start a Copilot chat session, pick the `orchestrator` agent for multi-step work (or a specialist such as `principal-architect`), and read [docs/state/STATE.md](docs/state/STATE.md) for where work stands. Agent hooks need a trusted folder.
 3. **Canary:** ask the agent to run `azd up`. A reply containing `HARNESS-POLICY AZD-MUTATE` means the hook is active. If the command runs instead, enforcement is off in this session; stop and fix trust first.
 4. Check the repository itself:
    ```

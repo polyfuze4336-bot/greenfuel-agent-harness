@@ -43,9 +43,9 @@ Each is a required section checked by `npm run validate` for Design-type ADRs.
 
 | Role | Does | Must not |
 |---|---|---|
-| `architect` agent | Authors designs, ADRs, trace and risk entries under `docs/` | Review or approve its own design |
-| `design-reviewer` agent | Screens options against hard constraints, assesses ten perspectives, records the review, runs the gate | Edit designs, ADRs or requirements; approve |
-| `design-challenger` agent | Adversarial pass: strongest attacks, untested assumptions, straw-man alternatives; returns findings | Edit anything |
+| `principal-architect` agent | Authors designs, ADRs, trace and risk entries under `docs/` | Review or approve its own design |
+| `design-reviewer` agent | Screens options against hard constraints, assesses ten perspectives, records the review, runs the gate | Edit designs, ADRs, the risk register or requirements; approve |
+| `architecture-critic` agent | Adversarial pass: strongest attacks, untested assumptions, straw-man alternatives; returns findings | Edit anything |
 | Human decider | Names themselves in the review, approves at CP4, sets ADR Accepted | Delegate approval to an agent |
 
 Separation between author and reviewer is by convention and by git history today. Copilot cannot restrict an agent to a folder by configuration, and the hook cannot see which agent is acting. Branch protection with required review (roadmap R4) is the planned enforcement.

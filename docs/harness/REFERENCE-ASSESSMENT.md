@@ -99,11 +99,11 @@ Legend. **Reused**: idea kept, original implementation. **Adapted**: idea change
 | Reference component | Disposition | Here | Reason |
 |---|---|---|---|
 | Root `AGENTS.md` operating manual | Adapted | [AGENTS.md](../../AGENTS.md) | Shorter; no Local-only tool names; no self-reported telemetry; adds phase and boundary rules |
-| 13 pipeline agents | Adapted | `architect`, `reviewer` | Two agents with explicit minimal tools. Native Plan agent covers planning. Lane agents Deferred (R8) |
+| 13 pipeline agents | Adapted | `principal-architect`, `qa-engineer` (and, later, the other specialists in [AGENT-ROSTER](../agents/AGENT-ROSTER.md)) | Explicit minimal tools per agent. Native Plan agent covers planning. Lane agents superseded by the roster |
 | `parallel-build-orchestrator` and lanes | Deferred | R8 | Needs a product and contracts first; self-listing (T2) and portability (T1) must be fixed |
 | `problem-statement-creation` + WorkIQ | Deferred | R9, Q7 | Data handling decision needed (S7) |
-| `technical-architect` | Adapted | `architect` | Drops Azure MCP data tools and WorkIQ; ADR-centric |
-| `verification-evaluator` / `code-reviewer` | Adapted | `reviewer` + recorder | Verdict from recorded observations, not a score (T7) |
+| `technical-architect` | Adapted | `principal-architect` | Drops Azure MCP data tools and WorkIQ; ADR-centric |
+| `verification-evaluator` / `code-reviewer` | Adapted | `qa-engineer` + recorder | Verdict from recorded observations, not a score (T7) |
 | `agent-feedback` retrospective and ledger | Deferred | R7 | Needs injection-safe, human-gated design (S4) |
 | Skills: `implementation-planning`, `parallel-build`, `observability`, `tdd-workflow`, `code-review`, `verification-loop`, `search-first`, `anti-patterns` | Deferred | R8 | Not needed until implementation |
 | Skill: `documentation-governance` | Rejected | none | Role definition mixed into `AGENTS.md`; docs conventions are an instruction file here |

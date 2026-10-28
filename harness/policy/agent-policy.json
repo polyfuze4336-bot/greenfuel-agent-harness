@@ -1,0 +1,94 @@
+{
+  "version": 1,
+  "testedWith": { "vscode": "1.143.0", "copilotCli": "1.0.105", "copilotCliAlsoProbed": "1.0.102", "checkedOn": "2026-10-28" },
+  "capabilitySources": [
+    "https://code.visualstudio.com/docs/agents/reference/custom-agent-file-reference",
+    "https://code.visualstudio.com/docs/agents/run/subagents",
+    "https://code.visualstudio.com/docs/agent-customization/hooks",
+    "https://docs.github.com/en/copilot/reference/custom-agents-configuration",
+    "https://docs.github.com/en/copilot/reference/hooks-reference"
+  ],
+  "frontmatter": {
+    "allowed": ["name", "description", "tools", "agents", "user-invocable", "disable-model-invocation", "hooks"],
+    "forbidden": {
+      "handoffs": "Local-harness only; the Copilot harness ignores it, so it cannot be relied on",
+      "mcp-servers": "Not used by VS Code custom agents; no MCP server is approved for this repository",
+      "infer": "Deprecated; use user-invocable and disable-model-invocation",
+      "model": "Pinning a model can fail where it is unavailable; agents inherit the session model",
+      "reasoning-effort": "Availability depends on the model; agents inherit the session setting",
+      "metadata": "Not used by VS Code custom agents",
+      "argument-hint": "Shown only in the Local chat input; not portable",
+      "target": "Not needed; agents are shared by both environments"
+    }
+  },
+  "toolAliases": ["execute", "read", "edit", "search", "agent", "web", "todo"],
+  "maxBodyChars": 30000,
+  "classes": {
+    "planner": { "purpose": "Plans, reviews and challenges. Cannot modify files or run commands", "allowedTools": ["read", "search", "todo", "agent"] },
+    "author": { "purpose": "Modifies files inside its own write scope. Cannot run commands", "allowedTools": ["read", "search", "edit", "web"] },
+    "executor": { "purpose": "Runs a short allow-list of commands and edits a narrow scope", "allowedTools": ["read", "search", "edit", "execute"] }
+  },
+  "requiredHeadings": ["Mission", "Allowed", "Prohibited", "Context", "Inputs", "Outputs", "Acceptance criteria", "Escalation", "Handoffs", "Evidence"],
+  "readOnlyCommands": ["^git (status|diff|log|show)(?!.*--output)( [-\\w./:@^~=]+)*$"],
+  "agents": {
+    "orchestrator": {
+      "class": "planner", "tools": ["read", "search", "todo", "agent"], "userInvocable": true, "disableModelInvocation": true,
+      "delegatesTo": ["principal-architect", "maritime-domain", "azure-platform", "application-engineer", "ai-engineer", "data-engineer", "security-reviewer", "sre-engineer", "qa-engineer", "architecture-critic", "design-reviewer"],
+      "writes": [], "writesPhase1": [], "commands": [], "web": false, "profiles": ["orchestration"], "dependsOn": []
+    },
+    "principal-architect": {
+      "class": "author", "tools": ["read", "search", "edit"], "userInvocable": true, "disableModelInvocation": false, "delegatesTo": [],
+      "writes": ["docs/architecture/designs/**", "docs/architecture/RISK-REGISTER.md", "docs/adr/**", "docs/state/**", "docs/design/system/**"], "writesPhase1": [],
+      "commands": [], "web": false, "profiles": ["architecture-governance", "business-framing"], "dependsOn": ["maritime-domain"]
+    },
+    "maritime-domain": {
+      "class": "planner", "tools": ["read", "search"], "userInvocable": true, "disableModelInvocation": false, "delegatesTo": [],
+      "writes": [], "writesPhase1": [], "commands": [], "web": false, "profiles": ["compliance-verification", "capability-dea", "capability-mba"], "dependsOn": []
+    },
+    "azure-platform": {
+      "class": "author", "tools": ["read", "search", "edit", "web"], "userInvocable": true, "disableModelInvocation": false, "delegatesTo": [],
+      "writes": ["docs/design/azure/**"], "writesPhase1": ["infra/**"],
+      "commands": [], "web": true, "profiles": ["sovereignty-data", "nfr-architecture", "edge-connectivity"], "dependsOn": ["principal-architect"]
+    },
+    "application-engineer": {
+      "class": "author", "tools": ["read", "search", "edit"], "userInvocable": true, "disableModelInvocation": false, "delegatesTo": [],
+      "writes": ["docs/design/application/**"], "writesPhase1": ["src/api/**", "src/web/**", "src/integration/**"],
+      "commands": [], "web": false, "profiles": ["nfr-architecture", "edge-connectivity", "security-identity"], "dependsOn": ["principal-architect", "data-engineer"]
+    },
+    "ai-engineer": {
+      "class": "author", "tools": ["read", "search", "edit"], "userInvocable": true, "disableModelInvocation": false, "delegatesTo": [],
+      "writes": ["docs/design/ai/**"], "writesPhase1": ["src/agents/**", "evals/**"],
+      "commands": [], "web": false, "profiles": ["agent-governance", "capability-cca", "capability-eaa"], "dependsOn": ["principal-architect", "data-engineer"]
+    },
+    "data-engineer": {
+      "class": "author", "tools": ["read", "search", "edit"], "userInvocable": true, "disableModelInvocation": false, "delegatesTo": [],
+      "writes": ["docs/design/data/**"], "writesPhase1": ["src/data/**", "src/calc/**", "db/**"],
+      "commands": [], "web": false, "profiles": ["capability-eaa", "capability-dea", "sovereignty-data"], "dependsOn": ["principal-architect", "maritime-domain"]
+    },
+    "security-reviewer": {
+      "class": "planner", "tools": ["read", "search"], "userInvocable": true, "disableModelInvocation": false, "delegatesTo": [],
+      "writes": [], "writesPhase1": [], "commands": [], "web": false, "profiles": ["security-identity", "sovereignty-data", "agent-governance"], "dependsOn": ["principal-architect"]
+    },
+    "sre-engineer": {
+      "class": "author", "tools": ["read", "search", "edit"], "userInvocable": true, "disableModelInvocation": false, "delegatesTo": [],
+      "writes": ["docs/design/operations/**", "docs/runbooks/**"], "writesPhase1": ["ops/**"],
+      "commands": [], "web": false, "profiles": ["nfr-architecture", "edge-connectivity"], "dependsOn": ["azure-platform", "application-engineer"]
+    },
+    "qa-engineer": {
+      "class": "executor", "tools": ["read", "search", "edit", "execute"], "userInvocable": true, "disableModelInvocation": false, "delegatesTo": [],
+      "writes": ["docs/design/test/**"], "writesPhase1": ["tests/product/**"],
+      "commands": ["^node --test( [\\w./][\\w./-]*\\.(m|c)?js)*$", "^npm (test|run validate|run stats)$",       "^node harness/scripts/(validate-harness|validate-agents|design-gate)\\.mjs( [-\\w./:=]+)*$", "^node harness/scripts/record-evidence\\.mjs --id EV-\\d{4} --claim \"[^\"`$]*\" -- (npm test|npm run validate|npm run stats|node --test( [\\w./][\\w./-]*\\.(m|c)?js)*|node harness/scripts/(validate-harness|validate-agents|design-gate)\\.mjs( [-\\w./:=]+)*|git (status|diff|log|show)(?!.*--output)( [-\\w./:@^~=]+)*)$", "^git (status|diff|log|show)(?!.*--output)( [-\\w./:@^~=]+)*$"],
+      "web": false, "profiles": ["assurance-review"], "dependsOn": ["application-engineer", "data-engineer", "ai-engineer"]
+    },
+    "architecture-critic": {
+      "class": "planner", "tools": ["read", "search"], "userInvocable": true, "disableModelInvocation": false, "delegatesTo": [],
+      "writes": [], "writesPhase1": [], "commands": [], "web": false, "profiles": ["architecture-governance"], "dependsOn": ["principal-architect"]
+    },
+    "design-reviewer": {
+      "class": "executor", "tools": ["read", "search", "edit", "execute"], "userInvocable": true, "disableModelInvocation": false, "delegatesTo": [],
+      "writes": ["docs/architecture/reviews/**"], "writesPhase1": [],
+      "commands": ["^node harness/scripts/(design-gate|validate-harness)\\.mjs( [-\\w./:=]+)*$", "^node harness/scripts/record-evidence\\.mjs --id EV-\\d{4} --claim \"[^\"`$]*\" -- (node harness/scripts/(validate-harness|design-gate)\\.mjs( [-\\w./:=]+)*|git (status|diff|log|show)(?!.*--output)( [-\\w./:@^~=]+)*)$", "^git (status|diff|log|show)(?!.*--output)( [-\\w./:@^~=]+)*$"],
+      "web": false, "profiles": ["architecture-governance"], "dependsOn": ["principal-architect", "architecture-critic", "security-reviewer"]
+    }
+  }
+}

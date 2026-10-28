@@ -20,12 +20,16 @@ function parse(argv) {
   const split = argv.indexOf('--');
   if (split < 0) throw new Error('Missing "--" before the command to run.');
   const opts = {};
-  for (let i = 0; i < split; i += 2) opts[argv[i].replace(/^--/, '')] = argv[i + 1];
+  for (let i = 0; i < split; i += 2) {
+    const key = argv[i].replace(/^--/, '');
+    if (!['id', 'claim'].includes(key)) throw new Error(`Unknown option '${argv[i]}'. Records are always written to docs/evidence/records.`);
+    opts[key] = argv[i + 1];
+  }
   if (!/^EV-\d{4}$/.test(opts.id ?? '')) throw new Error('--id must look like EV-0001.');
   if (!opts.claim) throw new Error('--claim is required.');
   const cmd = argv.slice(split + 1);
   if (!cmd.length) throw new Error('No command given after "--".');
-  return { id: opts.id, claim: opts.claim, cmd, outDir: opts.out ?? path.join(root, 'docs', 'evidence', 'records') };
+  return { id: opts.id, claim: opts.claim, cmd, outDir: path.join(root, 'docs', 'evidence', 'records') };
 }
 
 function gitHead() {

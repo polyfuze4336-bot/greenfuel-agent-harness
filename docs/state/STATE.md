@@ -14,7 +14,7 @@ Phase 0. Baseline v0.1 is **approved** (ADR 0003, 2026-10-28); the 37 decisions 
 - No Azure resource was created or queried. Only local `az version` and `azd version` ran.
 
 ## Claimed, unverified
-- Hook and agent behaviour in VS Code chat (R1 remainder); that agents follow `context-loading` (R11) and that `design-reviewer` and `design-challenger` behave as written (R12).
+- Hook and agent behaviour in VS Code chat (R1 remainder); that agents follow `context-loading` (R11) that `design-reviewer` and `architecture-critic` behave as written (R12); that a write attempted inside a delegated subagent is stopped (see [DEMO-READONLY-DELEGATION](../agents/DEMO-READONLY-DELEGATION.md)).
 - The example review was written by a model. No human has reviewed it.
 - The gate checks structure and consistency, not truth. Open weaknesses are listed in DESIGN-REVIEW-GATE section 3.
 - Every standard and scheme name is a candidate. Placeholder NFR numbers are proposals.

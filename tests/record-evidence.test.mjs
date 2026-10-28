@@ -1,6 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdtempSync, readFileSync, rmSync, existsSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import os from 'node:os';
 import path from 'node:path';
 import { createRequire } from 'node:module';
@@ -38,6 +40,14 @@ test('refuses to overwrite an existing record', () => tmp((outDir) => {
   record(args);
   assert.throws(() => record(args), /already exists/);
 }));
+
+test('the command line cannot redirect where records are written', () => {
+  const script = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'harness', 'scripts', 'record-evidence.mjs');
+  const r = spawnSync(process.execPath, [script, '--id', 'EV-9998', '--claim', 'x', '--out', path.join(os.tmpdir(), 'gf-escape'), '--', 'npm', 'test'], { encoding: 'utf8' });
+  assert.equal(r.status, 2);
+  assert.match(r.stderr, /Unknown option '--out'/);
+  assert.equal(existsSync(path.join(os.tmpdir(), 'gf-escape')), false);
+});
 
 test('refuses commands the policy denies, and writes nothing', () => tmp((outDir) => {
   assert.throws(() => record({ id: 'EV-0005', claim: 'x', cmd: ['azd', 'up'], outDir }), /Refusing to run/);

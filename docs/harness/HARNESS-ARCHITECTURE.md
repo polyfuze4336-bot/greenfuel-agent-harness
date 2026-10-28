@@ -43,14 +43,14 @@ The pillars are the programme's own list (confirmed by the owner when this stage
 - **Purpose.** Give each agent the least tooling it needs and prefer Microsoft-native services.
 - **Native.** Agent `tools` allow-lists; Azure MCP server and Azure extensions already installed on this machine; Azure CLI, azd and Bicep as local tools.
 - **Custom.** None. No MCP server is configured in the repository.
-- **Controls.** Every agent declares `tools` explicitly (validator rejects implicit-all). `architect` has no shell. `reviewer` has no edit. Zero runtime dependencies (validator rejects any in `package.json`).
+- **Controls.** Every agent declares `tools` explicitly (validator rejects implicit-all). `principal-architect` has no shell. `qa-engineer` and `design-reviewer` run only an anchored allow-list (agent-guard). Planners have no edit tool. Zero runtime dependencies (validator rejects any in `package.json`).
 - **Gap.** Which Azure MCP tools to allow, and per agent, is undecided (Q6). In Phase 0 the hook denies Azure mutation regardless.
 
 ### 3.3 Orchestration & Role Separation
 - **Purpose.** Keep roles narrow and keep the harness separate from the product.
 - **Native.** Custom agents; the built-in Plan agent for planning; native subagents (`task`) when a task needs a separate context.
 - **Custom.** None. No orchestrator, no lanes.
-- **Controls.** Two harness agents: `architect` (designs, writes docs only) and `reviewer` (verifies, cannot edit). Business agents live under `src/` in a later phase and are never defined in `.github/agents/`. Phase gate blocks `src/` and `infra/` until raised.
+- **Controls.** Twelve harness agents in three classes (planner, author, executor), defined in [AGENT-ROSTER](../agents/AGENT-ROSTER.md); only the orchestrator delegates. Business agents live under `src/` in a later phase and are never defined in `.github/agents/`. Phase gate blocks `src/` and `infra/` until raised.
 - **Gap.** Subagent depth and the exact boundary of business-agent design artefacts are open (Q8). Parallel lanes are deferred (roadmap R8).
 
 ### 3.4 Guardrails & Human Approval
@@ -75,7 +75,7 @@ The pillars are the programme's own list (confirmed by the owner when this stage
 - **Purpose.** "Done" means observed, not declared.
 - **Native.** Test and task running, problems view, GitHub Actions.
 - **Custom.** `harness/scripts/record-evidence.mjs` (runs a command, stores argv, exit code, duration, output hash and tail, git HEAD, runtime versions); `harness/scripts/validate-harness.mjs`; tests in `tests/`; `.github/workflows/validate.yml` (re-runs both outside the agent session, actions pinned to commit SHAs, read-only token).
-- **Controls.** `reviewer` returns `VERIFIED` only from a recorded exit-0 run that covers the claim. Evidence records are append-only by convention and blocked for agent edits by the hook. The recorder refuses commands the policy would deny.
+- **Controls.** `qa-engineer` returns `VERIFIED` only from a recorded exit-0 run that covers the claim. Evidence records are append-only by convention and blocked for agent edits by the hook. The recorder refuses commands the policy would deny.
 - **Limits.** A record proves a command ran with that result on that machine. It does not prove the command tests the claim. Records can be forged by a human or by a shell command that evades the hook; CI and git history are the cross-check. No Azure state is evidenced in Phase 0.
 
 ## 4. Runtime view

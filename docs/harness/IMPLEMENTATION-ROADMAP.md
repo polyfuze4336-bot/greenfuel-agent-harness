@@ -20,7 +20,7 @@ Status legend: **Done** (observed), **Written** (files exist, not observed live)
 
 | ID | Work | Exit criteria (observable) | Approval needed |
 |---|---|---|---|
-| R1 | Live-session verification of hooks, agents, skills and instructions in VS Code 1.143.0, in both Copilot and Local harnesses | **Partly done 2026-10-28** in Copilot CLI only ([LIVE-TEST-R1](LIVE-TEST-R1.md)): hook denies in a trusted folder, does nothing in an untrusted one. Remaining: VS Code chat (both harnesses), `architect` has no shell, `reviewer` cannot edit, skills and instructions load, `ask` path. Failing cases recorded as findings | Owner runs or watches the VS Code session |
+| R1 | Live-session verification of hooks, agents, skills and instructions in VS Code 1.143.0, in both Copilot and Local harnesses | **Partly done 2026-10-28** in Copilot CLI only ([LIVE-TEST-R1](LIVE-TEST-R1.md)): hook denies in a trusted folder, does nothing in an untrusted one. Remaining: VS Code chat (both harnesses), planners cannot edit, skills and instructions load, `ask` path. Failing cases recorded as findings | Owner runs or watches the VS Code session |
 | R1b | Hook-active canary and trust prerequisite | README states the trust prerequisite and a one-line canary the user runs (ask the agent to run `azd up`; a `HARNESS-POLICY` denial means hooks are active). Optionally a SessionStart hook that injects a visible banner | Owner |
 | R2 | Azure access model for agents: read-only identity, subscription and tenant scoping, Azure MCP allow-list per agent | ADR Accepted; Azure RBAC shows no write role for the agent identity (read-only query result recorded); allow-list written into agent `tools` | Subscription owner |
 | R3 | Isolation: evaluate terminal sandbox, dev container and assisted permissions | ADR with test results on this Windows machine; chosen mechanism documented in HARNESS-ARCHITECTURE | Owner |
@@ -33,7 +33,7 @@ Status legend: **Done** (observed), **Written** (files exist, not observed live)
 | ID | Work | Exit criteria | Approval |
 |---|---|---|---|
 | R11 | Live test of context loading: give a specialist agent a task under each of three profiles and check the `Context:` line against what it actually read | Recorded results show whether agents follow the procedure; if not, a documented gap justifies a context-pack generator (ADR 0001) | Owner |
-| R12 | Live test of the review roles: run `design-reviewer` and `design-challenger` on a new design in VS Code and compare with the gate | Recorded results show whether the roles follow the skills, avoid editing outside their folders, and never set Approved | Owner |
+| R12 | Live test of the review roles: run `design-reviewer` and `architecture-critic` on a new design in VS Code and compare with the gate | Recorded results show whether the roles follow the skills, avoid editing outside their folders, and never set Approved | Owner |
 | R13 | Sibling designs that DES-0001 depends on, in this order: certificate hosting and signing; edge security and platform; identity and roles; customer isolation; retention and recovery; non-production environments; evidence-package completeness and reconstruction; calculation and methodology distribution | Each has a design, a review and a Design ADR, and the gate result is recorded. None can be Approved until its M1 and M2 decisions are answered | Owner |
 
 ## Stage 3: Harness measurement and learning (only if needed)
