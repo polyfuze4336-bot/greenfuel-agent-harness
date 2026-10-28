@@ -45,3 +45,6 @@ High. Removing the module, CLI, policy, catalogue, checks, validator and path-cl
 - A sandbox for running checks is built (R15): the runner should use it.
 - The owner agrees performance, cost or recovery targets: the pending tests get runners.
 - The mass-balance contract is defined: RT-09 gets an executable contract check.
+
+## Evidence
+Automated tests ([evaluation-engine.test.mjs](../../tests/evaluation-engine.test.mjs), [validate-evaluation.test.mjs](../../tests/validate-evaluation.test.mjs)) cover the status rules, the gate rules, forged results, the catalogue validator and the command line. A full evaluation run is committed under `docs/evaluation/runs/` with its generated [EVALUATION-REPORT](../evaluation/EVALUATION-REPORT.md); the report, not this ADR, states what passed, failed, was blocked or is pending. Its first full run also caught a defect in this stage's own work (this ADR lacked its Evidence section and failed the architecture validator). An independent model review found six defects in the framework, each fixed with a regression test; that review is not an evidence record. See [EVALUATION-FRAMEWORK](../evaluation/EVALUATION-FRAMEWORK.md) for what was and was not shown.
