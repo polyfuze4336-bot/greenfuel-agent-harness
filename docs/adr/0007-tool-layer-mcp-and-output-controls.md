@@ -1,9 +1,9 @@
 # ADR 0007: Tool layer, MCP configuration and output controls
 
-- **Status:** Proposed
+- **Status:** Accepted (2026-10-28, programme owner, by instruction in chat: "approve and document it")
 - **Type:** Governance
 - **Date:** 2026-10-28
-- **Deciders:** Programme owner (not yet decided; see TODO T10)
+- **Deciders:** Programme owner
 - **Supersedes:** none
 
 ## Context

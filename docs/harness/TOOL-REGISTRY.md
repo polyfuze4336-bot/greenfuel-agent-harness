@@ -1,6 +1,6 @@
 # Tool registry
 
-Status: v0.1, Proposed (ADR 0007). Source of truth: [tool-registry.json](../../harness/tools/tool-registry.json) for the tools, [agent-policy.json](../../harness/policy/agent-policy.json) for which agent may use what. The tables below are **generated** from those two files and checked by `npm run validate`; do not edit them by hand. Security reasoning is in [MCP-SECURITY](./MCP-SECURITY.md); what each Copilot surface supports is in [TOOL-COMPATIBILITY](./TOOL-COMPATIBILITY.md).
+Status: v0.1, Accepted ([ADR 0007](../adr/0007-tool-layer-mcp-and-output-controls.md)). Source of truth: [tool-registry.json](../../harness/tools/tool-registry.json) for the tools, [agent-policy.json](../../harness/policy/agent-policy.json) for which agent may use what. The tables below are **generated** from those two files and checked by `npm run validate`; do not edit them by hand. Security reasoning is in [MCP-SECURITY](./MCP-SECURITY.md); what each Copilot surface supports is in [TOOL-COMPATIBILITY](./TOOL-COMPATIBILITY.md).
 
 ## How to read the registry
 

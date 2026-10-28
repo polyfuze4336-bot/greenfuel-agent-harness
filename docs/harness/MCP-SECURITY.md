@@ -1,6 +1,6 @@
 # MCP and tool security
 
-Status: v0.1, Proposed (ADR 0007). Scope: every tool an agent can reach, with the focus on MCP servers because they run code or call services with the developer's privileges. The inventory is in [TOOL-REGISTRY](./TOOL-REGISTRY.md); what each Copilot surface supports is in [TOOL-COMPATIBILITY](./TOOL-COMPATIBILITY.md). The live record of discovery and invocation is in [TOOL-DEMO](./TOOL-DEMO.md).
+Status: v0.1, Accepted ([ADR 0007](../adr/0007-tool-layer-mcp-and-output-controls.md)). Scope: every tool an agent can reach, with the focus on MCP servers because they run code or call services with the developer's privileges. The inventory is in [TOOL-REGISTRY](./TOOL-REGISTRY.md); what each Copilot surface supports is in [TOOL-COMPATIBILITY](./TOOL-COMPATIBILITY.md). The live record of discovery and invocation is in [TOOL-DEMO](./TOOL-DEMO.md).
 
 ## Trust model
 
