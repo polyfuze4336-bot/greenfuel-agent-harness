@@ -1,0 +1,141 @@
+{
+  "schema": "greenfuel.loop/v1",
+  "loopId": "LOOP-ff64d5605a",
+  "rev": 6,
+  "state": "PASSED",
+  "createdAt": "2026-10-28T12:38:25.517Z",
+  "updatedAt": "2026-10-28T12:38:38.890Z",
+  "createdBy": "operator",
+  "task": {
+    "schema": "greenfuel.loop-task/v1",
+    "title": "Fix the type error in the fixture summing function",
+    "objective": "The fixture project must type-check with the pinned TypeScript compiler. The function returns a string where a number is declared.",
+    "acceptance": [
+      "The fixture project type-checks with the pinned compiler with no errors",
+      "The compiler configuration is unchanged and no check is weakened"
+    ],
+    "agent": "session",
+    "requirements": [],
+    "constraints": [],
+    "checks": [
+      {
+        "id": "ts-build",
+        "kind": "build",
+        "argv": [
+          "tsc",
+          "--noEmit",
+          "-p",
+          "tsconfig.json"
+        ],
+        "covers": [
+          "src/**",
+          "tsconfig.json"
+        ]
+      }
+    ],
+    "protectedPaths": [
+      "tsconfig.json"
+    ],
+    "allowedWritePaths": [
+      "src/**"
+    ]
+  },
+  "taskSha256": "e97cf6901d0ab738e9e33f3856a013f622b513c9b6224af170c1fb9081d41b22",
+  "workspaceRel": ".harness-work/demo-ts",
+  "limits": {
+    "maxRepairAttempts": 3,
+    "maxIdenticalFailures": 2,
+    "timeoutSeconds": 120,
+    "wallBudgetSeconds": 900,
+    "maxCheckRuns": 30
+  },
+  "contextRefs": [],
+  "attempts": [
+    {
+      "id": "E0",
+      "type": "execute",
+      "status": "ENDED",
+      "startedAt": "2026-10-28T12:38:25.683Z",
+      "leaseExpiresAt": "2026-10-28T13:08:25.685Z",
+      "beforeSha": "cdffc022ab986bcf102b7c6d68bd682e98d9cdc634265c3ac738a4f5d492ba51",
+      "feedback": [],
+      "endedAt": "2026-10-28T12:38:25.861Z",
+      "afterSha": "cdffc022ab986bcf102b7c6d68bd682e98d9cdc634265c3ac738a4f5d492ba51",
+      "changed": [],
+      "changesSha256": "8133677170fa8579bcd801dd6d0d84b34cd0f91b9f7d14d5c57968421039dd36",
+      "noChange": true,
+      "summary": "initial attempt: no change made yet"
+    },
+    {
+      "id": "R1",
+      "type": "repair",
+      "status": "ENDED",
+      "startedAt": "2026-10-28T12:38:31.586Z",
+      "leaseExpiresAt": "2026-10-28T13:08:31.587Z",
+      "beforeSha": "cdffc022ab986bcf102b7c6d68bd682e98d9cdc634265c3ac738a4f5d492ba51",
+      "feedback": [
+        {
+          "check": "ts-build",
+          "class": "BUILD_ERROR",
+          "detail": "exit 2",
+          "evidence": "checks/E0-v1-ts-build.out.txt"
+        }
+      ],
+      "endedAt": "2026-10-28T12:38:37.738Z",
+      "afterSha": "1bacdf8c164eaed1179102a757e0e880981d2926b9dff592d7b40f19fdac74e8",
+      "changed": [
+        "src/sum.ts"
+      ],
+      "changesSha256": "b059b999bd0790a21191b5717b4603c1be6c85f54f7fa21b0bf4c54c56352593",
+      "noChange": false,
+      "summary": "return a number: round with Math.round instead of toFixed"
+    }
+  ],
+  "failureHistory": [
+    {
+      "seq": 1,
+      "attempt": "E0",
+      "classes": [
+        "BUILD_ERROR"
+      ],
+      "fingerprint": "cb41b050bfa1dde8532e9d97636266d594e3ddf5e8b11c3199d8dd8add8e22ab",
+      "labels": [
+        "E0-v1-ts-build"
+      ],
+      "checks": [
+        "ts-build"
+      ]
+    }
+  ],
+  "diagnoses": [],
+  "critiques": [],
+  "checkRuns": 2,
+  "wallMs": 1850,
+  "workspaceSha": "1bacdf8c164eaed1179102a757e0e880981d2926b9dff592d7b40f19fdac74e8",
+  "verifiedSha": "1bacdf8c164eaed1179102a757e0e880981d2926b9dff592d7b40f19fdac74e8",
+  "lastFailure": {
+    "fingerprint": "cb41b050bfa1dde8532e9d97636266d594e3ddf5e8b11c3199d8dd8add8e22ab",
+    "labels": [
+      "E0-v1-ts-build"
+    ],
+    "classes": [
+      "BUILD_ERROR"
+    ]
+  },
+  "feedback": [
+    {
+      "check": "ts-build",
+      "class": "BUILD_ERROR",
+      "detail": "exit 2",
+      "evidence": "checks/E0-v1-ts-build.out.txt"
+    }
+  ],
+  "outcome": {
+    "state": "PASSED",
+    "class": null,
+    "detail": "all declared checks passed",
+    "requires": null
+  },
+  "eventSeq": 17,
+  "eventHead": "69e9774d2a7c6c19631e242783276a09cb960ac558759b9c8dfa347572b6da5c"
+}

@@ -77,6 +77,7 @@ The pillars are the programme's own list (confirmed by the owner when this stage
 - **Custom.** `harness/scripts/record-evidence.mjs` (runs a command, stores argv, exit code, duration, output hash and tail, git HEAD, runtime versions); `harness/scripts/validate-harness.mjs`; tests in `tests/`; `.github/workflows/validate.yml` (re-runs both outside the agent session, actions pinned to commit SHAs, read-only token).
 - **Controls.** `qa-engineer` returns `VERIFIED` only from a recorded exit-0 run that covers the claim. Evidence records are append-only by convention and blocked for agent edits by the hook. The recorder refuses commands the policy would deny.
 - **Limits.** A record proves a command ran with that result on that machine. It does not prove the command tests the claim. Records can be forged by a human or by a shell command that evades the hook; CI and git history are the cross-check. No Azure state is evidenced in Phase 0.
+- **Repair loop (Stage 9, [ADR 0011](../adr/0011-bounded-repair-loop.md), Proposed).** [loop.cjs](../../harness/loop/loop.cjs) adds a bounded Plan, Execute, Verify, Critique, Repair loop in which only the loop runs the declared checks, every changed file is observed and screened, failures are classified and fingerprinted, a repair after a failed repair needs a diagnosis, and a hard-constraint, permission, isolation or tampering failure stops the loop ([LOOP](../loop/LOOP.md), [LOOP-VALIDATION-REPORT](../loop/LOOP-VALIDATION-REPORT.md)). It screens; it does not sandbox, and no agent can run it yet.
 
 ## 4. Runtime view
 

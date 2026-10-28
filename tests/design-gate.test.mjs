@@ -17,7 +17,7 @@ const HC = 'docs/architecture/HARD-CONSTRAINTS.md';
 
 function sandbox(changes, fn) {
   const dir = mkdtempSync(path.join(os.tmpdir(), 'gf-gate-'));
-  cpSync(repo, dir, { recursive: true, filter: (s) => !/[\\/](\.git|node_modules|escape-link)([\\/]|$)/.test(s) });
+  cpSync(repo, dir, { recursive: true, filter: (s) => !/[\\/](\.git|node_modules|\.harness-work|\.harness-toolchain|escape-link)([\\/]|$)/.test(s) });
   try {
     for (const [file, edit] of Object.entries(changes)) {
       const p = path.join(dir, file);

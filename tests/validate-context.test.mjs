@@ -14,7 +14,7 @@ const MAN = 'docs/context/context-manifest.json';
 
 function mutated(changes) {
   const dir = mkdtempSync(path.join(os.tmpdir(), 'gf-context-'));
-  cpSync(repo, dir, { recursive: true, filter: (s) => !/[\\/](\.git|node_modules|escape-link)([\\/]|$)/.test(s) });
+  cpSync(repo, dir, { recursive: true, filter: (s) => !/[\\/](\.git|node_modules|\.harness-work|\.harness-toolchain|escape-link)([\\/]|$)/.test(s) });
   try {
     for (const [file, fn] of Object.entries(changes)) {
       const p = path.join(dir, file);

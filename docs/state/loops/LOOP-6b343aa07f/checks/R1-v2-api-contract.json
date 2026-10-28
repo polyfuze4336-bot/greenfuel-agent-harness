@@ -1,0 +1,19 @@
+{
+  "schema": "greenfuel.command-evidence/v1",
+  "label": "R1-v2-api-contract",
+  "argv": [
+    "node",
+    "--test",
+    "contract.check.mjs"
+  ],
+  "cwd": "workspace",
+  "exitCode": 1,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-28T12:39:07.499Z",
+  "durationMs": 190,
+  "outputSha256": "2a1fb3d21b91aeb0b4aa8364a018a072ed07927db6def78d941e461e781656a9",
+  "outputBytes": 1100,
+  "outputTail": "TAP version 13\n# Subtest: getItem matches the item contract\nnot ok 1 - getItem matches the item contract\n  ---\n  duration_ms: 0.9348\n  type: 'test'\n  location: 'C:\\\\Users\\\\mkhalib\\\\OneDrive - Microsoft\\\\Desktop\\\\MISC Work\\\\GithubAgentHarness\\\\greenfuel-agent-harness\\\\.harness-work\\\\demo-repeat\\\\contract.check.mjs:9:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    field quantity must be a number\n    \n    'string' !== 'number'\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected: 'number'\n  actual: 'string'\n  operator: 'strictEqual'\n  stack: |-\n    TestContext.<anonymous> (file:///C:/Users/mkhalib/OneDrive%20-%20Microsoft/Desktop/MISC%20Work/GithubAgentHarness/greenfuel-agent-harness/.harness-work/demo-repeat/contract.check.mjs:12:63)\n    Test.runInAsyncScope (node:async_hooks:214:14)\n    Test.run (node:internal/test_runner/test:1047:25)\n    Test.start (node:internal/test_runner/test:944:17)\n    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)\n  ...\n1..1\n# tests 1\n# suites 0\n# pass 0\n# fail 1\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 115.0846\n",
+  "workspaceSha": "0619ee00e09dff1b103cf88ac3a3920af35341f66ec186d734a6ea7a82f0ac54"
+}

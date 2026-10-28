@@ -1,0 +1,5 @@
+{
+  "name": "fixture item contract",
+  "required": ["id", "name", "quantity"],
+  "types": { "id": "number", "name": "string", "quantity": "number" }
+}

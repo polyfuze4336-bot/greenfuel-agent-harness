@@ -1,0 +1,154 @@
+{
+  "schema": "greenfuel.loop/v1",
+  "loopId": "LOOP-6b343aa07f",
+  "rev": 6,
+  "state": "ESCALATED",
+  "createdAt": "2026-10-28T12:39:06.274Z",
+  "updatedAt": "2026-10-28T12:39:07.714Z",
+  "createdBy": "operator",
+  "task": {
+    "schema": "greenfuel.loop-task/v1",
+    "title": "Make the fixture item handler satisfy its contract",
+    "objective": "The contract check for the fixture item handler fails: a field has the wrong type.",
+    "acceptance": [
+      "The contract check passes",
+      "The contract and the contract check are unchanged"
+    ],
+    "agent": "session",
+    "requirements": [],
+    "constraints": [],
+    "checks": [
+      {
+        "id": "api-contract",
+        "kind": "contract",
+        "argv": [
+          "node",
+          "--test",
+          "contract.check.mjs"
+        ],
+        "covers": [
+          "api/**"
+        ]
+      }
+    ],
+    "protectedPaths": [
+      "contract.check.mjs",
+      "contract/**"
+    ],
+    "allowedWritePaths": [
+      "api/**"
+    ]
+  },
+  "taskSha256": "16f6c2f064a8d721772f912296a7ebe69be29974b1361884ea01db113c2c8a01",
+  "workspaceRel": ".harness-work/demo-repeat",
+  "limits": {
+    "maxRepairAttempts": 3,
+    "maxIdenticalFailures": 2,
+    "timeoutSeconds": 120,
+    "wallBudgetSeconds": 900,
+    "maxCheckRuns": 30
+  },
+  "contextRefs": [],
+  "attempts": [
+    {
+      "id": "E0",
+      "type": "execute",
+      "status": "ENDED",
+      "startedAt": "2026-10-28T12:39:06.451Z",
+      "leaseExpiresAt": "2026-10-28T13:09:06.453Z",
+      "beforeSha": "0e043cba14927175ead934b717d2a2dddc832b344b2ff25e0ae11ad53bb923a3",
+      "feedback": [],
+      "endedAt": "2026-10-28T12:39:06.609Z",
+      "afterSha": "0e043cba14927175ead934b717d2a2dddc832b344b2ff25e0ae11ad53bb923a3",
+      "changed": [],
+      "changesSha256": "f6cd5ae7b2fb11acc22c69ecc6f62784ad8e3a83448119a940cfb8b953a1e1bf",
+      "noChange": true,
+      "summary": "first look"
+    },
+    {
+      "id": "R1",
+      "type": "repair",
+      "status": "ENDED",
+      "startedAt": "2026-10-28T12:39:07.155Z",
+      "leaseExpiresAt": "2026-10-28T13:09:07.155Z",
+      "beforeSha": "0e043cba14927175ead934b717d2a2dddc832b344b2ff25e0ae11ad53bb923a3",
+      "feedback": [
+        {
+          "check": "api-contract",
+          "class": "CONTRACT_FAILURE",
+          "detail": "exit 1",
+          "evidence": "checks/E0-v1-api-contract.out.txt"
+        }
+      ],
+      "endedAt": "2026-10-28T12:39:07.319Z",
+      "afterSha": "0619ee00e09dff1b103cf88ac3a3920af35341f66ec186d734a6ea7a82f0ac54",
+      "changed": [
+        "api/handler.mjs"
+      ],
+      "changesSha256": "7bbc78ac10f9b083653fee1a4e9a7838aa39b97844b45bbd8b2b9f2254c3f732",
+      "noChange": false,
+      "summary": "cosmetic change only"
+    }
+  ],
+  "failureHistory": [
+    {
+      "seq": 1,
+      "attempt": "E0",
+      "classes": [
+        "CONTRACT_FAILURE"
+      ],
+      "fingerprint": "8bb885394962724dda5963c572ed9a1c5ba5d5c67f959c6e763e3aca35a78c03",
+      "labels": [
+        "E0-v1-api-contract"
+      ],
+      "checks": [
+        "api-contract"
+      ]
+    },
+    {
+      "seq": 2,
+      "attempt": "R1",
+      "classes": [
+        "CONTRACT_FAILURE"
+      ],
+      "fingerprint": "8bb885394962724dda5963c572ed9a1c5ba5d5c67f959c6e763e3aca35a78c03",
+      "labels": [
+        "R1-v2-api-contract"
+      ],
+      "checks": [
+        "api-contract"
+      ]
+    }
+  ],
+  "diagnoses": [],
+  "critiques": [],
+  "checkRuns": 2,
+  "wallMs": 365,
+  "workspaceSha": "0619ee00e09dff1b103cf88ac3a3920af35341f66ec186d734a6ea7a82f0ac54",
+  "verifiedSha": null,
+  "lastFailure": {
+    "fingerprint": "8bb885394962724dda5963c572ed9a1c5ba5d5c67f959c6e763e3aca35a78c03",
+    "labels": [
+      "R1-v2-api-contract"
+    ],
+    "classes": [
+      "CONTRACT_FAILURE"
+    ]
+  },
+  "feedback": [
+    {
+      "check": "api-contract",
+      "class": "CONTRACT_FAILURE",
+      "detail": "exit 1",
+      "evidence": "checks/R1-v2-api-contract.out.txt"
+    }
+  ],
+  "outcome": {
+    "state": "ESCALATED",
+    "class": "REPEATED_FAILURE",
+    "detail": "the same failure happened 2 times (the maximum is 2); a blind retry would not help",
+    "requires": "A person reads the diagnosis and the preserved failures and decides on a different approach."
+  },
+  "eventSeq": 17,
+  "eventHead": "e9ad04fe20eb133d964b4233c6a9e5da6033588c0a3cb94b3bf93baffa664cd8"
+}

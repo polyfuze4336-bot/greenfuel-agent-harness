@@ -18,6 +18,8 @@
     "validate:permissions": "node harness/scripts/validate-permissions.mjs",
     "validate:orchestration": "node harness/scripts/validate-orchestration.mjs",
     "validate:memory": "node harness/scripts/validate-memory.mjs",
+    "validate:loop": "node harness/scripts/validate-loop.mjs",
+    "loop": "node harness/scripts/loop.mjs",
     "memory": "node harness/scripts/memory.mjs",
     "tasks": "node harness/scripts/tasks.mjs",
     "permissions:audit": "node harness/scripts/audit-denials.mjs verify",

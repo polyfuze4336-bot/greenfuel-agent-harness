@@ -1,0 +1,22 @@
+{
+  "attempt": "R1",
+  "type": "repair",
+  "reason": "ended",
+  "startedAt": "2026-10-28T12:38:31.586Z",
+  "endedAt": "2026-10-28T12:38:37.738Z",
+  "beforeSha": "cdffc022ab986bcf102b7c6d68bd682e98d9cdc634265c3ac738a4f5d492ba51",
+  "afterSha": "1bacdf8c164eaed1179102a757e0e880981d2926b9dff592d7b40f19fdac74e8",
+  "changes": [
+    {
+      "path": "src/sum.ts",
+      "change": "modified",
+      "beforeSha": "2fd6afa38605e42b46ac89f67da4e04378cbc331f157f0bfe9641d2f4d8d69e5",
+      "afterSha": "2debdbb00a828cfd011acf9225f5c17de872833935a1bbd47cfdda90990215b3"
+    }
+  ],
+  "reportedActions": [],
+  "nonIdempotent": false,
+  "noChange": false,
+  "summary": "return a number: round with Math.round instead of toFixed",
+  "violations": []
+}

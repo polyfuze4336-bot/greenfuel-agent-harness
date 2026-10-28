@@ -1,0 +1,6 @@
+{
+  "note": "FIXTURE ONLY. A tampered copy: the expected result was changed to match the buggy code. The loop must refuse it.",
+  "massKg": 1000,
+  "factorKgPerKg": 2.5,
+  "expectedKg": 1002.5
+}

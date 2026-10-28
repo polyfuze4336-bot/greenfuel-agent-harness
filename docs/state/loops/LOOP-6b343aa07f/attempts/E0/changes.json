@@ -1,0 +1,15 @@
+{
+  "attempt": "E0",
+  "type": "execute",
+  "reason": "ended",
+  "startedAt": "2026-10-28T12:39:06.451Z",
+  "endedAt": "2026-10-28T12:39:06.609Z",
+  "beforeSha": "0e043cba14927175ead934b717d2a2dddc832b344b2ff25e0ae11ad53bb923a3",
+  "afterSha": "0e043cba14927175ead934b717d2a2dddc832b344b2ff25e0ae11ad53bb923a3",
+  "changes": [],
+  "reportedActions": [],
+  "nonIdempotent": false,
+  "noChange": true,
+  "summary": "first look",
+  "violations": []
+}

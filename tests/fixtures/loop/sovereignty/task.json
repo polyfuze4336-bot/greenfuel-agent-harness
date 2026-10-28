@@ -1,0 +1,16 @@
+{
+  "schema": "greenfuel.loop-task/v1",
+  "title": "Placement declaration must satisfy the sovereignty check",
+  "objective": "The fixture placement declaration names a cloud region as its residency basis. A region is not a residency control (hard constraint HC-01).",
+  "acceptance": [
+    "The sovereignty validator passes on the placement declaration",
+    "Residency is never satisfied by naming a region"
+  ],
+  "agent": "session",
+  "requirements": [],
+  "constraints": ["HC-01"],
+  "checks": [
+    { "id": "sovereignty", "kind": "policy", "argv": ["node", "harness/scripts/spec-validators.mjs", "sovereignty", "--path", "tests/fixtures/loop/sovereignty/placement", "--require"], "cwd": "repo", "hardConstraint": "HC-01" }
+  ],
+  "protectedPaths": ["policy/**"]
+}

@@ -14,3 +14,5 @@ memory/.lock/
 memory/**/*.tmp-*
 .DS_Store
 Thumbs.db
+.harness-work/
+.harness-toolchain/

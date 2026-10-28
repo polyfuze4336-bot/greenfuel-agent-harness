@@ -1,0 +1,22 @@
+{
+  "attempt": "R1",
+  "type": "repair",
+  "reason": "ended",
+  "startedAt": "2026-10-28T12:39:07.155Z",
+  "endedAt": "2026-10-28T12:39:07.319Z",
+  "beforeSha": "0e043cba14927175ead934b717d2a2dddc832b344b2ff25e0ae11ad53bb923a3",
+  "afterSha": "0619ee00e09dff1b103cf88ac3a3920af35341f66ec186d734a6ea7a82f0ac54",
+  "changes": [
+    {
+      "path": "api/handler.mjs",
+      "change": "modified",
+      "beforeSha": "0c109c1bbed5bbb49fbe90cee5c15172fb9ca62cac1d578975d451128a3b7c7c",
+      "afterSha": "3d430b591ee0bbaf163fd744f717f259fb7e88a827792115a0162390ab49bce0"
+    }
+  ],
+  "reportedActions": [],
+  "nonIdempotent": false,
+  "noChange": false,
+  "summary": "cosmetic change only",
+  "violations": []
+}

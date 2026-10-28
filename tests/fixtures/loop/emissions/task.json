@@ -1,0 +1,17 @@
+{
+  "schema": "greenfuel.loop-task/v1",
+  "title": "Correct the fixture calculation",
+  "objective": "The fixture calculation does not give the documented expected result (see EXPECTED.md next to this file).",
+  "acceptance": [
+    "The calculation check passes against the documented expected result",
+    "The expected result, the fixture data and the check are unchanged"
+  ],
+  "agent": "session",
+  "requirements": [],
+  "constraints": [],
+  "checks": [
+    { "id": "calc-fixture", "kind": "calculation", "argv": ["node", "--test", "calc.check.mjs"], "covers": ["calc.mjs"] }
+  ],
+  "protectedPaths": ["calc.check.mjs", "fixture-data.json"],
+  "allowedWritePaths": ["calc.mjs"]
+}

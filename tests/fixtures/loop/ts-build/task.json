@@ -1,0 +1,17 @@
+{
+  "schema": "greenfuel.loop-task/v1",
+  "title": "Fix the type error in the fixture summing function",
+  "objective": "The fixture project must type-check with the pinned TypeScript compiler. The function returns a string where a number is declared.",
+  "acceptance": [
+    "The fixture project type-checks with the pinned compiler with no errors",
+    "The compiler configuration is unchanged and no check is weakened"
+  ],
+  "agent": "session",
+  "requirements": [],
+  "constraints": [],
+  "checks": [
+    { "id": "ts-build", "kind": "build", "argv": ["tsc", "--noEmit", "-p", "tsconfig.json"], "covers": ["src/**", "tsconfig.json"] }
+  ],
+  "protectedPaths": ["tsconfig.json"],
+  "allowedWritePaths": ["src/**"]
+}

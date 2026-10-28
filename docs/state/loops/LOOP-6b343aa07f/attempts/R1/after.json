@@ -1,0 +1,17 @@
+{
+  "api/handler.mjs": {
+    "sha": "3d430b591ee0bbaf163fd744f717f259fb7e88a827792115a0162390ab49bce0",
+    "size": 172,
+    "big": false
+  },
+  "contract/item.contract.json": {
+    "sha": "d46cb72aaa8b21e3fe92a5e1c33de00f0556bf5ddaec0914c7dff93fa7cba559",
+    "size": 156,
+    "big": false
+  },
+  "contract.check.mjs": {
+    "sha": "fc4b8fb9827fc66650f860beca1afbbccecf74e429bd34276eae3b03655509ac",
+    "size": 648,
+    "big": false
+  }
+}

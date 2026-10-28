@@ -1,0 +1,22 @@
+{
+  "schema": "greenfuel.command-evidence/v1",
+  "label": "E0-v1-sovereignty",
+  "argv": [
+    "node",
+    "harness/scripts/spec-validators.mjs",
+    "sovereignty",
+    "--path",
+    "tests/fixtures/loop/sovereignty/placement",
+    "--require"
+  ],
+  "cwd": "repo",
+  "exitCode": 1,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-28T12:38:49.064Z",
+  "durationMs": 143,
+  "outputSha256": "6327cf3403d70f5d2ed9d72b4f4f8250bea9c776392e086ce05517b5eda52e53",
+  "outputBytes": 393,
+  "outputTail": "sovereignty: FAIL (2 item(s) checked)\n  - tests/fixtures/loop/sovereignty/placement/placement.json: placements[0] (shore-evidence-store): a cloud region is not a residency control (SEC-001, D-009); name the control and its evidence\n  note: Matrix consistency is always checked. Placement declarations are optional specifications.\n  note: A region name is never accepted as residency evidence.\n",
+  "workspaceSha": "74beb2e49951d9a2f2d8b82c92bffe83ef27ade58e03a79999741974c89dea91"
+}

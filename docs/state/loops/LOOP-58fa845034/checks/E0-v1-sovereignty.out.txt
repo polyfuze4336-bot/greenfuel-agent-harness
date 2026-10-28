@@ -1,0 +1,4 @@
+sovereignty: FAIL (2 item(s) checked)
+  - tests/fixtures/loop/sovereignty/placement/placement.json: placements[0] (shore-evidence-store): a cloud region is not a residency control (SEC-001, D-009); name the control and its evidence
+  note: Matrix consistency is always checked. Placement declarations are optional specifications.
+  note: A region name is never accepted as residency evidence.

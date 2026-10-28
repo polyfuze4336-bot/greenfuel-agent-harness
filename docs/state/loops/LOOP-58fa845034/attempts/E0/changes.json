@@ -1,0 +1,22 @@
+{
+  "attempt": "E0",
+  "type": "execute",
+  "reason": "ended",
+  "startedAt": "2026-10-28T12:38:48.707Z",
+  "endedAt": "2026-10-28T12:38:48.878Z",
+  "beforeSha": "bfa5b593e7a999cd6fddeb98ed47e764411cbde5f129fd4ef64c764e7efb80c5",
+  "afterSha": "74beb2e49951d9a2f2d8b82c92bffe83ef27ade58e03a79999741974c89dea91",
+  "changes": [
+    {
+      "path": "NOTES.md",
+      "change": "modified",
+      "beforeSha": "bc2e7f1a4ec5968564e735bd5e16000fe8e7305236f60a76e8005e91e36a5fe4",
+      "afterSha": "76b91b39b41efc51bf0a4755ac7575d6385595443467497bc6ad1d5447bdb3e4"
+    }
+  ],
+  "reportedActions": [],
+  "nonIdempotent": false,
+  "noChange": false,
+  "summary": "declare the region as the residency basis",
+  "violations": []
+}

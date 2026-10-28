@@ -1,0 +1,17 @@
+{
+  "schema": "greenfuel.loop-task/v1",
+  "title": "Make the fixture item handler satisfy its contract",
+  "objective": "The contract check for the fixture item handler fails: a field has the wrong type.",
+  "acceptance": [
+    "The contract check passes",
+    "The contract and the contract check are unchanged"
+  ],
+  "agent": "session",
+  "requirements": [],
+  "constraints": [],
+  "checks": [
+    { "id": "api-contract", "kind": "contract", "argv": ["node", "--test", "contract.check.mjs"], "covers": ["api/**"] }
+  ],
+  "protectedPaths": ["contract.check.mjs", "contract/**"],
+  "allowedWritePaths": ["api/**"]
+}

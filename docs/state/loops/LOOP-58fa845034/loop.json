@@ -1,0 +1,118 @@
+{
+  "schema": "greenfuel.loop/v1",
+  "loopId": "LOOP-58fa845034",
+  "rev": 3,
+  "state": "STOPPED",
+  "createdAt": "2026-10-28T12:38:48.492Z",
+  "updatedAt": "2026-10-28T12:38:49.224Z",
+  "createdBy": "operator",
+  "task": {
+    "schema": "greenfuel.loop-task/v1",
+    "title": "Placement declaration must satisfy the sovereignty check",
+    "objective": "The fixture placement declaration names a cloud region as its residency basis. A region is not a residency control (hard constraint HC-01).",
+    "acceptance": [
+      "The sovereignty validator passes on the placement declaration",
+      "Residency is never satisfied by naming a region"
+    ],
+    "agent": "session",
+    "requirements": [],
+    "constraints": [
+      "HC-01"
+    ],
+    "checks": [
+      {
+        "id": "sovereignty",
+        "kind": "policy",
+        "argv": [
+          "node",
+          "harness/scripts/spec-validators.mjs",
+          "sovereignty",
+          "--path",
+          "tests/fixtures/loop/sovereignty/placement",
+          "--require"
+        ],
+        "cwd": "repo",
+        "hardConstraint": "HC-01"
+      }
+    ],
+    "protectedPaths": [
+      "policy/**"
+    ]
+  },
+  "taskSha256": "5ffaec9ed8d5cf73e760416e964688a9ad63a2589677f4522cbe25ad50131e79",
+  "workspaceRel": ".harness-work/demo-sov",
+  "limits": {
+    "maxRepairAttempts": 3,
+    "maxIdenticalFailures": 2,
+    "timeoutSeconds": 120,
+    "wallBudgetSeconds": 900,
+    "maxCheckRuns": 30
+  },
+  "contextRefs": [],
+  "attempts": [
+    {
+      "id": "E0",
+      "type": "execute",
+      "status": "ENDED",
+      "startedAt": "2026-10-28T12:38:48.707Z",
+      "leaseExpiresAt": "2026-10-28T13:08:48.708Z",
+      "beforeSha": "bfa5b593e7a999cd6fddeb98ed47e764411cbde5f129fd4ef64c764e7efb80c5",
+      "feedback": [],
+      "endedAt": "2026-10-28T12:38:48.878Z",
+      "afterSha": "74beb2e49951d9a2f2d8b82c92bffe83ef27ade58e03a79999741974c89dea91",
+      "changed": [
+        "NOTES.md"
+      ],
+      "changesSha256": "3e64f5b3688932f0b3a54ddbd4de66723b0294e1b7614036e686bd6f2ba7e7b8",
+      "noChange": false,
+      "summary": "declare the region as the residency basis"
+    }
+  ],
+  "failureHistory": [
+    {
+      "seq": 1,
+      "attempt": "E0",
+      "classes": [
+        "HARD_CONSTRAINT_VIOLATION"
+      ],
+      "fingerprint": "03b27d08384688951fd02fce7a82ce05e84b05b07074c7cb74f9f5fbe20b744e",
+      "labels": [
+        "E0-v1-sovereignty"
+      ],
+      "checks": [
+        "sovereignty"
+      ]
+    }
+  ],
+  "diagnoses": [],
+  "critiques": [],
+  "checkRuns": 1,
+  "wallMs": 143,
+  "workspaceSha": "74beb2e49951d9a2f2d8b82c92bffe83ef27ade58e03a79999741974c89dea91",
+  "verifiedSha": null,
+  "lastFailure": {
+    "fingerprint": "03b27d08384688951fd02fce7a82ce05e84b05b07074c7cb74f9f5fbe20b744e",
+    "labels": [
+      "E0-v1-sovereignty"
+    ],
+    "classes": [
+      "HARD_CONSTRAINT_VIOLATION"
+    ]
+  },
+  "feedback": [
+    {
+      "check": "sovereignty",
+      "class": "HARD_CONSTRAINT_VIOLATION",
+      "detail": "exit 1",
+      "evidence": "checks/E0-v1-sovereignty.out.txt"
+    }
+  ],
+  "outcome": {
+    "state": "STOPPED",
+    "class": "HARD_CONSTRAINT_VIOLATION",
+    "detail": "sovereignty: exit 1",
+    "requires": "An architecture decision is needed. Resolve the open decision or constraint conflict; the loop will not repair it, and it must not be worked around."
+  },
+  "eventSeq": 10,
+  "eventHead": "510cff3bbef5318dfed243463ad933070529c4e23195bff1e00c0a074e06d256"
+}

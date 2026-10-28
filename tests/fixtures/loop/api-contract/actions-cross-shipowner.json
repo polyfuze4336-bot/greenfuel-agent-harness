@@ -1,0 +1,3 @@
+[
+  { "tool": "view", "args": { "path": "tests/fixtures/shipowners/owner-b/delivery-summary.json" } }
+]

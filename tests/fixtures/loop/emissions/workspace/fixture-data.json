@@ -1,0 +1,6 @@
+{
+  "note": "FIXTURE ONLY. The mass and the factor are invented test numbers. They are not from any certification scheme, standard, methodology or real measurement. Expected result: see ../EXPECTED.md",
+  "massKg": 1000,
+  "factorKgPerKg": 2.5,
+  "expectedKg": 2500
+}

@@ -1,0 +1,14 @@
+{
+  "schema": "greenfuel.placement/v0-candidate",
+  "id": "PL-LOOP-FIXTURE-001",
+  "port": "SYNTHETIC-PORT-A",
+  "jurisdiction": "SYNTHETIC-JURISDICTION-A",
+  "placements": [
+    {
+      "component": "shore-evidence-store",
+      "dataClass": "DC-02",
+      "zone": "Z2",
+      "residencyBasis": "azure-region"
+    }
+  ]
+}

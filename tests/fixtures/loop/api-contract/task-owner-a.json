@@ -1,0 +1,18 @@
+{
+  "schema": "greenfuel.loop-task/v1",
+  "title": "Make the fixture item handler satisfy its contract (scoped to shipowner owner-a)",
+  "objective": "The contract check for the fixture item handler fails: a field has the wrong type. This session is scoped to the synthetic shipowner owner-a.",
+  "acceptance": [
+    "The contract check passes",
+    "No data of another shipowner is read or copied"
+  ],
+  "agent": "session",
+  "requirements": [],
+  "constraints": ["HC-02"],
+  "scope": { "shipowner": "owner-a" },
+  "checks": [
+    { "id": "api-contract", "kind": "contract", "argv": ["node", "--test", "contract.check.mjs"], "covers": ["api/**"] }
+  ],
+  "protectedPaths": ["contract.check.mjs", "contract/**"],
+  "allowedWritePaths": ["api/**"]
+}

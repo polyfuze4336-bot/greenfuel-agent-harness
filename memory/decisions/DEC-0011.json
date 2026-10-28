@@ -1,0 +1,49 @@
+{
+  "kind": "decision",
+  "title": "Bounded Plan, Execute, Verify, Critique, Repair loop",
+  "statement": "Bounded Plan, Execute, Verify, Critique, Repair loop",
+  "body": "Proposed. Adopt, if the owner accepts: - [loop.cjs](../../harness/loop/loop.cjs) with [loop-policy.json](../../harness/policy/loop-policy.json), the CLI [loop.mjs](../../harness/scripts/loop.mjs), and `validate-loop` in `npm run validate` and CI, as described in [LOOP](../loop/LOOP.md). - PASSED reachable only from a verification the loop ran on the final files, plus an independent approval where the task requires one. - Failure classes that stop at once (hard constraint, permission, isolation, sensitive data, missing context, unsafe action, tampering, untracked change), that escalate (repeated failure, budget, non-idempotent failure, blocked review, a policy failure with no declared constraint) or that are repairable within 3 repair attempts and 2 identical failures; a diagnosis with a different approach before any repair that follows a failed repair. - `docs/state/loops/` as a control-plane path and the loop CLI on no agent's command list: only a person drives a loop in this stage. - A pinned TypeScript toolchain outside the manifest, verified before use. - No sandbox and no agent-run loop yet; both are recorded as open items (R15, T24).",
+  "refs": [
+    "ADR-0011",
+    "HC-11",
+    "ADR-0008",
+    "ADR-0009",
+    "ADR-0010",
+    "ADR-0002",
+    "file:docs/adr/0011-bounded-repair-loop.md"
+  ],
+  "subject": "adr.0011",
+  "position": "proposed",
+  "tags": [
+    "adr"
+  ],
+  "owner": "programme-owner",
+  "critical": false,
+  "provenance": {
+    "evidence": [],
+    "source": "adr",
+    "ref": "file:docs/adr/0011-bounded-repair-loop.md",
+    "sourceSha256": "703b00c667934e7182b3e492d534c73efaf74d6f64fde19dcd3bf7784401631b",
+    "trust": "unreviewed",
+    "recordedBy": {
+      "type": "importer",
+      "name": "import-adr"
+    }
+  },
+  "approval": null,
+  "validity": {
+    "supersedes": [],
+    "supersededBy": null,
+    "validUntil": "2026-12-27T12:45:35.081Z",
+    "reviewBy": null,
+    "status": "proposed",
+    "validFrom": "2026-10-28T12:45:35.082Z"
+  },
+  "schema": "greenfuel.memory/v1",
+  "category": "semantic",
+  "createdAt": "2026-10-28T12:45:35.082Z",
+  "updatedAt": "2026-10-28T12:45:35.082Z",
+  "classification": "internal",
+  "review": null,
+  "id": "DEC-0011"
+}

@@ -10,7 +10,7 @@ const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 function sandbox(mutate) {
   const dir = mkdtempSync(path.join(os.tmpdir(), 'gf-harness-'));
-  cpSync(repo, dir, { recursive: true, filter: (s) => !/[\\/](\.git|node_modules|escape-link)([\\/]|$)/.test(s) });
+  cpSync(repo, dir, { recursive: true, filter: (s) => !/[\\/](\.git|node_modules|\.harness-work|\.harness-toolchain|escape-link)([\\/]|$)/.test(s) });
   try { return mutate(dir); } finally { rmSync(dir, { recursive: true, force: true }); }
 }
 const checks = (errors) => errors.map((e) => e.check);

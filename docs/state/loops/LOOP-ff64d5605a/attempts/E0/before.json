@@ -1,0 +1,12 @@
+{
+  "src/sum.ts": {
+    "sha": "2fd6afa38605e42b46ac89f67da4e04378cbc331f157f0bfe9641d2f4d8d69e5",
+    "size": 204,
+    "big": false
+  },
+  "tsconfig.json": {
+    "sha": "7b5e0f635048ab5d3e1827ec1b4189a728860e2542920390d11e0205f8b1bbe8",
+    "size": 147,
+    "big": false
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "schema": "greenfuel.command-evidence/v1",
+  "label": "E0-v1-ts-build",
+  "argv": [
+    "tsc",
+    "--noEmit",
+    "-p",
+    "tsconfig.json"
+  ],
+  "cwd": "workspace",
+  "exitCode": 2,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-28T12:38:26.056Z",
+  "durationMs": 917,
+  "outputSha256": "b323c6dc0f6471d9ea6dd65e6d582fc27b1eb6283918761ada0e50b94fa972f9",
+  "outputBytes": 82,
+  "outputTail": "src/sum.ts(5,3): error TS2322: Type 'string' is not assignable to type 'number'.\r\n",
+  "workspaceSha": "cdffc022ab986bcf102b7c6d68bd682e98d9cdc634265c3ac738a4f5d492ba51"
+}
