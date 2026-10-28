@@ -14,6 +14,8 @@ const require = createRequire(import.meta.url);
 const { evaluate, loadPolicy } = require('../hooks/policy-guard.cjs');
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const TAIL_BYTES = 2000;
+// Default limit 300 seconds. A human may raise it with HARNESS_EVIDENCE_TIMEOUT_SECONDS for a long suite; the value is capped, and a bad value falls back to the default.
+const TIMEOUT_MS = (() => { const n = Number(process.env.HARNESS_EVIDENCE_TIMEOUT_SECONDS); return Number.isInteger(n) && n >= 1 && n <= 1800 ? n * 1000 : 300_000; })();
 const SECRET = /(bearer\s+[a-z0-9._-]{16,}|(?:key|token|secret|password|sig)=[^\s&"']{6,}|-----BEGIN [A-Z ]*PRIVATE KEY-----)/gi;
 
 function parse(argv) {
@@ -56,7 +58,7 @@ export function record({ id, claim, cmd, outDir }) {
 
   const started = Date.now();
   const [file, fileArgs] = resolveCommand(cmd);
-  const run = spawnSync(file, fileArgs, { cwd: root, encoding: 'utf8', timeout: 300_000, maxBuffer: 32 * 1024 * 1024 });
+  const run = spawnSync(file, fileArgs, { cwd: root, encoding: 'utf8', timeout: TIMEOUT_MS, maxBuffer: 32 * 1024 * 1024 });
   const output = `${run.stdout ?? ''}${run.stderr ?? ''}`;
   const rec = {
     id, claim,

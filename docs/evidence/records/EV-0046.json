@@ -1,0 +1,25 @@
+{
+  "id": "EV-0046",
+  "claim": "evaluate.mjs verify of EVRUN-bdce820495 re-derives every status, gate and hard-constraint verdict",
+  "argv": [
+    "node",
+    "harness/scripts/evaluate.mjs",
+    "verify",
+    "--run",
+    "EVRUN-bdce820495"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-28T16:12:20.294Z",
+  "durationMs": 497,
+  "outputSha256": "296bf9ac7a1f4dd1ac5c8e7ca28b6f3507fdce604ced5035ded233fa98ba83f7",
+  "outputBytes": 81,
+  "outputTail": "{\n  \"ok\": true,\n  \"problems\": [],\n  \"runId\": \"EVRUN-bdce820495\",\n  \"tests\": 70\n}\n",
+  "gitHead": "dbe2f23755d7f5c07c7a39a30e66eaa4957b3ab0",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}

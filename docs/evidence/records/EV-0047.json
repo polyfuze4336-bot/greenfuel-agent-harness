@@ -1,0 +1,22 @@
+{
+  "id": "EV-0047",
+  "claim": "npm test at dbe2f23: all tests pass, none skipped (includes Azure validator, evaluation re-run and record tests). Supersedes EV-0043, which timed out at the recorder's former fixed limit",
+  "argv": [
+    "npm",
+    "test"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-28T16:12:55.886Z",
+  "durationMs": 806405,
+  "outputSha256": "720823fb0cb27e15d0974a9d6bf5f03fd7fe304a198742d7274d4bc68460802c",
+  "outputBytes": 149808,
+  "outputTail": "e registry, no loader variables, no undeclared properties\nok 694 - candidates: env must equal the registry, no loader variables, no undeclared properties\n  ---\n  duration_ms: 2540.5972\n  type: 'test'\n  ...\n# Subtest: servers whose names collide after normalisation are rejected\nok 695 - servers whose names collide after normalisation are rejected\n  ---\n  duration_ms: 1727.2592\n  type: 'test'\n  ...\n# Subtest: candidates: exactly the pending servers, matching the registry, never carrying credentials\nok 696 - candidates: exactly the pending servers, matching the registry, never carrying credentials\n  ---\n  duration_ms: 6507.9892\n  type: 'test'\n  ...\n# Subtest: agent grants: exact server/tool names, enabled tools only, privilege by class, external only with web access\nok 697 - agent grants: exact server/tool names, enabled tools only, privilege by class, external only with web access\n  ---\n  duration_ms: 6793.9322\n  type: 'test'\n  ...\n# Subtest: agent grants: web hosts in the registry and policy must agree and be plain hosts\nok 698 - agent grants: web hosts in the registry and policy must agree and be plain hosts\n  ---\n  duration_ms: 3344.964\n  type: 'test'\n  ...\n# Subtest: hook, log ignore and generated documents are enforced\nok 699 - hook, log ignore and generated documents are enforced\n  ---\n  duration_ms: 7107.7277\n  type: 'test'\n  ...\n# Subtest: generated tables: complete, free of pipes inside cells, and idempotent under --write\nok 700 - generated tables: complete, free of pipes inside cells, and idempotent under --write\n  ---\n  duration_ms: 1865.3084\n  type: 'test'\n  ...\n# Subtest: helpers: grants resolve by alias, command substring and MCP name; server tool lists derive from enabled tools\nok 701 - helpers: grants resolve by alias, command substring and MCP name; server tool lists derive from enabled tools\n  ---\n  duration_ms: 45.0544\n  type: 'test'\n  ...\n1..701\n# tests 701\n# suites 0\n# pass 701\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 804872.3745\n",
+  "gitHead": "dbe2f23755d7f5c07c7a39a30e66eaa4957b3ab0",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}

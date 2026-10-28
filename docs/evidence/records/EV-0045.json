@@ -1,0 +1,23 @@
+{
+  "id": "EV-0045",
+  "claim": "validate-azure --bicep at dbe2f23: static policy passes and every Bicep file compiles with no diagnostics (local compiler, no Azure call)",
+  "argv": [
+    "node",
+    "harness/scripts/validate-azure.mjs",
+    "--bicep"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-28T16:12:02.573Z",
+  "durationMs": 16700,
+  "outputSha256": "b8164c6a3044c223ceba95e9b3e5ae05b61bf49ec160d1a33449abc04ab14012",
+  "outputBytes": 106,
+  "outputTail": "validate-azure: OK (bicep Bicep CLI version 0.48.1 (cec7951cf6): every file compiled with no diagnostics)\n",
+  "gitHead": "dbe2f23755d7f5c07c7a39a30e66eaa4957b3ab0",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}

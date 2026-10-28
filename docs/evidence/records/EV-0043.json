@@ -1,0 +1,22 @@
+{
+  "id": "EV-0043",
+  "claim": "npm test at dbe2f23: all tests pass, none skipped (includes Azure validator, evaluation re-run and record tests)",
+  "argv": [
+    "npm",
+    "test"
+  ],
+  "exitCode": null,
+  "signal": "SIGTERM",
+  "spawnError": "spawnSync C:\\Program Files\\nodejs\\node.exe ETIMEDOUT",
+  "startedAt": "2026-10-28T16:06:28.288Z",
+  "durationMs": 300058,
+  "outputSha256": "e43bc1cedc9ddfaf69bdbe425c289ae9ba30830dbed6613d8e025cd99dd4015d",
+  "outputBytes": 8562,
+  "outputTail": "  duration_ms: 0.7022\n  type: 'test'\n  ...\n# Subtest: break-glass records are P4 and need a reference\nok 35 - break-glass records are P4 and need a reference\n  ---\n  duration_ms: 2.4555\n  type: 'test'\n  ...\n# Subtest: the signature covers a canonical form, so key order does not matter and added fields do\nok 36 - the signature covers a canonical form, so key order does not matter and added fields do\n  ---\n  duration_ms: 2.0471\n  type: 'test'\n  ...\n# Subtest: an approval is not usable by an agent it does not name, and is spent after maxUses\nok 37 - an approval is not usable by an agent it does not name, and is spent after maxUses\n  ---\n  duration_ms: 75.6977\n  type: 'test'\n  ...\n# Subtest: the human workflow works end to end with encrypted keys: request, two signatures, verify\nok 38 - the human workflow works end to end with encrypted keys: request, two signatures, verify\n  ---\n  duration_ms: 130.7691\n  type: 'test'\n  ...\n# Subtest: verify-github-protection: a compliant protection response has no differences, and each weakening is reported\nok 39 - verify-github-protection: a compliant protection response has no differences, and each weakening is reported\n  ---\n  duration_ms: 2.1582\n  type: 'test'\n  ...\n# Subtest: verify-github-protection: failures are classified from status codes, and apply commands are printed rather than run\nok 40 - verify-github-protection: failures are classified from status codes, and apply commands are printed rather than run\n  ---\n  duration_ms: 36.226\n  type: 'test'\n  ...\n# Subtest: audit-denials: verify passes on an intact chain, fails on tampering, and summary reads without printing arguments\nok 41 - audit-denials: verify passes on an intact chain, fails on tampering, and summary reads without printing arguments\n  ---\n  duration_ms: 1682.2019\n  type: 'test'\n  ...\n# Subtest: audit log writes never contain raw arguments or secrets\nok 42 - audit log writes never contain raw arguments or secrets\n  ---\n  duration_ms: 20.0435\n  type: 'test'\n  ...\n",
+  "gitHead": "dbe2f23755d7f5c07c7a39a30e66eaa4957b3ab0",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}
