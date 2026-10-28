@@ -1,0 +1,25 @@
+{
+  "id": "EV-0030",
+  "claim": "tasks verify RUN-afb2a0466e: chain, checkpoints, captured replies, accepted files and command evidence match the record",
+  "argv": [
+    "node",
+    "harness/scripts/tasks.mjs",
+    "verify",
+    "--run",
+    "RUN-afb2a0466e"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-28T10:52:55.908Z",
+  "durationMs": 154,
+  "outputSha256": "a5bceb876e2b1879a7274c09672a92d2e0cc6cd9ed23d076f4d45dc4b0d7a522",
+  "outputBytes": 84,
+  "outputTail": "{\n  \"ok\": true,\n  \"problems\": [],\n  \"events\": 44,\n  \"checkpoints\": 9,\n  \"rev\": 21\n}\n",
+  "gitHead": "3d88241882ee9f021447cd1770f73d847269336c",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}

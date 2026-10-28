@@ -1,0 +1,22 @@
+{
+  "id": "EV-0029",
+  "claim": "validate-orchestration passes: policy coherent, hook registered, orchestrator read-only, docs current, committed run intact",
+  "argv": [
+    "node",
+    "harness/scripts/validate-orchestration.mjs"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-28T10:52:55.270Z",
+  "durationMs": 191,
+  "outputSha256": "f7341fc561b703c78c6af0388c28c8aa4700989bf761b6d6788049ecad57f1a5",
+  "outputBytes": 27,
+  "outputTail": "validate-orchestration: OK\n",
+  "gitHead": "3d88241882ee9f021447cd1770f73d847269336c",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}
