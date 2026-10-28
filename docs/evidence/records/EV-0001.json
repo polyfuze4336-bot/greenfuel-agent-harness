@@ -1,0 +1,22 @@
+{
+  "id": "EV-0001",
+  "claim": "Repository validator reports no problems",
+  "argv": [
+    "node",
+    "harness/scripts/validate-harness.mjs"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-28T05:19:51.024Z",
+  "durationMs": 143,
+  "outputSha256": "2b3457a9c3f2dd9d09397ca7d1226e853725706a02d6f7dcc99dfbea4a577902",
+  "outputBytes": 21,
+  "outputTail": "validate-harness: OK\n",
+  "gitHead": "17a7de242fe358b8c0b9e65a167166511b20f6e1",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}

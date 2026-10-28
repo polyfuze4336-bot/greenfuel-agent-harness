@@ -6,7 +6,10 @@ Resume point. Update with the `session-handoff` skill. Facts only; unverified it
 Phase 0 (harness foundation). Objective: owner review of the foundation and decision on ADR 0001 and 0002.
 
 ## Done (with evidence)
-Populated after the verification run; see below.
+- Reference repository assessed from a read-only snapshot; findings in [REFERENCE-ASSESSMENT](../harness/REFERENCE-ASSESSMENT.md). Evidence: the document cites file paths and line numbers; no command was run against the reference code.
+- Repository validator passes on commit `17a7de2`: [EV-0001](../evidence/records/EV-0001.json) (exit 0).
+- 68 unit tests pass (policy guard decisions and hook process contract, evidence recorder, validator rules) on commit `17a7de2`: [EV-0002](../evidence/records/EV-0002.json) (exit 0). These test the scripts in isolation, not behaviour inside Copilot.
+- Phase 0 gate holds: no `src/`, `infra/`, IaC, Dockerfile or `azure.yaml` exist (validator check `phase-gate`, in EV-0001). No Azure command was run during this stage.
 
 ## Claimed, unverified
 - Hook and agents behave as documented inside a live Copilot session (roadmap R1).

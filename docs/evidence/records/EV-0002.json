@@ -1,0 +1,22 @@
+{
+  "id": "EV-0002",
+  "claim": "All unit tests for policy guard, recorder and validator pass",
+  "argv": [
+    "node",
+    "--test"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-28T05:19:51.338Z",
+  "durationMs": 2902,
+  "outputSha256": "b6e6e131a5860948fee5159e27900532acf9d3a9a2849f34b7b735dc657951fc",
+  "outputBytes": 9302,
+  "outputTail": "rites nothing\nok 56 - refuses commands the policy denies, and writes nothing\n  ---\n  duration_ms: 1.9612\n  type: 'test'\n  ...\n# Subtest: policy allows the recorder invocation itself\nok 57 - policy allows the recorder invocation itself\n  ---\n  duration_ms: 0.7256\n  type: 'test'\n  ...\n# Subtest: real repository validates cleanly\nok 58 - real repository validates cleanly\n  ---\n  duration_ms: 100.2855\n  type: 'test'\n  ...\n# Subtest: frontmatter parser reads simple keys and rejects missing block\nok 59 - frontmatter parser reads simple keys and rejects missing block\n  ---\n  duration_ms: 0.2645\n  type: 'test'\n  ...\n# Subtest: phase 0 rejects application code\nok 60 - phase 0 rejects application code\n  ---\n  duration_ms: 291.8504\n  type: 'test'\n  ...\n# Subtest: phase 0 rejects IaC files anywhere\nok 61 - phase 0 rejects IaC files anywhere\n  ---\n  duration_ms: 241.4505\n  type: 'test'\n  ...\n# Subtest: agent without explicit tools is rejected\nok 62 - agent without explicit tools is rejected\n  ---\n  duration_ms: 344.4611\n  type: 'test'\n  ...\n# Subtest: broken markdown link is rejected\nok 63 - broken markdown link is rejected\n  ---\n  duration_ms: 203.6448\n  type: 'test'\n  ...\n# Subtest: secret-like content is rejected\nok 64 - secret-like content is rejected\n  ---\n  duration_ms: 283.2208\n  type: 'test'\n  ...\n# Subtest: unpinned workflow action is rejected\nok 65 - unpinned workflow action is rejected\n  ---\n  duration_ms: 259.9765\n  type: 'test'\n  ...\n# Subtest: runtime dependencies are rejected\nok 66 - runtime dependencies are rejected\n  ---\n  duration_ms: 279.9225\n  type: 'test'\n  ...\n# Subtest: missing pillar in architecture doc is rejected\nok 67 - missing pillar in architecture doc is rejected\n  ---\n  duration_ms: 336.7093\n  type: 'test'\n  ...\n# Subtest: missing hook script is rejected\nok 68 - missing hook script is rejected\n  ---\n  duration_ms: 299.8781\n  type: 'test'\n  ...\n1..68\n# tests 68\n# suites 0\n# pass 68\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 2825.4605\n",
+  "gitHead": "17a7de242fe358b8c0b9e65a167166511b20f6e1",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}
