@@ -93,12 +93,17 @@ test('validate-orchestration checks committed runs: tampering and a leftover ACT
   let root = sandbox();
   const ctx = engine.makeContext({ root, runsDir: path.join(root, 'docs/state/runs') });
   const { runId } = engine.initRun(ctx, examplePlan());
-  assert.deepEqual(errorsOf(root), [], 'locally, an open run is allowed while work is in progress');
-  const prevCi = process.env.CI; process.env.CI = 'true';
-  try { assert.ok(errorsOf(root).some((e) => new RegExp(`run ${runId} is ACTIVE`).test(e)), 'in CI an ACTIVE run is an error: it would block untracked delegation'); } finally { if (prevCi === undefined) delete process.env.CI; else process.env.CI = prevCi; }
-  engine.cancelRun(ctx, runId, { reason: 'finished' });
-  assert.deepEqual(errorsOf(root), [], 'a finished run with an intact chain is fine');
-  editText(root, `docs/state/runs/${runId}/events.jsonl`, (t) => t.replace('"run-created"', '"run-edited"'));
-  assert.ok(errorsOf(root).some((e) => /failed its integrity check/.test(e)));
+  const prevCi = process.env.CI;
+  try {
+    delete process.env.CI;
+    assert.deepEqual(errorsOf(root), [], 'locally, an open run is allowed while work is in progress');
+    process.env.CI = 'true';
+    assert.ok(errorsOf(root).some((e) => new RegExp(`run ${runId} is ACTIVE`).test(e)), 'in CI an ACTIVE run is an error: it would block untracked delegation');
+    delete process.env.CI;
+    engine.cancelRun(ctx, runId, { reason: 'finished' });
+    assert.deepEqual(errorsOf(root), [], 'a finished run with an intact chain is fine');
+    editText(root, `docs/state/runs/${runId}/events.jsonl`, (t) => t.replace('"run-created"', '"run-edited"'));
+    assert.ok(errorsOf(root).some((e) => /failed its integrity check/.test(e)));
+  } finally { if (prevCi === undefined) delete process.env.CI; else process.env.CI = prevCi; }
   void setup; root = null;
 });
