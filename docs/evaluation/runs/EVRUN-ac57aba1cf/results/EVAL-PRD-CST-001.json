@@ -1,0 +1,7 @@
+{
+  "schema": "greenfuel.eval-evidence/v1",
+  "testId": "EVAL-PRD-CST-001",
+  "ran": false,
+  "status": "PENDING",
+  "actual": "Not run: There is no approved design, no volume and no budget; any estimate now would be fabricated"
+}

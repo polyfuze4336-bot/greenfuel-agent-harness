@@ -1,0 +1,31 @@
+{
+  "schema": "greenfuel.eval-evidence/v1",
+  "testId": "EVAL-HRN-FUN-003",
+  "ran": true,
+  "argv": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/orchestration-engine.test.mjs",
+    "tests/orchestration-plan.test.mjs",
+    "tests/orchestration-hook-cli.test.mjs"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-28T14:07:49.489Z",
+  "durationMs": 6965,
+  "outputSha256": "604d23ce5d3e828819d673496f3021a3cd16edcbf6b9d7c5e2ebb156b03368ae",
+  "outputBytes": 23338,
+  "outputTail": " duration_ms: 0.2735\n  type: 'test'\n  ...\n# Subtest: plan validation rejects a reviewer that is not a reviewer agent\nok 103 - plan validation rejects a reviewer that is not a reviewer agent\n  ---\n  duration_ms: 0.293\n  type: 'test'\n  ...\n# Subtest: plan validation rejects a review task that does not depend on the reviewed task\nok 104 - plan validation rejects a review task that does not depend on the reviewed task\n  ---\n  duration_ms: 0.2678\n  type: 'test'\n  ...\n# Subtest: plan validation rejects a review task without a verdict test\nok 105 - plan validation rejects a review task without a verdict test\n  ---\n  duration_ms: 0.2893\n  type: 'test'\n  ...\n# Subtest: plan validation rejects an unchecked artifact\nok 106 - plan validation rejects an unchecked artifact\n  ---\n  duration_ms: 0.7256\n  type: 'test'\n  ...\n# Subtest: plan validation rejects a short waiver\nok 107 - plan validation rejects a short waiver\n  ---\n  duration_ms: 0.3179\n  type: 'test'\n  ...\n# Subtest: plan validation rejects a review that names a missing task\nok 108 - plan validation rejects a review that names a missing task\n  ---\n  duration_ms: 0.2946\n  type: 'test'\n  ...\n# Subtest: an operation at P2 or above is allowed in a plan but makes the task wait for a signed approval\nok 109 - an operation at P2 or above is allowed in a plan but makes the task wait for a signed approval\n  ---\n  duration_ms: 0.4541\n  type: 'test'\n  ...\n# Subtest: a task run by the orchestrator itself is valid only when read-only with a result artifact\nok 110 - a task run by the orchestrator itself is valid only when read-only with a result artifact\n  ---\n  duration_ms: 2.9351\n  type: 'test'\n  ...\n# Subtest: the real repository is untouched: validating plans reads files but creates none\nok 111 - the real repository is untouched: validating plans reads files but creates none\n  ---\n  duration_ms: 27.2524\n  type: 'test'\n  ...\n1..111\n# tests 111\n# suites 0\n# pass 111\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 6888.0561\n",
+  "parsed": {
+    "tests": 111,
+    "pass": 111,
+    "fail": 0,
+    "skipped": 0,
+    "todo": 0,
+    "cancelled": 0
+  },
+  "status": "PASS",
+  "actual": "ran and passed: 111 tests, 0 failed, 0 skipped"
+}

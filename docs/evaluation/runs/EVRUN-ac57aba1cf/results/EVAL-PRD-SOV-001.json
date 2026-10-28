@@ -1,0 +1,7 @@
+{
+  "schema": "greenfuel.eval-evidence/v1",
+  "testId": "EVAL-PRD-SOV-001",
+  "ran": false,
+  "status": "PENDING",
+  "actual": "Not run: No Customer Compliance Agent, tenant store or identity exists. The harness-side analogue is EVAL-HRN-SOV-001"
+}

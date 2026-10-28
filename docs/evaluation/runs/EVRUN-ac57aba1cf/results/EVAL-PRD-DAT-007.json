@@ -1,0 +1,7 @@
+{
+  "schema": "greenfuel.eval-evidence/v1",
+  "testId": "EVAL-PRD-DAT-007",
+  "ran": false,
+  "status": "PENDING",
+  "actual": "Not run: No mass-balance model, agent or storage exists, and no harness validator for mass balance exists"
+}

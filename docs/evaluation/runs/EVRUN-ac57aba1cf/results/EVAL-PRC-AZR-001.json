@@ -1,0 +1,8 @@
+{
+  "schema": "greenfuel.eval-evidence/v1",
+  "testId": "EVAL-PRC-AZR-001",
+  "ran": false,
+  "blockedReason": "required gate G5 is BLOCKED; this test must not run before it passes",
+  "status": "BLOCKED",
+  "actual": "Not run: required gate G5 is BLOCKED; this test must not run before it passes"
+}

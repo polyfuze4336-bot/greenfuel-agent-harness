@@ -1,0 +1,7 @@
+{
+  "schema": "greenfuel.eval-evidence/v1",
+  "testId": "EVAL-PRD-OBS-001",
+  "ran": false,
+  "status": "PENDING",
+  "actual": "Not run: No audit store, agent or evidence package exists. The contract-level analogues are EVAL-PRC-DAT-001 to EVAL-PRC-DAT-006"
+}

@@ -1,0 +1,7 @@
+{
+  "schema": "greenfuel.eval-evidence/v1",
+  "testId": "EVAL-HRN-PRF-001",
+  "ran": false,
+  "status": "PENDING",
+  "actual": "Not run: No budget or reference machine has been agreed, and no figure may be invented; a measurement without a budget cannot pass or fail"
+}

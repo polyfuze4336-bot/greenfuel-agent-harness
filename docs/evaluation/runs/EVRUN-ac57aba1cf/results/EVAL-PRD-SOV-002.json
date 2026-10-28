@@ -1,0 +1,7 @@
+{
+  "schema": "greenfuel.eval-evidence/v1",
+  "testId": "EVAL-PRD-SOV-002",
+  "ran": false,
+  "status": "PENDING",
+  "actual": "Not run: No placement, store or deployment exists, and the jurisdictions and legal basis are open decisions (D-009, D-011)"
+}

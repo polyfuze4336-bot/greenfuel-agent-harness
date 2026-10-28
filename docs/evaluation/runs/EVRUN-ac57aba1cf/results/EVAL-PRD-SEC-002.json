@@ -1,0 +1,7 @@
+{
+  "schema": "greenfuel.eval-evidence/v1",
+  "testId": "EVAL-PRD-SEC-002",
+  "ran": false,
+  "status": "PENDING",
+  "actual": "Not run: No filing workflow, identity or approval service exists. The contract-level analogue is EVAL-PRC-SEC-001 and the harness analogue is EVAL-HRN-SEC-003"
+}

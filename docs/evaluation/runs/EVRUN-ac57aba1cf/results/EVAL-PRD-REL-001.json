@@ -1,0 +1,7 @@
+{
+  "schema": "greenfuel.eval-evidence/v1",
+  "testId": "EVAL-PRD-REL-001",
+  "ran": false,
+  "status": "PENDING",
+  "actual": "Not run: No edge component or synchronisation exists, and the edge platform is an open decision"
+}

@@ -1,0 +1,7 @@
+{
+  "schema": "greenfuel.eval-evidence/v1",
+  "testId": "EVAL-PRD-SEC-003",
+  "ran": false,
+  "status": "PENDING",
+  "actual": "Not run: No Azure resource, role assignment or policy exists and none may be created without explicit approval. The harness analogues are EVAL-HRN-SEC-001 and EVAL-HRN-SEC-002"
+}

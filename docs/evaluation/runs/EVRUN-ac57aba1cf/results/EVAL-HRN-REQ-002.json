@@ -1,0 +1,29 @@
+{
+  "schema": "greenfuel.eval-evidence/v1",
+  "testId": "EVAL-HRN-REQ-002",
+  "ran": true,
+  "argv": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/validate-context.test.mjs"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-28T14:05:38.809Z",
+  "durationMs": 22849,
+  "outputSha256": "4a7c99879aed58aceeb9ec0c53ffba8ae3834acb5d18b7ed21feb3fd205329b3",
+  "outputBytes": 2123,
+  "outputTail": "on_ms: 65.5252\n  type: 'test'\n  ...\n# Subtest: baseline counts match what the documents state\nok 2 - baseline counts match what the documents state\n  ---\n  duration_ms: 51.3147\n  type: 'test'\n  ...\n# Subtest: duplicate requirement id is rejected\nok 3 - duplicate requirement id is rejected\n  ---\n  duration_ms: 1289.9616\n  type: 'test'\n  ...\n# Subtest: a pipe inside a cell is rejected\nok 4 - a pipe inside a cell is rejected\n  ---\n  duration_ms: 1349.2729\n  type: 'test'\n  ...\n# Subtest: invalid class and priority are rejected\nok 5 - invalid class and priority are rejected\n  ---\n  duration_ms: 1123.2006\n  type: 'test'\n  ...\n# Subtest: unknown capability tag is rejected\nok 6 - unknown capability tag is rejected\n  ---\n  duration_ms: 1511.7255\n  type: 'test'\n  ...\n# Subtest: requirement without a traceability row is rejected, and so is an orphan row\nok 7 - requirement without a traceability row is rejected, and so is an orphan row\n  ---\n  duration_ms: 2797.5528\n  type: 'test'\n  ...\n# Subtest: class A must cite the case study; class B must cite ARCH\nok 8 - class A must cite the case study; class B must cite ARCH\n  ---\n  duration_ms: 2293.4777\n  type: 'test'\n  ...\n# Subtest: unknown references are rejected\nok 9 - unknown references are rejected\n  ---\n  duration_ms: 4900.8629\n  type: 'test'\n  ...\n# Subtest: Open (C) must list clarifications, not architecture decisions\nok 10 - Open (C) must list clarifications, not architecture decisions\n  ---\n  duration_ms: 1107.5231\n  type: 'test'\n  ...\n# Subtest: decision register shape is enforced\nok 11 - decision register shape is enforced\n  ---\n  duration_ms: 2710.1458\n  type: 'test'\n  ...\n# Subtest: manifest: uncovered requirement, missing file and unlisted source document are rejected\nok 12 - manifest: uncovered requirement, missing file and unlisted source document are rejected\n  ---\n  duration_ms: 3483.1249\n  type: 'test'\n  ...\n1..12\n# tests 12\n# suites 0\n# pass 12\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 22783.0278\n",
+  "parsed": {
+    "tests": 12,
+    "pass": 12,
+    "fail": 0,
+    "skipped": 0,
+    "todo": 0,
+    "cancelled": 0
+  },
+  "status": "PASS",
+  "actual": "ran and passed: 12 tests, 0 failed, 0 skipped"
+}

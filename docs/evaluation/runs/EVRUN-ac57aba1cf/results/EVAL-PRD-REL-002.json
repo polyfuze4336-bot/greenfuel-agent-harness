@@ -1,0 +1,7 @@
+{
+  "schema": "greenfuel.eval-evidence/v1",
+  "testId": "EVAL-PRD-REL-002",
+  "ran": false,
+  "status": "PENDING",
+  "actual": "Not run: No recovery objectives are agreed, nothing is deployed and no backup exists. Any objective now would be fabricated"
+}

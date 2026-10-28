@@ -1,0 +1,7 @@
+{
+  "schema": "greenfuel.eval-evidence/v1",
+  "testId": "EVAL-PRD-FUN-001",
+  "ran": false,
+  "status": "PENDING",
+  "actual": "Not run: No application code exists. The bunkering application must not be built until a human raises the phase"
+}

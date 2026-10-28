@@ -1,0 +1,7 @@
+{
+  "schema": "greenfuel.eval-evidence/v1",
+  "testId": "EVAL-PRD-PRF-001",
+  "ran": false,
+  "status": "PENDING",
+  "actual": "Not run: No volumes or targets have been agreed (open decisions) and nothing is deployed. No figure may be invented"
+}

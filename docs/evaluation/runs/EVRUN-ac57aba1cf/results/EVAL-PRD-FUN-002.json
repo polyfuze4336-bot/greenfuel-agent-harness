@@ -1,0 +1,7 @@
+{
+  "schema": "greenfuel.eval-evidence/v1",
+  "testId": "EVAL-PRD-FUN-002",
+  "ran": false,
+  "status": "PENDING",
+  "actual": "Not run: No calculation engine exists and no methodology is verified (decision register D-002); a scheme-specific expected result cannot be defined yet"
+}

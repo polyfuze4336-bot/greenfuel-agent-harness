@@ -1,0 +1,7 @@
+{
+  "schema": "greenfuel.eval-evidence/v1",
+  "testId": "EVAL-PRD-OPS-001",
+  "ran": false,
+  "status": "PENDING",
+  "actual": "Not run: No runbook, system or on-call arrangement exists"
+}
