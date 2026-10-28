@@ -67,7 +67,8 @@ Nothing below has been requested from or granted by anyone. Order reflects depen
 
 ## Limits
 
-- The assessment reads files. It checks structure and recorded preconditions; it does not show that Azure behaves as the design assumes.
+- The assessment reads files. It checks structure and recorded preconditions; it does not show that Azure behaves as the design assumes. A gate-clearing record must be well formed, bound to a commit and signed by a named human, but a person who can write the file can still forge it: review and the control-plane path rule are the control.
+- No independent model review of this stage was obtained (the review agent failed with an authentication error); it has had my own review and tests only.
 - The IaC scaffold compiled under the local Bicep compiler (a version recorded in the evidence). Compiling is not deploying: resource providers, API versions, role IDs, policy IDs and property names are not verified against a subscription.
 - The five candidate-service lean decisions, the hosting options and the validation set are proposals.
 - No claim here is a compliance claim. Standards and regulations stay candidates until verified (HC-10).

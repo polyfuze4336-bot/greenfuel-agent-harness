@@ -169,12 +169,46 @@ function check(root, fail) {
     for (const x of g.gates ?? []) { if (!x.title || !x.evidence || !x.approver) fail(`deployment-gates.json: ${x.id} needs a title, the evidence it needs and an approver role`); if ('status' in x) fail(`deployment-gates.json: ${x.id} carries a status; status is computed, never declared`); }
   }
   const phase = (() => { try { return j(root, 'harness/policy/command-policy.json').phase; } catch { return null; } })();
+  // the records and the register are control plane: an agent cannot write them, so it cannot clear a gate
+  try {
+    const cp = j(root, 'harness/policy/permissions.json').pathClasses.find((c) => c.id === 'control-plane');
+    for (const f of ['docs/azure/data/port-assessments.json', 'docs/azure/data/whatif-record.json', 'docs/azure/data/cost-estimate.json']) if (!cp || !new RegExp(cp.pattern).test(f)) fail(`permissions.json: ${f} must be a control-plane path so no agent can write it`);
+  } catch { fail('permissions.json could not be read to confirm that the Azure records are control plane'); }
   if (phase !== 0 && phase !== null && !has(root, 'docs/azure/data/phase-raised.json')) fail('the phase is raised but no record of the human decision exists');
 }
 
 // ---------------------------------------------------------------- readiness: every recorded blocker, computed from files
+// A record file clears its gate only when it is a well-formed record by a named human, bound to a commit, with evidence. An empty file,
+// or one written by an agent, clears nothing. (A person who can write the file can still forge it: review and the control-plane path rule
+// are the control.)
+const RECORDS = {
+  'capability-verification': { gate: 'DG-03', extra: (d, bad) => { if (!Array.isArray(d.checks) || !d.checks.length) bad('checks must list the live checks (service, SKU, region, result)'); } },
+  'whatif-record': { gate: 'DG-06', extra: (d, bad) => { if (!ENVS.includes(d.environment)) bad('environment must be dev, test or prod'); if (!Number.isInteger(d.deleteCount) || d.deleteCount !== 0) bad('deleteCount must be 0: a what-if with a delete blocks the run'); } },
+  'cost-estimate': { gate: 'DG-07', extra: (d, bad) => { if (!Array.isArray(d.inputs) || !d.inputs.length || d.inputs.some((i) => !i.source)) bad('every input needs a source'); if (!Array.isArray(d.priceSources) || !d.priceSources.length) bad('priceSources must cite the official price source and its date'); if (!d.budget) bad('a budget must be recorded'); } },
+  'runbook-exercise': { gate: 'DG-09', extra: (d, bad) => { if (!Array.isArray(d.runbooks) || !d.runbooks.length) bad('runbooks must list what was exercised'); if (d.environment === 'prod') bad('an exercise is in non-production'); } },
+  'smoke-test-record': { gate: 'DG-10', extra: (d, bad) => { if (!['dev', 'test'].includes(d.environment)) bad('environment must be dev or test'); if (d.result !== 'PASS') bad('result must be PASS and come from a run'); } },
+};
+export function recordProblems(kind, doc) {
+  const p = []; const bad = (m) => p.push(`${kind}: ${m}`); const spec = RECORDS[kind];
+  if (!spec) return [`${kind}: unknown record kind`];
+  if (!doc || typeof doc !== 'object' || Array.isArray(doc)) return [`${kind}: must be an object`];
+  if (doc.schema !== 'greenfuel.azure-record/v1') bad('schema must be greenfuel.azure-record/v1');
+  if (doc.kind !== kind) bad(`kind must be ${kind}`);
+  if (!/^[0-9a-f]{40}$/.test(doc.gitHead ?? '')) bad('gitHead must be the 40-character commit the record is bound to');
+  if (!doc.recordedBy || /agent|model|assistant|copilot/i.test(doc.recordedBy)) bad('recordedBy must name a human');
+  if (Number.isNaN(Date.parse(doc.recordedAt ?? ''))) bad('recordedAt must be a date');
+  if (!Array.isArray(doc.evidence) || !doc.evidence.length || doc.evidence.some((e) => typeof e !== 'string' || !e)) bad('evidence must list at least one evidence record');
+  spec.extra(doc, bad);
+  return p;
+}
 export function azureBlockers(root) {
   const out = []; const b = (id, msg) => out.push({ gate: id, msg });
+  const record = (kind, missing) => {
+    const f = `docs/azure/data/${kind}.json`;
+    if (!has(root, f)) return b(RECORDS[kind].gate, missing);
+    let doc; try { doc = j(root, f); } catch { return b(RECORDS[kind].gate, `${f} is not valid JSON, so it clears nothing`); }
+    for (const m of recordProblems(kind, doc)) b(RECORDS[kind].gate, `${f} exists but clears nothing: ${m}`);
+  };
   const phase = (() => { try { return j(root, 'harness/policy/command-policy.json').phase ?? 0; } catch { return 0; } })();
   if (phase < 1) b('DG-12', 'Phase 0: infrastructure, application and Azure changes are not permitted; raising the phase is a human decision recorded in an ADR');
   const dir = path.join(root, 'docs/architecture/reviews');
@@ -191,20 +225,20 @@ export function azureBlockers(root) {
   for (const [id, what, gate] of [['D-037', 'the Azure tenant, subscription and landing zone', 'DG-11'], ['D-003', 'the ports and jurisdictions', 'DG-02'], ['D-009', 'the residency interpretation per port', 'DG-02'], ['D-010', 'the hosting model per port', 'DG-02'], ['D-013', 'tamper evidence and key custody', 'DG-04'], ['D-028', 'where AI inference runs', 'DG-02'], ['D-031', 'availability, recovery and latency targets', 'DG-09'], ['D-033', 'the operating model and support access', 'DG-09'], ['D-018', 'the edge platform', 'DG-02']]) if (open(id)) b(gate, `${id} is open: ${what}`);
   let approvers = 0; try { approvers = j(root, 'harness/policy/approvers.json').approvers.length; } catch { /* leave 0 */ }
   if (!approvers) b('DG-04', 'No approver is registered (T13), so no signed approval can exist for a billable or Azure change');
-  if (!has(root, 'docs/azure/data/capability-verification.json')) b('DG-03', 'No live verification of region and service availability exists: it needs read-only Azure access that has not been approved (T11, D-037)');
+  record('capability-verification', 'No live verification of region and service availability exists: it needs read-only Azure access that has not been approved (T11, D-037)');
   const identities = (() => { try { return j(root, 'harness/policy/azure-identities.json'); } catch { return null; } })();
   if (!identities || identities.status !== 'applied') b('DG-04', 'The scoped deployment identities, custom role, locks and policy have not been created (T17); nothing exists in Azure');
   for (const env of ENVS) {
     const f = `infra/params/${env}.parameters.json`;
     if (has(root, f) && Object.values(j(root, f).parameters).some((x) => x.value === PLACEHOLDER)) b('DG-05', `${f} still has unresolved ${PLACEHOLDER} values`);
   }
-  if (!has(root, 'docs/azure/data/whatif-record.json')) b('DG-06', 'No what-if result is recorded for any environment, so no infrastructure change has been reviewed');
-  if (!has(root, 'docs/azure/data/cost-estimate.json')) b('DG-07', 'No sourced cost estimate and no agreed budget exist; any figure now would be invented (HC-12)');
+  record('whatif-record', 'No what-if result is recorded for any environment, so no infrastructure change has been reviewed');
+  record('cost-estimate', 'No sourced cost estimate and no agreed budget exist; any figure now would be invented (HC-12)');
   const approvalsDir = path.join(root, 'docs/approvals');
   const signed = existsSync(approvalsDir) ? readdirSync(approvalsDir).filter((f) => /\.json$/.test(f)) : [];
   if (!signed.length) b('DG-08', 'No signed approval record exists for creating resources or for any billable change');
-  if (!has(root, 'docs/azure/data/runbook-exercise.json')) b('DG-09', 'No runbook, rollback or recovery procedure has been exercised in a non-production environment');
-  if (!has(root, 'docs/azure/data/smoke-test-record.json')) b('DG-10', 'No post-deployment smoke or integration test has run: nothing is deployed');
+  record('runbook-exercise', 'No runbook, rollback or recovery procedure has been exercised in a non-production environment');
+  record('smoke-test-record', 'No post-deployment smoke or integration test has run: nothing is deployed');
   return out;
 }
 

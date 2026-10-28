@@ -26,7 +26,7 @@ Dev, test and prod are separate deployments of the same template with separate p
 
 ## Approval gates
 
-The twelve gates in [deployment-gates.json](data/deployment-gates.json) are computed by `node harness/scripts/validate-azure.mjs --readiness` and by the existing `deployment-readiness` utility, which includes them. A gate with no recorded blocker reads `NO-BLOCKERS-FOUND`. That is a statement that nothing recorded blocks it, not an approval: each gate also needs its named approver.
+The twelve gates in [deployment-gates.json](data/deployment-gates.json) are computed by `node harness/scripts/validate-azure.mjs --readiness` and by the existing `deployment-readiness` utility, which includes them. Records that clear a gate (`capability-verification`, `whatif-record`, `cost-estimate`, `runbook-exercise`, `smoke-test-record` under `docs/azure/data/`) must carry the schema, the commit they are bound to, a named human recorder, a date, evidence and their own fields (for example a what-if with a delete count of 0); an empty or agent-written file clears nothing. They are control-plane paths, so no agent can write them. A gate with no recorded blocker reads `NO-BLOCKERS-FOUND`. That is a statement that nothing recorded blocks it, not an approval: each gate also needs its named approver.
 
 | Gate | What must exist |
 |---|---|

@@ -6,7 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { cpSync, mkdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { repo } from './support/permission-fixtures.mjs';
-import { validateAzure, azureBlockers, azureReadiness, iacProblems, portProblems, VALIDATIONS } from '../harness/scripts/validate-azure.mjs';
+import { validateAzure, azureBlockers, azureReadiness, iacProblems, portProblems, recordProblems, VALIDATIONS } from '../harness/scripts/validate-azure.mjs';
 
 const FILES = ['infra', 'docs/azure', 'harness/policy', 'docs/context/DECISION-REGISTER.md', 'docs/architecture/reviews', '.github/workflows', 'docs/approvals'];
 function sandbox() {
@@ -21,6 +21,26 @@ const errorsOf = (root) => validateAzure(root).map((e) => e.msg);
 const REG = 'docs/azure/data/port-assessments.json';
 const verified = () => Object.fromEntries(VALIDATIONS.map((k) => [k, { status: 'Verified', evidence: ['docs/evidence/records/EV-0001.json'], verifiedBy: 'A. Person' }]));
 const goodPort = () => ({ id: 'PORT-TST', jurisdiction: 'synthetic', residencyStatus: 'Established', hostingOption: 'A', legalBasis: { decision: 'D-009', reference: 'synthetic counsel opinion' }, basis: ['counsel opinion', 'in-jurisdiction replication check'], validations: verified(), verifiedBy: 'A. Person' });
+const goodRecord = (kind) => ({ schema: 'greenfuel.azure-record/v1', kind, gitHead: 'a'.repeat(40), recordedBy: 'A. Person', recordedAt: '2026-10-28T00:00:00Z', evidence: ['EV-0001'],
+  ...({ 'whatif-record': { environment: 'dev', deleteCount: 0 }, 'capability-verification': { checks: [{ service: 'x' }] }, 'cost-estimate': { inputs: [{ source: 's' }], priceSources: ['official, dated'], budget: 'recorded' }, 'runbook-exercise': { environment: 'test', runbooks: ['deploy'] }, 'smoke-test-record': { environment: 'dev', result: 'PASS' } })[kind] });
+
+test('azure records: each kind needs its schema, a commit, a named human, evidence and its own fields; an agent or an empty object clears nothing', () => {
+  for (const kind of ['whatif-record', 'capability-verification', 'cost-estimate', 'runbook-exercise', 'smoke-test-record']) {
+    assert.deepEqual(recordProblems(kind, goodRecord(kind)), [], kind);
+    assert.ok(recordProblems(kind, {}).length >= 4, `${kind}: an empty object`);
+    assert.ok(recordProblems(kind, { ...goodRecord(kind), recordedBy: 'copilot agent' }).some((m) => /must name a human/.test(m)), `${kind}: an agent recorder`);
+    assert.ok(recordProblems(kind, { ...goodRecord(kind), gitHead: 'main' }).some((m) => /40-character commit/.test(m)), `${kind}: a branch name instead of a commit`);
+    assert.ok(recordProblems(kind, { ...goodRecord(kind), evidence: [] }).some((m) => /evidence/.test(m)), `${kind}: no evidence`);
+  }
+  assert.ok(recordProblems('cost-estimate', { ...goodRecord('cost-estimate'), inputs: [{}] }).some((m) => /every input needs a source/.test(m)));
+  assert.ok(recordProblems('smoke-test-record', { ...goodRecord('smoke-test-record'), environment: 'prod' }).some((m) => /dev or test/.test(m)));
+  assert.ok(recordProblems('nonsense', {}).some((m) => /unknown record kind/.test(m)));
+});
+
+test('validate-azure rejects an Azure record path that an agent could write', () => {
+  const r = sandbox();
+  try { editJson(r, 'harness/policy/permissions.json', (j) => { const c = j.pathClasses.find((x) => x.id === 'control-plane'); c.pattern = c.pattern.replace('docs/azure/data/|', ''); }); assert.ok(errorsOf(r).some((e) => /docs\/azure\/data\/whatif-record\.json must be a control-plane path/.test(e))); } finally { rm(r); }
+});
 
 test('the committed Azure scaffold, documents, port register and gate definition pass', () => assert.deepEqual(errorsOf(repo), []));
 
@@ -122,7 +142,13 @@ test('readiness: raising the phase, an approver, a what-if record and approvals 
     editJson(r, 'harness/policy/approvers.json', (j) => { j.approvers.push({ id: 'x' }); });
     assert.ok(!azureBlockers(r).some((b) => /No approver is registered/.test(b.msg)));
     writeFileSync(path.join(r, 'docs/azure/data/whatif-record.json'), '{}');
-    assert.ok(!azureBlockers(r).some((b) => b.gate === 'DG-06'));
+    assert.ok(azureBlockers(r).some((b) => b.gate === 'DG-06' && /exists but clears nothing/.test(b.msg)), 'an empty record clears nothing');
+    for (const bad of [{ ...goodRecord('whatif-record'), recordedBy: 'the azure-platform agent' }, { ...goodRecord('whatif-record'), deleteCount: 2 }, { ...goodRecord('whatif-record'), gitHead: 'abc' }, { ...goodRecord('whatif-record'), evidence: [] }, { ...goodRecord('whatif-record'), environment: 'qa' }, { ...goodRecord('whatif-record'), schema: 'x' }]) {
+      writeFileSync(path.join(r, 'docs/azure/data/whatif-record.json'), JSON.stringify(bad));
+      assert.ok(azureBlockers(r).some((b) => b.gate === 'DG-06'), `an invalid record must not clear DG-06: ${JSON.stringify(bad).slice(0, 80)}`);
+    }
+    writeFileSync(path.join(r, 'docs/azure/data/whatif-record.json'), JSON.stringify(goodRecord('whatif-record')));
+    assert.ok(!azureBlockers(r).some((b) => b.gate === 'DG-06'), 'a well-formed record by a named human clears it');
     for (const g of ['DG-01', 'DG-02', 'DG-03', 'DG-05', 'DG-07', 'DG-08', 'DG-09', 'DG-10', 'DG-11']) assert.ok(azureBlockers(r).some((b) => b.gate === g), `${g} stays blocked`);
   } finally { rm(r); }
 });
