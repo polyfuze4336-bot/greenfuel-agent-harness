@@ -1,0 +1,22 @@
+{
+  "id": "EV-0009",
+  "claim": "Repository validator, including architecture checks and figures lint, reports no problems",
+  "argv": [
+    "node",
+    "harness/scripts/validate-harness.mjs"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-28T06:39:14.193Z",
+  "durationMs": 304,
+  "outputSha256": "2b3457a9c3f2dd9d09397ca7d1226e853725706a02d6f7dcc99dfbea4a577902",
+  "outputBytes": 21,
+  "outputTail": "validate-harness: OK\n",
+  "gitHead": "bacce2f91316bcdcc0f236427f8bef054e1532f9",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}

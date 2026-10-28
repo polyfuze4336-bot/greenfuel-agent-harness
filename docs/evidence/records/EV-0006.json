@@ -1,0 +1,28 @@
+{
+  "id": "EV-0006",
+  "claim": "GitHub Actions workflow validate completed successfully on pushed commit 9f9a1f0",
+  "argv": [
+    "gh",
+    "run",
+    "view",
+    "40641249592",
+    "--repo",
+    "polyfuze4336-bot/greenfuel-agent-harness",
+    "--json",
+    "status,conclusion,headSha,workflowName"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-28T06:39:12.049Z",
+  "durationMs": 1122,
+  "outputSha256": "11fcb52829232fbb74ba5c10684180373fa768d115927a6156f4b11b8142d2b4",
+  "outputBytes": 125,
+  "outputTail": "{\"conclusion\":\"success\",\"headSha\":\"9f9a1f058ad5984390a9d531fc9e42a9c14ed547\",\"status\":\"completed\",\"workflowName\":\"validate\"}\n",
+  "gitHead": "bacce2f91316bcdcc0f236427f8bef054e1532f9",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}
