@@ -1,8 +1,8 @@
 # ADR 0001: Native-first harness; custom code only for documented gaps
 
-- **Status:** Proposed
+- **Status:** Accepted (2026-10-28, programme owner, by instruction in chat after reviewing the Stage 0 summary)
 - **Date:** 2026-10-28
-- **Deciders:** TBD (programme owner)
+- **Deciders:** Programme owner
 - **Supersedes:** none
 
 ## Context

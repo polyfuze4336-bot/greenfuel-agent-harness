@@ -12,9 +12,9 @@ Status legend: **Done** (observed), **Written** (files exist, not observed live)
 | Repo structure, AGENTS.md, two agents, three skills, two instruction files | Written; validator passes |
 | Policy hook, evidence recorder, validator, tests | Done for unit tests; hook Written, not observed live |
 | CI workflow | Written; not run (no remote) |
-| ADR 0001 and 0002 | Proposed; awaiting human acceptance |
+| ADR 0001 and 0002 | Accepted 2026-10-28 by the programme owner |
 
-**Gate to leave Stage 0:** the owner reviews this repository and accepts ADR 0001 and 0002 (or rejects with changes). No automatic progression.
+**Gate to leave Stage 0:** passed 2026-10-28. The owner accepted ADR 0001 and ADR 0002. R1 was approved to run.
 
 ## Stage 1: Prove it works in a real session
 
