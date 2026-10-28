@@ -92,3 +92,12 @@ test('the agent policy and the permission ceilings agree on who can run a shell'
     assert.equal(hasShell ? ceiling >= 1 : ceiling === 0, true, agent);
   }
 });
+
+test('run state and the orchestration policy are control plane: no agent may write them, even with a write scope that overlaps', () => {
+  for (const agent of AGENTS) for (const p of ['docs/state/runs/RUN-0123456789/run.json', 'docs/state/runs/RUN-0123456789/events.jsonl', 'docs/state/runs/RUN-0123456789/results/T1-a1.md', 'harness/policy/orchestration-policy.json', 'harness/orchestration/engine.cjs']) {
+    const d = decideFor(agent, 'edit', { path: p });
+    assert.equal(d.decision, 'deny', `${agent} ${p}`);
+    assert.ok(d.rules.includes('CTL-01'), `${agent} ${p}: ${d.rules}`);
+  }
+  assert.equal(decideFor('principal-architect', 'edit', { path: 'docs/state/STATE.md' }).decision, 'allow', 'the rest of docs/state is still writable by its owner');
+});

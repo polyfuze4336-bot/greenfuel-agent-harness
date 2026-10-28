@@ -1,0 +1,90 @@
+{
+  "schema": "greenfuel.orchestration-policy/v1",
+  "description": "Rules for the task-execution framework. This file is control plane: agents cannot change it. The engine (harness/orchestration/engine.cjs) reads it; tests and validate-orchestration check that the two agree.",
+  "runsDir": "docs/state/runs",
+  "limits": {
+    "maxTasks": 25,
+    "maxAttemptsCap": 3,
+    "maxReopensPerTask": 1,
+    "leaseMinutes": 30,
+    "maxPlanBytes": 60000,
+    "maxResultBytes": 200000,
+    "maxArtifactsPerTask": 10,
+    "maxContextFilesPerTask": 12
+  },
+  "limitsNote": "Placeholder working values chosen by this design, not derived from any external requirement. The owner may change them.",
+  "states": ["PENDING", "READY", "RUNNING", "BLOCKED", "FAILED", "VALIDATING", "AWAITING_APPROVAL", "COMPLETED", "CANCELLED"],
+  "terminalStates": ["COMPLETED", "CANCELLED"],
+  "transitions": {
+    "PENDING": ["READY", "BLOCKED", "AWAITING_APPROVAL", "CANCELLED"],
+    "READY": ["RUNNING", "BLOCKED", "PENDING", "CANCELLED"],
+    "AWAITING_APPROVAL": ["READY", "PENDING", "CANCELLED"],
+    "RUNNING": ["VALIDATING", "FAILED", "BLOCKED", "AWAITING_APPROVAL", "READY", "CANCELLED"],
+    "VALIDATING": ["COMPLETED", "FAILED", "BLOCKED", "CANCELLED"],
+    "BLOCKED": ["PENDING", "READY", "CANCELLED"],
+    "FAILED": ["READY", "PENDING", "CANCELLED"],
+    "COMPLETED": ["VALIDATING", "READY", "PENDING"],
+    "CANCELLED": []
+  },
+  "transitionNotes": {
+    "RUNNING>AWAITING_APPROVAL": "the work needs a human decision part-way; the attempt is refunded because nothing was completed",
+    "RUNNING>READY": "only by release, when an attempt never ran (for example the tool rejected a malformed call after the hook started it); the attempt is refunded and the release is logged with its reason",
+    "COMPLETED>VALIDATING": "only by resume, when a recorded artifact no longer matches its hash",
+    "COMPLETED>READY": "only by reopen, after a blocking review verdict, within maxReopensPerTask",
+    "FAILED>READY": "only by retry, when the error class is retryable and attempts remain",
+    "READY>PENDING": "only by the reopen cascade, which invalidates dependents of a reopened task",
+    "AWAITING_APPROVAL>PENDING": "only by the reopen cascade",
+    "FAILED>PENDING": "only by the reopen cascade",
+    "COMPLETED>PENDING": "only by the reopen cascade",
+    "VALIDATING>BLOCKED": "a missing input discovered while validating"
+  },
+  "runStates": ["ACTIVE", "COMPLETED", "NEEDS_HUMAN", "STOPPED", "CLOSED", "CANCELLED"],
+  "errorClasses": {
+    "TRANSIENT": { "retryable": true, "action": "retry", "backoffSeconds": [5, 30, 120], "meaning": "Timeout, rate limit, network or tool crash that may not recur" },
+    "INTERRUPTED": { "retryable": true, "action": "retry", "backoffSeconds": [0, 0, 0], "meaning": "The attempt stopped without reporting (crash, closed session, expired lease)" },
+    "ACCEPTANCE_FAILED": { "retryable": true, "action": "retry", "backoffSeconds": [0, 0, 0], "meaning": "The output was produced but failed an acceptance test. The retry must use a changed prompt that carries the failed checks" },
+    "INPUT_MISSING": { "retryable": false, "action": "block", "meaning": "A needed input, context file or answer is absent. Another attempt cannot fix it" },
+    "PERMISSION_DENIED": { "retryable": false, "action": "escalate", "meaning": "A guard or hook refused an action. Trying another route is a bypass, not a retry" },
+    "CONFLICT": { "retryable": false, "action": "escalate", "meaning": "Requirements, constraints or agent outputs contradict each other and need a human decision" },
+    "POLICY_VIOLATION": { "retryable": false, "action": "stop", "meaning": "A hard constraint or approval rule was broken or nearly broken. The run is frozen for human review" },
+    "INTERNAL": { "retryable": false, "action": "stop", "meaning": "The framework's own state is inconsistent or corrupt" },
+    "UNKNOWN": { "retryable": true, "maxRetries": 1, "action": "retry", "backoffSeconds": [5], "meaning": "Not recognised. One retry, then escalate" }
+  },
+  "classifierPatterns": [
+    { "class": "PERMISSION_DENIED", "pattern": "denied by (pre|post)ToolUse hook|\\[(AGENT-GUARD|HARNESS-POLICY)|not a permitted delegation target|permission (was )?denied|\\bDEF-0\\d\\b|\\bCTL-01\\b|\\bEXEC-01\\b" },
+    { "class": "POLICY_VIOLATION", "pattern": "hard constraint|\\bHC-\\d+\\b violated|cross-(jurisdiction|shipowner)|residency (was )?(breached|violated)|fabricat(ed|ion) (measurement|factor|evidence|certificate)" },
+    { "class": "INPUT_MISSING", "pattern": "ENOENT|no such file|file not found|missing (input|context|requirement)|cannot find .*context|decision .* (is )?open" },
+    { "class": "CONFLICT", "pattern": "contradict|conflicting requirements|cannot satisfy both" },
+    { "class": "TRANSIENT", "pattern": "timed? ?out|ETIMEDOUT|ECONNRESET|ENOTFOUND|EAI_AGAIN|rate.?limit|\\b429\\b|\\b50[234]\\b|temporar(y|ily) unavailable|overloaded" },
+    { "class": "INTERRUPTED", "pattern": "lease expired|interrupted|session (ended|closed)|killed|SIGTERM|SIGKILL" },
+    { "class": "ACCEPTANCE_FAILED", "pattern": "acceptance (test|check)s? failed" }
+  ],
+  "acceptanceTypes": ["file-exists", "file-contains", "file-not-contains", "headings", "min-words", "json-valid", "verdict", "cites-requirements", "no-secret", "command"],
+  "commandAllowList": [
+    "^npm run validate$",
+    "^npm test$",
+    "^node --test tests/(?!.*\\.\\.)[\\w./-]+\\.mjs$",
+    "^node harness/scripts/(validate-[\\w-]+|spec-validators)\\.mjs( (?!--write\\b)[\\w:./-]+)*$"
+  ],
+  "commandNote": "A command check is an argv that must match one pattern here. It is run without a shell, after the repository command guard, and only by `tasks.mjs validate`, never by a hook. A plan cannot add commands: this list is the only source.",
+  "reviewerAgents": ["architecture-critic", "design-reviewer", "security-reviewer"],
+  "verdicts": ["ACCEPT", "ACCEPT-WITH-CONDITIONS", "REWORK", "REJECT"],
+  "blockingVerdicts": ["REWORK", "REJECT"],
+  "review": {
+    "requiredWhenAgentClass": ["author", "executor"],
+    "waiverMinChars": 20
+  },
+  "delegation": {
+    "marker": "TASK-REF:",
+    "markerPattern": "TASK-REF:\\s*(RUN-[0-9a-f]{10})/(T[A-Za-z0-9_-]{1,30})",
+    "requireSync": true,
+    "denyUntrackedWhileRunActive": true,
+    "resultsSubdir": "results"
+  },
+  "approval": {
+    "schema": "greenfuel.task-approval/v1",
+    "note": "A task approval is a human decision on a task, signed with the same registered approver keys as operation approvals (harness/policy/approvers.json). It is bound to the plan hash, run and task. It is separate from operation approvals, which the permission hooks check on each tool call."
+  },
+  "recoveryMinChars": 20,
+  "taskIdPattern": "^T[A-Za-z0-9_-]{1,30}$"
+}

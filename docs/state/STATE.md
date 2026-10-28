@@ -3,7 +3,7 @@
 Resume point. Update with the `session-handoff` skill. Facts only; unverified items are labelled.
 
 ## Current phase and objective
-Phase 0. Baseline v0.1 is **approved** (ADR 0003); the 37 decisions stay open, deferred by the owner. The architecture-governance capability is **approved as a process** (ADR 0005); [DES-0001](../architecture/designs/DES-0001-delivery-measurement-storage-topology.md) is computed **Blocked** and is not approved. The twelve specialist agents are **approved** ([ADR 0006](../adr/0006-specialist-agent-roster-and-enforcement.md)), the tool layer is **approved** ([ADR 0007](../adr/0007-tool-layer-mcp-and-output-controls.md)) and the **least-privilege permission model is approved** ([ADR 0008](../adr/0008-least-privilege-permission-model.md), Accepted 2026-10-28, including the working approval limits): policy-as-code, a decision engine called by the hooks, signed approvals, a hash-chained denied-action log, Azure identity and GitHub protection specifications (not applied), a validator and negative tests. Its follow-ups T13 to T17 are deferred by the owner. No application code and no Azure resources exist; no Azure or GitHub sign-in was used by any agent.
+Phase 0. Baseline v0.1 is **approved** (ADR 0003); the 37 decisions stay open, deferred by the owner. The architecture-governance capability is **approved as a process** (ADR 0005); [DES-0001](../architecture/designs/DES-0001-delivery-measurement-storage-topology.md) is computed **Blocked** and is not approved. The twelve specialist agents are **approved** ([ADR 0006](../adr/0006-specialist-agent-roster-and-enforcement.md)), the tool layer is **approved** ([ADR 0007](../adr/0007-tool-layer-mcp-and-output-controls.md)) and the **least-privilege permission model is approved** ([ADR 0008](../adr/0008-least-privilege-permission-model.md), Accepted 2026-10-28, including the working approval limits): policy-as-code, a decision engine called by the hooks, signed approvals, a hash-chained denied-action log, Azure identity and GitHub protection specifications (not applied), a validator and negative tests. Its follow-ups T13 to T17 are deferred by the owner. This stage added the **task-execution framework** ([ADR 0009](../adr/0009-task-execution-framework.md), Proposed): a deterministic engine, a delegation hook driving native `task` delegation, a human-run CLI, two read-only MCP tools, a durable hash-chained run store and a live demonstration ([DEMO-EVIDENCE-STORE](../orchestration/DEMO-EVIDENCE-STORE.md)). Objective: owner review of the framework and a decision on the demonstration run (TODO T19). No application code and no Azure resources exist; no Azure or GitHub sign-in was used by any agent.
 
 ## Done (with evidence)
 - Owner decisions 2026-10-28: ADR 0001 and 0002 accepted; baseline approved; governance capability approved; specialist roster approved (ADR 0006); M1 decisions, decider naming (T3) and the T9 agent checks deferred. All earlier commits are pushed; CI succeeded on `2f52908` (`EV-0006` and earlier CI: `EV-0003`).
@@ -26,6 +26,13 @@ Phase 0. Baseline v0.1 is **approved** (ADR 0003); the 37 decisions stay open, d
   - An independent review found three real bypasses (run-time-built commands, direct ARM REST, run-time-built paths in a scoped session); fixed with regression tests. Two limits were documented, not fixed. That review is not an evidence record.
   - **Not enforced:** GitHub branch protection (HTTP 403 on this plan), Azure RBAC and locks (nothing created), operating-system isolation. The approver registry is empty, so no P2+ operation by an agent can succeed.
 
+- **Task-execution framework (this stage, committed locally, not pushed):**
+  - [ORCHESTRATION](../orchestration/ORCHESTRATION.md), [TASK-CONTRACT](../orchestration/TASK-CONTRACT.md), the engine [engine.cjs](../../harness/orchestration/engine.cjs), policy [orchestration-policy.json](../../harness/policy/orchestration-policy.json), hook [delegation-guard.cjs](../../harness/hooks/delegation-guard.cjs), CLI [tasks.mjs](../../harness/scripts/tasks.mjs), validator `validate-orchestration`, MCP tools `check_plan` and `get_run_status` (orchestrator only; the orchestrator remains read-only).
+  - Evidence at the committed HEAD: `npm test` 445 pass (`EV-0027`), `npm run validate` clean (`EV-0028`), `validate-orchestration` OK (`EV-0029`), live run verifies (`EV-0030`).
+  - Live demonstration in Copilot CLI 1.0.105, run `RUN-afb2a0466e`: the orchestrator drafted the plan and validated it with `check_plan`; the hook enforced and recorded native delegation to principal-architect, security-reviewer and architecture-critic; the critic returned REWORK twice; the run ended NEEDS_HUMAN with 44 events and 9 checkpoints, chain verified. The sample proposal is an unapproved model-written draft.
+  - Defects found and fixed: four by the live run, and four by an independent model review (not an evidence record). Each has regression tests.
+  - **Not exercised live:** the retry path, error classes, lease expiry, task approvals (the approver registry is empty) and VS Code. Tests cover the first four only.
+
 ## Claimed, unverified
 - VS Code chat behaviour for agents, hooks, MCP server start and trust prompts, and `server/tool` in agent `tools:` (TODO T8, T12). Whether the CLI kills a server at its `timeout`.
 - Agent output quality and consistency: single runs. A write attempted inside a delegated subagent; native `agents` allow-list enforcement on its own (TODO T9, deferred).
@@ -35,7 +42,8 @@ Phase 0. Baseline v0.1 is **approved** (ADR 0003); the 37 decisions stay open, d
 - The example review was written by a model. No human has reviewed it.
 - The gate checks structure and consistency, not truth (DESIGN-REVIEW-GATE section 3). The approval-status guard matches text and cannot authenticate a human (roadmap R4).
 - Every standard and scheme name is a candidate. Placeholder NFR numbers are proposals.
-- Commits `e4a935e` and `eff5bc7`: CI result recorded below once checked. CI runs on Linux; the permission tests were run on Windows only and path-handling cases could differ.
+- Commits `e4a935e` and `eff5bc7` were pushed and CI succeeded on `3a3fcdf`. The task-execution commit has not been pushed, so CI has not run on it; its tests ran on Windows only (file-hash checks tolerate line-ending differences, which is the main cross-platform risk).
+- The framework proves structure and provenance, not truth. Model-written content (the sample proposal, the reviews) is unverified. Undeclared writes by an agent inside its write scope are not detected. Hooks for `task` were observed only in Copilot CLI (T18).
 - The permission screen is regular-expression based; new evasions are possible. The default session is screened, not sandboxed.
 - Approval limits (lifetimes, uses, approver counts) are proposals.
 
@@ -43,10 +51,12 @@ Phase 0. Baseline v0.1 is **approved** (ADR 0003); the 37 decisions stay open, d
 1. Owner follows up on T13 (approvers and limits), T14 (branch protection), T15 (OS isolation), T16 (break-glass contacts, audit retention), T17 (Azure identities after D-037): all deferred.
 2. Owner decides whether and when to approve the Azure and GitHub MCP candidates (T11).
 3. Owner names the deciders (T3) and answers or defers the M1 decisions; then run the governance gate on sibling designs.
-4. Finish R1 in VS Code and the VS Code tool checks (T12); run R11, R12.
+4. Finish R1 in VS Code and the VS Code tool checks (T12, T18); run R11, R12.
+5. Owner decides the fate of run `RUN-afb2a0466e` (T19) and confirms the framework limits (T20). Until the run is closed, untracked delegation is denied.
 
 ## Open approvals
-- Pushing the newest commits to GitHub (any commits after `eff5bc7`)
+- ADR 0009, the task-execution framework (Proposed)
+- Pushing the task-execution commits to GitHub (any commits after `3a3fcdf`)
 - Azure and GitHub sign-in, and any pending MCP candidate (none approved)
 - ADR 0004 (Proposed; cannot be Accepted while RV-0001 is Blocked)
 - All 37 decisions (Open, deferred)

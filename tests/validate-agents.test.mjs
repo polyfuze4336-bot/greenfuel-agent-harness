@@ -12,7 +12,7 @@ const agent = (n) => `.github/agents/${n}.agent.md`;
 
 function mutated(changes, after) {
   const dir = mkdtempSync(path.join(os.tmpdir(), 'gf-agents-'));
-  cpSync(repo, dir, { recursive: true, filter: (s) => !/[\\/](\.git|node_modules)([\\/]|$)/.test(s) });
+  cpSync(repo, dir, { recursive: true, filter: (s) => !/[\\/](\.git|node_modules|escape-link)([\\/]|$)/.test(s) });
   try {
     for (const [file, fn] of Object.entries(changes)) {
       const p = path.join(dir, file);

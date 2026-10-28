@@ -253,7 +253,7 @@ test('readiness: the real repository is NOT-READY and lists why', () => {
 test('readiness: each blocker clears only when its own recorded condition is met, and a self-declared approval does not count', () => {
   const root = mkdtempSync(path.join(os.tmpdir(), 'gf-ready-'));
   roots.push(root);
-  cpSync(repo, root, { recursive: true, filter: (s) => !/[\\/](\.git|node_modules|\.harness-logs)([\\/]|$)/.test(s) });
+  cpSync(repo, root, { recursive: true, filter: (s) => !/[\\/](\.git|node_modules|\.harness-logs|escape-link)([\\/]|$)/.test(s) });
   const edit = (rel, fn) => { const p = path.join(root, rel); const b = readFileSync(p, 'utf8'); const a = fn(b); assert.notEqual(a, b, rel); writeFileSync(p, a); };
   const blockers = () => msgs(runUtility('deployment-readiness', root));
   const has = (re) => blockers().some((m) => re.test(m));

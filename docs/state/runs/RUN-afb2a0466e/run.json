@@ -1,0 +1,921 @@
+{
+  "schema": "greenfuel.run/v1",
+  "runId": "RUN-afb2a0466e",
+  "planHash": "afb2a0466e9fe1b98858b61558ad76bb5b40bfdcbc3ca3a827bbc5c0ec71f82a",
+  "plan": {
+    "schema": "greenfuel.task-plan/v1",
+    "title": "Jurisdiction-local evidence store design",
+    "request": "Design a jurisdiction-local evidence store for delivery measurement evidence. Architect proposes, security reviewer assesses residency, critic challenges, orchestrator consolidates. Do not provision Azure resources.",
+    "objective": "Produce a design proposal, a residency/isolation/tamper assessment, an adversarial challenge and a consolidated report. Phase 0: documents only, nothing provisioned.",
+    "requirements": [
+      "FR-001",
+      "FR-006",
+      "SEC-001",
+      "SEC-002",
+      "SEC-006",
+      "SEC-008"
+    ],
+    "constraints": [
+      "HC-01",
+      "HC-02",
+      "HC-07",
+      "HC-08",
+      "HC-11",
+      "HC-12"
+    ],
+    "risks": [
+      {
+        "id": "RK-1",
+        "text": "The proposal may treat an Azure region choice as proof of port-jurisdiction residency.",
+        "mitigation": "T2 and T3 check against SEC-001 and HC-01; the legal meaning of the jurisdiction (D-009) is left as an open decision, not assumed."
+      },
+      {
+        "id": "RK-2",
+        "text": "The proposal may invent Azure SKUs, prices, availability or compliance figures.",
+        "mitigation": "A file-not-contains test rejects placeholders and T3 challenges unsourced figures (HC-12); unknowns must be marked ASSUMPTION or TBD."
+      },
+      {
+        "id": "RK-3",
+        "text": "A design might imply resource creation or application code, breaching Phase 0.",
+        "mitigation": "Only documentation artifacts are allowed; the plan has no P2 or higher operations (HC-11)."
+      },
+      {
+        "id": "RK-4",
+        "text": "Review tasks may agree without independent challenge, or the consolidation may relay unverified claims as fact.",
+        "mitigation": "T3 must end with a Verdict and T4 must list unverified claims and human-only decisions separately."
+      }
+    ],
+    "tasks": [
+      {
+        "id": "T1",
+        "title": "Propose evidence store design",
+        "objective": "Write a design proposal for a jurisdiction-local evidence store for delivery measurement evidence covering residency, per-shipowner isolation, append-only tamper evidence and offline edge reconciliation. No resources are provisioned.",
+        "requirements": [
+          "FR-001",
+          "FR-006",
+          "SEC-001",
+          "SEC-008"
+        ],
+        "agent": "principal-architect",
+        "inputContext": [
+          "docs/context/REQUIREMENTS.md",
+          "docs/architecture/HARD-CONSTRAINTS.md"
+        ],
+        "expectedArtifacts": [
+          {
+            "kind": "file",
+            "path": "docs/design/system/EVIDENCE-STORE-PROPOSAL.md"
+          }
+        ],
+        "permissions": {
+          "tier": "P1",
+          "tools": [
+            "read",
+            "search",
+            "edit"
+          ],
+          "operations": [
+            "fs.read",
+            "fs.search",
+            "fs.write"
+          ]
+        },
+        "dependsOn": [],
+        "acceptance": [
+          {
+            "id": "A1",
+            "type": "headings",
+            "target": "docs/design/system/EVIDENCE-STORE-PROPOSAL.md",
+            "headings": [
+              "Requirement trace",
+              "Options",
+              "Assumptions",
+              "Risks"
+            ]
+          },
+          {
+            "id": "A2",
+            "type": "min-words",
+            "target": "docs/design/system/EVIDENCE-STORE-PROPOSAL.md",
+            "min": 300
+          },
+          {
+            "id": "A3",
+            "type": "cites-requirements",
+            "target": "docs/design/system/EVIDENCE-STORE-PROPOSAL.md",
+            "min": 3
+          },
+          {
+            "id": "A4",
+            "type": "file-not-contains",
+            "target": "docs/design/system/EVIDENCE-STORE-PROPOSAL.md",
+            "pattern": "TODO|TBC|lorem ipsum|XXX"
+          }
+        ],
+        "maxAttempts": 2,
+        "recovery": "Delete docs/design/system/EVIDENCE-STORE-PROPOSAL.md (or git restore it) and re-delegate with the failed checks quoted. Nothing else is changed.",
+        "review": {
+          "required": true,
+          "by": "T3"
+        },
+        "executor": "delegate"
+      },
+      {
+        "id": "T2",
+        "title": "Assess residency, isolation and tamper evidence",
+        "objective": "Assess T1's design for port-jurisdiction residency (including backups, logs, keys, support access), tenant isolation and tamper evidence. Report findings only.",
+        "requirements": [
+          "SEC-001",
+          "SEC-002",
+          "SEC-006",
+          "SEC-008"
+        ],
+        "agent": "security-reviewer",
+        "inputContext": [
+          "docs/context/REQUIREMENTS.md",
+          "docs/architecture/HARD-CONSTRAINTS.md"
+        ],
+        "expectedArtifacts": [
+          {
+            "kind": "result"
+          }
+        ],
+        "permissions": {
+          "tier": "P0",
+          "tools": [
+            "read",
+            "search"
+          ],
+          "operations": [
+            "fs.read",
+            "fs.search"
+          ]
+        },
+        "dependsOn": [
+          "T1"
+        ],
+        "acceptance": [
+          {
+            "id": "A1",
+            "type": "headings",
+            "target": "@result",
+            "headings": [
+              "Residency",
+              "Tenant isolation",
+              "Tamper evidence"
+            ]
+          },
+          {
+            "id": "A2",
+            "type": "min-words",
+            "target": "@result",
+            "min": 200
+          },
+          {
+            "id": "A3",
+            "type": "cites-requirements",
+            "target": "@result",
+            "min": 3
+          },
+          {
+            "id": "A4",
+            "type": "no-secret",
+            "target": "@result"
+          }
+        ],
+        "maxAttempts": 2,
+        "recovery": "The task writes nothing. Discard its captured result and re-delegate with the failed checks quoted.",
+        "executor": "delegate"
+      },
+      {
+        "id": "T3",
+        "title": "Challenge the assumptions",
+        "objective": "Independently challenge the assumptions of T1 and T2, find unsupported claims and missing hard constraints, and end with a Verdict line.",
+        "requirements": [
+          "SEC-001",
+          "SEC-008"
+        ],
+        "agent": "architecture-critic",
+        "inputContext": [
+          "docs/context/REQUIREMENTS.md",
+          "docs/architecture/HARD-CONSTRAINTS.md"
+        ],
+        "expectedArtifacts": [
+          {
+            "kind": "result"
+          }
+        ],
+        "permissions": {
+          "tier": "P0",
+          "tools": [
+            "read",
+            "search"
+          ],
+          "operations": [
+            "fs.read",
+            "fs.search"
+          ]
+        },
+        "dependsOn": [
+          "T1",
+          "T2"
+        ],
+        "acceptance": [
+          {
+            "id": "A1",
+            "type": "verdict",
+            "target": "@result"
+          },
+          {
+            "id": "A2",
+            "type": "cites-requirements",
+            "target": "@result",
+            "min": 2
+          },
+          {
+            "id": "A3",
+            "type": "min-words",
+            "target": "@result",
+            "min": 150
+          },
+          {
+            "id": "A4",
+            "type": "no-secret",
+            "target": "@result"
+          }
+        ],
+        "maxAttempts": 2,
+        "recovery": "The task writes nothing. Discard its captured result and re-delegate with the failed checks quoted.",
+        "executor": "delegate"
+      },
+      {
+        "id": "T4",
+        "title": "Consolidate the result",
+        "objective": "Consolidate T1-T3: findings by agent, conflicts, unverified claims and decisions only a human can make. Read-only; output captured by a human.",
+        "requirements": [
+          "SEC-001",
+          "SEC-008",
+          "FR-001"
+        ],
+        "agent": "orchestrator",
+        "executor": "orchestrator",
+        "inputContext": [
+          "docs/context/REQUIREMENTS.md",
+          "docs/architecture/HARD-CONSTRAINTS.md"
+        ],
+        "expectedArtifacts": [
+          {
+            "kind": "result"
+          }
+        ],
+        "permissions": {
+          "tier": "P0",
+          "tools": [
+            "read",
+            "search"
+          ],
+          "operations": [
+            "fs.read",
+            "fs.search"
+          ]
+        },
+        "dependsOn": [
+          "T1",
+          "T2",
+          "T3"
+        ],
+        "acceptance": [
+          {
+            "id": "A1",
+            "type": "headings",
+            "target": "@result",
+            "headings": [
+              "Findings by agent",
+              "Conflicts",
+              "Unverified claims",
+              "Decisions for a human"
+            ]
+          },
+          {
+            "id": "A2",
+            "type": "cites-requirements",
+            "target": "@result",
+            "min": 2
+          },
+          {
+            "id": "A3",
+            "type": "no-secret",
+            "target": "@result"
+          },
+          {
+            "id": "A4",
+            "type": "command",
+            "argv": [
+              "npm",
+              "run",
+              "validate"
+            ]
+          }
+        ],
+        "maxAttempts": 2,
+        "recovery": "The task writes nothing. Discard the captured consolidation and have a human capture a corrected one."
+      }
+    ]
+  },
+  "topoOrder": [
+    "T1",
+    "T2",
+    "T3",
+    "T4"
+  ],
+  "policyBlocking": [
+    "REWORK",
+    "REJECT"
+  ],
+  "state": "NEEDS_HUMAN",
+  "rev": 21,
+  "createdAt": "2026-10-28T10:19:41.434Z",
+  "updatedAt": "2026-10-28T10:45:59.045Z",
+  "attention": [
+    "T3 gave REWORK on T1: a human decision or a reopen is needed"
+  ],
+  "approvalsUsed": [],
+  "tasks": {
+    "T1": {
+      "status": "COMPLETED",
+      "attempts": 2,
+      "reopens": 1,
+      "retryAfter": null,
+      "lease": null,
+      "attemptLog": [
+        {
+          "attempt": 1,
+          "startedAt": "2026-10-28T10:20:32.276Z",
+          "promptSha256": "db18a2f7a00e1c5599fe7a21494913a306a897dca62895106737a4a1bdce82b9",
+          "agent": "principal-architect",
+          "endedAt": "2026-10-28T10:21:20.316Z",
+          "outcome": "completed"
+        },
+        {
+          "attempt": 2,
+          "startedAt": "2026-10-28T10:29:28.166Z",
+          "promptSha256": "07a5c30b91005f4f5bf51d7ebcd8244ce7deb21ca6e4b4c22fe823c3770d24e0",
+          "agent": "principal-architect",
+          "endedAt": "2026-10-28T10:32:11.299Z",
+          "outcome": "completed"
+        }
+      ],
+      "artifacts": [
+        {
+          "kind": "file",
+          "path": "docs/design/system/EVIDENCE-STORE-PROPOSAL.md",
+          "sha256": "c66a0316cc19218b047d4114c1f4012964a2d4d22b3e0809d7f40095ebf14fea",
+          "bytes": 9990,
+          "mtimeMs": 1793182871654.117,
+          "attempt": 1
+        },
+        {
+          "kind": "file",
+          "path": "docs/design/system/EVIDENCE-STORE-PROPOSAL.md",
+          "sha256": "6f9b87431bc9cc038d1779087633fe20699ce7a5b158a98d1308c073478b4f18",
+          "bytes": 29016,
+          "mtimeMs": 1793183514876.303,
+          "attempt": 2
+        }
+      ],
+      "evidence": [
+        {
+          "type": "artifact",
+          "ref": "docs/design/system/EVIDENCE-STORE-PROPOSAL.md",
+          "sha256": "6f9b87431bc9cc038d1779087633fe20699ce7a5b158a98d1308c073478b4f18"
+        },
+        {
+          "type": "acceptance",
+          "ref": "T1#attempt2",
+          "sha256": "4a9f2d483ee5863f301e9e42bdf0ea6c27bbff59f4d03ebaa696f0ac5ff44f5b"
+        }
+      ],
+      "acceptance": {
+        "attempt": 2,
+        "at": "2026-10-28T10:32:11.299Z",
+        "results": [
+          {
+            "id": "fresh:docs/design/system/EVIDENCE-STORE-PROPOSAL.md",
+            "type": "artifact-fresh",
+            "ok": true,
+            "detail": "written during this attempt"
+          },
+          {
+            "id": "A1",
+            "type": "headings",
+            "ok": true,
+            "detail": "all present"
+          },
+          {
+            "id": "A2",
+            "type": "min-words",
+            "ok": true,
+            "detail": "4264 words (minimum 300)"
+          },
+          {
+            "id": "A3",
+            "type": "cites-requirements",
+            "ok": true,
+            "detail": "cites 4 of this task's requirements (minimum 3)"
+          },
+          {
+            "id": "A4",
+            "type": "file-not-contains",
+            "ok": true,
+            "detail": "absent"
+          }
+        ],
+        "ok": true
+      },
+      "verdict": null,
+      "blockedReason": null,
+      "lastError": null,
+      "classCounts": {},
+      "feedback": [],
+      "terminal": false,
+      "drift": [],
+      "approval": {
+        "required": false,
+        "tier": null,
+        "reason": null,
+        "applied": null
+      },
+      "updatedAt": "2026-10-28T10:32:11.299Z",
+      "released": [
+        {
+          "attempt": 2,
+          "at": "2026-10-28T10:28:23.436Z",
+          "reason": "Attempt 2 was started by the hook for a delegation the tool rejected as malformed (missing the name field); no delegate ran and the proposal file was not revised",
+          "promptSha256": "3acd73ab9013b286d92ea09d1b942f0980057b6ead5e24a0a4c3047c50daf328"
+        }
+      ]
+    },
+    "T2": {
+      "status": "COMPLETED",
+      "attempts": 1,
+      "reopens": 0,
+      "retryAfter": null,
+      "lease": null,
+      "attemptLog": [
+        {
+          "attempt": 1,
+          "startedAt": "2026-10-28T10:21:30.532Z",
+          "promptSha256": "89495256144707a602f4751dfb1ac0d83ce84ea1e9a15f72c98f24da3e87fff9",
+          "agent": "security-reviewer",
+          "endedAt": "2026-10-28T10:22:11.852Z",
+          "outcome": "completed",
+          "superseded": true
+        },
+        {
+          "attempt": 1,
+          "startedAt": "2026-10-28T10:32:22.958Z",
+          "promptSha256": "ea4b57546355af510e20e5d76e66777e339033519e4008fe2c9280d2736ff74c",
+          "agent": "security-reviewer",
+          "endedAt": "2026-10-28T10:33:23.058Z",
+          "outcome": "completed"
+        }
+      ],
+      "artifacts": [
+        {
+          "kind": "result",
+          "path": "results/T2-s1.md",
+          "sha256": "23f9e8ac6fda8fdf33e57f5853e672313771a6d64ddf4e6abe61571da40a420b",
+          "bodySha256": "fd40a1f13ba26c7c488b001f1904a630b76e28a25382f300a201d9d14fa0f0a4",
+          "bytes": 10700,
+          "attempt": 1,
+          "source": "hook: security-reviewer reply",
+          "redactions": 0,
+          "truncated": false
+        }
+      ],
+      "evidence": [
+        {
+          "type": "captured-result",
+          "ref": "results/T2-s1.md",
+          "sha256": "23f9e8ac6fda8fdf33e57f5853e672313771a6d64ddf4e6abe61571da40a420b"
+        },
+        {
+          "type": "acceptance",
+          "ref": "T2#attempt1",
+          "sha256": "fbe33bee28e2aa50409e53183dd8789fef21bde02eaba0908f08de4fe9800104"
+        }
+      ],
+      "acceptance": {
+        "attempt": 1,
+        "at": "2026-10-28T10:33:23.058Z",
+        "results": [
+          {
+            "id": "A1",
+            "type": "headings",
+            "ok": true,
+            "detail": "all present"
+          },
+          {
+            "id": "A2",
+            "type": "min-words",
+            "ok": true,
+            "detail": "1693 words (minimum 200)"
+          },
+          {
+            "id": "A3",
+            "type": "cites-requirements",
+            "ok": true,
+            "detail": "cites 4 of this task's requirements (minimum 3)"
+          },
+          {
+            "id": "A4",
+            "type": "no-secret",
+            "ok": true,
+            "detail": "none found"
+          }
+        ],
+        "ok": true
+      },
+      "verdict": null,
+      "blockedReason": null,
+      "lastError": null,
+      "classCounts": {},
+      "feedback": [],
+      "terminal": false,
+      "drift": [],
+      "approval": {
+        "required": false,
+        "tier": null,
+        "reason": null,
+        "applied": null
+      },
+      "updatedAt": "2026-10-28T10:33:23.058Z",
+      "archive": [
+        {
+          "reason": "invalidated by the reopen of T1",
+          "at": "2026-10-28T10:25:00.114Z",
+          "attempts": 1,
+          "verdict": null,
+          "artifacts": [
+            {
+              "kind": "result",
+              "path": "results/T2-a1.md",
+              "sha256": "e2b9ad435a5e3ed15cf2ab2e11e4c8125f3914f58ac3d5d177d6cd0b31fdaa27",
+              "bodySha256": "5d9fed4b9729813132c35aa30b3e78924dabf6115c7034bb82aff4e7a20d2369",
+              "bytes": 7351,
+              "attempt": 1,
+              "source": "hook: security-reviewer reply",
+              "redactions": 0,
+              "truncated": false
+            }
+          ],
+          "evidence": [
+            {
+              "type": "captured-result",
+              "ref": "results/T2-a1.md",
+              "sha256": "e2b9ad435a5e3ed15cf2ab2e11e4c8125f3914f58ac3d5d177d6cd0b31fdaa27"
+            },
+            {
+              "type": "acceptance",
+              "ref": "T2#attempt1",
+              "sha256": "8b27d61968328c5501def73d4c616557c638b62864559dea9677c16c6d2be488"
+            }
+          ],
+          "acceptance": {
+            "attempt": 1,
+            "at": "2026-10-28T10:22:11.852Z",
+            "results": [
+              {
+                "id": "A1",
+                "type": "headings",
+                "ok": true,
+                "detail": "all present"
+              },
+              {
+                "id": "A2",
+                "type": "min-words",
+                "ok": true,
+                "detail": "1142 words (minimum 200)"
+              },
+              {
+                "id": "A3",
+                "type": "cites-requirements",
+                "ok": true,
+                "detail": "cites 4 of this task's requirements (minimum 3)"
+              },
+              {
+                "id": "A4",
+                "type": "no-secret",
+                "ok": true,
+                "detail": "none found"
+              }
+            ],
+            "ok": true
+          }
+        }
+      ],
+      "submissions": 1
+    },
+    "T3": {
+      "status": "COMPLETED",
+      "attempts": 1,
+      "reopens": 0,
+      "retryAfter": null,
+      "lease": null,
+      "attemptLog": [
+        {
+          "attempt": 1,
+          "startedAt": "2026-10-28T10:22:28.733Z",
+          "promptSha256": "2f1d32f382ecc812ca1f5cd6c767a20007bf07570f67edfb0b7038540bada4e5",
+          "agent": "architecture-critic",
+          "endedAt": "2026-10-28T10:23:24.645Z",
+          "outcome": "completed",
+          "superseded": true
+        },
+        {
+          "attempt": 1,
+          "startedAt": "2026-10-28T10:33:54.251Z",
+          "promptSha256": "b4fc013a3d81240b92212f365176c6f6a90a6df229f680ec0919a33864832bf6",
+          "agent": "architecture-critic",
+          "endedAt": "2026-10-28T10:35:05.093Z",
+          "outcome": "completed"
+        }
+      ],
+      "artifacts": [
+        {
+          "kind": "result",
+          "path": "results/T3-s1.md",
+          "sha256": "0d6fbddfffb9322f286ee78cbd3052a5534ad47ff89cbbdfeb42583974af0244",
+          "bodySha256": "fb9cda385ddc86f4151cc0ef88985b782afbd102151368190d96232fc04c4796",
+          "bytes": 9478,
+          "attempt": 1,
+          "source": "hook: architecture-critic reply",
+          "redactions": 0,
+          "truncated": false
+        }
+      ],
+      "evidence": [
+        {
+          "type": "captured-result",
+          "ref": "results/T3-s1.md",
+          "sha256": "0d6fbddfffb9322f286ee78cbd3052a5534ad47ff89cbbdfeb42583974af0244"
+        },
+        {
+          "type": "acceptance",
+          "ref": "T3#attempt1",
+          "sha256": "c4ecb243b170ce08a813b20dd45c7dd0455082352d5ff9fcecf6504217d1040d"
+        }
+      ],
+      "acceptance": {
+        "attempt": 1,
+        "at": "2026-10-28T10:35:05.092Z",
+        "results": [
+          {
+            "id": "A1",
+            "type": "verdict",
+            "ok": true,
+            "detail": "verdict REWORK"
+          },
+          {
+            "id": "A2",
+            "type": "cites-requirements",
+            "ok": true,
+            "detail": "cites 2 of this task's requirements (minimum 2)"
+          },
+          {
+            "id": "A3",
+            "type": "min-words",
+            "ok": true,
+            "detail": "1540 words (minimum 150)"
+          },
+          {
+            "id": "A4",
+            "type": "no-secret",
+            "ok": true,
+            "detail": "none found"
+          }
+        ],
+        "ok": true
+      },
+      "verdict": "REWORK",
+      "blockedReason": null,
+      "lastError": null,
+      "classCounts": {},
+      "feedback": [],
+      "terminal": false,
+      "drift": [],
+      "approval": {
+        "required": false,
+        "tier": null,
+        "reason": null,
+        "applied": null
+      },
+      "updatedAt": "2026-10-28T10:35:05.093Z",
+      "archive": [
+        {
+          "reason": "invalidated by the reopen of T1",
+          "at": "2026-10-28T10:25:00.114Z",
+          "attempts": 1,
+          "verdict": "REWORK",
+          "artifacts": [
+            {
+              "kind": "result",
+              "path": "results/T3-a1.md",
+              "sha256": "d5acc77afdcd5c22c292a13f12ad604a31a7e04a74c41f77ded20b849cbc5762",
+              "bodySha256": "cf4811e38d81ee74d2db64ae6bb7f3c6e8ccd2d00d8e3bb401f766b7b0ff7e23",
+              "bytes": 8785,
+              "attempt": 1,
+              "source": "hook: architecture-critic reply",
+              "redactions": 0,
+              "truncated": false
+            }
+          ],
+          "evidence": [
+            {
+              "type": "captured-result",
+              "ref": "results/T3-a1.md",
+              "sha256": "d5acc77afdcd5c22c292a13f12ad604a31a7e04a74c41f77ded20b849cbc5762"
+            },
+            {
+              "type": "acceptance",
+              "ref": "T3#attempt1",
+              "sha256": "90e3e5002a2ee43c1dc7b3c2d70df0e5caed2ba6f61a6d426f7638c232246250"
+            }
+          ],
+          "acceptance": {
+            "attempt": 1,
+            "at": "2026-10-28T10:23:24.645Z",
+            "results": [
+              {
+                "id": "A1",
+                "type": "verdict",
+                "ok": true,
+                "detail": "verdict REWORK"
+              },
+              {
+                "id": "A2",
+                "type": "cites-requirements",
+                "ok": true,
+                "detail": "cites 2 of this task's requirements (minimum 2)"
+              },
+              {
+                "id": "A3",
+                "type": "min-words",
+                "ok": true,
+                "detail": "1408 words (minimum 150)"
+              },
+              {
+                "id": "A4",
+                "type": "no-secret",
+                "ok": true,
+                "detail": "none found"
+              }
+            ],
+            "ok": true
+          }
+        }
+      ],
+      "submissions": 1
+    },
+    "T4": {
+      "status": "COMPLETED",
+      "attempts": 1,
+      "reopens": 0,
+      "retryAfter": null,
+      "lease": null,
+      "attemptLog": [
+        {
+          "attempt": 1,
+          "startedAt": "2026-10-28T10:36:00.556Z",
+          "promptSha256": "97877ef2a4f8e30aeec94b127979acda0474df626f3285fc3a74b47a39b5e510",
+          "agent": "orchestrator",
+          "endedAt": "2026-10-28T10:36:17.294Z",
+          "outcome": "completed"
+        }
+      ],
+      "artifacts": [
+        {
+          "kind": "result",
+          "path": "results/T4-s1.md",
+          "sha256": "388a1938d05b2b1d1629174685faf166521062bd1f99dccaa2637509cd399c24",
+          "bodySha256": "bdd3d9bde20d1672464bb6b7f1bffa8701c1192a325d6ba76385699d308358dd",
+          "bytes": 6958,
+          "attempt": 1,
+          "source": "operator capture of the orchestrator's final reply in Copilot CLI 1.0.105 (second pass)",
+          "redactions": 0,
+          "truncated": false
+        }
+      ],
+      "evidence": [
+        {
+          "type": "captured-result",
+          "ref": "results/T4-s1.md",
+          "sha256": "388a1938d05b2b1d1629174685faf166521062bd1f99dccaa2637509cd399c24"
+        },
+        {
+          "type": "acceptance",
+          "ref": "T4#attempt1",
+          "sha256": "f7a355f57464cf2ff1a17f4855338ef9cfb3446f60d6e4972428c0c6c14593e8"
+        },
+        {
+          "type": "command",
+          "ref": "evidence/T4-A4-a1.json",
+          "sha256": "f7bdae09bc1ddd687192b5cf910f3c3ad85a32df50752e73a04928d208ad9847"
+        }
+      ],
+      "acceptance": {
+        "attempt": 1,
+        "at": "2026-10-28T10:36:17.294Z",
+        "results": [
+          {
+            "id": "A1",
+            "type": "headings",
+            "ok": true,
+            "detail": "all present"
+          },
+          {
+            "id": "A2",
+            "type": "cites-requirements",
+            "ok": true,
+            "detail": "cites 2 of this task's requirements (minimum 2)"
+          },
+          {
+            "id": "A3",
+            "type": "no-secret",
+            "ok": true,
+            "detail": "none found"
+          },
+          {
+            "id": "A4",
+            "type": "command",
+            "ok": true,
+            "detail": "exit 0",
+            "evidenceRef": "evidence/T4-A4-a1.json",
+            "evidenceSha256": "f7bdae09bc1ddd687192b5cf910f3c3ad85a32df50752e73a04928d208ad9847"
+          }
+        ],
+        "ok": true
+      },
+      "verdict": null,
+      "blockedReason": null,
+      "lastError": null,
+      "classCounts": {},
+      "feedback": [],
+      "terminal": false,
+      "drift": [],
+      "approval": {
+        "required": false,
+        "tier": null,
+        "reason": null,
+        "applied": null
+      },
+      "updatedAt": "2026-10-28T10:36:17.294Z",
+      "archive": [
+        {
+          "reason": "invalidated by the reopen of T1",
+          "at": "2026-10-28T10:25:00.114Z",
+          "attempts": 0,
+          "verdict": null,
+          "artifacts": [],
+          "evidence": [],
+          "acceptance": null
+        }
+      ],
+      "submissions": 1
+    }
+  },
+  "eventHead": "b8edceb2c817227985f0f22c7e9ba5dd816be74d7e22816c5d70bd378c00cdca",
+  "eventSeq": 44,
+  "lastCommit": {
+    "events": [
+      {
+        "seq": 43,
+        "ts": "2026-10-28T10:45:59.046Z",
+        "runId": "RUN-afb2a0466e",
+        "rev": 21,
+        "actor": "operator",
+        "action": "integrity-upgrade",
+        "reason": "the state hash now covers the plan, order, limits and every task field, not only part of the state",
+        "stateHash": "975b453d56033e11f0f9731f275bf0a79307e57d40ea3b210ff0bb64b976e822",
+        "prevHash": "4dab721157ecb8f22adfda3f77710a3042453ae3612ccb60f59f2356da3264ae",
+        "hash": "e47e31f838c5f6faac32508427881397501362a69ffd5a59397d6430d9b9d978"
+      },
+      {
+        "seq": 44,
+        "ts": "2026-10-28T10:45:59.046Z",
+        "runId": "RUN-afb2a0466e",
+        "rev": 21,
+        "actor": "operator",
+        "action": "checkpoint",
+        "reason": "integrity upgrade and review fixes",
+        "stateHash": "975b453d56033e11f0f9731f275bf0a79307e57d40ea3b210ff0bb64b976e822",
+        "prevHash": "e47e31f838c5f6faac32508427881397501362a69ffd5a59397d6430d9b9d978",
+        "hash": "b8edceb2c817227985f0f22c7e9ba5dd816be74d7e22816c5d70bd378c00cdca"
+      }
+    ]
+  },
+  "limits": {
+    "leaseMinutes": 30
+  },
+  "hashVersion": 2
+}

@@ -10,7 +10,7 @@ const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 function sandbox(mutate) {
   const dir = mkdtempSync(path.join(os.tmpdir(), 'gf-harness-'));
-  cpSync(repo, dir, { recursive: true, filter: (s) => !/[\\/](\.git|node_modules)([\\/]|$)/.test(s) });
+  cpSync(repo, dir, { recursive: true, filter: (s) => !/[\\/](\.git|node_modules|escape-link)([\\/]|$)/.test(s) });
   try { return mutate(dir); } finally { rmSync(dir, { recursive: true, force: true }); }
 }
 const checks = (errors) => errors.map((e) => e.check);
@@ -41,6 +41,15 @@ test('agent without explicit tools is rejected', () => sandbox((dir) => {
 
 test('broken markdown link is rejected', () => sandbox((dir) => {
   writeFileSync(path.join(dir, 'docs', 'broken.md'), '[x](./nope.md)');
+  assert.ok(checks(validate(dir)).includes('links'));
+}));
+
+test('links inside captured delegate replies are not checked, but links in other run files are', () => sandbox((dir) => {
+  const run = path.join(dir, 'docs', 'state', 'runs', 'RUN-0123456789');
+  mkdirSync(path.join(run, 'results'), { recursive: true });
+  writeFileSync(path.join(run, 'results', 'T1-a1.md'), '[model wrote this](./nope.md)');
+  assert.equal(checks(validate(dir)).includes('links'), false);
+  writeFileSync(path.join(run, 'NOTES.md'), '[x](./nope.md)');
   assert.ok(checks(validate(dir)).includes('links'));
 }));
 

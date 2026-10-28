@@ -16,6 +16,8 @@
     "validate:deployment-readiness": "node harness/scripts/spec-validators.mjs deployment-readiness",
     "validate:tools": "node harness/scripts/validate-tools.mjs",
     "validate:permissions": "node harness/scripts/validate-permissions.mjs",
+    "validate:orchestration": "node harness/scripts/validate-orchestration.mjs",
+    "tasks": "node harness/scripts/tasks.mjs",
     "permissions:audit": "node harness/scripts/audit-denials.mjs verify",
     "permissions:github": "node harness/scripts/verify-github-protection.mjs",
     "mcp:server": "node harness/mcp/greenfuel-tools-server.mjs",

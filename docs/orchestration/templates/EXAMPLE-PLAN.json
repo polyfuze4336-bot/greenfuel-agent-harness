@@ -1,0 +1,49 @@
+{
+  "schema": "greenfuel.task-plan/v1",
+  "title": "Example: assess a storage assumption and challenge it",
+  "request": "Example request: assess whether keeping delivery measurements in the port jurisdiction is consistent with the baseline, then have the assessment challenged.",
+  "objective": "Produce a maritime assessment of the residency assumption, then an independent challenge of it. Read-only: no files are changed.",
+  "requirements": ["FR-001", "SEC-001"],
+  "constraints": ["HC-01"],
+  "risks": [
+    { "id": "RK-1", "text": "The assessment may treat a cloud region as proof of port-jurisdiction residency.", "mitigation": "The acceptance tests require the result to cite the requirements and the critic task checks the claim; HC-01 says a region choice is not proof." }
+  ],
+  "tasks": [
+    {
+      "id": "T1",
+      "title": "Assess the residency assumption",
+      "objective": "Explain what the baseline requires for delivery measurement data and list the assumptions an architecture would need to prove, without proposing a design.",
+      "requirements": ["FR-001", "SEC-001"],
+      "agent": "maritime-domain",
+      "inputContext": ["docs/context/REQUIREMENTS.md", "docs/architecture/HARD-CONSTRAINTS.md"],
+      "expectedArtifacts": [{ "kind": "result" }],
+      "permissions": { "tier": "P0", "tools": ["read", "search"], "operations": ["fs.read", "fs.search"] },
+      "dependsOn": [],
+      "acceptance": [
+        { "id": "A1", "type": "min-words", "target": "@result", "min": 120 },
+        { "id": "A2", "type": "cites-requirements", "target": "@result", "min": 2 },
+        { "id": "A3", "type": "headings", "target": "@result", "headings": ["Assumptions"] }
+      ],
+      "maxAttempts": 2,
+      "recovery": "The task writes nothing. If it fails, discard its captured result and re-delegate with the failed checks in the prompt."
+    },
+    {
+      "id": "T2",
+      "title": "Challenge the assessment",
+      "objective": "Independently challenge T1: find unsupported claims and missing constraints, and end with a verdict line.",
+      "requirements": ["SEC-001"],
+      "agent": "architecture-critic",
+      "inputContext": ["docs/context/REQUIREMENTS.md", "docs/architecture/HARD-CONSTRAINTS.md"],
+      "expectedArtifacts": [{ "kind": "result" }],
+      "permissions": { "tier": "P0", "tools": ["read", "search"], "operations": ["fs.read", "fs.search"] },
+      "dependsOn": ["T1"],
+      "acceptance": [
+        { "id": "A1", "type": "verdict", "target": "@result" },
+        { "id": "A2", "type": "cites-requirements", "target": "@result", "min": 1 },
+        { "id": "A3", "type": "no-secret", "target": "@result" }
+      ],
+      "maxAttempts": 2,
+      "recovery": "The task writes nothing. If it fails, discard its captured result and re-delegate with the failed checks in the prompt."
+    }
+  ]
+}

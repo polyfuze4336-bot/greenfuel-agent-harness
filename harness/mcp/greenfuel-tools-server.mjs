@@ -3,6 +3,7 @@
 // It exposes the repository's deterministic validators and read-only memory lookups to agents that have no shell.
 // Properties, all enforced here and covered by tests/mcp-server.test.mjs:
 //   - every tool is read-only: nothing is written, no network is used, no child process except `git log`
+//     (the run tools read the run store without repairing it: the engine is loaded in read-only mode)
 //   - arguments are validated against a fixed schema; unknown properties are rejected
 //   - paths are limited to docs/specs and tests/fixtures; ids and counts are range-checked
 //   - output is stripped of control and invisible characters and capped at MAX_OUTPUT_BYTES
@@ -10,11 +11,14 @@
 // Limits: tool work is synchronous, so a call cannot be interrupted from inside; the client's per-server
 // `timeout` is the enforcer. Results are observations, not evidence records (see docs/harness/MCP-SECURITY.md).
 import { readFileSync, existsSync, readdirSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { REPO, runUtility } from '../scripts/spec-validators.mjs';
 import { loadContext, rowsOf, hasContext } from '../scripts/validate-context.mjs';
+
+const { makeContext, checkPlanView, runStatusView } = createRequire(import.meta.url)('../orchestration/engine.cjs');
 
 export const SERVER = { name: 'greenfuel-tools', title: 'Green-fuel harness tools (read-only)', version: '0.1.0' };
 export const MAX_OUTPUT_BYTES = 32768;
@@ -53,6 +57,16 @@ export const TOOLS = [
     description: 'Returns recent commits and recorded evidence (id, claim, exit code, commit).',
     inputSchema: { type: 'object', additionalProperties: false, properties: { limit: { type: 'integer', minimum: 1, maximum: 50, description: 'Number of items, default 15.' } } },
   },
+  {
+    name: 'check_plan', title: 'Check a task plan', util: null,
+    description: 'Validates a task plan (JSON text) against the task-execution contract: agents, permissions, requirements, acceptance tests, dependencies and review rules. Creates nothing. A valid plan is still only a draft until a human initialises the run.',
+    inputSchema: { type: 'object', additionalProperties: false, required: ['plan'], properties: { plan: { type: 'string', description: 'The plan as JSON text (greenfuel.task-plan/v1), at most 60000 characters.' } } },
+  },
+  {
+    name: 'get_run_status', title: 'Get task run status', util: null,
+    description: 'Returns the state of a task run: each task status, attempts, feedback to carry into a retry, the recommended next action and the latest events. Without runId it lists the runs.',
+    inputSchema: { type: 'object', additionalProperties: false, properties: { runId: { type: 'string', description: 'A run id such as RUN-0123456789.' } } },
+  },
 ];
 
 // Removes characters that can hide instructions from a reader: control characters, zero-width and bidi marks, tag characters.
@@ -81,6 +95,8 @@ function checkArgs(tool, args) {
   if (args.path !== undefined && (typeof args.path !== 'string' || !PATH_RE.test(args.path) || args.path.includes('..'))) throw new Error('path must be under docs/specs/ or tests/fixtures/ and contain only letters, digits, . _ - /');
   if (args.id !== undefined && (typeof args.id !== 'string' || !REQ_RE.test(args.id))) throw new Error('id must look like FR-009');
   if (args.limit !== undefined && (!Number.isInteger(args.limit) || args.limit < 1 || args.limit > 50)) throw new Error('limit must be an integer from 1 to 50');
+  if (args.plan !== undefined && (typeof args.plan !== 'string' || args.plan.length > 60000)) throw new Error('plan must be JSON text of at most 60000 characters');
+  if (args.runId !== undefined && (typeof args.runId !== 'string' || !/^RUN-[0-9a-f]{10}$/.test(args.runId))) throw new Error('runId must look like RUN-0123456789');
   return args;
 }
 
@@ -152,6 +168,8 @@ export function callTool(name, rawArgs) {
   if (name === 'trace_requirement') return trace(args.id);
   if (name === 'get_accepted_decisions') return decisions();
   if (name === 'get_task_state') return taskState();
+  if (name === 'check_plan') return checkPlanView(args.plan, makeContext());
+  if (name === 'get_run_status') return runStatusView(makeContext(), args.runId);
   return history(args.limit ?? 15);
 }
 

@@ -35,7 +35,7 @@
     "orchestrator": {
       "class": "planner", "tools": ["read", "search", "todo", "agent"], "userInvocable": true, "disableModelInvocation": true,
       "delegatesTo": ["principal-architect", "maritime-domain", "azure-platform", "application-engineer", "ai-engineer", "data-engineer", "security-reviewer", "sre-engineer", "qa-engineer", "architecture-critic", "design-reviewer"],
-      "writes": [], "writesPhase1": [], "commands": [], "web": false, "mcp": ["greenfuel-tools/get_task_state", "greenfuel-tools/get_implementation_history", "greenfuel-tools/get_accepted_decisions", "greenfuel-tools/validate_deployment_readiness"], "profiles": ["orchestration"], "dependsOn": []
+      "writes": [], "writesPhase1": [], "commands": [], "web": false, "mcp": ["greenfuel-tools/get_task_state", "greenfuel-tools/get_implementation_history", "greenfuel-tools/get_accepted_decisions", "greenfuel-tools/validate_deployment_readiness", "greenfuel-tools/check_plan", "greenfuel-tools/get_run_status"], "profiles": ["orchestration"], "dependsOn": []
     },
     "principal-architect": {
       "class": "author", "tools": ["read", "search", "edit"], "userInvocable": true, "disableModelInvocation": false, "delegatesTo": [],

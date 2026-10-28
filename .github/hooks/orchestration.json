@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "type": "command",
+        "command": "node harness/hooks/delegation-guard.cjs pre",
+        "timeoutSec": 15
+      }
+    ],
+    "postToolUse": [
+      {
+        "type": "command",
+        "command": "node harness/hooks/delegation-guard.cjs post",
+        "timeoutSec": 20
+      }
+    ]
+  }
+}

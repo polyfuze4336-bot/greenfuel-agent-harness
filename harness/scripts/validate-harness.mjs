@@ -9,6 +9,7 @@ import { validateArchitecture } from './validate-architecture.mjs';
 import { validateAgents } from './validate-agents.mjs';
 import { validateTools } from './validate-tools.mjs';
 import { validatePermissions } from './validate-permissions.mjs';
+import { validateOrchestration } from './validate-orchestration.mjs';
 
 export const PILLARS = [
   'Context & Instructions',
@@ -34,6 +35,8 @@ const REQUIRED = [
   'harness/policy/permissions.json', 'harness/policy/approvers.json', 'harness/policy/azure-identities.json', 'harness/policy/github-protection.json',
   'harness/hooks/permission-engine.cjs', 'harness/scripts/approval.mjs', 'harness/scripts/audit-denials.mjs', 'harness/scripts/verify-github-protection.mjs',
   '.github/CODEOWNERS', 'docs/approvals/README.md', 'tests/permission-negative.test.mjs',
+  'harness/policy/orchestration-policy.json', 'harness/orchestration/engine.cjs', 'harness/hooks/delegation-guard.cjs', '.github/hooks/orchestration.json', 'harness/scripts/tasks.mjs', 'harness/scripts/validate-orchestration.mjs',
+  'docs/orchestration/ORCHESTRATION.md', 'docs/orchestration/TASK-CONTRACT.md', 'docs/orchestration/templates/EXAMPLE-PLAN.json',
   ...['PERMISSION-MODEL', 'APPROVAL-WORKFLOWS', 'BREAK-GLASS', 'SECRETS-HANDLING', 'ENFORCEMENT-STATUS', 'DENIED-ACTION-AUDIT', 'NEGATIVE-TESTS'].map((n) => `docs/security/${n}.md`),
 ];
 const SKIP_DIRS = new Set(['.git', 'node_modules', '.harness-logs']);
@@ -120,7 +123,8 @@ export function validate(root) {
     for (const m of text.matchAll(/uses:\s*([^\s#]+)/g)) if (!m[1].startsWith('./') && !/@[0-9a-f]{40}$/.test(m[1])) fail('workflows', `${rel(f)}: ${m[1]} is not pinned to a commit SHA`);
   }
 
-  for (const f of files.filter((p) => p.endsWith('.md'))) {
+  // Captured delegate replies are untrusted model output stored by the task engine, not authored documents; their links are not checked.
+  for (const f of files.filter((p) => p.endsWith('.md') && !/docs[\\/]state[\\/]runs[\\/][^\\/]+[\\/]results[\\/]/.test(p))) {
     const text = readFileSync(f, 'utf8').replace(/```[\s\S]*?```/g, '').replace(/`[^`\n]*`/g, '');
     for (const m of text.matchAll(/\[[^\]]*\]\(([^)\s]+)\)/g)) {
       const target = m[1].split('#')[0];
@@ -156,7 +160,7 @@ export function validate(root) {
     for (const p of PILLARS) if (!text.includes(p)) fail('pillars', `${doc}: pillar '${p}' not represented`);
   }
 
-  return [...errors, ...validateContext(root), ...validateArchitecture(root), ...validateAgents(root), ...validateTools(root), ...validatePermissions(root)];
+  return [...errors, ...validateContext(root), ...validateArchitecture(root), ...validateAgents(root), ...validateTools(root), ...validatePermissions(root), ...validateOrchestration(root)];
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

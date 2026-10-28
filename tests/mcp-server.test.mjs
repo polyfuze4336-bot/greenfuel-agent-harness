@@ -31,8 +31,8 @@ test('tools cannot be listed or called before initialize', () => {
 test('discovery: every tool is declared read-only, closed-world and has a closed input schema', () => {
   resetForTests(); init();
   const { tools } = handle({ jsonrpc: '2.0', id: 3, method: 'tools/list' }).result;
-  assert.equal(tools.length, 13);
-  assert.equal(new Set(tools.map((t) => t.name)).size, 13);
+  assert.equal(tools.length, 15);
+  assert.equal(new Set(tools.map((t) => t.name)).size, 15);
   for (const t of tools) {
     assert.equal(t.annotations.readOnlyHint, true, t.name);
     assert.equal(t.annotations.destructiveHint, false, t.name);
@@ -114,7 +114,7 @@ test('output is cleaned of invisible characters and capped', () => {
 test('every tool runs and returns well-formed JSON text within the cap', () => {
   resetForTests(); init();
   for (const t of TOOLS) {
-    const r = call(t.name, t.name === 'trace_requirement' ? { id: 'SEC-001' } : {});
+    const r = call(t.name, t.name === 'trace_requirement' ? { id: 'SEC-001' } : t.name === 'check_plan' ? { plan: '{}' } : {});
     assert.equal(r.result.isError, false, `${t.name}: ${r.result?.content?.[0]?.text}`);
     assert.ok(Buffer.byteLength(text(r)) <= MAX_OUTPUT_BYTES, t.name);
     JSON.parse(text(r).replace(/\n\[output truncated.*$/s, ''));
@@ -162,3 +162,46 @@ test('process level: stdout carries protocol messages only; stderr carries metad
 });
 
 function os_tmp() { return process.env.TEMP ?? process.env.TMPDIR ?? '/tmp'; }
+
+test('run tools: check_plan validates without creating anything; get_run_status reads without writing', async () => {
+  const { mkdtempSync, readFileSync, writeFileSync, rmSync, readdirSync, existsSync } = await import('node:fs');
+  const os = await import('node:os');
+  const { createRequire } = await import('node:module');
+  const engine = createRequire(import.meta.url)('../harness/orchestration/engine.cjs');
+  const runs = mkdtempSync(path.join(os.tmpdir(), 'gf-mcp-runs-'));
+  const prev = process.env.HARNESS_RUNS_DIR; process.env.HARNESS_RUNS_DIR = runs;
+  try {
+    resetForTests(); init();
+    const planText = readFileSync(path.join(repo, 'docs/orchestration/templates/EXAMPLE-PLAN.json'), 'utf8');
+    const ok = JSON.parse(text(call('check_plan', { plan: planText })));
+    assert.equal(ok.ok, true); assert.deepEqual(ok.criticalPath, ['T1', 'T2']); assert.match(ok.note, /human runs/);
+    assert.deepEqual(readdirSync(runs), [], 'checking a plan creates no run');
+    const bad = JSON.parse(text(call('check_plan', { plan: planText.replace('"FR-001", "SEC-001"]', '"FR-999"]') })));
+    assert.equal(bad.ok, false); assert.ok(bad.errors.some((e) => e.code === 'REQ_UNKNOWN'));
+    const refusedCall = (name, args, re) => { const r = call(name, args); assert.equal(r.result.isError, true, name); assert.match(text(r), re); };
+    refusedCall('check_plan', {}, /missing argument 'plan'/);
+    refusedCall('check_plan', { plan: 'x'.repeat(60001) }, /at most 60000/);
+    refusedCall('get_run_status', { runId: '../x' }, /runId must look like/);
+    refusedCall('get_run_status', { runId: 'RUN-0123456789', extra: 1 }, /unknown argument/);
+    assert.deepEqual(JSON.parse(text(call('get_run_status', {}))).runs, []);
+    const ctx = engine.makeContext({ runsDir: runs });
+    const { runId } = engine.initRun(ctx, JSON.parse(planText));
+    engine.start(ctx, runId, 'T1', { agent: 'maritime-domain', promptSha256: engine.sha256('p') });
+    const st = JSON.parse(text(call('get_run_status', { runId })));
+    assert.equal(st.state, 'ACTIVE'); assert.equal(st.tasks[0].status, 'RUNNING'); assert.equal(st.integrity.ok, true);
+    assert.equal(st.next.recommendation.action, 'wait');
+    // A crash left the log behind. The read-only tool must report a sound state without repairing the file.
+    const ev = path.join(runs, runId, 'events.jsonl');
+    const all = readFileSync(ev, 'utf8').split('\n').filter(Boolean);
+    const last = engine.loadRun(ctx, runId).lastCommit.events.length;
+    const truncated = `${all.slice(0, all.length - last).join('\n')}\n`;
+    writeFileSync(ev, truncated);
+    const again = JSON.parse(text(call('get_run_status', { runId })));
+    assert.equal(again.integrity.ok, true);
+    assert.equal(readFileSync(ev, 'utf8'), truncated, 'the read-only tool did not write the repair');
+    assert.ok(!existsSync(path.join(runs, runId, '.lock')));
+  } finally {
+    if (prev === undefined) delete process.env.HARNESS_RUNS_DIR; else process.env.HARNESS_RUNS_DIR = prev;
+    rmSync(runs, { recursive: true, force: true });
+  }
+});
