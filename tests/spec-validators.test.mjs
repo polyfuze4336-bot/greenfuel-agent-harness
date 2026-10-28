@@ -246,7 +246,7 @@ test('certificates: local hosting, human approval and methodology traceability a
 test('readiness: the real repository is NOT-READY and lists why', () => {
   const r = runUtility('deployment-readiness', repo);
   assert.equal(r.status, 'NOT-READY');
-  for (const re of [/Phase 0/, /No infrastructure specification/, /No design review has status Approved/, /milestone-1 decisions are still open/, /No human decider/]) assert.ok(msgs(r).some((m) => re.test(m)), String(re));
+  for (const re of [/Phase 0/, /non-deployable scaffold/, /No design review has status Approved/, /milestone-1 decisions are still open/, /No human decider/, /\[DG-02\] No port is named/, /\[DG-07\] No sourced cost estimate/]) assert.ok(msgs(r).some((m) => re.test(m)), String(re));
   assert.ok(r.notes.some((n) => /not an approval/.test(n)));
 });
 
@@ -257,12 +257,12 @@ test('readiness: each blocker clears only when its own recorded condition is met
   const edit = (rel, fn) => { const p = path.join(root, rel); const b = readFileSync(p, 'utf8'); const a = fn(b); assert.notEqual(a, b, rel); writeFileSync(p, a); };
   const blockers = () => msgs(runUtility('deployment-readiness', root));
   const has = (re) => blockers().some((m) => re.test(m));
-  assert.ok(has(/Phase 0/) && has(/No infrastructure specification/) && has(/No design review has status Approved/) && has(/No human decider/) && has(/milestone-1 decisions/));
+  assert.ok(has(/Phase 0/) && has(/non-deployable scaffold/) && has(/No design review has status Approved/) && has(/No human decider/) && has(/milestone-1 decisions/));
   edit('harness/policy/command-policy.json', (t) => t.replace('"phase": 0', '"phase": 1'));
   assert.equal(has(/Phase 0/), false);
-  mkdirSync(path.join(root, 'infra'));
-  writeFileSync(path.join(root, 'infra', 'main.bicep'), '// placeholder\n');
-  assert.equal(has(/No infrastructure specification/), false);
+  edit('infra/main.bicep', (t) => t.replace('SCAFFOLD, NOT DEPLOYABLE', 'reviewed'));
+  assert.equal(has(/non-deployable scaffold/), false);
+  assert.ok(has(/\[DG-05\] .*REQUIRES-APPROVAL/), 'the Azure gates stay blocked by the unresolved parameter files');
   edit('docs/state/TODO.md', (t) => t.replace(/(\| T3 \|.*)Deferred/, '$1Named'));
   assert.equal(has(/No human decider/), false);
   rmSync(path.join(root, 'docs', 'context', 'DECISION-REGISTER.md'));

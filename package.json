@@ -20,6 +20,7 @@
     "validate:memory": "node harness/scripts/validate-memory.mjs",
     "validate:loop": "node harness/scripts/validate-loop.mjs",
     "validate:evaluation": "node harness/scripts/validate-evaluation.mjs",
+    "validate:azure": "node harness/scripts/validate-azure.mjs",
     "evaluate": "node harness/scripts/evaluate.mjs",
     "loop": "node harness/scripts/loop.mjs",
     "memory": "node harness/scripts/memory.mjs",

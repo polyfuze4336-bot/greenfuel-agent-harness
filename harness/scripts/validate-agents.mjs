@@ -266,7 +266,9 @@ export function validateAgents(root) {
   }
 
   if (phase === 0) {
-    for (const [n, a] of Object.entries(agents)) for (const g of a.writesPhase1) if (existsSync(path.join(root, prefixOf(g)))) fail(`phase 0: ${n} phase-1 path '${prefixOf(g)}' exists`);
+    // ADR 0014: infra/ may hold the non-deployable scaffold. Agents still cannot write it: command-policy.json gates the path until the phase is raised.
+    const scaffold = existsSync(path.join(root, 'infra/main.bicep')) && /SCAFFOLD, NOT DEPLOYABLE/.test(readFileSync(path.join(root, 'infra/main.bicep'), 'utf8'));
+    for (const [n, a] of Object.entries(agents)) for (const g of a.writesPhase1) if (existsSync(path.join(root, prefixOf(g))) && !(scaffold && prefixOf(g) === 'infra/')) fail(`phase 0: ${n} phase-1 path '${prefixOf(g)}' exists`);
   }
   return errors;
 }

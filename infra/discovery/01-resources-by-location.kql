@@ -1,0 +1,5 @@
+// Azure Resource Graph, READ ONLY. Environment discovery: every resource in scope with its location, so unexpected regions stand out.
+// Human-run only, after approval to sign in (T11, D-037). Nothing here has been run. Never paste results containing names of customers or vessels.
+resources
+| project subscriptionId, resourceGroup, type, name, location, kind, sku = tostring(sku.name), tags
+| order by subscriptionId asc, resourceGroup asc, type asc

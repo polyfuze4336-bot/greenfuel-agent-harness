@@ -14,6 +14,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
+const os = require('node:os');
 const { spawnSync } = require('node:child_process');
 const perm = require('../hooks/permission-engine.cjs');
 
@@ -355,6 +356,39 @@ function verifyRun(ctx, runId) {
 }
 const listRuns = (ctx) => (fs.existsSync(ctx.runsDir) ? fs.readdirSync(ctx.runsDir).filter((d) => RUN_RE.test(d)).sort() : []);
 
+function latestFullRun(ctx) {
+  let best = null;
+  for (const id of listRuns(ctx)) { const run = readJson(path.join(ctx.runsDir, id, 'run.json')); if (!run.partial && (!best || run.startedAt > best.run.startedAt)) best = { id, run }; }
+  return best;
+}
+// Differences between a fresh run and the committed one. A difference is allowed only when the policy lists that test with the exact
+// status the fresh run may report and a reason; anything else, including a different gate or hard-constraint verdict, is a difference.
+function compareRuns(policy, fresh, committed) {
+  const allowed = new Map((policy.ciRerun?.allowedDifferences ?? []).map((a) => [a.id, a]));
+  const diffs = []; const old = new Map(committed.tests.map((t) => [t.id, t.status])); const now = new Map(fresh.tests.map((t) => [t.id, t.status]));
+  for (const id of new Set([...old.keys(), ...now.keys()])) {
+    if (old.get(id) === now.get(id)) continue;
+    const a = allowed.get(id);
+    if (a && now.get(id) === a.status) continue;
+    diffs.push(`${id}: committed ${old.get(id) ?? 'absent'}, re-run ${now.get(id) ?? 'absent'}`);
+  }
+  const g = (r) => JSON.stringify(r.gates.map((x) => [x.id, x.status])); if (g(fresh) !== g(committed)) diffs.push(`gates differ: committed ${g(committed)}, re-run ${g(fresh)}`);
+  const h = (r) => JSON.stringify(r.hardConstraints.map((x) => [x.id, x.verdict])); if (h(fresh) !== h(committed)) diffs.push('hard-constraint verdicts differ from the committed run');
+  return diffs;
+}
+// Re-runs the whole evaluation into a temporary folder and compares it with the latest committed full run. Nothing is committed.
+function rerun(ctx) {
+  const committed = latestFullRun(ctx);
+  if (!committed) throw new EvalError('NO_COMMITTED_RUN', 'there is no committed full run to compare with');
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'eval-rerun-'));
+  try {
+    const nctx = { ...ctx, runsDir: tmp };
+    const r = runEvaluation(nctx); const v = verifyRun(nctx, r.runId);
+    const differences = [...v.problems.filter((p) => !p.startsWith('note:')), ...compareRuns(ctx.policy, r.run, committed.run)];
+    return { ok: differences.length === 0, committedRun: committed.id, counts: r.run.counts, gates: r.run.gates.map((x) => `${x.id} ${x.status}`), differences, allowed: (ctx.policy.ciRerun?.allowedDifferences ?? []).map((a) => a.id) };
+  } finally { fs.rmSync(tmp, { recursive: true, force: true }); }
+}
+
 // ---------------------------------------------------------------- report
 function renderReport(ctx, runId) {
   if (!RUN_RE.test(runId)) throw new EvalError('RUN', `'${text(runId).slice(0, 40)}' is not a run id`);
@@ -388,4 +422,4 @@ function renderReport(ctx, runId) {
   return `${L.join('\n')}\n`;
 }
 
-module.exports = { ROOT, EvalError, makeContext, loadCatalogue, validateCatalogue, parseTap, deriveStatus, evaluateGates, hardConstraintMatrix, runEvaluation, verifyRun, listRuns, renderReport, knownRequirementIds, commandProblems, argvOf };
+module.exports = { ROOT, EvalError, makeContext, loadCatalogue, validateCatalogue, parseTap, deriveStatus, evaluateGates, hardConstraintMatrix, runEvaluation, verifyRun, listRuns, latestFullRun, compareRuns, rerun, renderReport, knownRequirementIds, commandProblems, argvOf };

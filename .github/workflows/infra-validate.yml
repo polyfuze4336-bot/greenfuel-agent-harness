@@ -1,0 +1,42 @@
+name: infra-validate
+
+# Compiles and checks the infrastructure scaffold. It does not sign in to Azure, preview changes or deploy, and it has no secret.
+# A workflow that does any of those is refused by validate-azure until a human raises the phase (HC-11).
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'infra/**'
+      - 'docs/azure/**'
+      - 'harness/scripts/validate-azure.mjs'
+      - '.github/workflows/infra-validate.yml'
+  pull_request:
+    paths:
+      - 'infra/**'
+      - 'docs/azure/**'
+      - 'harness/scripts/validate-azure.mjs'
+      - '.github/workflows/infra-validate.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  infra:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+      - name: Static infrastructure policy, port register, documents and readiness gate
+        run: node harness/scripts/validate-azure.mjs --readiness || test $? -eq 2
+      # The Bicep CLI is installed by version through the Azure CLI that the runner already has. It is downloaded, not checksum-verified.
+      - name: Install the Bicep CLI (pinned version, no Azure sign-in)
+        run: az bicep install --version v0.48.1
+      - name: Compile every Bicep file
+        run: |
+          export PATH="$HOME/.azure/bin:$PATH"
+          node harness/scripts/validate-azure.mjs --bicep

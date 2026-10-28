@@ -1,0 +1,11 @@
+// Azure Resource Graph, READ ONLY. Resources that could expose data or break the residency rules: public network access not disabled,
+// shared key or local authentication still enabled, geo-redundant storage or backup. Properties differ per type, so a resource that is
+// absent from the result has not been shown to be safe: it may simply not expose that property.
+resources
+| extend publicAccess = tostring(properties.publicNetworkAccess),
+         sharedKey = tostring(properties.allowSharedKeyAccess),
+         localAuthDisabled = tostring(properties.disableLocalAuth),
+         storageSku = tostring(sku.name),
+         geoBackup = tostring(properties.backup.geoRedundantBackup)
+| where publicAccess =~ 'Enabled' or sharedKey =~ 'true' or localAuthDisabled =~ 'false' or storageSku has_any ('GRS', 'GZRS') or geoBackup =~ 'Enabled'
+| project subscriptionId, resourceGroup, type, name, location, publicAccess, sharedKey, localAuthDisabled, storageSku, geoBackup

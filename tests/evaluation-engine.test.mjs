@@ -414,3 +414,37 @@ test('review: the command line exits 3 for a run that blocks progression, and re
     assert.equal(cli('gates', '--run', out.runId).status, 1);
   } finally { rm(dir); }
 });
+test('rerun (CI): an identical re-run passes; an unlisted difference fails; the listed TypeScript skip is tolerated but nothing else', () => {
+  const committed = tmp(); const base = mkctx(committed, fake({}));
+  try {
+    ev.runEvaluation(base);
+    const again = (opts) => ev.rerun({ ...base, run: fake(opts) });
+    const same = again({}); assert.equal(same.ok, true, same.differences.join('; ')); assert.match(same.committedRun, /^EVRUN-[0-9a-f]{10}$/);
+    const listed = again({ suiteOverride: { 'tests/loop-engine.test.mjs': { tests: 31, skipped: 1 } } });
+    assert.equal(listed.ok, true, 'the TypeScript scenario skipped in CI is the one listed difference'); assert.deepEqual(listed.allowed, ['EVAL-HRN-FUN-004']);
+    const other = again({ suiteOverride: { 'tests/memory.test.mjs,tests/validate-memory.test.mjs': { tests: 100, skipped: 1 } } });
+    assert.equal(other.ok, false); assert.ok(other.differences.some((d) => /EVAL-HRN-FUN-002: committed PASS, re-run BLOCKED/.test(d)));
+    const worse = again({ suiteOverride: { 'tests/loop-engine.test.mjs': { tests: 31, fail: 1 } } });
+    assert.equal(worse.ok, false, 'a FAIL where the committed run says PASS is not the listed BLOCKED difference');
+    const gate = again({ fail: ['EVAL-HRN-SEC-001'] });
+    assert.equal(gate.ok, false); assert.ok(gate.differences.some((d) => /gates differ/.test(d)));
+    const hc = again({ fail: ['EVAL-PRC-SEC-001'] });
+    assert.ok(hc.differences.some((d) => /hard-constraint verdicts differ/.test(d)));
+  } finally { rm(committed); }
+  assert.throws(() => ev.rerun(mkctx(tmp(), fake({}))), /no committed full run/);
+});
+
+test('rerun (CI): compareRuns lists only differences the policy allows, by exact test and status', () => {
+  const mk = (tests, gates = [], hardConstraints = []) => ({ tests: tests.map(([id, status]) => ({ id, status })), gates, hardConstraints });
+  const p = { ciRerun: { allowedDifferences: [{ id: 'A', status: 'BLOCKED', reason: 'x' }] } };
+  assert.deepEqual(ev.compareRuns(p, mk([['A', 'BLOCKED'], ['B', 'PASS']]), mk([['A', 'PASS'], ['B', 'PASS']])), []);
+  assert.equal(ev.compareRuns(p, mk([['A', 'FAIL']]), mk([['A', 'PASS']])).length, 1);
+  assert.equal(ev.compareRuns(p, mk([['B', 'FAIL']]), mk([['B', 'PASS']])).length, 1);
+  assert.equal(ev.compareRuns(p, mk([['A', 'BLOCKED'], ['C', 'PASS']]), mk([['A', 'PASS']])).length, 1, 'a test that appears or disappears is a difference');
+  assert.equal(ev.compareRuns({}, mk([['A', 'BLOCKED']]), mk([['A', 'PASS']])).length, 1, 'with no policy entry nothing is tolerated');
+});
+
+test('rerun (CI): the command line refuses to compare when no committed run exists', () => {
+  const dir = tmp(); const env = { ...process.env, CI: 'true', HARNESS_EVAL_RUNS_DIR: dir }; delete env.NODE_TEST_CONTEXT;
+  try { const r = spawnSync(process.execPath, ['harness/scripts/evaluate.mjs', 'rerun'], { cwd: ROOT, env, encoding: 'utf8', timeout: 60000 }); assert.equal(r.status, 2); assert.match(r.stdout, /NO_COMMITTED_RUN/); } finally { rm(dir); }
+});

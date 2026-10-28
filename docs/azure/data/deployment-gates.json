@@ -1,0 +1,18 @@
+{
+  "schema": "greenfuel.deployment-gates/v1",
+  "description": "The twelve deployment gates. Status is computed from the repository by validate-azure --readiness, never declared here. A gate with no blocker is NO-BLOCKERS-FOUND, which is not an approval: every gate also needs the named approver. No gate authorises a deployment by itself, and production is never deployed automatically (HC-11).",
+  "gates": [
+    { "id": "DG-01", "title": "Azure design reviewed and approved", "evidence": "An Approved design review record for the reference architecture, with the Well-Architected assessment and the ten review perspectives answered", "approver": "design approver named under T3" },
+    { "id": "DG-02", "title": "Residency established per port, with a hosting option", "evidence": "Port register entry per port: legal basis, basis other than region, eight validations Verified with evidence", "approver": "compliance counsel and sovereignty lead" },
+    { "id": "DG-03", "title": "Region and service capability verified live", "evidence": "A recorded read-only check of each required service, SKU, feature and zone in the chosen region, in the approved subscription", "approver": "enterprise architect" },
+    { "id": "DG-04", "title": "Identity, RBAC and key custody validated", "evidence": "Registered approvers, scoped deployment identities, role assignments checked against the pinned list, key custody decision", "approver": "security architect" },
+    { "id": "DG-05", "title": "Infrastructure as code complete and validated", "evidence": "Parameter files with approved values outside the secret path, bicep build and static policy checks clean, reviewed commit", "approver": "azure platform owner" },
+    { "id": "DG-06", "title": "What-if and dependency plan reviewed", "evidence": "A recorded what-if result per environment for the reviewed commit, with no unexpected delete", "approver": "azure platform owner" },
+    { "id": "DG-07", "title": "Cost estimate sourced and budget set", "evidence": "An estimate built from sourced unit prices and agreed volumes, a budget and alert contacts", "approver": "programme owner" },
+    { "id": "DG-08", "title": "Approval recorded for resource creation and billable change", "evidence": "A signed approval record bound to the reviewed commit, the scope and the environment", "approver": "registered approvers (P3, and P4 where it applies)" },
+    { "id": "DG-09", "title": "Operations, rollback and recovery ready", "evidence": "Runbooks exercised in non-production, rollback and restore tested in the jurisdiction, support-access model agreed, recovery targets agreed", "approver": "port operations and the site reliability owner" },
+    { "id": "DG-10", "title": "Post-deployment smoke and integration tests defined and run", "evidence": "A recorded run of the smoke and integration tests against the non-production deployment", "approver": "qa owner" },
+    { "id": "DG-11", "title": "Tenant, subscription and environment separation decided", "evidence": "D-037 decided; dev, test and prod in separate subscriptions or an equivalent recorded separation", "approver": "programme owner" },
+    { "id": "DG-12", "title": "Phase raised by a human", "evidence": "An ADR recording the human decision that raises the phase, and the phase value in command-policy.json", "approver": "programme owner" }
+  ]
+}

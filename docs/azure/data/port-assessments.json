@@ -1,0 +1,24 @@
+{
+  "schema": "greenfuel.port-assessments/v1",
+  "description": "Register of per-port residency assessments. Empty on purpose: the ports and jurisdictions are not named (D-003) and no legal basis has been verified (D-009). A region is not a residency control (HC-01). A port is Established only with a legal basis, a basis other than the region alone, and all eight validations Verified with evidence and a named human verifier. Control plane: agents cannot edit it.",
+  "defaultHostingUntilEstablished": "C",
+  "hostingOptions": {
+    "A": "In-country Azure region hosts the cell. Allowed only when residency is Established for that port",
+    "B": "In-country Azure region for the shore services plus a jurisdiction-local edge store for the evidence of record",
+    "C": "Jurisdiction-local evidence store (edge or on-premises, possibly Azure Arc or Azure Local managed) with a controlled shore integration that carries only flows approved under D-011",
+    "D": "Hosted by a partner in the jurisdiction. Needs the same validations and a contract",
+    "None": "No hosting option is feasible for this port; escalate"
+  },
+  "validationsRequired": ["replication", "backups", "diagnostics", "supportAccess", "disasterRecovery", "aiInference", "identityAndControlPlane", "pipelines"],
+  "portTemplate": {
+    "id": "PORT-XXX",
+    "jurisdiction": "named by D-003",
+    "residencyStatus": "Undetermined",
+    "hostingOption": "C",
+    "legalBasis": { "decision": "D-009", "reference": "the legal source, cited by counsel" },
+    "basis": ["what establishes residency; never the region alone"],
+    "validations": { "replication": { "status": "Unverified", "evidence": [], "verifiedBy": "" } },
+    "verifiedBy": ""
+  },
+  "ports": []
+}

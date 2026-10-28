@@ -1,0 +1,51 @@
+{
+  "kind": "decision",
+  "title": "Independent evaluation framework",
+  "statement": "Independent evaluation framework",
+  "body": "Accepted. The owner also decided that CI re-runs the evaluation (T29). Adopt: - [eval.cjs](../../harness/eval/eval.cjs), [evaluation-policy.json](../../harness/policy/evaluation-policy.json), the human-run CLI [evaluate.mjs](../../harness/scripts/evaluate.mjs), and `validate-evaluation` in `npm run validate` and CI, as described in [EVALUATION-FRAMEWORK](../evaluation/EVALUATION-FRAMEWORK.md). - Four statuses: PASS (ran and showed its outcome), FAIL (including \"could not show it ran\"), BLOCKED (precondition unmet, or skipped), PENDING (the system does not exist). Only PASS counts, and only with evidence that it ran. - Gates G1 to G7 decided by rules, no score, a hard-constraint verdict printed above the gates, entry criteria that block every gate if a harness control test fails, and `requires` so a readiness check cannot run before the gates it depends on. - Three suites kept apart by ID prefix and enforced by validation: the coding harness, production candidate contracts, and production agents (all pending). - `evaluation/` and `docs/evaluation/` as control-plane paths, and no agent granted the evaluation runner, so an agent cannot edit a test or produce a result. Running the evaluation and committing its run and report are human steps. - A committed full run and a report that must equal what the latest run generates. - **CI re-runs the full evaluation** (`evaluate.mjs rerun`) on every push into a temporary folder, verifies it, and compares every test status, gate and hard-constraint verdict with the latest committed run. Any difference fails CI, except differences the policy lists by test ID with a reason. The one listed today is the TypeScript build scenario (`EVAL-HRN-FUN-004`), which CI reports BLOCKED because the pinned toolchain is not installed there; the pin is a SHA-1 value from the reviewing machine and cannot be assumed to match a public install. A CI re-run reproduces the committed record. It is not a signature and does not make the run tamper-proof.",
+  "refs": [
+    "ADR-0012",
+    "HC-08",
+    "ADR-0008",
+    "ADR-0002",
+    "file:docs/adr/0012-independent-evaluation-framework.md"
+  ],
+  "subject": "adr.0012",
+  "position": "accepted",
+  "tags": [
+    "adr"
+  ],
+  "owner": "programme-owner",
+  "critical": false,
+  "provenance": {
+    "evidence": [],
+    "source": "adr",
+    "ref": "file:docs/adr/0012-independent-evaluation-framework.md",
+    "sourceSha256": "de18dc87ebf2bf8ce209da05e766354b1327e76b4ea43a69f7adb54548a54b0f",
+    "trust": "authoritative",
+    "recordedBy": {
+      "type": "importer",
+      "name": "import-adr"
+    }
+  },
+  "approval": {
+    "by": "programme-owner",
+    "at": "2026-10-28T00:00:00.000Z",
+    "ref": "ADR-0012"
+  },
+  "validity": {
+    "supersedes": [],
+    "supersededBy": null,
+    "validUntil": null,
+    "reviewBy": null,
+    "status": "approved",
+    "validFrom": "2026-10-28T14:23:02.054Z"
+  },
+  "schema": "greenfuel.memory/v1",
+  "category": "semantic",
+  "createdAt": "2026-10-28T14:23:02.054Z",
+  "updatedAt": "2026-10-28T14:23:02.054Z",
+  "classification": "internal",
+  "review": null,
+  "id": "DEC-0012"
+}

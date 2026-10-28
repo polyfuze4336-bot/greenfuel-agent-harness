@@ -1,0 +1,7 @@
+// Azure Resource Graph, READ ONLY. Role assignments with broad roles (Owner, Contributor, User Access Administrator) at any scope, for the
+// identity and RBAC validation. Principal names are object IDs only; resolve them with the tenant owner, not in a prompt.
+authorizationresources
+| where type =~ 'microsoft.authorization/roleassignments'
+| extend roleId = tolower(tostring(split(tostring(properties.roleDefinitionId), '/')[-1]))
+| where roleId in ('8e3af657-a8ff-443c-a75c-2fe8c4bcb635', 'b24988ac-6180-42a0-ab88-20f7382dd24c', '18d7d88d-d35e-4fb5-a5c3-7773c20a72d9')
+| project subscriptionId, scope = tostring(properties.scope), roleId, principalId = tostring(properties.principalId), principalType = tostring(properties.principalType)

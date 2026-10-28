@@ -5,7 +5,7 @@ The independent evaluation of the coding harness and of the future solution's co
 - Policy: [evaluation-policy.json](../../harness/policy/evaluation-policy.json). Engine: [eval.cjs](../../harness/eval/eval.cjs). Command line: [evaluate.mjs](../../harness/scripts/evaluate.mjs). Validator: [validate-evaluation.mjs](../../harness/scripts/validate-evaluation.mjs).
 - Test definitions: [evaluation/catalogue/](../../evaluation/catalogue/) (data, never results). Executable checks: [evaluation/checks/](../../evaluation/checks/). Synthetic fixtures: [evaluation/fixtures/](../../evaluation/fixtures/).
 - Results: [runs/](./runs/), one folder per run, with one evidence file per test. The generated [EVALUATION-REPORT.md](./EVALUATION-REPORT.md) is the report.
-- Decision record: [ADR 0012](../adr/0012-independent-evaluation-framework.md) (Proposed until the owner accepts it).
+- Decision records: [ADR 0012](../adr/0012-independent-evaluation-framework.md) (Accepted) and [ADR 0013](../adr/0013-evaluation-findings-effective-periods-and-timestamps.md) (Accepted: the rules behind the two contract findings).
 
 ## Domains
 
@@ -84,6 +84,7 @@ node harness/scripts/evaluate.mjs run --ids EVAL-HRN-SEC-001,EVAL-PRC-AZR-001
 node harness/scripts/evaluate.mjs verify --run EVRUN-xxxxxxxxxx
 node harness/scripts/evaluate.mjs report --run EVRUN-xxxxxxxxxx --write
 node harness/scripts/validate-evaluation.mjs                configuration, catalogue, committed runs and the report
+node harness/scripts/evaluate.mjs rerun                     CI: re-run everything into a temp folder and compare with the latest committed run
 ```
 
 A full run executes whole existing suites, so it takes several minutes. `run` records the run and then exits **3** when progression is blocked (a failing test, a violated hard constraint or a gate that is not PASS), so a pipeline cannot read a failed evaluation as success; a partial run reports `not evaluated` and exits 0 unless a test failed. `report` and `gates` refuse a run that does not verify. The loop's TypeScript scenario needs the pinned toolchain (`HARNESS_TOOLCHAIN_DIR`); without it that test is skipped and EVAL-HRN-FUN-004 is reported BLOCKED, not passed. A run is bounded: a time limit per command, an output limit, a scrubbed environment (no `NODE_OPTIONS`), no shell, and only commands that match the allow-list in the policy.
@@ -97,11 +98,11 @@ These restrictions are enforced by code and tested in [evaluation-engine.test.mj
 - The catalogue cannot hold results, mixed suites, unknown requirement IDs, an executable production-agent test, or a command outside the allow-list. Coverage of every domain, gate, hard constraint and red-team scenario is required.
 - `evaluation/`, `docs/evaluation/` (including committed runs and the report) and the evaluation policy are control-plane paths: no agent can write them. The permission engine denies it.
 - The committed report must equal what the latest full run generates, so it cannot be edited by hand. Every committed run must re-verify.
-- CI runs `validate-evaluation` on every push.
+- CI runs `validate-evaluation` on every push, and **re-runs the whole evaluation** (`evaluate.mjs rerun`, owner decision T29) in a separate job. The re-run goes to a temporary folder, is verified, and is compared with the latest committed run: every test status, every gate and every hard-constraint verdict must match, except tests the policy lists with the exact status the re-run may report. The one listed today is the TypeScript scenario (`EVAL-HRN-FUN-004`), which CI reports BLOCKED because the pinned toolchain is not installed there. The comparison is tested in [evaluation-engine.test.mjs](../../tests/evaluation-engine.test.mjs) and the policy entries are checked by `validate-evaluation`.
 
 ## Human procedure
 
-- **Running the evaluation** and committing its run and report are human steps. The committed run is a record of what one person ran at one commit, on one machine. CI verifies the record is consistent; it does not re-run the tests (the full test suite runs separately in CI).
+- **Running the evaluation** and committing its run and report are human steps. The committed run is a record of what one person ran at one commit, on one machine. CI verifies the record is consistent and re-runs the evaluation to confirm that it reproduces; a re-run is not a signature, and it is not the full test suite (that runs separately in CI).
 - **Accepting a gate** is a human decision. A gate PASS is a necessary condition, never the approval. G6 in particular needs the owner's approval of deployment readiness.
 - **Changing a test.** The catalogue and checks are control plane, so changing a test needs a human commit and review. An agent cannot weaken a test to make it pass, but a human can, and review is the control.
 - **Resolving a finding** is a decision for the owner and the principal architect. The framework reports a gap; it never fixes a contract silently.

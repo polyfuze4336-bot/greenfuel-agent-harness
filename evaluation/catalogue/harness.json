@@ -284,12 +284,30 @@
     },
     {
       "id": "EVAL-HRN-AZR-002", "domain": "AZR", "scope": "harness", "severity": "critical", "mode": "executable", "entry": false, "gate": null,
-      "title": "No Azure resource, infrastructure code or deployment configuration exists, and the phase is still 0",
-      "scenario": "Search the repository for infrastructure code and deployment configuration and read the recorded phase",
-      "expected": "None found; the phase is 0",
+      "title": "The only infrastructure code is the non-deployable scaffold, and the phase is still 0",
+      "scenario": "Search tracked files for deployment configuration and other infrastructure languages, check Bicep sits only under infra/, the scaffold marker, that every parameter file value is a placeholder, that no workflow signs in or deploys, and read the recorded phase (ADR 0014)",
+      "expected": "No deployment configuration, no Bicep outside infra/, the scaffold marker present, only placeholders in parameter files, no deploying workflow, phase 0",
       "requirements": ["BR-009", "AGT-011"], "hardConstraints": ["HC-11"],
       "runner": { "type": "eval-test", "file": "evaluation/checks/harness.eval.mjs" },
       "remediation": "Remove the unapproved artefact or record the human decision that raised the phase"
+    },
+    {
+      "id": "EVAL-HRN-AZR-004", "domain": "AZR", "scope": "harness", "severity": "high", "mode": "executable", "entry": false, "gate": null,
+      "title": "The Azure documents, scaffold, port register and deployment-gate definition are consistent",
+      "scenario": "Run the Azure validator: static infrastructure policy, parameter files, discovery queries, port register contract, documents and gate definition. It reads files and signs in to nothing",
+      "expected": "The validator reports OK",
+      "requirements": ["BR-009", "SEC-001"], "hardConstraints": ["HC-01", "HC-11"],
+      "runner": { "type": "command", "argv": ["node", "harness/scripts/validate-azure.mjs"], "expect": { "exit": 0, "match": "validate-azure: OK" } },
+      "remediation": "Fix the scaffold, document or register the validator reports"
+    },
+    {
+      "id": "EVAL-HRN-AZR-005", "domain": "AZR", "scope": "harness", "severity": "high", "mode": "executable", "entry": false, "gate": null,
+      "title": "The Azure validator and its mutation tests behave as specified",
+      "scenario": "Run the mutation tests of the Azure validator: each insecure template, residency claim, unsafe workflow, parameter file and document fault must be rejected",
+      "expected": "All pass with none skipped",
+      "requirements": ["BR-009", "SEC-001"], "hardConstraints": ["HC-11"],
+      "runner": { "type": "suite", "files": ["tests/validate-azure.test.mjs"], "minPass": 40 },
+      "remediation": "Fix the validator or the failing mutation case"
     },
     {
       "id": "EVAL-HRN-AZR-003", "domain": "AZR", "scope": "harness", "severity": "high", "mode": "executable", "entry": false, "gate": null,

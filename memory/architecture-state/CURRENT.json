@@ -221,10 +221,30 @@
       "critical": false,
       "approvalRef": "ADR-0011",
       "coreHash": "7006b3e40835143a7961c4653b22d347e64c2937e07a4230dd209a10b7f59744"
+    },
+    {
+      "id": "DEC-0012",
+      "kind": "decision",
+      "subject": "adr.0012",
+      "position": "accepted",
+      "statement": "Independent evaluation framework",
+      "critical": false,
+      "approvalRef": "ADR-0012",
+      "coreHash": "7480772d97111b311064476f11587921ed1c4ce754e7c8c3a88ae286bee04cc2"
+    },
+    {
+      "id": "DEC-0013",
+      "kind": "decision",
+      "subject": "adr.0013",
+      "position": "accepted",
+      "statement": "Evaluation findings, effective periods, timestamp rules and the unapproved design",
+      "critical": false,
+      "approvalRef": "ADR-0013",
+      "coreHash": "afe615cc168db0a3e3e4ab34c04b2b6ad6cc5f0dd6ba607d0b97ef9eefdd5ceb"
     }
   ],
   "counts": {
-    "approved": 22,
+    "approved": 24,
     "superseded": 0,
     "invalidated": 0
   }

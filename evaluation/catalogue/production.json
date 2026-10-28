@@ -112,6 +112,24 @@
       "remediation": "Tighten the lineage contract"
     },
     {
+      "id": "EVAL-PRC-SOV-003", "domain": "SOV", "scope": "production-contract", "severity": "critical", "mode": "executable", "entry": false, "gate": "G3",
+      "title": "A port cannot be recorded as residency-established by region alone, without a legal basis or evidence, or by an agent",
+      "scenario": "Synthetic port assessment registers: a region as the only basis, no legal basis, a validation with no evidence, an agent verifier, an undetermined port hosted in a cloud region, a missing validation, and a default hosting changed to a region, beside a fully evidenced port",
+      "expected": "The register contract rejects each fault and accepts the fully evidenced port",
+      "requirements": ["SEC-001", "SEC-002", "NFR-009"], "hardConstraints": ["HC-01"],
+      "runner": { "type": "eval-test", "file": "evaluation/checks/azure-contract.eval.mjs" },
+      "remediation": "Tighten the port register contract"
+    },
+    {
+      "id": "EVAL-PRC-SEC-003", "domain": "SEC", "scope": "production-contract", "severity": "critical", "mode": "executable", "entry": false, "gate": "G3", "redTeam": "RT-11",
+      "title": "The infrastructure policy rejects public access, shared keys, geo-redundant copies, key reads, broad roles and default decisions",
+      "scenario": "Synthetic Bicep fixtures with each fault, and the committed scaffold modules as the control that must pass",
+      "expected": "The policy rejects each fixture and accepts every committed module",
+      "requirements": ["SEC-001", "SEC-009", "BR-009"], "hardConstraints": ["HC-01", "HC-09", "HC-11"],
+      "runner": { "type": "eval-test", "file": "evaluation/checks/azure-contract.eval.mjs" },
+      "remediation": "Tighten the infrastructure policy so the fault is rejected"
+    },
+    {
       "id": "EVAL-PRD-FUN-001", "domain": "FUN", "scope": "production-agent", "severity": "high", "mode": "pending", "entry": false, "gate": "G4",
       "title": "Application unit, integration and API contract tests pass",
       "scenario": "Run the application test suites against the implemented services",
@@ -195,7 +213,7 @@
     {
       "id": "EVAL-PRC-AZR-001", "domain": "AZR", "scope": "production-contract", "severity": "critical", "mode": "executable", "entry": false, "gate": "G6", "requires": ["G5"],
       "title": "No deployment readiness blocker remains",
-      "scenario": "Run the readiness validator. It runs only when G5 has PASSed, because readiness must not be assessed before integration and agent evaluations pass. This is the intentionally blocked test of the Stage 10 demonstration",
+      "scenario": "Run the readiness validator. It now includes the twelve Azure deployment gates. It runs only when G5 has PASSed, because readiness must not be assessed before integration and agent evaluations pass. This is the intentionally blocked test of the Stage 10 demonstration",
       "expected": "The validator finds no blockers. This is a necessary condition only; approval of readiness remains a human decision",
       "requirements": ["BR-009", "AGT-006"], "hardConstraints": ["HC-11"],
       "runner": { "type": "command", "argv": ["node", "harness/scripts/spec-validators.mjs", "deployment-readiness"], "expect": { "exit": 0, "match": "NO-BLOCKERS-FOUND" } },
@@ -207,8 +225,8 @@
       "scenario": "Run Bicep build, what-if and policy validation on the reviewed template in a non-production scope",
       "expected": "No errors, no unreviewed change, no deletion in the what-if output",
       "requirements": ["BR-009", "NFR-003"], "hardConstraints": ["HC-11"],
-      "pendingReason": "No infrastructure code exists and none may be written before a design is approved",
-      "remediation": "Write and review the template after G2 and G3 pass"
+      "pendingReason": "Only a non-deployable scaffold exists (ADR 0014). No design is approved, no Azure sign-in is approved, and no what-if may run before they are",
+      "remediation": "After G2 and G3 pass and the sign-in is approved, replace the scaffold values through a reviewed change and run what-if in non-production"
     },
     {
       "id": "EVAL-PRD-PRF-001", "domain": "PRF", "scope": "production-agent", "severity": "high", "mode": "pending", "entry": false, "gate": "G6",

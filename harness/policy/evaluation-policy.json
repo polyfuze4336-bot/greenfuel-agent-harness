@@ -70,9 +70,15 @@
   },
   "commandAllowList": [
     "^node --test --test-reporter=tap( [A-Za-z0-9_][A-Za-z0-9_./-]*)+$",
-    "^node harness/scripts/(spec-validators|design-gate|validate-harness|validate-agents|validate-permissions|validate-orchestration|validate-memory|validate-loop|validate-tools|validate-architecture|validate-context|validate-evaluation)\\.mjs( [A-Za-z0-9_=:-][A-Za-z0-9_./=:-]*)*$"
+    "^node harness/scripts/(spec-validators|design-gate|validate-harness|validate-agents|validate-permissions|validate-orchestration|validate-memory|validate-loop|validate-tools|validate-architecture|validate-context|validate-evaluation|validate-azure)\\.mjs( [A-Za-z0-9_=:-][A-Za-z0-9_./=:-]*)*$"
   ],
   "commandNote": "No shell, no node options other than the TAP reporter, no network, a scrubbed environment (no NODE_OPTIONS). The runner only runs what the catalogue declares and the catalogue is a control-plane path.",
   "limits": { "timeoutSeconds": 600, "outputMaxBytes": 33554432, "outputTailBytes": 2000, "actualMax": 300 },
+  "ciRerun": {
+    "note": "CI re-runs the whole evaluation into a temporary folder and compares it with the latest committed full run. Any difference fails CI unless it is listed here by test ID with the exact status the re-run may report and a reason. Gates and hard-constraint verdicts are always compared.",
+    "allowedDifferences": [
+      { "id": "EVAL-HRN-FUN-004", "status": "BLOCKED", "reason": "The pinned TypeScript toolchain is not installed in CI, so the build-failure scenario is skipped. A skipped test is BLOCKED, never PASS. The pin is a SHA-1 value from the reviewing machine and a public install is not assumed to match it" }
+    ]
+  },
   "limitsNote": "Working values chosen by this design, not measured."
 }

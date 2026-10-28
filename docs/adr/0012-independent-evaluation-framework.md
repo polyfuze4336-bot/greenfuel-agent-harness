@@ -1,6 +1,6 @@
 # ADR 0012: Independent evaluation framework
 
-- **Status:** Proposed (awaiting the programme owner's decision)
+- **Status:** Accepted (2026-10-28, programme owner, by instruction in chat: "accept and document"; T29 decided in the same reply: CI re-runs the evaluation)
 - **Type:** Governance
 - **Date:** 2026-10-28
 - **Deciders:** Programme owner
@@ -20,13 +20,14 @@
 4. **A small deterministic engine over a data catalogue, with the runner executing only allow-listed commands, one evidence file per result, statuses re-derived from evidence, gates and hard constraints computed by rule, and a report generated from the run (chosen).**
 
 ## Decision
-Proposed. Adopt:
+Accepted. The owner also decided that CI re-runs the evaluation (T29). Adopt:
 - [eval.cjs](../../harness/eval/eval.cjs), [evaluation-policy.json](../../harness/policy/evaluation-policy.json), the human-run CLI [evaluate.mjs](../../harness/scripts/evaluate.mjs), and `validate-evaluation` in `npm run validate` and CI, as described in [EVALUATION-FRAMEWORK](../evaluation/EVALUATION-FRAMEWORK.md).
 - Four statuses: PASS (ran and showed its outcome), FAIL (including "could not show it ran"), BLOCKED (precondition unmet, or skipped), PENDING (the system does not exist). Only PASS counts, and only with evidence that it ran.
 - Gates G1 to G7 decided by rules, no score, a hard-constraint verdict printed above the gates, entry criteria that block every gate if a harness control test fails, and `requires` so a readiness check cannot run before the gates it depends on.
 - Three suites kept apart by ID prefix and enforced by validation: the coding harness, production candidate contracts, and production agents (all pending).
 - `evaluation/` and `docs/evaluation/` as control-plane paths, and no agent granted the evaluation runner, so an agent cannot edit a test or produce a result. Running the evaluation and committing its run and report are human steps.
 - A committed full run and a report that must equal what the latest run generates.
+- **CI re-runs the full evaluation** (`evaluate.mjs rerun`) on every push into a temporary folder, verifies it, and compares every test status, gate and hard-constraint verdict with the latest committed run. Any difference fails CI, except differences the policy lists by test ID with a reason. The one listed today is the TypeScript build scenario (`EVAL-HRN-FUN-004`), which CI reports BLOCKED because the pinned toolchain is not installed there; the pin is a SHA-1 value from the reviewing machine and cannot be assumed to match a public install. A CI re-run reproduces the committed record. It is not a signature and does not make the run tamper-proof.
 
 ## Consequences
 - The evaluation reports real gaps, and the first run did: DES-0001 is not approved (G2 fails), the candidate contracts accept an outdated emissions factor set and a manipulated timestamp (G3 fails, HC-08 is reported VIOLATED), and later gates are blocked. These findings are for the owner and the principal architect to decide; the framework does not fix them.

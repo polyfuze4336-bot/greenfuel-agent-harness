@@ -142,8 +142,10 @@ test('command allow-lists that permit dangerous commands are rejected', () => {
   has(mutated({ [POL]: policyEdit((p) => { p.agents['qa-engineer'].commands = ['^git .*$']; }) }), /permits a dangerous command/);
 });
 
-test('phase 0: an existing phase-1 product folder is rejected', () => {
-  has(mutated({ [agent('qa-engineer')]: (t) => t + '\n' }, (dir) => { cpSync(path.join(dir, 'docs'), path.join(dir, 'infra'), { recursive: true }); }), /phase-1 path 'infra\/' exists/);
+test('phase 0: an existing phase-1 product folder is rejected, while the marked infrastructure scaffold is the one allowed exception (ADR 0014)', () => {
+  has(mutated({ [agent('qa-engineer')]: (t) => t + '\n' }, (dir) => { rmSync(path.join(dir, 'infra'), { recursive: true, force: true }); cpSync(path.join(dir, 'docs'), path.join(dir, 'infra'), { recursive: true }); }), /phase-1 path 'infra\/' exists/);
+  assert.deepEqual(mutated({ [agent('qa-engineer')]: (t) => t + '\n' }, () => {}).filter((m) => /phase-1 path/.test(m)), [], 'the committed scaffold is accepted');
+  has(mutated({ [agent('qa-engineer')]: (t) => t + '\n' }, (dir) => { writeFileSync(path.join(dir, 'infra/main.bicep'), 'targetScope = \'resourceGroup\'\n'); }), /phase-1 path 'infra\/' exists/);
 });
 
 test('missing hook type and open-ended command patterns are rejected', () => {

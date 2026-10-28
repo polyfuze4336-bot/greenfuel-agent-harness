@@ -7,6 +7,7 @@
 //   evaluate.mjs verify --run EVRUN-x                             re-derive every status and gate from the recorded evidence
 //   evaluate.mjs report --run EVRUN-x [--write]                   render the report (--write: docs/evaluation/EVALUATION-REPORT.md)
 //   evaluate.mjs gates --run EVRUN-x                              print the gate table      evaluate.mjs list
+//   evaluate.mjs rerun                                            CI: re-run everything into a temp folder and compare with the latest committed run (exit 1 on any unlisted difference)
 import fs from 'node:fs';
 import path from 'node:path';
 import { createRequire } from 'node:module';
@@ -37,8 +38,11 @@ try {
       break;
     }
     case 'gates': { if (typeof flags.run !== 'string' || !/^EVRUN-[0-9a-f]{10}$/.test(flags.run)) usage('--run EVRUN-<10 hex> is required'); const v = ev.verifyRun(ctx, flags.run); if (!v.ok) { out({ ok: false, error: 'UNVERIFIED', problems: v.problems }); process.exit(1); } const run = JSON.parse(fs.readFileSync(path.join(ctx.runsDir, flags.run, 'run.json'), 'utf8')); out({ gates: run.gates, hardConstraints: run.hardConstraints.filter((h) => h.verdict !== 'NO TEST FAILED') }); break; }
+    case 'rerun': {
+      const r = ev.rerun(ctx); out(r); process.exit(r.ok ? 0 : 1); break;
+    }
     case 'list': out({ ok: true, runs: ev.listRuns(ctx) }); break;
-    default: usage('commands: validate run verify report gates list');
+    default: usage('commands: validate run verify report gates list rerun');
   }
 } catch (e) {
   if (e instanceof ev.EvalError) { out({ ok: false, error: e.code, message: e.message }); process.exit(2); }

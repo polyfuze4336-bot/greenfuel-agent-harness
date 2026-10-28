@@ -1,0 +1,52 @@
+{
+  "kind": "decision",
+  "title": "Evaluation findings, effective periods, timestamp rules and the unapproved design",
+  "statement": "Evaluation findings, effective periods, timestamp rules and the unapproved design",
+  "body": "Accepted. The best course is to decide the rules, keep the tests as they are, and implement under R16: 1. **Effective periods.** Every emissions methodology version and every reference-data item (factor set, default value table, conversion table) carries `effectiveFrom` and `effectiveTo` as UTC times. An open end is allowed only when `openEnded` is true and a person recorded why. A calculation is rejected unless the trusted time of the delivery it covers lies inside the effective period of the methodology version and of every reference-data item it uses. A change in a factor or a period is a new version with a new definition hash, never an edit in place. Which periods a scheme actually prescribes is for the maritime-domain agent and the verifier of D-002 to supply as cited values; the contract never supplies one. 2. **Timestamps.** Every raw record carries `trustedTime` with the identifier of its clock source, and `receivedAt`, the time the receiving component accepted it. Rules: within one source, `trustedTime` does not decrease as `sequence` increases; `trustedTime` is not later than `receivedAt` plus a declared maximum skew; a record that breaks either rule is quarantined as an evidence-integrity finding with both values kept, and is never corrected or dropped. The maximum skew is a required parameter with no default, to be set by the maritime-domain and edge design from the equipment's clock specification. An offline edge device stamps `receivedAt` from its own clock and records its last synchronisation, so a drifted clock is visible rather than trusted. 3. **DES-0001 stays Blocked.** The design review gate is correct to block it. G2 will not pass until the owner answers or defers the open decisions with named deciders (T2, T3). No test, gate or review status is changed to make it pass. 4. **Implementation.** Roadmap R16 implements points 1 and 2 in the candidate contracts, fixtures and mutation tests, and re-runs the evaluation. `EVAL-PRC-DAT-005` and `EVAL-PRC-DAT-006` keep failing until it lands. R16 comes before any sibling design that depends on lineage or methodology (R13) is submitted for review. 5. **Targets (T28).** The owner agreed that no response-time, volume, recovery, cost or budget figure is invented. The pending performance, operations, cost and recovery tests stay pending until a requirement supplies a sourced target. Each must come from a stakeholder or a cited document.",
+  "refs": [
+    "ADR-0013",
+    "HC-08",
+    "HC-05",
+    "D-001",
+    "D-002",
+    "file:docs/adr/0013-evaluation-findings-effective-periods-and-timestamps.md"
+  ],
+  "subject": "adr.0013",
+  "position": "accepted",
+  "tags": [
+    "adr"
+  ],
+  "owner": "programme-owner",
+  "critical": false,
+  "provenance": {
+    "evidence": [],
+    "source": "adr",
+    "ref": "file:docs/adr/0013-evaluation-findings-effective-periods-and-timestamps.md",
+    "sourceSha256": "7d30aa6e39c13d59745f5b208f8bd1ed9daf488b906af49138c9f1675d70506d",
+    "trust": "authoritative",
+    "recordedBy": {
+      "type": "importer",
+      "name": "import-adr"
+    }
+  },
+  "approval": {
+    "by": "programme-owner",
+    "at": "2026-10-28T00:00:00.000Z",
+    "ref": "ADR-0013"
+  },
+  "validity": {
+    "supersedes": [],
+    "supersededBy": null,
+    "validUntil": null,
+    "reviewBy": null,
+    "status": "approved",
+    "validFrom": "2026-10-28T14:23:02.295Z"
+  },
+  "schema": "greenfuel.memory/v1",
+  "category": "semantic",
+  "createdAt": "2026-10-28T14:23:02.295Z",
+  "updatedAt": "2026-10-28T14:23:02.295Z",
+  "classification": "internal",
+  "review": null,
+  "id": "DEC-0013"
+}

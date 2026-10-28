@@ -1,0 +1,28 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "environment": { "value": "dev" },
+    "jurisdictionCode": { "value": "REQUIRES-APPROVAL" },
+    "location": { "value": "REQUIRES-APPROVAL" },
+    "deploymentApproved": { "value": "REQUIRES-APPROVAL" },
+    "approvalReference": { "value": "REQUIRES-APPROVAL" },
+    "tags": { "value": "REQUIRES-APPROVAL" },
+    "logRetentionInDays": { "value": "REQUIRES-APPROVAL" },
+    "logIngestionNetworkAccess": { "value": "REQUIRES-APPROVAL" },
+    "storageSku": { "value": "REQUIRES-APPROVAL" },
+    "serviceBusSku": { "value": "REQUIRES-APPROVAL" },
+    "serviceBusCapacity": { "value": "REQUIRES-APPROVAL" },
+    "serviceBusZoneRedundant": { "value": "REQUIRES-APPROVAL" },
+    "postgresSkuName": { "value": "REQUIRES-APPROVAL" },
+    "postgresSkuTier": { "value": "REQUIRES-APPROVAL" },
+    "postgresStorageSizeGB": { "value": "REQUIRES-APPROVAL" },
+    "postgresHighAvailabilityMode": { "value": "REQUIRES-APPROVAL" },
+    "postgresVersion": { "value": "REQUIRES-APPROVAL" },
+    "containerAppsSubnetId": { "value": "REQUIRES-APPROVAL" },
+    "allowedLocations": { "value": "REQUIRES-APPROVAL" },
+    "budgetAmount": { "value": "REQUIRES-APPROVAL" },
+    "budgetContactEmails": { "value": "REQUIRES-APPROVAL" },
+    "budgetStartDate": { "value": "REQUIRES-APPROVAL" }
+  }
+}

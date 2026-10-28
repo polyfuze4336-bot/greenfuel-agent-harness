@@ -74,6 +74,24 @@ function check(root, fail) {
   const pkg = j(root, 'package.json');
   if (!/validate-evaluation|validate-harness|npm run validate/.test(JSON.stringify(pkg.scripts))) fail('package.json must run the evaluation validator');
 
+  // CI re-run: the tolerated differences are few, named, reasoned, and can never excuse a failure or a control test
+  const rr = P.ciRerun?.allowedDifferences;
+  if (!Array.isArray(rr)) fail('policy ciRerun.allowedDifferences must be a list (it may be empty): CI re-runs the evaluation and compares it with the committed run');
+  else {
+    const entryIds = new Set(cat.tests.filter((t) => t.entry).map((t) => t.id));
+    for (const a of rr) {
+      const t = cat.tests.find((x) => x.id === a.id);
+      if (!t) fail(`ciRerun: ${a.id} is not a catalogue test`);
+      else if (t.entry || (t.hardConstraints ?? []).length) fail(`ciRerun: ${a.id} guards a control or a hard constraint and cannot be a tolerated difference`);
+      if (a.status !== 'BLOCKED') fail(`ciRerun: ${a.id} may only differ as BLOCKED (a skipped test), never PASS, FAIL or PENDING`);
+      if (typeof a.reason !== 'string' || a.reason.trim().length < 25) fail(`ciRerun: ${a.id} needs a reason of 25 characters or more`);
+      if (entryIds.has(a.id)) fail(`ciRerun: ${a.id} is an entry test`);
+    }
+    if (rr.length > 3) fail('ciRerun: more than three tolerated differences: the re-run no longer reproduces the committed run');
+  }
+  const wf = has(root, '.github/workflows/validate.yml') ? readFileSync(path.join(root, '.github/workflows/validate.yml'), 'utf8') : '';
+  if (!/evaluate\.mjs rerun/.test(wf)) fail('.github/workflows/validate.yml must run evaluate.mjs rerun so CI re-runs the evaluation and compares it with the committed run');
+
   // documents
   for (const [f, topics] of Object.entries(DOC_TOPICS)) {
     if (!has(root, f)) continue;

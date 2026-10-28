@@ -175,11 +175,19 @@ test('EVAL-HRN-DAT-003: the framework never reports PASS for a test that did not
   assert.equal(s(suite, null), 'FAIL');
 });
 
-test('EVAL-HRN-AZR-002: no Azure resource, infrastructure code or deployment configuration exists, and the harness is still in Phase 0', () => {
+test('EVAL-HRN-AZR-002: the only infrastructure code is the non-deployable scaffold: no deployment configuration, no deploying workflow, no deployable parameter value, and the phase is still 0', () => {
   assert.equal(readJson('harness/policy/command-policy.json').phase, 0);
   const files = execFileSync('git', ['ls-files'], { cwd: ROOT, encoding: 'utf8' }).split('\n').filter(Boolean);
-  const iac = files.filter((f) => /\.(bicep|bicepparam|tf|tfvars)$/.test(f) || /(^|\/)azure\.yaml$/.test(f) || /^infra\//.test(f));
-  assert.deepEqual(iac, []);
+  assert.deepEqual(files.filter((f) => /\.(bicepparam|tf|tfvars)$/.test(f) || /(^|\/)azure\.yaml$/.test(f) || /^\.azure\//.test(f)), [], 'no deployment configuration or other infrastructure language');
+  assert.deepEqual(files.filter((f) => /\.bicep$/.test(f) && !f.startsWith('infra/')), [], 'Bicep exists only under infra/');
+  assert.match(fs.readFileSync(path.join(ROOT, 'infra/main.bicep'), 'utf8'), /SCAFFOLD, NOT DEPLOYABLE/);
+  for (const env of ['dev', 'test', 'prod']) {
+    const params = readJson(`infra/params/${env}.parameters.json`).parameters;
+    for (const [k, v] of Object.entries(params)) if (k !== 'environment') assert.equal(v.value, 'REQUIRES-APPROVAL', `${env}.${k} must not carry a deployable value`);
+  }
+  for (const f of files.filter((x) => x.startsWith('.github/workflows/'))) {
+    assert.ok(!/azure\/login|az\s+(login|deployment|group)|azd\s+(up|deploy|provision)|secrets\.AZURE|id-token:\s*write|what-if/i.test(fs.readFileSync(path.join(ROOT, f), 'utf8')), `${f} must not sign in to Azure or deploy`);
+  }
 });
 
 test('EVAL-HRN-AZR-003: only the local read-only tool server and Microsoft Learn are configured; no Azure or GitHub MCP server is configured or authenticated', () => {

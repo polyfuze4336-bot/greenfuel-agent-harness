@@ -1,0 +1,5 @@
+// Azure Resource Graph, READ ONLY. Policy assignments and resource locks in scope, to learn which guardrails already exist before any
+// reuse decision. An existing resource is reused only after ownership, security, region and compatibility checks (docs/azure/RESOURCE-INVENTORY.md).
+policyresources
+| where type =~ 'microsoft.authorization/policyassignments'
+| project subscriptionId, name, displayName = tostring(properties.displayName), scope = tostring(properties.scope), enforcementMode = tostring(properties.enforcementMode)

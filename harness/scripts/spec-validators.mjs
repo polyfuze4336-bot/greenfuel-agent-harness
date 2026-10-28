@@ -16,6 +16,7 @@ import { loadContext, validateContext, rowsOf, hasContext } from './validate-con
 import { validateArchitecture } from './validate-architecture.mjs';
 import { validateAgents } from './validate-agents.mjs';
 import { validateTools } from './validate-tools.mjs';
+import { azureBlockers } from './validate-azure.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const REPO = path.resolve(HERE, '..', '..');
@@ -362,6 +363,7 @@ function readiness(root) {
   if (phase < 1) b('Phase 0: application code, infrastructure and Azure changes are not permitted; raising the phase is a human decision recorded in an ADR');
   const hasIac = existsSync(path.join(root, 'infra')) || walk(root).some((f) => /\.(bicep|bicepparam|tf)$/.test(f));
   if (!hasIac) b('No infrastructure specification exists');
+  else if (existsSync(path.join(root, 'infra/main.bicep')) && /SCAFFOLD, NOT DEPLOYABLE/.test(readFileSync(path.join(root, 'infra/main.bicep'), 'utf8'))) b('The only infrastructure is a non-deployable scaffold (ADR 0014): it has no approved design, no real parameter values and no what-if');
   const dir = path.join(root, 'docs/architecture/reviews');
   const reviews = existsSync(dir) ? readdirSync(dir).filter((f) => f.endsWith('.md')) : [];
   const approved = reviews.filter((f) => /^- \*\*Status:\*\*\s*Approved\b/mi.test(readFileSync(path.join(dir, f), 'utf8')));
@@ -379,6 +381,7 @@ function readiness(root) {
   } catch { /* no TODO file: nothing to report */ }
   const toolErrors = validateTools(root);
   if (toolErrors.length) b(`The tool configuration has ${toolErrors.length} problem(s)`);
+  for (const x of azureBlockers(root)) b(`[${x.gate}] ${x.msg}`);
   const status = blockers.length ? 'NOT-READY' : 'NO-BLOCKERS-FOUND';
   return result('deployment-readiness', 1, blockers, [
     'Checks the preconditions recorded in the specifications. It tests no application and cannot show that anything is ready.',
