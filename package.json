@@ -19,6 +19,8 @@
     "validate:orchestration": "node harness/scripts/validate-orchestration.mjs",
     "validate:memory": "node harness/scripts/validate-memory.mjs",
     "validate:loop": "node harness/scripts/validate-loop.mjs",
+    "validate:evaluation": "node harness/scripts/validate-evaluation.mjs",
+    "evaluate": "node harness/scripts/evaluate.mjs",
     "loop": "node harness/scripts/loop.mjs",
     "memory": "node harness/scripts/memory.mjs",
     "tasks": "node harness/scripts/tasks.mjs",

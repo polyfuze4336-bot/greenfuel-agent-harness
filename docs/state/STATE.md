@@ -69,7 +69,7 @@ Phase 0. Baseline v0.1 is **approved** (ADR 0003); the 37 decisions stay open, d
 4. Finish R1 in VS Code and the VS Code tool checks (T12, T18); run R11, R12.
 5. Done: the demonstration run was closed (T19) and the framework limits confirmed (T20).
 6. T23 stays open until T13: then implement signed approvals for memory (roadmap R14).
-7. Done: ADR 0011 accepted, working values and toolchain acknowledged (T25), and qa-engineer allowed to run loop status, erify and erify-store (T24). Open: whether CI should install the TypeScript toolchain.
+7. Done: ADR 0011 accepted, working values and toolchain acknowledged (T25), and qa-engineer allowed to run loop status, verify and verify-store (T24). Open: whether CI should install the TypeScript toolchain.
 
 ## Open approvals
 - none for memory (ADR 0010 Accepted)

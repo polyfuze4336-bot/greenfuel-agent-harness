@@ -25,4 +25,5 @@ jobs:
       - run: node harness/scripts/validate-orchestration.mjs
       - run: node harness/scripts/validate-memory.mjs
       - run: node harness/scripts/validate-loop.mjs
+      - run: node harness/scripts/validate-evaluation.mjs
       - run: node --test

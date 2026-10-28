@@ -27,6 +27,15 @@ Owner-facing list of pending answers and approvals. Items are removed only when 
 |---|---|---|---|
 | T23 | **Decided 2026-10-28 (architect, on the owner's instruction).** Interim: owner reviews every change to `memory/` and `docs/adr/` in the diff before it is pushed. Target: signed approvals for approve, supersede and invalidate once approvers are registered (roadmap R14). Open until T13 is done | [ADR 0010](../adr/0010-persistent-memory.md), [MEMORY-GOVERNANCE](../memory/MEMORY-GOVERNANCE.md) limits | Memory approvals being more than procedure |
 
+## Awaiting the owner (evaluation stage, 2026-10-28)
+
+| # | Item | Source | Blocks |
+|---|---|---|---|
+| T26 | Accept or change ADR 0012 (independent evaluation framework). It is Proposed | [ADR 0012](../adr/0012-independent-evaluation-framework.md) | Treating the framework as approved |
+| T27 | Decide the three findings the evaluation reported, with the principal architect: an effective period for emissions methodology and reference data (EVAL-PRC-DAT-005), time-order and plausibility rules with a trusted-time source for sensor timestamps (EVAL-PRC-DAT-006, which makes HC-08 report VIOLATED), and DES-0001 not being Approved (G2, which waits on T2 and T3). Roadmap R16 | [EVALUATION-REPORT](../evaluation/EVALUATION-REPORT.md), [IMPLEMENTATION-ROADMAP](../harness/IMPLEMENTATION-ROADMAP.md) | G2 and G3 passing; every later gate |
+| T28 | Agree targets and budgets so the pending tests can become executable: response times and volumes (NFR-014, NFR-015), recovery objectives, a cost budget, and a hook-latency or suite-time budget for the harness. No figure has been invented | [EVALUATION-FRAMEWORK](../evaluation/EVALUATION-FRAMEWORK.md) | Performance, operations, cost and recovery evaluations |
+| T29 | Decide whether CI should re-run the evaluation. Today CI verifies that the committed run and report are consistent and that every status follows from its evidence; it does not re-run the tests. A re-run in CI would need the pinned TypeScript toolchain (also undecided) | [EVALUATION-FRAMEWORK](../evaluation/EVALUATION-FRAMEWORK.md) limits | CI independently reproducing the evaluation |
+
 ## Decisions made
 
 | Date | Decision | Recorded in |
@@ -45,4 +54,4 @@ Owner-facing list of pending answers and approvals. Items are removed only when 
 | 2026-10-28 | Permission model accepted (ADR 0008) and pushed; CI succeeded on 3a3fcdf. Task-execution framework built and demonstrated; ADR 0009 is Proposed | [ADR 0009](../adr/0009-task-execution-framework.md) |
 | 2026-10-28 | Task-execution framework accepted (ADR 0009 Accepted); commits pushed. T18: owner reports the hook and tools were verified in VS Code chat (recorded as owner-reported, not observed by the assistant). T19: the owner accepted the critic's REWORK as the outcome of the demonstration run, which was closed (event 45); the proposal stays an unapproved draft. T20: the framework limits were confirmed as working values | [ADR 0009](../adr/0009-task-execution-framework.md), [DEMO-EVIDENCE-STORE](../orchestration/DEMO-EVIDENCE-STORE.md) |
 | 2026-10-28 | Persistent memory accepted (ADR 0010 Accepted); its memory entry approved by the importer. T22: memory working values confirmed (not measured). T23: decided by the architect on the owner's instruction (interim procedure; signed approvals after T13, roadmap R14). Memory commits pushed | [ADR 0010](../adr/0010-persistent-memory.md) |
-| 2026-10-28 | Repair loop accepted (ADR 0011 Accepted); T25: toolchain install acknowledged, loop working values confirmed (CI keeps skipping the TypeScript scenario; installing it in CI was not decided). T24: allowed, narrowly: qa-engineer may run loop status, erify and erify-store; everything else stays human-run. Loop commits pushed | [ADR 0011](../adr/0011-bounded-repair-loop.md) |
+| 2026-10-28 | Repair loop accepted (ADR 0011 Accepted); T25: toolchain install acknowledged, loop working values confirmed (CI keeps skipping the TypeScript scenario; installing it in CI was not decided). T24: allowed, narrowly: qa-engineer may run loop status, verify and verify-store; everything else stays human-run. Loop commits pushed | [ADR 0011](../adr/0011-bounded-repair-loop.md) |

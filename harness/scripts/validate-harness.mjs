@@ -12,6 +12,7 @@ import { validatePermissions } from './validate-permissions.mjs';
 import { validateOrchestration } from './validate-orchestration.mjs';
 import { validateMemory } from './validate-memory.mjs';
 import { validateLoop } from './validate-loop.mjs';
+import { validateEvaluation } from './validate-evaluation.mjs';
 
 export const PILLARS = [
   'Context & Instructions',
@@ -41,6 +42,8 @@ const REQUIRED = [
   'docs/orchestration/ORCHESTRATION.md', 'docs/orchestration/TASK-CONTRACT.md', 'docs/orchestration/templates/EXAMPLE-PLAN.json',
   'harness/policy/memory-policy.json', 'harness/memory/store.cjs', 'harness/scripts/memory.mjs', 'harness/scripts/validate-memory.mjs', 'memory/README.md', 'docs/memory/MEMORY-MODEL.md', 'docs/memory/MEMORY-GOVERNANCE.md',
   'harness/policy/loop-policy.json', 'harness/loop/loop.cjs', 'harness/scripts/loop.mjs', 'harness/scripts/validate-loop.mjs', 'docs/loop/LOOP.md', 'docs/loop/LOOP-VALIDATION-REPORT.md',
+  'harness/policy/evaluation-policy.json', 'harness/eval/eval.cjs', 'harness/scripts/evaluate.mjs', 'harness/scripts/validate-evaluation.mjs', 'evaluation/catalogue/harness.json', 'evaluation/catalogue/production.json',
+  'evaluation/checks/harness.eval.mjs', 'evaluation/checks/production-contract.eval.mjs', 'docs/evaluation/EVALUATION-FRAMEWORK.md', 'docs/evaluation/EVALUATION-REPORT.md',
   ...['PERMISSION-MODEL', 'APPROVAL-WORKFLOWS', 'BREAK-GLASS', 'SECRETS-HANDLING', 'ENFORCEMENT-STATUS', 'DENIED-ACTION-AUDIT', 'NEGATIVE-TESTS'].map((n) => `docs/security/${n}.md`),
 ];
 const SKIP_DIRS = new Set(['.git', 'node_modules', '.harness-logs']);
@@ -164,7 +167,7 @@ export function validate(root) {
     for (const p of PILLARS) if (!text.includes(p)) fail('pillars', `${doc}: pillar '${p}' not represented`);
   }
 
-  return [...errors, ...validateContext(root), ...validateArchitecture(root), ...validateAgents(root), ...validateTools(root), ...validatePermissions(root), ...validateOrchestration(root), ...validateMemory(root), ...validateLoop(root)];
+  return [...errors, ...validateContext(root), ...validateArchitecture(root), ...validateAgents(root), ...validateTools(root), ...validatePermissions(root), ...validateOrchestration(root), ...validateMemory(root), ...validateLoop(root), ...validateEvaluation(root)];
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

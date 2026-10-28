@@ -350,8 +350,8 @@ function writeAudit(model, event, decision, extra = {}) {
     const rec = {
       schema: model.perm.audit.schema, seq, ts: (extra.now ?? new Date()).toISOString(), session: event.sessionId ?? null, agent: extra.agent ?? null, mode: decision.mode,
       tool: String(event.toolName ?? event.tool_name ?? ''), operations: decision.operations?.map((o) => o.op) ?? [], tier: decision.tier ?? null, environment: decision.environment ?? null,
-      decision: 'deny', rules: decision.rules ?? [], reason: String(decision.reasons?.[0] ?? extra.reason ?? '').slice(0, 300),
-      paths: (decision.targets ?? []).slice(0, 5).map((t) => t.rel), scope: decision.scope ?? null, argsSha256: sha256(args), argsPreview: secretTarget ? '[withheld: secret path]' : redact(args).slice(0, 160),
+      decision: 'deny', rules: decision.rules ?? [], reason: redact(String(decision.reasons?.[0] ?? extra.reason ?? '')).slice(0, 300),
+      paths: (decision.targets ?? []).slice(0, 5).map((t) => redact(t.rel)), scope: decision.scope ?? null, argsSha256: sha256(args), argsPreview: secretTarget ? '[withheld: secret path]' : redact(args).slice(0, 160),
       approvals: decision.approvals ?? [], unchained: locked ? undefined : true, prevHash: locked ? prev : null,
     };
     rec.hash = sha256(canonical({ ...rec, hash: undefined }));
