@@ -1,0 +1,23 @@
+{
+  "id": "EV-0020",
+  "claim": "Deployment-readiness utility reports NOT-READY (exit 2) with its blockers; nothing is deployable",
+  "argv": [
+    "node",
+    "harness/scripts/spec-validators.mjs",
+    "deployment-readiness"
+  ],
+  "exitCode": 2,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-28T09:03:34.465Z",
+  "durationMs": 244,
+  "outputSha256": "baa3fe3f1f13f4177fe463113c76a95999e0827843f1bee1155bf4e8439b0b4e",
+  "outputBytes": 785,
+  "outputTail": "deployment-readiness: NOT-READY (1 item(s) checked)\n  - Phase 0: application code, infrastructure and Azure changes are not permitted; raising the phase is a human decision recorded in an ADR\n  - No infrastructure specification exists\n  - No design review has status Approved (1 review record(s) exist)\n  - 17 milestone-1 decisions are still open: D-001, D-002, D-003, D-004, D-005, D-006, D-007, D-008, D-009, D-012, D-015, D-019, D-020, D-022, D-023, D-024, D-034\n  - No human decider is named (TODO T3), so nothing can be approved\n  note: Checks the preconditions recorded in the specifications. It tests no application and cannot show that anything is ready.\n  note: Deployment is a human-run action (HC-11). No result here authorises it, and NO-BLOCKERS-FOUND is not an approval.\n",
+  "gitHead": "5f9ba584eedb5a90bd15e9830cd20112a4ed1b9b",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}

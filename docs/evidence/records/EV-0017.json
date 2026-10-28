@@ -1,0 +1,22 @@
+{
+  "id": "EV-0017",
+  "claim": "Full test suite passes on the tool-layer commit",
+  "argv": [
+    "npm",
+    "test"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-28T09:02:55.234Z",
+  "durationMs": 37533,
+  "outputSha256": "d16b1acd9653449e054e5e32368153ea7b08db55b2d3ab56a2b0e4196bfdf255",
+  "outputBytes": 45918,
+  "outputTail": "qual the registry, no loader variables, no undeclared properties\nok 223 - candidates: env must equal the registry, no loader variables, no undeclared properties\n  ---\n  duration_ms: 397.7735\n  type: 'test'\n  ...\n# Subtest: servers whose names collide after normalisation are rejected\nok 224 - servers whose names collide after normalisation are rejected\n  ---\n  duration_ms: 483.4239\n  type: 'test'\n  ...\n# Subtest: candidates: exactly the pending servers, matching the registry, never carrying credentials\nok 225 - candidates: exactly the pending servers, matching the registry, never carrying credentials\n  ---\n  duration_ms: 1115.0508\n  type: 'test'\n  ...\n# Subtest: agent grants: exact server/tool names, enabled tools only, privilege by class, external only with web access\nok 226 - agent grants: exact server/tool names, enabled tools only, privilege by class, external only with web access\n  ---\n  duration_ms: 870.3251\n  type: 'test'\n  ...\n# Subtest: agent grants: web hosts in the registry and policy must agree and be plain hosts\nok 227 - agent grants: web hosts in the registry and policy must agree and be plain hosts\n  ---\n  duration_ms: 533.591\n  type: 'test'\n  ...\n# Subtest: hook, log ignore and generated documents are enforced\nok 228 - hook, log ignore and generated documents are enforced\n  ---\n  duration_ms: 1068.3012\n  type: 'test'\n  ...\n# Subtest: generated tables: complete, free of pipes inside cells, and idempotent under --write\nok 229 - generated tables: complete, free of pipes inside cells, and idempotent under --write\n  ---\n  duration_ms: 336.1635\n  type: 'test'\n  ...\n# Subtest: helpers: grants resolve by alias, command substring and MCP name; server tool lists derive from enabled tools\nok 230 - helpers: grants resolve by alias, command substring and MCP name; server tool lists derive from enabled tools\n  ---\n  duration_ms: 2.2332\n  type: 'test'\n  ...\n1..230\n# tests 230\n# suites 0\n# pass 230\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 37100.9467\n",
+  "gitHead": "5f9ba584eedb5a90bd15e9830cd20112a4ed1b9b",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}
