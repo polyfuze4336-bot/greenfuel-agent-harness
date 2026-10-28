@@ -1,0 +1,30 @@
+{
+  "schema": "greenfuel.eval-evidence/v1",
+  "testId": "EVAL-HRN-FUN-002",
+  "ran": true,
+  "argv": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/memory.test.mjs",
+    "tests/validate-memory.test.mjs"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-28T15:10:54.586Z",
+  "durationMs": 143497,
+  "outputSha256": "281133b86b1c72d7fb06433db74e089be20f2ec146e39f65f8b8b6c90cf38834",
+  "outputBytes": 14785,
+  "outputTail": "emory_resume are listed as read-only tools and never write\n  ---\n  duration_ms: 1711.707\n  type: 'test'\n  ...\n# Subtest: memory_search returns approved constraints and decisions first, with status, trust and a data-not-instructions note\nok 61 - memory_search returns approved constraints and decisions first, with status, trust and a data-not-instructions note\n  ---\n  duration_ms: 4572.6812\n  type: 'test'\n  ...\n# Subtest: the memory tools refuse malformed arguments\nok 62 - the memory tools refuse malformed arguments\n  ---\n  duration_ms: 1.7191\n  type: 'test'\n  ...\n# Subtest: memory files are a control-plane path: no agent may edit them, and no agent may run the memory CLI\nok 63 - memory files are a control-plane path: no agent may edit them, and no agent may run the memory CLI\n  ---\n  duration_ms: 5268.0994\n  type: 'test'\n  ...\n# Subtest: an agent cannot bypass the block by delegating: the denial depends on the acting agent, and every agent is denied\nok 64 - an agent cannot bypass the block by delegating: the denial depends on the acting agent, and every agent is denied\n  ---\n  duration_ms: 0.927\n  type: 'test'\n  ...\n# Subtest: the CLI needs a named writer for every write, and the writer type decides what is accepted\nok 65 - the CLI needs a named writer for every write, and the writer type decides what is accepted\n  ---\n  duration_ms: 972.8571\n  type: 'test'\n  ...\n# Subtest: a whole-folder rollback or rewrite of the memory ledger is detected against Git, a legitimate append is not\nok 66 - a whole-folder rollback or rewrite of the memory ledger is detected against Git, a legitimate append is not\n  ---\n  duration_ms: 1088.3853\n  type: 'test'\n  ...\n# Subtest: memory_resume lists only active or interrupted tasks that have not expired\nok 67 - memory_resume lists only active or interrupted tasks that have not expired\n  ---\n  duration_ms: 214.7376\n  type: 'test'\n  ...\n1..67\n# tests 67\n# suites 0\n# pass 67\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 143378.3703\n",
+  "parsed": {
+    "tests": 67,
+    "pass": 67,
+    "fail": 0,
+    "skipped": 0,
+    "todo": 0,
+    "cancelled": 0
+  },
+  "status": "PASS",
+  "actual": "ran and passed: 67 tests, 0 failed, 0 skipped"
+}

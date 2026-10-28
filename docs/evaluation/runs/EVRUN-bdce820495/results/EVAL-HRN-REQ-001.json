@@ -1,0 +1,21 @@
+{
+  "schema": "greenfuel.eval-evidence/v1",
+  "testId": "EVAL-HRN-REQ-001",
+  "ran": true,
+  "argv": [
+    "node",
+    "harness/scripts/spec-validators.mjs",
+    "requirements"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-28T15:05:58.704Z",
+  "durationMs": 253,
+  "outputSha256": "fcde8f5b478bf63991f3da03277fa57784ae0b6661e9e508a93ed7b266a7a42d",
+  "outputBytes": 136,
+  "outputTail": "requirements: PASS (1 item(s) checked)\n  note: Checks documents and configuration in this repository; there is no application to check.\n",
+  "matched": true,
+  "status": "PASS",
+  "actual": "ran and passed: exit 0, output contained /requirements: PASS/"
+}

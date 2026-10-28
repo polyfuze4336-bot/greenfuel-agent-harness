@@ -1,0 +1,7 @@
+{
+  "schema": "greenfuel.eval-evidence/v1",
+  "testId": "EVAL-PRD-AZR-002",
+  "ran": false,
+  "status": "PENDING",
+  "actual": "Not run: Only a non-deployable scaffold exists (ADR 0014). No design is approved, no Azure sign-in is approved, and no what-if may run before they are"
+}

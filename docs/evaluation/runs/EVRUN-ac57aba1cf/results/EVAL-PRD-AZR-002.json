@@ -1,7 +1,0 @@
-{
-  "schema": "greenfuel.eval-evidence/v1",
-  "testId": "EVAL-PRD-AZR-002",
-  "ran": false,
-  "status": "PENDING",
-  "actual": "Not run: No infrastructure code exists and none may be written before a design is approved"
-}

@@ -1,0 +1,32 @@
+{
+  "schema": "greenfuel.eval-evidence/v1",
+  "testId": "EVAL-HRN-SEC-006",
+  "ran": true,
+  "argv": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/permissions-engine.test.mjs",
+    "tests/approvals.test.mjs",
+    "tests/policy-guard.test.mjs",
+    "tests/agent-guard.test.mjs"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-28T15:15:35.528Z",
+  "durationMs": 4455,
+  "outputSha256": "2563e29eb1907462d2bd4f6f943ec828e6d6311ce2505c288b0882d209c56e65",
+  "outputBytes": 16885,
+  "outputTail": "denied\nok 89 - policy: pem read denied\n  ---\n  duration_ms: 12.1265\n  type: 'test'\n  ...\n# Subtest: policy: shell cat of .env denied\nok 90 - policy: shell cat of .env denied\n  ---\n  duration_ms: 12.4599\n  type: 'test'\n  ...\n# Subtest: policy: azure mcp mutation\nok 91 - policy: azure mcp mutation\n  ---\n  duration_ms: 13.2597\n  type: 'test'\n  ...\n# Subtest: policy: azure mcp read\nok 92 - policy: azure mcp read\n  ---\n  duration_ms: 13.5893\n  type: 'test'\n  ...\n# Subtest: policy: unrelated tool\nok 93 - policy: unrelated tool\n  ---\n  duration_ms: 11.0595\n  type: 'test'\n  ...\n# Subtest: policy: VS Code snake_case payload\nok 94 - policy: VS Code snake_case payload\n  ---\n  duration_ms: 13.1822\n  type: 'test'\n  ...\n# Subtest: policy: toolArgs as JSON string\nok 95 - policy: toolArgs as JSON string\n  ---\n  duration_ms: 13.2445\n  type: 'test'\n  ...\n# Subtest: policy: deny outranks ask\nok 96 - policy: deny outranks ask\n  ---\n  duration_ms: 13.4444\n  type: 'test'\n  ...\n# Subtest: policy: missing tool name fails closed\nok 97 - policy: missing tool name fails closed\n  ---\n  duration_ms: 0.0986\n  type: 'test'\n  ...\n# Subtest: policy: phase gate lifts only when policy phase is raised\nok 98 - policy: phase gate lifts only when policy phase is raised\n  ---\n  duration_ms: 13.482\n  type: 'test'\n  ...\n# Subtest: hook process: deny emits the documented JSON shape and exit 0\nok 99 - hook process: deny emits the documented JSON shape and exit 0\n  ---\n  duration_ms: 138.2653\n  type: 'test'\n  ...\n# Subtest: hook process: no match emits {} (no decision, never an implicit allow)\nok 100 - hook process: no match emits {} (no decision, never an implicit allow)\n  ---\n  duration_ms: 105.9517\n  type: 'test'\n  ...\n# Subtest: hook process: unparseable input fails closed with exit 2\nok 101 - hook process: unparseable input fails closed with exit 2\n  ---\n  duration_ms: 69.4044\n  type: 'test'\n  ...\n1..101\n# tests 101\n# suites 0\n# pass 101\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 4325.6774\n",
+  "parsed": {
+    "tests": 101,
+    "pass": 101,
+    "fail": 0,
+    "skipped": 0,
+    "todo": 0,
+    "cancelled": 0
+  },
+  "status": "PASS",
+  "actual": "ran and passed: 101 tests, 0 failed, 0 skipped"
+}

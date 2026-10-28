@@ -49,7 +49,7 @@ const REQUIRED = [
   ...['AZURE-REFERENCE-ARCHITECTURE', 'REGIONAL-AVAILABILITY', 'SOVEREIGNTY-DEPLOYMENT-MATRIX', 'DEPLOYMENT-STRATEGY', 'RESOURCE-INVENTORY', 'COST-AND-CAPACITY', 'OPERATIONS-AND-DR', 'AZURE-READINESS-ASSESSMENT'].map((n) => `docs/azure/${n}.md`),
   ...['PERMISSION-MODEL', 'APPROVAL-WORKFLOWS', 'BREAK-GLASS', 'SECRETS-HANDLING', 'ENFORCEMENT-STATUS', 'DENIED-ACTION-AUDIT', 'NEGATIVE-TESTS'].map((n) => `docs/security/${n}.md`),
 ];
-const SKIP_DIRS = new Set(['.git', 'node_modules', '.harness-logs']);
+const SKIP_DIRS = new Set(['.git', 'node_modules', '.harness-logs', '.harness-work', '.harness-toolchain']);
 const FALLBACK_SECRET_PATTERNS = ['-----BEGIN [A-Z ]*PRIVATE KEY-----', 'AccountKey=[A-Za-z0-9+/=]{20,}', '\\bghp_[A-Za-z0-9]{30,}', '\\bgithub_pat_[A-Za-z0-9_]{30,}'];
 
 // One list for the repository scan, the MCP configuration check and the output hook: harness/policy/secret-patterns.json.

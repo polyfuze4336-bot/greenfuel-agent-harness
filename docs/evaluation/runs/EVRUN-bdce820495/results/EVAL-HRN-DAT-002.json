@@ -1,0 +1,30 @@
+{
+  "schema": "greenfuel.eval-evidence/v1",
+  "testId": "EVAL-HRN-DAT-002",
+  "ran": true,
+  "argv": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/validate-orchestration.test.mjs",
+    "tests/validate-loop.test.mjs"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-28T15:14:43.743Z",
+  "durationMs": 50544,
+  "outputSha256": "9871f0a5172c07e1e47a0c5a27fc5ee18420edd7fb697d605494c7b14445caab",
+  "outputBytes": 13139,
+  "outputTail": "tration rejects a non-integer limit\nok 58 - validate-orchestration rejects a non-integer limit\n  ---\n  duration_ms: 706.8121\n  type: 'test'\n  ...\n# Subtest: validate-orchestration rejects background delegation allowed\nok 59 - validate-orchestration rejects background delegation allowed\n  ---\n  duration_ms: 655.4289\n  type: 'test'\n  ...\n# Subtest: validate-orchestration rejects untracked delegation allowed during a run\nok 60 - validate-orchestration rejects untracked delegation allowed during a run\n  ---\n  duration_ms: 612.2434\n  type: 'test'\n  ...\n# Subtest: validate-orchestration rejects the runs folder moved\nok 61 - validate-orchestration rejects the runs folder moved\n  ---\n  duration_ms: 735.5214\n  type: 'test'\n  ...\n# Subtest: validate-orchestration rejects an unknown acceptance type\nok 62 - validate-orchestration rejects an unknown acceptance type\n  ---\n  duration_ms: 759.8125\n  type: 'test'\n  ...\n# Subtest: validate-orchestration rejects the runs folder no longer control plane\nok 63 - validate-orchestration rejects the runs folder no longer control plane\n  ---\n  duration_ms: 641.9817\n  type: 'test'\n  ...\n# Subtest: validate-orchestration rejects wiring that weakens the orchestrator or the hook\nok 64 - validate-orchestration rejects wiring that weakens the orchestrator or the hook\n  ---\n  duration_ms: 3471.8923\n  type: 'test'\n  ...\n# Subtest: validate-orchestration rejects missing documents, an invalid example plan and stale generated tables\nok 65 - validate-orchestration rejects missing documents, an invalid example plan and stale generated tables\n  ---\n  duration_ms: 2711.3362\n  type: 'test'\n  ...\n# Subtest: validate-orchestration checks committed runs: tampering and a leftover ACTIVE run are reported\nok 66 - validate-orchestration checks committed runs: tampering and a leftover ACTIVE run are reported\n  ---\n  duration_ms: 1055.0129\n  type: 'test'\n  ...\n1..66\n# tests 66\n# suites 0\n# pass 66\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 50442.0771\n",
+  "parsed": {
+    "tests": 66,
+    "pass": 66,
+    "fail": 0,
+    "skipped": 0,
+    "todo": 0,
+    "cancelled": 0
+  },
+  "status": "PASS",
+  "actual": "ran and passed: 66 tests, 0 failed, 0 skipped"
+}

@@ -1,0 +1,29 @@
+{
+  "schema": "greenfuel.eval-evidence/v1",
+  "testId": "EVAL-HRN-REL-001",
+  "ran": true,
+  "argv": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/orchestration-durability.test.mjs"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-28T15:16:33.619Z",
+  "durationMs": 2309,
+  "outputSha256": "7f9e16c9818cb6f6d9745bd1b632e99f0487afd902cb98f881e234553a5d9aec",
+  "outputBytes": 2949,
+  "outputTail": "127.8341\n  type: 'test'\n  ...\n# Subtest: verifyRun notices a rewritten checkpoint\nok 5 - verifyRun notices a rewritten checkpoint\n  ---\n  duration_ms: 65.8534\n  type: 'test'\n  ...\n# Subtest: a delegate that never reports is detected by its lease, swept as INTERRUPTED and can be retried with a new prompt\nok 6 - a delegate that never reports is detected by its lease, swept as INTERRUPTED and can be retried with a new prompt\n  ---\n  duration_ms: 86.6221\n  type: 'test'\n  ...\n# Subtest: a manual checkpoint records the exact head of the log\nok 7 - a manual checkpoint records the exact head of the log\n  ---\n  duration_ms: 68.9651\n  type: 'test'\n  ...\n# Subtest: a stale lock left by a crashed process does not block the run\nok 8 - a stale lock left by a crashed process does not block the run\n  ---\n  duration_ms: 38.2727\n  type: 'test'\n  ...\n# Subtest: two processes cannot both start the same task: exactly one wins, and the log stays consistent\nok 9 - two processes cannot both start the same task: exactly one wins, and the log stays consistent\n  ---\n  duration_ms: 470.7941\n  type: 'test'\n  ...\n# Subtest: concurrent submissions from many processes keep the chain intact\nok 10 - concurrent submissions from many processes keep the chain intact\n  ---\n  duration_ms: 476.0697\n  type: 'test'\n  ...\n# Subtest: a committed run still verifies after a checkout that rewrote line endings (the Windows to Linux case that failed in CI)\nok 11 - a committed run still verifies after a checkout that rewrote line endings (the Windows to Linux case that failed in CI)\n  ---\n  duration_ms: 116.0394\n  type: 'test'\n  ...\n# Subtest: captured replies are stored with LF endings whatever the reply used, so their hash is platform independent\nok 12 - captured replies are stored with LF endings whatever the reply used, so their hash is platform independent\n  ---\n  duration_ms: 67.9908\n  type: 'test'\n  ...\n1..12\n# tests 12\n# suites 0\n# pass 12\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 2227.3011\n",
+  "parsed": {
+    "tests": 12,
+    "pass": 12,
+    "fail": 0,
+    "skipped": 0,
+    "todo": 0,
+    "cancelled": 0
+  },
+  "status": "PASS",
+  "actual": "ran and passed: 12 tests, 0 failed, 0 skipped"
+}
