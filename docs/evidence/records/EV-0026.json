@@ -1,0 +1,22 @@
+{
+  "id": "EV-0026",
+  "claim": "GitHub branch protection spec check: read-only comparison reports unavailable on this plan",
+  "argv": [
+    "node",
+    "harness/scripts/verify-github-protection.mjs"
+  ],
+  "exitCode": 3,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-28T09:40:10.296Z",
+  "durationMs": 894,
+  "outputSha256": "493e0c296dc8c0821880f08914bf963d92e4b1a1ea99f7690748d65934f99c82",
+  "outputBytes": 131,
+  "outputTail": "verify-github-protection: UNAVAILABLE. gh: Upgrade to GitHub Pro or make this repository public to enable this feature. (HTTP 403)\n",
+  "gitHead": "e4a935eb9fb982399aec6b3b1a9cc14679bbc3e0",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}

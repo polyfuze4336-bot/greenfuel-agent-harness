@@ -1,0 +1,22 @@
+{
+  "id": "EV-0024",
+  "claim": "validate-permissions reports the permission policy coherent, with specifications consistent with agent policy and tool registry",
+  "argv": [
+    "node",
+    "harness/scripts/validate-permissions.mjs"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-28T09:39:34.729Z",
+  "durationMs": 103,
+  "outputSha256": "27c35d8f3767d7a915f616705dadd306783ac9c5735757d733d78b3fe01cfee0",
+  "outputBytes": 25,
+  "outputTail": "validate-permissions: OK\n",
+  "gitHead": "e4a935eb9fb982399aec6b3b1a9cc14679bbc3e0",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}
