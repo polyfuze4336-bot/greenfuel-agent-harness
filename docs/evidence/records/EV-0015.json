@@ -1,0 +1,22 @@
+{
+  "id": "EV-0015",
+  "claim": "Full test suite passes on the recorder-fix commit",
+  "argv": [
+    "npm",
+    "test"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-28T07:12:01.176Z",
+  "durationMs": 31073,
+  "outputSha256": "55163ecf76e63fc6c2483fe42cd73a56e1e769ff2d93f7693ef37b0f5e392da7",
+  "outputBytes": 24028,
+  "outputTail": ": 'test'\n  ...\n# Subtest: manifest: uncovered requirement, missing file and unlisted source document are rejected\nok 137 - manifest: uncovered requirement, missing file and unlisted source document are rejected\n  ---\n  duration_ms: 2513.1838\n  type: 'test'\n  ...\n# Subtest: real repository validates cleanly\nok 138 - real repository validates cleanly\n  ---\n  duration_ms: 698.5171\n  type: 'test'\n  ...\n# Subtest: frontmatter parser reads simple keys and rejects missing block\nok 139 - frontmatter parser reads simple keys and rejects missing block\n  ---\n  duration_ms: 0.1673\n  type: 'test'\n  ...\n# Subtest: phase 0 rejects application code\nok 140 - phase 0 rejects application code\n  ---\n  duration_ms: 1736.149\n  type: 'test'\n  ...\n# Subtest: phase 0 rejects IaC files anywhere\nok 141 - phase 0 rejects IaC files anywhere\n  ---\n  duration_ms: 1705.8937\n  type: 'test'\n  ...\n# Subtest: agent without explicit tools is rejected\nok 142 - agent without explicit tools is rejected\n  ---\n  duration_ms: 1880.481\n  type: 'test'\n  ...\n# Subtest: broken markdown link is rejected\nok 143 - broken markdown link is rejected\n  ---\n  duration_ms: 1635.4847\n  type: 'test'\n  ...\n# Subtest: secret-like content is rejected\nok 144 - secret-like content is rejected\n  ---\n  duration_ms: 1679.6432\n  type: 'test'\n  ...\n# Subtest: unpinned workflow action is rejected\nok 145 - unpinned workflow action is rejected\n  ---\n  duration_ms: 1662.9377\n  type: 'test'\n  ...\n# Subtest: runtime dependencies are rejected\nok 146 - runtime dependencies are rejected\n  ---\n  duration_ms: 1234.6009\n  type: 'test'\n  ...\n# Subtest: missing pillar in architecture doc is rejected\nok 147 - missing pillar in architecture doc is rejected\n  ---\n  duration_ms: 1353.1837\n  type: 'test'\n  ...\n# Subtest: missing hook script is rejected\nok 148 - missing hook script is rejected\n  ---\n  duration_ms: 1500.278\n  type: 'test'\n  ...\n1..148\n# tests 148\n# suites 0\n# pass 148\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 30499.7921\n",
+  "gitHead": "d719cf4495767f62bd9ac9a0bbd6b220a1c2e1ca",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}

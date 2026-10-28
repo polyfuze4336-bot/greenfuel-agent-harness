@@ -1,0 +1,22 @@
+{
+  "id": "EV-0012",
+  "claim": "Full test suite passes on the specialist-agent commit",
+  "argv": [
+    "npm",
+    "test"
+  ],
+  "exitCode": null,
+  "signal": null,
+  "spawnError": "spawnSync npm ENOENT",
+  "startedAt": "2026-10-28T07:11:30.679Z",
+  "durationMs": 4,
+  "outputSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "outputBytes": 0,
+  "outputTail": "",
+  "gitHead": "43f3cbdf90be11e231fc272ebe7cf89a22a883c6",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "id": "EV-0014",
+  "claim": "Agent definitions match agent-policy.json; installed VS Code and Copilot CLI match tested versions",
+  "argv": [
+    "node",
+    "harness/scripts/validate-agents.mjs",
+    "--versions"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-28T07:11:31.048Z",
+  "durationMs": 641,
+  "outputSha256": "ab24ed8268a34b0d46b49f7d796382b815fe59fc4f8cf2808d3426872dd5161c",
+  "outputBytes": 122,
+  "outputTail": "NOTE VS Code: 1.143.0 matches the tested version\nNOTE Copilot CLI: 1.0.105 matches the tested version\nvalidate-agents: OK\n",
+  "gitHead": "43f3cbdf90be11e231fc272ebe7cf89a22a883c6",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}
