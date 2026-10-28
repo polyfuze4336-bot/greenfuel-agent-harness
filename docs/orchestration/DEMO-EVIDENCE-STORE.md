@@ -4,7 +4,7 @@ A live run of the [task-execution framework](./ORCHESTRATION.md) on a sample arc
 
 **Request:** design a jurisdiction-local evidence store for delivery measurement evidence. The principal architect proposes a design, the security reviewer assesses residency, the architecture critic challenges the assumptions, and the orchestrator consolidates the result.
 
-**Outcome:** the framework ran the whole chain and produced real artifacts and a verified execution trace. The run ended **NEEDS_HUMAN**, not COMPLETED, because the independent critic returned **REWORK on the architect's design twice** and the bounded rework allowance was spent. That is the framework working: the design is not approved and nothing in the repository treats it as approved.
+**Outcome:** the framework ran the whole chain and produced real artifacts and a verified execution trace. The run ended **NEEDS_HUMAN**, not COMPLETED, and the owner then **closed it with the REWORK as the recorded outcome** (event 45), because the independent critic returned **REWORK on the architect's design twice** and the bounded rework allowance was spent. That is the framework working: the design is not approved and nothing in the repository treats it as approved.
 
 ## What ran
 
@@ -18,7 +18,7 @@ A live run of the [task-execution framework](./ORCHESTRATION.md) on a sample arc
 | Consolidate | The orchestrator wrote the consolidation as its final reply. **A human captured it** as T4 with `tasks.mjs submit`; the log records that source | orchestrator, operator |
 | Final gate | T4's command check `npm run validate` ran through `tasks.mjs validate` and was recorded as evidence | engine |
 
-The full sequence, with timestamps, actors and hashes, is the generated [TRACE](../state/runs/RUN-afb2a0466e/TRACE.md): 44 events, 9 checkpoints, hash chain verified. The last two events (43 and 44) are the human-run integrity upgrade described below. The deterministic summary is the generated [REPORT](../state/runs/RUN-afb2a0466e/REPORT.md).
+The full sequence, with timestamps, actors and hashes, is the generated [TRACE](../state/runs/RUN-afb2a0466e/TRACE.md): 45 events, 10 checkpoints, hash chain verified. Events 43 and 44 are the human-run integrity upgrade described below; event 45 is the owner's decision to close the run. The deterministic summary is the generated [REPORT](../state/runs/RUN-afb2a0466e/REPORT.md).
 
 ## Real artifacts
 
@@ -61,7 +61,7 @@ All run files are under `docs/state/runs/RUN-afb2a0466e/`. The first-pass replie
 
 ## What a human decides next
 
-From the consolidation and the run state: whether to accept REWORK as the outcome and stop, to raise the rework allowance and reopen T1 again, or to discard the proposal; the baseline decisions the reviewers say block any acceptance (D-009, D-010, D-011 on residency and hosting; D-013, D-015, D-016, D-018 and others); and whether the documentation rule for links in design files applies. See TODO items T18 to T20.
+**Decided 2026-10-28 (T19):** the owner accepted the critic's REWORK as the outcome and stopped; the run is CLOSED and the proposal stays an unapproved draft. Closing approves nothing. Still open, because the reviewers say they block any acceptance of a design like this: the baseline decisions the reviewers say block any acceptance (D-009, D-010, D-011 on residency and hosting; D-013, D-015, D-016, D-018 and others); and whether the documentation rule for links in design files applies. They remain in the decision register.
 
 ## Reproduce or verify
 

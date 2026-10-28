@@ -332,10 +332,10 @@
     "REWORK",
     "REJECT"
   ],
-  "state": "NEEDS_HUMAN",
-  "rev": 21,
+  "state": "CLOSED",
+  "rev": 22,
   "createdAt": "2026-10-28T10:19:41.434Z",
-  "updatedAt": "2026-10-28T10:45:59.045Z",
+  "updatedAt": "2026-10-28T11:16:17.195Z",
   "attention": [
     "T3 gave REWORK on T1: a human decision or a reopen is needed"
   ],
@@ -884,33 +884,26 @@
       "submissions": 1
     }
   },
-  "eventHead": "b8edceb2c817227985f0f22c7e9ba5dd816be74d7e22816c5d70bd378c00cdca",
-  "eventSeq": 44,
+  "eventHead": "19b257b9f2d4fa894ac15b71361fafdeff1ef5a65b8d4532bea16eb2547db6c6",
+  "eventSeq": 45,
   "lastCommit": {
     "events": [
       {
-        "seq": 43,
-        "ts": "2026-10-28T10:45:59.046Z",
+        "seq": 45,
+        "ts": "2026-10-28T11:16:17.198Z",
         "runId": "RUN-afb2a0466e",
-        "rev": 21,
+        "rev": 22,
         "actor": "operator",
-        "action": "integrity-upgrade",
-        "reason": "the state hash now covers the plan, order, limits and every task field, not only part of the state",
-        "stateHash": "975b453d56033e11f0f9731f275bf0a79307e57d40ea3b210ff0bb64b976e822",
-        "prevHash": "4dab721157ecb8f22adfda3f77710a3042453ae3612ccb60f59f2356da3264ae",
-        "hash": "e47e31f838c5f6faac32508427881397501362a69ffd5a59397d6430d9b9d978"
-      },
-      {
-        "seq": 44,
-        "ts": "2026-10-28T10:45:59.046Z",
-        "runId": "RUN-afb2a0466e",
-        "rev": 21,
-        "actor": "operator",
-        "action": "checkpoint",
-        "reason": "integrity upgrade and review fixes",
-        "stateHash": "975b453d56033e11f0f9731f275bf0a79307e57d40ea3b210ff0bb64b976e822",
-        "prevHash": "e47e31f838c5f6faac32508427881397501362a69ffd5a59397d6430d9b9d978",
-        "hash": "b8edceb2c817227985f0f22c7e9ba5dd816be74d7e22816c5d70bd378c00cdca"
+        "action": "run-state",
+        "from": "NEEDS_HUMAN",
+        "to": "CLOSED",
+        "reason": "Owner decision 2026-10-28 (TODO T19): accept the critic's REWORK as the outcome and stop. The proposal is an unapproved draft and is not reopened.",
+        "detail": {
+          "closedBy": "operator"
+        },
+        "stateHash": "afd4ae596023d49445e55c04fd3a857a26d9dd751b75926666aca39b58a27f27",
+        "prevHash": "b8edceb2c817227985f0f22c7e9ba5dd816be74d7e22816c5d70bd378c00cdca",
+        "hash": "19b257b9f2d4fa894ac15b71361fafdeff1ef5a65b8d4532bea16eb2547db6c6"
       }
     ]
   },

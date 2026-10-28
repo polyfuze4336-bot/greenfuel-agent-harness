@@ -12,7 +12,7 @@
     "maxArtifactsPerTask": 10,
     "maxContextFilesPerTask": 12
   },
-  "limitsNote": "Placeholder working values chosen by this design, not derived from any external requirement. The owner may change them.",
+  "limitsNote": "Working values chosen by this design and confirmed by the owner on 2026-10-28 (TODO T20). They are not derived from any external requirement; the owner may change them.",
   "states": ["PENDING", "READY", "RUNNING", "BLOCKED", "FAILED", "VALIDATING", "AWAITING_APPROVAL", "COMPLETED", "CANCELLED"],
   "terminalStates": ["COMPLETED", "CANCELLED"],
   "transitions": {

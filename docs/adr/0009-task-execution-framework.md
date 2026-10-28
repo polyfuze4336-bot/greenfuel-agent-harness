@@ -1,9 +1,9 @@
 # ADR 0009: Task-execution framework
 
-- **Status:** Proposed
+- **Status:** Accepted (2026-10-28, programme owner, by instruction in chat: "accept and document it")
 - **Type:** Governance
 - **Date:** 2026-10-28
-- **Deciders:** Programme owner (not yet decided)
+- **Deciders:** Programme owner
 - **Supersedes:** none
 
 ## Context
@@ -11,7 +11,7 @@
 - FACT: Observed 2026-10-28 in Copilot CLI 1.0.105: the repository-wide `preToolUse` and `postToolUse` hooks both fire for the native `task` tool. The pre payload carries the target `agent_type`, the prompt and the mode; the post payload carries the delegate's reply as `toolResult.textResultForLlm`. A hook can therefore enforce and record delegation without any change to how the orchestrator delegates. See [ORCHESTRATION](../orchestration/ORCHESTRATION.md).
 - FACT: The orchestrator is read-only by an accepted decision ([ADR 0006](./0006-specialist-agent-roster-and-enforcement.md)): no edit tool, no command, no write scope. Two of the three agents the demonstration needs (`security-reviewer` and `architecture-critic`) are planners with no edit tool, so their output exists only as the reply of a delegation.
 - FACT: The permission model ([ADR 0008](./0008-least-privilege-permission-model.md)) already supplies signed approvals, a never-grantable list and a hash-chained audit approach that this framework reuses.
-- ASSUMPTION: The limits in the policy (attempts, reopens, lease, sizes, task count) are placeholder working values for the owner to confirm; they are not derived from any external requirement.
+- ASSUMPTION: The limits in the policy (attempts, reopens, lease, sizes, task count) were placeholders; the owner confirmed them as working values on 2026-10-28. They are not derived from any external requirement.
 
 ## Options considered
 1. **Prompt-only orchestration.** The orchestrator tracks tasks in its own context. Rejected: no persistence across sessions, no enforcement, and "done" is self-declared.
@@ -20,7 +20,7 @@
 4. **A small deterministic engine driven by native hooks, with files as the store, a human-run CLI and read-only MCP tools (chosen).** Native delegation does the work; the hook enforces order and captures results; the engine judges results against declared tests; the orchestrator stays read-only.
 
 ## Decision
-Proposed for approval:
+Accepted. The owner also confirmed the limits in the policy as working values (T20) and reported that the hook and tools were verified in VS Code chat (T18; reported by the owner, not observed by the assistant).
 - Adopt [engine.cjs](../../harness/orchestration/engine.cjs) and [orchestration-policy.json](../../harness/policy/orchestration-policy.json): the task contract, nine states with an explicit transition table, plan validation (agents, tools, permissions, requirements, context, artifacts, acceptance, dependencies, risks, review), error classes with bounded retries and escalation, human approval pauses using the registered approver keys, and a durable, hash-chained run store under `docs/state/runs/`.
 - Drive it from [delegation-guard.cjs](../../harness/hooks/delegation-guard.cjs), registered repository-wide: before a `task` call it starts the attempt or denies the delegation; after it, it stores the reply and runs the acceptance tests. While a run is active, a delegation without a `TASK-REF` marker is denied.
 - Expose `check_plan` and `get_run_status` as read-only MCP tools to the orchestrator only. Create, retry, unblock, reopen, approve and cancel remain human or CI actions through [tasks.mjs](../../harness/scripts/tasks.mjs).
@@ -32,8 +32,8 @@ Proposed for approval:
 - A multi-step request now has an auditable record: who was delegated what, in what order, how many attempts, what came back (hashed and marked untrusted), what passed, and what needed a human.
 - The engine proves structure and provenance, not truth. Content quality still depends on the specialist agents, the independent review task and the human.
 - The orchestrator's consolidation has no hook to capture it; a human captures it with `submit --result-file`, and the log says so.
-- Hooks are observed only in Copilot CLI 1.0.105 and need a trusted folder. VS Code behaviour is unverified (T12, T18).
-- A run that is ACTIVE, waiting for a human or stopped blocks untracked delegation until it is finished, cancelled or closed by a human (`tasks.mjs close`); this is deliberate. The committed demonstration run is waiting for a human (TODO T19), so ad hoc delegation by agents is denied until the owner decides.
+- Hooks were observed by the assistant only in Copilot CLI 1.0.105 and need a trusted folder. The owner reports VS Code chat was verified (T18) but that was not independently observed here; the earlier tool and agent checks in VS Code (T8, T9, T12) remain open.
+- A run that is ACTIVE, waiting for a human or stopped blocks untracked delegation until it is finished, cancelled or closed by a human (`tasks.mjs close`); this is deliberate. The demonstration run was closed by the owner decision recorded in TODO (T19), so ad hoc delegation is allowed again.
 - More custom code to maintain: the engine is a single module with a test suite, but it is code the harness owns.
 
 ## Reversibility

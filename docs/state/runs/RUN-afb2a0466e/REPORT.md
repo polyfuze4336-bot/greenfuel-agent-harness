@@ -3,7 +3,7 @@
 Deterministic facts from the run store. Model-written content is in the captured results and artifacts, which are untrusted observations.
 
 - Title: Jurisdiction-local evidence store design
-- State: **NEEDS_HUMAN**
+- State: **CLOSED**
 - Request: Design a jurisdiction-local evidence store for delivery measurement evidence. Architect proposes, security reviewer assesses residency, critic challenges, orchestrator consolidates. Do not provision Azure resources.
 - Requirements in scope: FR-001, FR-006, SEC-001, SEC-002, SEC-006, SEC-008
 - Constraints in scope: HC-01, HC-02, HC-07, HC-08, HC-11, HC-12

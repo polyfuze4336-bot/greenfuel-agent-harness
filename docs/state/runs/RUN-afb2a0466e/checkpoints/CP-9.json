@@ -1,0 +1,30 @@
+{
+  "schema": "greenfuel.checkpoint/v1",
+  "n": 9,
+  "ts": "2026-10-28T11:16:17.203Z",
+  "label": "run-state",
+  "runId": "RUN-afb2a0466e",
+  "rev": 22,
+  "eventSeq": 45,
+  "eventHead": "19b257b9f2d4fa894ac15b71361fafdeff1ef5a65b8d4532bea16eb2547db6c6",
+  "stateHash": "afd4ae596023d49445e55c04fd3a857a26d9dd751b75926666aca39b58a27f27",
+  "runState": "CLOSED",
+  "tasks": {
+    "T1": {
+      "status": "COMPLETED",
+      "attempts": 2
+    },
+    "T2": {
+      "status": "COMPLETED",
+      "attempts": 1
+    },
+    "T3": {
+      "status": "COMPLETED",
+      "attempts": 1
+    },
+    "T4": {
+      "status": "COMPLETED",
+      "attempts": 1
+    }
+  }
+}

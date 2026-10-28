@@ -2,7 +2,7 @@
 
 How a complex engineering request becomes a structured, resumable, auditable workflow in the greenfuel-agent-harness. This is part of the **coding harness**. It is not the business agents of the bunkering product, and it does not build the application.
 
-Decision record: [ADR 0009](../adr/0009-task-execution-framework.md). The task format: [TASK-CONTRACT](./TASK-CONTRACT.md). The rules live in [orchestration-policy.json](../../harness/policy/orchestration-policy.json); the tables below are generated from it.
+Decision record: [ADR 0009](../adr/0009-task-execution-framework.md) (Accepted). The task format: [TASK-CONTRACT](./TASK-CONTRACT.md). The rules live in [orchestration-policy.json](../../harness/policy/orchestration-policy.json); the tables below are generated from it.
 
 ## What it is, and what it is not
 
@@ -79,7 +79,7 @@ It is **not** a distributed orchestration service, a scheduler or a queue. Nothi
 
 `ACTIVE`, `COMPLETED`, `NEEDS_HUMAN`, `STOPPED`, `CLOSED`, `CANCELLED`. A run is COMPLETED only when every task is COMPLETED and no blocking review verdict (REWORK, REJECT) stands. NEEDS_HUMAN means no task can proceed without a person. STOPPED freezes the run after a policy violation or an internal inconsistency. CLOSED means a human concluded a NEEDS_HUMAN or STOPPED run (`tasks.mjs close`); closing approves nothing. While a run is ACTIVE, NEEDS_HUMAN or STOPPED, a delegation without its task marker is denied.
 
-### Limits (placeholder working values)
+### Limits (working values confirmed by the owner)
 
 | Limit | Value |
 |---|---|
@@ -158,11 +158,11 @@ The pre hook fails closed for `task` calls. The post hook never blocks the call.
 - **An attempt is started before the tool runs.** If the tool then rejects the call for a reason the hook cannot see, the attempt is left RUNNING with nobody working on it. The hook checks the arguments it knows the tool requires (ORCH-ARGS), and a human can `release` an orphaned attempt, which refunds it and logs why. Without a release, the lease expiry marks it INTERRUPTED and it counts against the budget.
 - **Orchestrator-run tasks** (such as a consolidation) have no hook to capture their output. A human captures it with `tasks.mjs submit --result-file`, and the event log says so.
 - **The marker depends on the orchestrator including it.** ORCH-01 makes omission safe while a run is active. With no active run, delegation is untracked by design.
-- **Hooks load only in a trusted folder** and have been observed only in Copilot CLI 1.0.105, not in VS Code chat (TODO T12 and T18).
+- **Hooks load only in a trusted folder.** The assistant observed them only in Copilot CLI 1.0.105. The owner reports the framework was verified in VS Code chat (T18); that report is recorded here but was not independently observed.
 - **No parallel delegation.** Tasks run one at a time, synchronously. Independent tasks in one level are not run concurrently.
 - **No rollback.** A task's recovery plan is a statement for a human; the engine does not undo file changes. File artifacts are limited to the agent's own write scope, and drift is detected, not reverted.
 - **Run ids are derived from the plan hash.** Two plans that differ in any field are different runs.
-- **The limits are placeholders** chosen by this design (attempts, lease, sizes). They are not derived from any external requirement.
+- **The limits are working values** chosen by this design (attempts, lease, sizes) and confirmed by the owner. They are not derived from any external requirement.
 - **The control-plane protection of `docs/state/runs/` is enforced by the permission hooks**, which stop agents but not a human or another tool with write access to the folder. The hash chain would detect such edits on the next load; it cannot stop them.
 
 ## Running it

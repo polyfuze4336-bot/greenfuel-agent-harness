@@ -3,9 +3,9 @@
 Generated from `events.jsonl` by `tasks.mjs trace`. Do not edit by hand; the event log is the source.
 
 - Plan: Jurisdiction-local evidence store design (plan hash `afb2a0466e9fe1b9`)
-- Run state: **NEEDS_HUMAN** at revision 21
-- Events: 44; hash chain intact
-- Checkpoints: 9
+- Run state: **CLOSED** at revision 22
+- Events: 45; hash chain intact
+- Checkpoints: 10
 
 | Seq | Time (UTC) | Actor | Task | Action | Transition | Detail |
 |---|---|---|---|---|---|---|
@@ -53,6 +53,7 @@ Generated from `events.jsonl` by `tasks.mjs trace`. Do not edit by hand; the eve
 | 42 | 2026-10-28 10:36:17 | operator |  | run-state | ACTIVE to NEEDS_HUMAN | T3 gave REWORK on T1: a human decision or a reopen is needed |
 | 43 | 2026-10-28 10:45:59 | operator |  | integrity-upgrade |  | the state hash now covers the plan, order, limits and every task field, not only part of the state |
 | 44 | 2026-10-28 10:45:59 | operator |  | checkpoint |  | integrity upgrade and review fixes |
+| 45 | 2026-10-28 11:16:17 | operator |  | run-state | NEEDS_HUMAN to CLOSED | Owner decision 2026-10-28 (TODO T19): accept the critic's REWORK as the outcome and stop. The proposal is an unapproved draft and is not reopened. closedBy=operator |
 
 ## Final task states
 
@@ -67,4 +68,4 @@ Generated from `events.jsonl` by `tasks.mjs trace`. Do not edit by hand; the eve
 
 - T3 gave REWORK on T1: a human decision or a reopen is needed
 
-Last event hash: `b8edceb2c817227985f0f22c7e9ba5dd816be74d7e22816c5d70bd378c00cdca`
+Last event hash: `19b257b9f2d4fa894ac15b71361fafdeff1ef5a65b8d4532bea16eb2547db6c6`

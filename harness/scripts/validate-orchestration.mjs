@@ -31,7 +31,7 @@ export function renderOrchestrationTables(root) {
   L.push('', '### Error classes and what the engine does', '', '| Class | Retryable | Action | Backoff (seconds) | Meaning |', '|---|---|---|---|---|');
   for (const [k, d] of Object.entries(m.errorClasses)) L.push(`| ${k} | ${d.retryable ? `yes${d.maxRetries ? `, at most ${d.maxRetries}` : ''}` : 'no'} | ${d.action} | ${d.backoffSeconds ? d.backoffSeconds.join(', ') : 'n/a'} | ${cell(d.meaning)} |`);
   L.push('', '### Run states', '', `${m.runStates.map((s) => `\`${s}\``).join(', ')}. A run is COMPLETED only when every task is COMPLETED and no blocking review verdict (${m.blockingVerdicts.join(', ')}) stands. NEEDS_HUMAN means no task can proceed without a person. STOPPED freezes the run after a policy violation or an internal inconsistency. CLOSED means a human concluded a NEEDS_HUMAN or STOPPED run (\`tasks.mjs close\`); closing approves nothing. While a run is ACTIVE, NEEDS_HUMAN or STOPPED, a delegation without its task marker is denied.`);
-  L.push('', '### Limits (placeholder working values)', '', '| Limit | Value |', '|---|---|');
+  L.push('', '### Limits (working values confirmed by the owner)', '', '| Limit | Value |', '|---|---|');
   for (const [k, v] of Object.entries(m.limits)) L.push(`| ${k} | ${v} |`);
   return L.join('\n');
 }
