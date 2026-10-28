@@ -3,39 +3,37 @@
 Resume point. Update with the `session-handoff` skill. Facts only; unverified items are labelled.
 
 ## Current phase and objective
-Phase 0. Stage 0 (harness foundation) is accepted. Stage 2 has started with the **requirements baseline v0.1** in [docs/context/](../context/). Objective: owner review of the baseline and answers to the M1 decisions in the [decision register](../context/DECISION-REGISTER.md). No options analysis or design has started.
+Phase 0. Baseline v0.1 is **approved** (ADR 0003, 2026-10-28); the 37 decisions stay open, deferred by the owner. Stage 2 now has an **architecture-governance capability** in [docs/architecture/](../architecture/): hard constraints, ten review perspectives, checkpoints, a design-review gate, a defence question bank and a risk register. It is demonstrated on one example, [DES-0001](../architecture/designs/DES-0001-delivery-measurement-storage-topology.md), which the gate computes as **Blocked**. Objective: owner review of the governance capability and the example.
 
 ## Done (with evidence)
-- ADR 0001 and ADR 0002 accepted by the programme owner on 2026-10-28.
-- Private GitHub repo `polyfuze4336-bot/greenfuel-agent-harness` created and Stage 0 history pushed (owner approved the repo and its owner account). The `validate` workflow completed successfully on commit `fca906d`: `EV-0003`.
-- R1 partly done in Copilot CLI 1.0.102: the hook denied `azd up` and a write to `src/` in a trusted folder, and did nothing in an untrusted folder. Details and limits in [LIVE-TEST-R1](../harness/LIVE-TEST-R1.md). No evidence record, because the output was relayed by the model rather than captured by the recorder.
-- Earlier Stage 0 evidence: validator pass `EV-0001` and 68 unit tests `EV-0002`, both on commit `17a7de2`.
-- Requirements baseline v0.1 written: 99 requirements (37 class A, 62 class B), 37 open decisions, 25 unverified scheme or standard candidates, data classification, sovereignty and autonomy matrices, assumptions, and a context-loading strategy with 15 profiles. Counts come from `npm run stats`.
-- An independent model review of the baseline (a separate agent, not an evidence record) raised 10 issues: break-glass access contradicting residency (SEC-002), cross-boundary placements missing the legal-flow condition (SOVEREIGNTY-MATRIX), mixed A and B content in six rows, a bit-identical standard fixed before D-022, offline issuance assumed before D-007 and D-020, a signed-source assumption (AGT-003), numeric targets inside class A rows, and two context profiles that omitted sovereignty controls. All were fixed in the baseline. It found no problems in the standards and regulation citations; that does not verify them.
-- `npm run validate` and `npm test` pass on the baseline commit: `EV-0004` and `EV-0005`. These show the baseline is internally consistent (IDs, traceability, references, manifest coverage). They do not show the content is right.
+- Owner decisions 2026-10-28: ADR 0001 and 0002 accepted; baseline approved and 2 commits pushed; M1 decisions deferred; R1 live test approved. CI succeeded on pushed commit `9f9a1f0`: `EV-0006`. Earlier CI on `fca906d`: `EV-0003`.
+- Stage 0 evidence: `EV-0001`, `EV-0002`. Baseline evidence: `EV-0004`, `EV-0005`. R1 partly done in Copilot CLI only: [LIVE-TEST-R1](../harness/LIVE-TEST-R1.md) (hook enforces in a trusted folder, silently not loaded in an untrusted one).
+- Governance built: twelve hard constraints, ten perspectives, five checkpoints, 60 defence questions (21 critical), 14 risks, three templates, two roles, three skills, and the gate (`design-gate.mjs`, `validate-architecture.mjs`). `npm test`: 102 tests, with mutation tests that reject, block and approve. Gate and validator evidence: `EV-0007` to `EV-0011`.
+- Example: DES-0001 compares five options. The gate rejects the central store (HC-01), refuses to pass an unscreened option, and computes Blocked for the selected jurisdiction-local option, listing open decisions, partial Must requirements, four unassessed perspectives and six unanswered critical questions. [ADR 0004](../adr/0004-delivery-measurement-storage-topology.md) stays Proposed.
+- Two independent model reviews of the governance work found gate bypasses and example overclaims; both were fixed or recorded (RK-014, DESIGN-REVIEW-GATE section 3). These reviews are not evidence records.
 - No Azure resource was created or queried. Only local `az version` and `azd version` ran.
 
 ## Claimed, unverified
-- Hook and agent behaviour in VS Code chat (remaining part of R1).
-- That agents follow the `context-loading` procedure (R11).
-- Every regulatory, scheme and standard name in [CERTIFICATION-SCHEMES](../context/CERTIFICATION-SCHEMES.md). All are candidates. Verification procedure is D-002.
-- Placeholder NFR numbers (NFR-003, NFR-004, NFR-007, NFR-008) are proposals, not targets.
-- Whether the baseline matches the owner's intent. No stakeholder has reviewed it.
-- The CI workflow on commits after `fca906d` (not pushed).
+- Hook and agent behaviour in VS Code chat (R1 remainder); that agents follow `context-loading` (R11) and that `design-reviewer` and `design-challenger` behave as written (R12).
+- The example review was written by a model. No human has reviewed it.
+- The gate checks structure and consistency, not truth. Open weaknesses are listed in DESIGN-REVIEW-GATE section 3.
+- Every standard and scheme name is a candidate. Placeholder NFR numbers are proposals.
+- The 2 newest commits are not pushed.
 
 ## Next actions
-1. Owner reviews the baseline, in this order: [PROBLEMSTATEMENT](../../PROBLEMSTATEMENT.md), [DECISION-REGISTER](../context/DECISION-REGISTER.md), [REQUIREMENTS](../context/REQUIREMENTS.md), [ASSUMPTIONS](../context/ASSUMPTIONS.md).
-2. Owner answers or defers the 17 M1 decisions.
-3. Owner approves pushing the new commits to the private repo.
-4. Finish R1 in VS Code chat; run R11.
+1. Owner reviews [GOVERNANCE](../architecture/GOVERNANCE.md), [HARD-CONSTRAINTS](../architecture/HARD-CONSTRAINTS.md), [DESIGN-REVIEW-GATE](../architecture/DESIGN-REVIEW-GATE.md) and the DES-0001 / RV-0001 example.
+2. Owner approves pushing the new commits.
+3. Owner names the deciders (T3) and answers or defers the M1 decisions; then run R13 sibling designs.
+4. Finish R1 in VS Code; run R11 and R12.
 
 ## Open approvals
-- Baseline v0.1 (not yet approved by the owner)
-- Pushing commits after `fca906d` to GitHub (not pushed)
-- All 37 decisions in the register (Open)
+- Pushing the newest commits to GitHub
+- ADR 0004 (Proposed; cannot be Accepted while RV-0001 is Blocked)
+- All 37 decisions (Open, deferred)
 
 ## Blockers and risks
-- Seventeen M1 decisions block options analysis.
+- Seventeen M1 decisions block any design from being Approved.
+- No design can be Approved without a named human decider; none is named.
 - Hooks are not loaded in untrusted folders, silently. Trust the folder first.
-- Repository sits in a OneDrive-synced folder (Q1).
-- Hook fail-open on timeout and evasion by shell commands (see HARNESS-ARCHITECTURE section 3.4).
+- The repository sits in a OneDrive-synced folder (Q1).
+- The gate can be satisfied with vacuous reasons (RK-014); branch protection and an approver registry are roadmap R4.

@@ -5,6 +5,7 @@ import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { validateContext, contextStats } from './validate-context.mjs';
+import { validateArchitecture } from './validate-architecture.mjs';
 
 export const PILLARS = [
   'Context & Instructions',
@@ -21,6 +22,8 @@ const REQUIRED = [
   ...['BUSINESS-CASE', 'REQUIREMENTS', 'NON-FUNCTIONAL-REQUIREMENTS', 'DATA-CLASSIFICATION', 'SOVEREIGNTY-MATRIX', 'AGENT-AUTONOMY-MATRIX',
     'CERTIFICATION-SCHEMES', 'ASSUMPTIONS', 'REQUIREMENTS-TRACEABILITY', 'DECISION-REGISTER', 'CONTEXT-LOADING-STRATEGY'].map((n) => `docs/context/${n}.md`),
   'docs/context/context-manifest.json',
+  ...['GOVERNANCE', 'HARD-CONSTRAINTS', 'REVIEW-PERSPECTIVES', 'REVIEW-CHECKPOINTS', 'DESIGN-REVIEW-GATE', 'DEFENSE-QUESTION-BANK', 'RISK-REGISTER'].map((n) => `docs/architecture/${n}.md`),
+  'docs/architecture/templates/DESIGN.template.md', 'docs/architecture/templates/REVIEW-RECORD.template.md', 'docs/architecture/templates/ADR-DESIGN.template.md',
 ];
 const SKIP_DIRS = new Set(['.git', 'node_modules']);
 const SECRET_PATTERNS = [
@@ -137,7 +140,7 @@ export function validate(root) {
     for (const p of PILLARS) if (!text.includes(p)) fail('pillars', `${doc}: pillar '${p}' not represented`);
   }
 
-  return [...errors, ...validateContext(root)];
+  return [...errors, ...validateContext(root), ...validateArchitecture(root)];
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

@@ -28,11 +28,13 @@ Never define a business agent in `.github/agents/`. Never give a harness agent a
 6. **Resumable.** End sessions by updating `docs/state/STATE.md` (skill: `session-handoff`). Native memory is local to one machine; anything the team relies on goes in git.
 7. **Minimal.** Prefer native Copilot features. New dependency or custom code needs a documented requirement in [CAPABILITY-MATRIX](docs/harness/CAPABILITY-MATRIX.md) and approval.
 8. **Load context by profile, not by repository.** Use the `context-loading` skill and [context-manifest.json](docs/context/context-manifest.json). Start specialist answers with a `Context:` line naming the profile and what was read.
+9. **Major designs go through the design-review gate.** Author with `design-authoring` (agent `architect`), review with `design-review` (agent `design-reviewer`, with `design-challenger` for the adversarial pass), and a named human decides at checkpoint CP4. Nothing is Approved or Accepted by an agent. A design that violates a [hard constraint](docs/architecture/HARD-CONSTRAINTS.md) is rejected; one with critical requirements or decisions unresolved stays Blocked. See [GOVERNANCE](docs/architecture/GOVERNANCE.md).
 
 ## Commands
 ```
-npm test            # node --test: policy guard and validator tests
-npm run validate    # structural and policy checks for this repo
+npm test            # node --test: policy guard, recorder, validator and gate tests
+npm run validate    # structural, baseline, architecture-gate and policy checks for this repo
+node harness/scripts/design-gate.mjs <review.md>   # design review gate (add --select X for a what-if, --coverage for trace coverage)
 node harness/scripts/record-evidence.mjs --id EV-NNNN --claim "..." -- <command>
 ```
 Requires Node.js 20 or later. There are no packages to install.
@@ -40,8 +42,9 @@ Requires Node.js 20 or later. There are no packages to install.
 ## Where things are
 - Harness design: [docs/harness/](docs/harness/) — start with [HARNESS-ARCHITECTURE](docs/harness/HARNESS-ARCHITECTURE.md).
 - Product context baseline: [PROBLEMSTATEMENT](PROBLEMSTATEMENT.md) and [docs/context/](docs/context/) (requirements, traceability, decision register, matrices). Load through profiles; see [CONTEXT-LOADING-STRATEGY](docs/context/CONTEXT-LOADING-STRATEGY.md).
+- Architecture governance: [docs/architecture/](docs/architecture/) (hard constraints, perspectives, checkpoints, gate, question bank, risk register, templates, designs and reviews).
 - Decisions: [docs/adr/](docs/adr/). Evidence: [docs/evidence/](docs/evidence/). Resume point: [docs/state/STATE.md](docs/state/STATE.md). Owner to-do list: [docs/state/TODO.md](docs/state/TODO.md).
-- Agents: `architect` (design, docs-only edits, no shell), `reviewer` (independent verification, no edits).
+- Agents: `architect` (authors designs, docs-only edits, no shell), `reviewer` (independent verification, no edits), `design-reviewer` (design reviews and the gate, edits only reviews), `design-challenger` (adversarial, read-only).
 - Policy data: `harness/policy/command-policy.json`. Hook: `harness/hooks/policy-guard.cjs`, registered by `.github/hooks/policy.json`.
 
 ## Definition of done for any change

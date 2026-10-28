@@ -10,8 +10,8 @@ Native Copilot features do the loading (always-on files, skills, file links, sea
 
 | Layer | What | How it loads | Size (bytes) |
 |---|---|---|---|
-| L0 Always | [AGENTS.md](../../AGENTS.md) | Loaded natively by the runtime in every session | 4,974 |
-| L1 Core | [STATE.md](../state/STATE.md) and [PROBLEMSTATEMENT.md](../../PROBLEMSTATEMENT.md) | Agent reads at session start (the agent definitions and AGENTS.md say so) | 8,075 |
+| L0 Always | [AGENTS.md](../../AGENTS.md) | Loaded natively by the runtime in every session | 5,983 |
+| L1 Core | [STATE.md](../state/STATE.md) and [PROBLEMSTATEMENT.md](../../PROBLEMSTATEMENT.md) | Agent reads at session start (the agent definitions and AGENTS.md say so) | 7,969 |
 | L2 Profile | The documents and the requirement, decision and scheme rows named by one profile | The agent applies the `context-loading` skill: pick a profile, read its documents, then read only the selected rows | see section 5 |
 | L3 On demand | A single requirement, decision, ADR or scheme entry by ID | Agent searches for the ID | small |
 
@@ -32,6 +32,7 @@ Profile names and contents live in the manifest. Summary:
 | compliance-verification | Verify class D claims | Every requirement that carries a Verify (D) reference |
 | assurance-review | Independent review of the baseline | All requirements |
 | baseline-maintenance | Change the baseline itself | All requirements, all context documents |
+| architecture-governance | Author, review or defend a major design | None. The governance documents; add the capability and requirement profiles the design touches |
 | harness-engineering | Change the coding harness | None. Harness documents and ADRs only |
 
 Every requirement is reachable from at least one profile other than the two "all" profiles; the validator fails otherwise.
@@ -47,27 +48,28 @@ Every requirement is reachable from at least one profile other than the two "all
 ## 5. Measured cost (bytes of Markdown and JSON, 2026-10-28)
 Measured by `node harness/scripts/validate-harness.mjs --stats` on this commit. Bytes are not tokens; no tokenizer was run. "Whole documents" is what loading every listed file in full costs. "Row-filtered" is what the procedure above costs if the agent reads only the selected requirement rows.
 
-About 227 KB of Markdown and JSON in the whole repository (227,271 bytes when measured; this document itself and later edits change it). L0 plus L1: 13,049 bytes.
+About 334 KB of Markdown and JSON in the whole repository (333,739 bytes when measured; this document itself and later edits change it). L0 plus L1: 13,952 bytes.
 
 | Profile | Requirements selected | Whole documents | Row-filtered |
 |---|---|---|---|
-| business-framing | 9 | 81,558 | 43,661 |
-| capability-dea | 21 | 90,339 | 50,217 |
-| capability-eaa | 22 | 93,965 | 54,137 |
-| capability-dra | 17 | 90,339 | 48,474 |
-| capability-mba | 17 | 93,965 | 51,820 |
-| capability-cca | 19 | 90,339 | 48,911 |
-| sovereignty-data | 22 | 80,728 | 40,580 |
-| security-identity | 33 | 79,113 | 43,514 |
-| agent-governance | 23 | 64,527 | 32,001 |
-| edge-connectivity | 10 | 74,034 | 28,277 |
-| nfr-architecture | 21 | 35,371 | 21,571 |
-| compliance-verification | 41 | 84,827 | 53,091 |
-| assurance-review | 99 | 110,539 | 110,539 |
-| baseline-maintenance | 99 | 127,301 | 127,301 |
-| harness-engineering | 0 | 50,157 | 50,157 |
+| business-framing | 9 | 82,461 | 44,564 |
+| capability-dea | 21 | 91,242 | 51,120 |
+| capability-eaa | 22 | 94,868 | 55,040 |
+| capability-dra | 17 | 91,242 | 49,377 |
+| capability-mba | 17 | 94,868 | 52,723 |
+| capability-cca | 19 | 91,242 | 49,814 |
+| sovereignty-data | 22 | 81,631 | 41,483 |
+| security-identity | 33 | 80,016 | 44,417 |
+| agent-governance | 23 | 65,430 | 32,904 |
+| edge-connectivity | 10 | 74,937 | 29,180 |
+| nfr-architecture | 21 | 36,274 | 22,474 |
+| compliance-verification | 41 | 85,730 | 53,994 |
+| assurance-review | 99 | 111,442 | 111,442 |
+| baseline-maintenance | 99 | 128,204 | 128,204 |
+| architecture-governance | 0 | 59,396 | 59,396 |
+| harness-engineering | 0 | 53,737 | 53,737 |
 
-**What this shows.** Loading whole documents saves little: capability profiles cost about 40 percent of the repository because the requirements and traceability tables are large and every capability profile must also carry the sovereignty matrix and part of the requirements. Row filtering brings capability profiles to roughly 21 to 24 percent. The sovereignty matrix and the other matrices are still counted whole in the row-filtered figure, so a section-level read would save more. Row filtering relies on the agent following the procedure; that is not yet tested. The profiles `assurance-review` and `baseline-maintenance` are intentionally large because their task is to see the whole baseline; they are the cost of independent review (49 and 56 percent).
+**What this shows.** Loading whole documents saves little: capability profiles cost 27 to 28 percent of the repository because the requirements and traceability tables are large and every capability profile must also carry the sovereignty matrix and part of the requirements. Row filtering brings capability profiles to roughly 15 to 17 percent. The sovereignty matrix and the other matrices are still counted whole in the row-filtered figure, so a section-level read would save more. Row filtering relies on the agent following the procedure; that is not yet tested. The profiles `assurance-review` and `baseline-maintenance` are intentionally large (33 and 38 percent) because their task is to see the whole baseline; they are the cost of independent review. The percentages fell compared with the earlier measurement only because the repository grew with the architecture-governance documents, not because the profiles got smaller.
 
 Sovereignty controls were added to every capability profile after an independent review showed that a specialist could otherwise design processing of delivery data without seeing the residency rules. Smaller context was traded for safety on purpose.
 

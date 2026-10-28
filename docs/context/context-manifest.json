@@ -102,6 +102,13 @@
       "decisions": ["*"],
       "schemes": ["*"]
     },
+    "architecture-governance": {
+      "purpose": "Author, review or defend a major architecture design: hard constraints, perspectives, checkpoints, gate, question bank, risks",
+      "documents": ["docs/architecture/GOVERNANCE.md", "docs/architecture/HARD-CONSTRAINTS.md", "docs/architecture/REVIEW-PERSPECTIVES.md", "docs/architecture/REVIEW-CHECKPOINTS.md", "docs/architecture/DESIGN-REVIEW-GATE.md", "docs/architecture/DEFENSE-QUESTION-BANK.md", "docs/architecture/RISK-REGISTER.md"],
+      "requirements": { "include": [] },
+      "decisions": [],
+      "schemes": []
+    },
     "harness-engineering": {
       "purpose": "Change the coding harness (not the product design)",
       "documents": ["docs/harness/HARNESS-ARCHITECTURE.md", "docs/harness/CAPABILITY-MATRIX.md", "docs/harness/IMPLEMENTATION-ROADMAP.md", "docs/harness/OPEN-QUESTIONS.md", "docs/adr/0001-native-first-harness.md", "docs/adr/0002-phase-gating-and-approval-enforcement.md"],

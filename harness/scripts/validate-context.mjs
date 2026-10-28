@@ -17,7 +17,7 @@ const MANIFEST = 'docs/context/context-manifest.json';
 const SCAN_DIRS = ['docs/context', 'docs/state'];
 
 const refs = (text, re) => [...text.matchAll(re)].map((m) => m[0]);
-const rowsOf = (text) => text.split(/\r?\n/).map((l) => l.trim()).filter((l) => l.startsWith('|'))
+export const rowsOf = (text) => text.split(/\r?\n/).map((l) => l.trim()).filter((l) => l.startsWith('|'))
   .map((l) => l.replace(/^\|/, '').replace(/\|$/, '').split('|').map((c) => c.trim()));
 
 export function hasContext(root) {
@@ -55,6 +55,14 @@ export function loadContext(root) {
     }
   }
 
+  const adrDir = path.join(root, 'docs', 'adr');
+  const adrStatus = new Map();
+  for (const f of existsSync(adrDir) ? readdirSync(adrDir) : []) {
+    const n = f.match(/^(\d{4})-/)?.[1];
+    if (n) adrStatus.set(n, readFileSync(path.join(adrDir, f), 'utf8').match(/\*\*Status:\*\*\s*(\w+)/)?.[1]);
+  }
+  const adrs = new Set(adrStatus.keys());
+
   const decisions = new Map();
   if (existsSync(path.join(root, REGISTER))) {
     for (const c of rowsOf(read(REGISTER))) {
@@ -66,6 +74,8 @@ export function loadContext(root) {
       if (!['M1', 'M2', 'M3'].includes(by)) fail(`${id}: needed-by '${by}' must be M1, M2 or M3`);
       if (!need || !why || !options || !owner) fail(`${id}: every register column must be filled`);
       if (!/^(Open|Decided \(ADR-\d{4}\))$/.test(status)) fail(`${id}: status '${status}' must be Open or Decided (ADR-nnnn)`);
+      const adr = status.match(/ADR-(\d{4})/)?.[1];
+      if (adr && adrStatus.get(adr) !== 'Accepted') fail(`${id}: Decided needs an Accepted ADR, but ADR-${adr} is ${adrStatus.get(adr) ?? 'missing'}`);
       decisions.set(id, { id, kind, by, status });
     }
   }
@@ -84,9 +94,6 @@ export function loadContext(root) {
     for (const c of rowsOf(read(PROBLEM))) if (/^CS-(CAP-\d|C\d|P\d)$/.test(c[0])) cs.add(c[0]);
   }
 
-  const adrDir = path.join(root, 'docs', 'adr');
-  const adrs = new Set(existsSync(adrDir) ? readdirSync(adrDir).map((f) => f.match(/^(\d{4})-/)?.[1]).filter(Boolean) : []);
-
   const trace = new Map();
   if (existsSync(path.join(root, TRACE))) {
     for (const c of rowsOf(read(TRACE))) {
@@ -97,7 +104,7 @@ export function loadContext(root) {
       trace.set(id, { id, source, validation, evidence, decs, depends, open, verify });
     }
   }
-  return { reqs, decisions, schemes, cs, adrs, trace, errors };
+  return { reqs, decisions, schemes, cs, adrs, adrStatus, trace, errors };
 }
 
 export function validateContext(root) {

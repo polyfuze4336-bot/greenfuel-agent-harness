@@ -1,26 +1,7 @@
-# ADR NNNN: Title
+# ADR template
 
-- **Status:** Proposed <!-- Proposed | Accepted | Rejected | Superseded. Only a human sets Accepted. -->
-- **Date:** YYYY-MM-DD
-- **Deciders:** TBD
-- **Supersedes:** none
+The ADR template (version 2) moved to [docs/architecture/templates/ADR-DESIGN.template.md](../architecture/templates/ADR-DESIGN.template.md). Copy it to `docs/adr/NNNN-short-title.md`.
 
-## Context
-What forces are at play? Label each statement FACT (with source), ASSUMPTION, or DECISION.
-
-## Options considered
-1. **Option A** — summary. Trade-offs: ...
-2. **Option B** — summary. Trade-offs: ...
-3. **Do nothing** — consequences.
-
-## Decision
-The chosen option and the reason it beat the others.
-
-## Consequences
-Positive, negative, and new obligations (security, cost, operations).
-
-## Revisit when
-Observable conditions that would show this decision is wrong.
-
-## Evidence
-Links to evidence records, benchmarks, or sources. Empty means the decision is unverified.
+- Type **Design**: all sections are required and checked, and the ADR needs a review record (see [GOVERNANCE](../architecture/GOVERNANCE.md)).
+- Type **Harness** or **Governance**: the common sections only (Context, Options considered, Decision, Consequences, Revisit when, Evidence).
+- ADR 0001 and 0002 predate the Type field and are treated as Harness.
