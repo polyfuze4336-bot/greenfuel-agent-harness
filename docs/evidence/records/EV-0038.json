@@ -1,0 +1,22 @@
+{
+  "id": "EV-0038",
+  "claim": "validate-loop reports OK at the loop commit",
+  "argv": [
+    "node",
+    "harness/scripts/validate-loop.mjs"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-28T12:59:23.698Z",
+  "durationMs": 226,
+  "outputSha256": "f7f4d19e873e65c731a8638f51e9dbe04202e0a4df9381c98fbfc55c75ca1127",
+  "outputBytes": 18,
+  "outputTail": "validate-loop: OK\n",
+  "gitHead": "a323bb975d84ba9e412782baf4656ca2cb533bae",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}

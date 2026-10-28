@@ -1,0 +1,24 @@
+{
+  "id": "EV-0037",
+  "claim": "loop engine and validate-loop tests pass at the loop commit",
+  "argv": [
+    "node",
+    "--test",
+    "tests/loop-engine.test.mjs",
+    "tests/validate-loop.test.mjs"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-28T12:58:56.323Z",
+  "durationMs": 26954,
+  "outputSha256": "6338d6c5df67ce4fea731deb00473bd504c7faac0103d713c45ce64a7c598d2e",
+  "outputBytes": 14068,
+  "outputTail": ".\n# Subtest: validate-loop rejects an unpinned toolchain\nok 53 - validate-loop rejects an unpinned toolchain\n  ---\n  duration_ms: 1055.5912\n  type: 'test'\n  ...\n# Subtest: validate-loop rejects the loop store no longer control plane\nok 54 - validate-loop rejects the loop store no longer control plane\n  ---\n  duration_ms: 605.145\n  type: 'test'\n  ...\n# Subtest: validate-loop rejects an agent allowed to run the loop\nok 55 - validate-loop rejects an agent allowed to run the loop\n  ---\n  duration_ms: 602.9698\n  type: 'test'\n  ...\n# Subtest: validate-loop rejects workspaces no longer ignored\nok 56 - validate-loop rejects workspaces no longer ignored\n  ---\n  duration_ms: 604.5596\n  type: 'test'\n  ...\n# Subtest: validate-loop rejects a document that dropped a required topic\nok 57 - validate-loop rejects a document that dropped a required topic\n  ---\n  duration_ms: 612.9772\n  type: 'test'\n  ...\n# Subtest: validate-loop rejects a document that claims certification\nok 58 - validate-loop rejects a document that claims certification\n  ---\n  duration_ms: 633.1332\n  type: 'test'\n  ...\n# Subtest: validate-loop rejects an emissions fixture that lost its disclaimer\nok 59 - validate-loop rejects an emissions fixture that lost its disclaimer\n  ---\n  duration_ms: 638.2738\n  type: 'test'\n  ...\n# Subtest: validate-loop rejects an expected result that disagrees with the data\nok 60 - validate-loop rejects an expected result that disagrees with the data\n  ---\n  duration_ms: 578.8034\n  type: 'test'\n  ...\n# Subtest: validate-loop rejects a recorded loop whose log was altered\nok 61 - validate-loop rejects a recorded loop whose log was altered\n  ---\n  duration_ms: 616.483\n  type: 'test'\n  ...\n# Subtest: validate-loop rejects a recorded loop whose evidence was altered\nok 62 - validate-loop rejects a recorded loop whose evidence was altered\n  ---\n  duration_ms: 708.4918\n  type: 'test'\n  ...\n1..62\n# tests 62\n# suites 0\n# pass 62\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 26865.2568\n",
+  "gitHead": "a323bb975d84ba9e412782baf4656ca2cb533bae",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}
