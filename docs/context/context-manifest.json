@@ -1,0 +1,113 @@
+{
+  "version": 1,
+  "description": "Context profiles for specialist agents. A profile names the documents and the requirement, decision and scheme rows an agent should load for a task. Source of truth for docs/context/CONTEXT-LOADING-STRATEGY.md. Checked by npm run validate.",
+  "alwaysLoaded": ["AGENTS.md"],
+  "core": ["docs/state/STATE.md", "PROBLEMSTATEMENT.md"],
+  "profiles": {
+    "business-framing": {
+      "purpose": "Scope, value, stakeholders and business-level options",
+      "documents": ["docs/context/BUSINESS-CASE.md", "docs/context/ASSUMPTIONS.md", "docs/context/DECISION-REGISTER.md", "docs/context/REQUIREMENTS.md", "docs/context/REQUIREMENTS-TRACEABILITY.md"],
+      "requirements": { "include": ["BR-*"] },
+      "decisions": ["D-001", "D-003", "D-004", "D-005", "D-007", "D-034", "D-035"],
+      "schemes": []
+    },
+    "capability-dea": {
+      "purpose": "Design or review the Delivery Evidence capability",
+      "documents": ["docs/context/REQUIREMENTS.md", "docs/context/NON-FUNCTIONAL-REQUIREMENTS.md", "docs/context/REQUIREMENTS-TRACEABILITY.md", "docs/context/DATA-CLASSIFICATION.md", "docs/context/SOVEREIGNTY-MATRIX.md", "docs/context/AGENT-AUTONOMY-MATRIX.md"],
+      "requirements": { "caps": ["DEA"], "include": ["BR-002", "FR-028", "FR-029", "FR-030", "SEC-001", "SEC-003", "SEC-004", "SEC-008", "AGT-002", "AGT-003", "NFR-001"] },
+      "decisions": ["D-003", "D-004", "D-009", "D-011", "D-013", "D-018", "D-019", "D-020", "D-021", "D-024", "D-028"],
+      "schemes": ["V-01", "V-04", "V-09", "V-10", "V-21", "V-22", "V-23"]
+    },
+    "capability-eaa": {
+      "purpose": "Design or review the Emissions Attribute capability",
+      "documents": ["docs/context/REQUIREMENTS.md", "docs/context/NON-FUNCTIONAL-REQUIREMENTS.md", "docs/context/REQUIREMENTS-TRACEABILITY.md", "docs/context/CERTIFICATION-SCHEMES.md", "docs/context/SOVEREIGNTY-MATRIX.md", "docs/context/AGENT-AUTONOMY-MATRIX.md"],
+      "requirements": { "caps": ["EAA"], "include": ["FR-028", "FR-029", "FR-030", "SEC-001", "SEC-003", "SEC-004", "SEC-008", "AGT-002", "AGT-003", "AGT-004", "NFR-001"] },
+      "decisions": ["D-001", "D-002", "D-009", "D-011", "D-022", "D-028"],
+      "schemes": ["V-01", "V-02", "V-03", "V-04", "V-05", "V-06", "V-07", "V-08", "V-12"]
+    },
+    "capability-dra": {
+      "purpose": "Design or review the Dispute Resolution capability",
+      "documents": ["docs/context/REQUIREMENTS.md", "docs/context/NON-FUNCTIONAL-REQUIREMENTS.md", "docs/context/REQUIREMENTS-TRACEABILITY.md", "docs/context/DATA-CLASSIFICATION.md", "docs/context/SOVEREIGNTY-MATRIX.md", "docs/context/AGENT-AUTONOMY-MATRIX.md"],
+      "requirements": { "caps": ["DRA"], "include": ["FR-005", "FR-029", "SEC-001", "SEC-003", "SEC-004", "SEC-008", "AGT-002", "AGT-003"] },
+      "decisions": ["D-007", "D-009", "D-011", "D-012", "D-013", "D-014", "D-026", "D-028"],
+      "schemes": ["V-09", "V-20", "V-24", "V-25", "V-26"]
+    },
+    "capability-mba": {
+      "purpose": "Design or review the Mass-Balance capability",
+      "documents": ["docs/context/REQUIREMENTS.md", "docs/context/NON-FUNCTIONAL-REQUIREMENTS.md", "docs/context/REQUIREMENTS-TRACEABILITY.md", "docs/context/CERTIFICATION-SCHEMES.md", "docs/context/SOVEREIGNTY-MATRIX.md", "docs/context/AGENT-AUTONOMY-MATRIX.md"],
+      "requirements": { "caps": ["MBA"], "include": ["FR-028", "FR-029", "SEC-001", "SEC-003", "SEC-004", "SEC-008", "AGT-002", "AGT-003"] },
+      "decisions": ["D-004", "D-009", "D-011", "D-023", "D-028"],
+      "schemes": ["V-01", "V-02", "V-11"]
+    },
+    "capability-cca": {
+      "purpose": "Design or review the Customer Compliance capability",
+      "documents": ["docs/context/REQUIREMENTS.md", "docs/context/NON-FUNCTIONAL-REQUIREMENTS.md", "docs/context/REQUIREMENTS-TRACEABILITY.md", "docs/context/DATA-CLASSIFICATION.md", "docs/context/SOVEREIGNTY-MATRIX.md", "docs/context/AGENT-AUTONOMY-MATRIX.md"],
+      "requirements": { "caps": ["CCA"], "include": ["FR-028", "FR-029", "AGT-002", "AGT-003", "SEC-001", "SEC-003", "SEC-004", "SEC-012"] },
+      "decisions": ["D-005", "D-009", "D-011", "D-015", "D-028", "D-029", "D-030"],
+      "schemes": ["V-05", "V-06"]
+    },
+    "sovereignty-data": {
+      "purpose": "Residency, isolation, classification and data-flow design",
+      "documents": ["docs/context/SOVEREIGNTY-MATRIX.md", "docs/context/DATA-CLASSIFICATION.md", "docs/context/REQUIREMENTS.md", "docs/context/NON-FUNCTIONAL-REQUIREMENTS.md", "docs/context/REQUIREMENTS-TRACEABILITY.md"],
+      "requirements": { "caps": ["SOV"], "include": ["DATA-*", "SEC-005", "SEC-006", "SEC-014", "NFR-010"] },
+      "decisions": ["D-003", "D-009", "D-010", "D-011", "D-014", "D-016", "D-017", "D-028", "D-033", "D-036"],
+      "schemes": ["V-10", "V-33", "V-35"]
+    },
+    "security-identity": {
+      "purpose": "Security architecture, identity, keys, tamper evidence, approvals",
+      "documents": ["docs/context/REQUIREMENTS.md", "docs/context/NON-FUNCTIONAL-REQUIREMENTS.md", "docs/context/REQUIREMENTS-TRACEABILITY.md", "docs/context/AGENT-AUTONOMY-MATRIX.md", "docs/context/DATA-CLASSIFICATION.md"],
+      "requirements": { "include": ["SEC-*", "AGT-*", "NFR-001", "NFR-010", "NFR-011", "NFR-012", "FR-026", "FR-027", "FR-031"] },
+      "decisions": ["D-007", "D-013", "D-021", "D-027", "D-030", "D-033"],
+      "schemes": ["V-30", "V-31", "V-32", "V-34"]
+    },
+    "agent-governance": {
+      "purpose": "Agent charters, autonomy levels, action catalogue, evaluation",
+      "documents": ["docs/context/AGENT-AUTONOMY-MATRIX.md", "docs/context/REQUIREMENTS.md", "docs/context/REQUIREMENTS-TRACEABILITY.md"],
+      "requirements": { "include": ["AGT-*", "FR-015", "FR-022", "FR-023", "FR-024", "FR-025", "FR-027", "FR-028", "SEC-005", "SEC-006", "SEC-009", "SEC-010", "SEC-012"] },
+      "decisions": ["D-007", "D-008", "D-027", "D-029", "D-030"],
+      "schemes": []
+    },
+    "edge-connectivity": {
+      "purpose": "Edge platform, offline operation, synchronisation, device security",
+      "documents": ["docs/context/REQUIREMENTS.md", "docs/context/REQUIREMENTS-TRACEABILITY.md", "docs/context/NON-FUNCTIONAL-REQUIREMENTS.md", "docs/context/SOVEREIGNTY-MATRIX.md"],
+      "requirements": { "caps": ["EDG"], "include": ["SEC-013"] },
+      "decisions": ["D-018", "D-019", "D-020", "D-021", "D-032"],
+      "schemes": ["V-10", "V-22", "V-30"]
+    },
+    "nfr-architecture": {
+      "purpose": "Quality attributes, targets and verification",
+      "documents": ["docs/context/NON-FUNCTIONAL-REQUIREMENTS.md", "docs/context/REQUIREMENTS-TRACEABILITY.md"],
+      "requirements": { "include": ["NFR-*"] },
+      "decisions": ["D-010", "D-020", "D-031", "D-032"],
+      "schemes": []
+    },
+    "compliance-verification": {
+      "purpose": "Verify candidate regulatory and certification claims (class D)",
+      "documents": ["docs/context/CERTIFICATION-SCHEMES.md", "docs/context/DECISION-REGISTER.md", "docs/context/REQUIREMENTS.md", "docs/context/NON-FUNCTIONAL-REQUIREMENTS.md", "docs/context/REQUIREMENTS-TRACEABILITY.md"],
+      "requirements": { "withVerify": true },
+      "decisions": ["D-001", "D-002", "D-009", "D-016", "D-022", "D-023"],
+      "schemes": ["*"]
+    },
+    "assurance-review": {
+      "purpose": "Independent review of the baseline: completeness, consistency, evidence",
+      "documents": ["docs/context/REQUIREMENTS.md", "docs/context/NON-FUNCTIONAL-REQUIREMENTS.md", "docs/context/REQUIREMENTS-TRACEABILITY.md", "docs/context/DECISION-REGISTER.md", "docs/context/ASSUMPTIONS.md", "docs/context/DATA-CLASSIFICATION.md", "docs/context/SOVEREIGNTY-MATRIX.md", "docs/context/AGENT-AUTONOMY-MATRIX.md", "docs/evidence/README.md"],
+      "requirements": "all",
+      "decisions": ["*"],
+      "schemes": ["*"]
+    },
+    "baseline-maintenance": {
+      "purpose": "Change the baseline itself (all context documents)",
+      "documents": ["docs/context/BUSINESS-CASE.md", "docs/context/REQUIREMENTS.md", "docs/context/NON-FUNCTIONAL-REQUIREMENTS.md", "docs/context/DATA-CLASSIFICATION.md", "docs/context/SOVEREIGNTY-MATRIX.md", "docs/context/AGENT-AUTONOMY-MATRIX.md", "docs/context/CERTIFICATION-SCHEMES.md", "docs/context/ASSUMPTIONS.md", "docs/context/REQUIREMENTS-TRACEABILITY.md", "docs/context/DECISION-REGISTER.md"],
+      "requirements": "all",
+      "decisions": ["*"],
+      "schemes": ["*"]
+    },
+    "harness-engineering": {
+      "purpose": "Change the coding harness (not the product design)",
+      "documents": ["docs/harness/HARNESS-ARCHITECTURE.md", "docs/harness/CAPABILITY-MATRIX.md", "docs/harness/IMPLEMENTATION-ROADMAP.md", "docs/harness/OPEN-QUESTIONS.md", "docs/adr/0001-native-first-harness.md", "docs/adr/0002-phase-gating-and-approval-enforcement.md"],
+      "requirements": { "include": [] },
+      "decisions": [],
+      "schemes": []
+    }
+  }
+}

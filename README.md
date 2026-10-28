@@ -10,11 +10,12 @@ A GitHub Copilot harness for VS Code, built to help design, implement, test, dep
 |---|---|
 | Rules | [AGENTS.md](AGENTS.md), `.github/instructions/` |
 | Roles | `architect` (design, docs-only edits, no shell), `reviewer` (independent verification, no edits) in `.github/agents/` |
-| Workflows | Skills `adr-authoring`, `session-handoff`, `evidence-validation` in `.github/skills/` |
+| Workflows | Skills `adr-authoring`, `session-handoff`, `evidence-validation`, `context-loading` in `.github/skills/` |
 | Guardrails | `preToolUse` hook (`harness/hooks/policy-guard.cjs`) with data-driven policy (`harness/policy/command-policy.json`), registered by `.github/hooks/policy.json` |
-| Evidence | `harness/scripts/record-evidence.mjs`, `harness/scripts/validate-harness.mjs`, `tests/`, CI in `.github/workflows/validate.yml` |
-| Decisions and state | [docs/adr/](docs/adr/), [docs/state/STATE.md](docs/state/STATE.md), [docs/evidence/](docs/evidence/) |
+| Evidence | `harness/scripts/record-evidence.mjs`, `harness/scripts/validate-harness.mjs`, `harness/scripts/validate-context.mjs`, `tests/`, CI in `.github/workflows/validate.yml` |
+| Decisions and state | [docs/adr/](docs/adr/), [docs/state/STATE.md](docs/state/STATE.md), [docs/state/TODO.md](docs/state/TODO.md), [docs/evidence/](docs/evidence/) |
 | Design of the harness | [docs/harness/](docs/harness/) |
+| Product context baseline | [PROBLEMSTATEMENT.md](PROBLEMSTATEMENT.md) and [docs/context/](docs/context/): business case, 99 requirements with traceability, data classification, sovereignty and autonomy matrices, candidate schemes, assumptions, [unresolved decision register](docs/context/DECISION-REGISTER.md), [context-loading strategy](docs/context/CONTEXT-LOADING-STRATEGY.md) |
 
 Read in this order: [REFERENCE-ASSESSMENT](docs/harness/REFERENCE-ASSESSMENT.md), [HARNESS-ARCHITECTURE](docs/harness/HARNESS-ARCHITECTURE.md), [CAPABILITY-MATRIX](docs/harness/CAPABILITY-MATRIX.md), [IMPLEMENTATION-ROADMAP](docs/harness/IMPLEMENTATION-ROADMAP.md), [OPEN-QUESTIONS](docs/harness/OPEN-QUESTIONS.md).
 
@@ -33,15 +34,16 @@ Each is mapped to native Copilot features and any custom code in the [capability
 
 Prerequisites: VS Code with GitHub Copilot, Node.js 20 or later. No packages to install.
 
-1. Open this folder in VS Code and trust the workspace. The hook runs only in a trusted workspace.
+1. Open this folder in VS Code and **trust the workspace**. Hooks are not loaded in an untrusted folder, and nothing warns you (observed in Copilot CLI; see [LIVE-TEST-R1](docs/harness/LIVE-TEST-R1.md)). For Copilot CLI, the folder must be in its trusted folders.
 2. Start a Copilot chat session, pick the `architect` or `reviewer` agent from the agent picker, and read [docs/state/STATE.md](docs/state/STATE.md) for where work stands.
-3. Check the repository itself:
+3. **Canary:** ask the agent to run `azd up`. A reply containing `HARNESS-POLICY AZD-MUTATE` means the hook is active. If the command runs instead, enforcement is off in this session; stop and fix trust first.
+4. Check the repository itself:
    ```
    npm test
    npm run validate
    ```
 
-Not yet verified: that the hook and agents behave as documented inside a live Copilot session. That is roadmap item R1 and is the first thing to test.
+Verified so far: the hook denies in Copilot CLI 1.0.102 in a trusted folder. Not yet verified: VS Code chat behaviour, agent tool restrictions, and skill and instruction loading (roadmap R1).
 
 ## Principles
 

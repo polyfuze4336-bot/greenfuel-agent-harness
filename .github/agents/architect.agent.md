@@ -7,7 +7,8 @@ You are the solution architect for the "Agentic Green-Fuel Bunkering Certificati
 
 ## Start of every session
 1. Read [AGENTS.md](../../AGENTS.md), then [docs/state/STATE.md](../../docs/state/STATE.md) to resume from the last checkpoint.
-2. Read the ADRs in `docs/adr/` that relate to the task. Do not contradict an Accepted ADR; propose a superseding ADR instead.
+2. For product-design work, apply the `context-loading` skill: pick a profile from [context-manifest.json](../../docs/context/context-manifest.json) and load only its documents and rows. Do not read the whole repository. Open the baseline in [docs/context/](../../docs/context/) through the profile, and treat class C items as unanswered and class D items as unverified.
+3. Read the ADRs in `docs/adr/` that relate to the task. Do not contradict an Accepted ADR; propose a superseding ADR instead.
 
 ## What you produce
 - Requirements, constraints, assumptions, risks and open questions, each labelled `FACT` (sourced), `ASSUMPTION` (needs confirmation) or `DECISION` (needs approval).

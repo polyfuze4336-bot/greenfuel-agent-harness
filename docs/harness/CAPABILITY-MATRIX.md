@@ -14,7 +14,9 @@ Native-capability claims come from the sources in Section 4, read on 2026-10-28 
 |---|---|---|---|---|---|---|
 | C1 | Always-on repo rules for every session | Context & Instructions | `AGENTS.md` | No | [AGENTS.md](../../AGENTS.md) | Written, not observed live |
 | C2 | Rules that load only for relevant files | Context & Instructions | `.instructions.md` with `applyTo` | No | `.github/instructions/*` | Written, not observed live; frontmatter validated |
-| C3 | Recorded architecture decisions | Context & Instructions | None specific (Markdown convention) | Convention only | `docs/adr/`, `adr-authoring` skill | Written; no ADR accepted yet |
+| C3 | Recorded architecture decisions | Context & Instructions | None specific (Markdown convention) | Convention only | `docs/adr/`, `adr-authoring` skill | Written; ADR 0001 and 0002 Accepted 2026-10-28 |
+| C4 | Task-specific context instead of the whole repository | Context & Instructions | Always-on `AGENTS.md`, skills, file links, search. No native per-agent document restriction | Partial: profile definitions and a coverage check | `docs/context/context-manifest.json`, `context-loading` skill, manifest checks in `validate-context.mjs` | Manifest checks Tested; agents following the procedure not observed ([CONTEXT-LOADING-STRATEGY](../context/CONTEXT-LOADING-STRATEGY.md) section 8) |
+| C5 | Requirements baseline is complete, consistent and traceable | Verification & Evidence | None | Yes | Baseline checks in `validate-context.mjs`: unique IDs, classes, one traceability row per requirement, source rules, resolvable references | Tested (mutation tests) |
 | T1 | Per-role tool restriction | Tools & Azure Integration | Agent `tools` allow-list | No | `architect`, `reviewer` agents | Validator checks `tools` is explicit; enforcement by runtime not observed |
 | T2 | Azure documentation and resource context | Tools & Azure Integration | Azure MCP server and Azure extensions (installed) | Allow-list per agent undecided | none | Not implemented (Q6) |
 | T3 | Azure authoring and validation | Tools & Azure Integration | Bicep extension, `az bicep`, `what-if`, `azd` | No | `azure-iac.instructions.md` (rules only) | Rules written; no IaC in Phase 0 |
@@ -24,7 +26,7 @@ Native-capability claims come from the sources in Section 4, read on 2026-10-28 
 | O3 | Isolated context for sub-tasks | Orchestration & Role Separation | Subagents (`task`) | No | none | Native only |
 | O4 | Harness separate from business agents | Orchestration & Role Separation | None | Yes | Phase gate in policy; boundary rule in AGENTS.md; validator rejects `src/`, `infra/` in phase 0 | Tested (gate and validator); boundary rule is prose |
 | G1 | Human approves risky actions | Guardrails & Human Approval | Permission levels, tool/URL/terminal approval | Bypassed by Allow all and Autopilot | Hook `ask` decisions | Tested (unit); not observed live |
-| G2 | Hard block on deployment and Azure change | Guardrails & Human Approval | `preToolUse` hook deny | Needs a script and policy | `policy-guard.cjs`, `command-policy.json` | Tested (unit); not observed live |
+| G2 | Hard block on deployment and Azure change | Guardrails & Human Approval | `preToolUse` hook deny | Needs a script and policy | `policy-guard.cjs`, `command-policy.json` | Tested (unit); observed live in Copilot CLI 1.0.102 in a trusted folder only; not loaded in an untrusted folder; VS Code not tested |
 | G3 | Protect guardrails from agent edits | Guardrails & Human Approval | None | Yes | Control-plane path rule in hook; CI re-run | Tested (unit); not observed live |
 | G4 | No secrets in repo | Guardrails & Human Approval | GitHub secret scanning (repo-level, not yet enabled) | Local check needed | Secret patterns in validator; `.gitignore`; hook denies secret-file access | Tested (validator, hook) |
 | G5 | Command isolation | Guardrails & Human Approval | Terminal sandbox setting (`chat.agent.sandbox.enabled`) | Platform support unverified | none | Not implemented (Q5, R3) |
@@ -47,10 +49,11 @@ Every custom component, why it exists, and how big it is. Removal triggers are l
 |---|---|---|---|---|---|
 | `harness/hooks/policy-guard.cjs` + `harness/policy/command-policy.json` | 137 + 33 | G1, G2, G3, O4 | Approval modes can be bypassed; no native way to block specific commands or paths by phase | none (Node built-ins) | A native, policy-as-config permission feature covers deny rules by command and path |
 | `harness/scripts/record-evidence.mjs` | 75 | V2 | No native tamper-evident record of a command result | none | A native, exportable tool-run log with exit codes is available and acceptable as evidence |
-| `harness/scripts/validate-harness.mjs` | 147 | T4, O4, V4, G4, G6 | No native linter for this repository's conventions | none | Never fully; shrink as native validation of agents, skills and hooks appears |
-| `tests/*.test.mjs` | 98 + 50 + 73 | all "Tested" rows | Tests for the above | `node:test` built in | With the components |
+| `harness/scripts/validate-harness.mjs` | 152 | T4, O4, V4, G4, G6 | No native linter for this repository's conventions | none | Never fully; shrink as native validation of agents, skills and hooks appears |
+| `harness/scripts/validate-context.mjs` | 243 | C4, C5 | No native check that a requirements baseline is internally consistent or that context profiles cover it | none | A native requirements or knowledge-base validation capability exists, or the baseline moves to a tool that enforces these rules |
+| `tests/*.test.mjs` | 98 + 50 + 73 + 89 | all "Tested" rows | Tests for the above | `node:test` built in | With the components |
 
-Total custom: about 510 lines of code plus 221 lines of tests, zero third-party packages.
+Total custom: about 607 lines of code plus 310 lines of tests, zero third-party packages.
 
 ## 3. Native capabilities available but not adopted yet
 

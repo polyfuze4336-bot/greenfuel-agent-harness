@@ -30,4 +30,4 @@
 Live testing shows hooks do not fire in the user's session type, or a native phase/permission feature replaces this.
 
 ## Evidence
-Unit tests in `tests/policy-guard.test.mjs`. No live-session evidence yet.
+Unit tests in `tests/policy-guard.test.mjs`. Live test in Copilot CLI 1.0.102 on 2026-10-28 ([LIVE-TEST-R1](../harness/LIVE-TEST-R1.md)): with the folder trusted the hook denied `azd up` and a write to `src/`; with the folder untrusted the hook did not run and `azd up` executed. Consequence accepted into this ADR: **enforcement exists only in trusted folders where hooks are loaded**, so the hook must be paired with a user-run canary, CI and review. VS Code chat has not been tested.

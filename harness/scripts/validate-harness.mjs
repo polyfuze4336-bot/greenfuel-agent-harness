@@ -4,6 +4,7 @@
 import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { validateContext, contextStats } from './validate-context.mjs';
 
 export const PILLARS = [
   'Context & Instructions',
@@ -14,9 +15,12 @@ export const PILLARS = [
   'Verification & Evidence',
 ];
 const REQUIRED = [
-  'README.md', 'AGENTS.md', 'package.json', 'harness/policy/command-policy.json',
+  'README.md', 'AGENTS.md', 'PROBLEMSTATEMENT.md', 'package.json', 'harness/policy/command-policy.json',
   'docs/harness/REFERENCE-ASSESSMENT.md', 'docs/harness/HARNESS-ARCHITECTURE.md', 'docs/harness/CAPABILITY-MATRIX.md',
-  'docs/harness/IMPLEMENTATION-ROADMAP.md', 'docs/harness/OPEN-QUESTIONS.md', 'docs/state/STATE.md',
+  'docs/harness/IMPLEMENTATION-ROADMAP.md', 'docs/harness/OPEN-QUESTIONS.md', 'docs/state/STATE.md', 'docs/state/TODO.md',
+  ...['BUSINESS-CASE', 'REQUIREMENTS', 'NON-FUNCTIONAL-REQUIREMENTS', 'DATA-CLASSIFICATION', 'SOVEREIGNTY-MATRIX', 'AGENT-AUTONOMY-MATRIX',
+    'CERTIFICATION-SCHEMES', 'ASSUMPTIONS', 'REQUIREMENTS-TRACEABILITY', 'DECISION-REGISTER', 'CONTEXT-LOADING-STRATEGY'].map((n) => `docs/context/${n}.md`),
+  'docs/context/context-manifest.json',
 ];
 const SKIP_DIRS = new Set(['.git', 'node_modules']);
 const SECRET_PATTERNS = [
@@ -133,12 +137,13 @@ export function validate(root) {
     for (const p of PILLARS) if (!text.includes(p)) fail('pillars', `${doc}: pillar '${p}' not represented`);
   }
 
-  return errors;
+  return [...errors, ...validateContext(root)];
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const i = process.argv.indexOf('--root');
   const root = path.resolve(i > 0 ? process.argv[i + 1] : path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..'));
+  if (process.argv.includes('--stats')) { console.log(JSON.stringify(contextStats(root), null, 2)); process.exit(0); }
   const errors = validate(root);
   if (process.argv.includes('--json')) console.log(JSON.stringify({ root, ok: !errors.length, errors }, null, 2));
   else if (errors.length) { for (const e of errors) console.error(`FAIL [${e.check}] ${e.msg}`); console.error(`${errors.length} problem(s).`); }

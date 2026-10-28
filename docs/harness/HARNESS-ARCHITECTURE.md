@@ -1,6 +1,6 @@
 # Harness Architecture
 
-Status: Proposed (see [ADR 0001](../adr/0001-native-first-harness.md), [ADR 0002](../adr/0002-phase-gating-and-approval-enforcement.md)). Nothing here has been observed in a live Copilot session yet; see [OPEN-QUESTIONS](OPEN-QUESTIONS.md) Q4.
+Status: Accepted decisions ([ADR 0001](../adr/0001-native-first-harness.md), [ADR 0002](../adr/0002-phase-gating-and-approval-enforcement.md)). The hook has been observed enforcing in Copilot CLI 1.0.102 (trusted folder only); VS Code chat is not yet tested. See [LIVE-TEST-R1](LIVE-TEST-R1.md) and [OPEN-QUESTIONS](OPEN-QUESTIONS.md) Q4.
 
 ## 1. Purpose and scope
 
@@ -111,7 +111,7 @@ flowchart LR
 |---|---|---|
 | Hook script crashes or errors | Tool call denied (fail-closed) | Visible to the user; fix and retry |
 | Hook times out | Call proceeds through normal approvals (fail-open) | Keep policy fast; sandbox and RBAC as backstops |
-| Hooks disabled by user, policy or session type | No enforcement | Detect in live test (roadmap R1); organisation policy for managed machines |
+| Hooks disabled by user, policy, session type, or an untrusted folder | No enforcement and no warning. Observed in Copilot CLI: `azd up` ran in an untrusted folder ([LIVE-TEST-R1](LIVE-TEST-R1.md)) | Trust the folder; run the canary in the README; organisation policy for managed machines; CI as the independent check |
 | Node missing on host | Hook cannot run, calls denied | Node 20+ is a stated prerequisite |
 | Native feature changes names or payload | Hook misreads tool args | Tests pin the documented shapes; review on VS Code upgrade |
 

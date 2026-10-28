@@ -20,14 +20,19 @@ Status legend: **Done** (observed), **Written** (files exist, not observed live)
 
 | ID | Work | Exit criteria (observable) | Approval needed |
 |---|---|---|---|
-| R1 | Live-session verification of hooks, agents, skills and instructions in VS Code 1.143.0, in both Copilot and Local harnesses | A written test script and results showing: hook fires for shell and edit tools; deny and ask appear as documented; `architect` has no shell; `reviewer` cannot edit; skills load; failing cases recorded as findings, not hidden | Owner runs or watches the session |
+| R1 | Live-session verification of hooks, agents, skills and instructions in VS Code 1.143.0, in both Copilot and Local harnesses | **Partly done 2026-10-28** in Copilot CLI only ([LIVE-TEST-R1](LIVE-TEST-R1.md)): hook denies in a trusted folder, does nothing in an untrusted one. Remaining: VS Code chat (both harnesses), `architect` has no shell, `reviewer` cannot edit, skills and instructions load, `ask` path. Failing cases recorded as findings | Owner runs or watches the VS Code session |
+| R1b | Hook-active canary and trust prerequisite | README states the trust prerequisite and a one-line canary the user runs (ask the agent to run `azd up`; a `HARNESS-POLICY` denial means hooks are active). Optionally a SessionStart hook that injects a visible banner | Owner |
 | R2 | Azure access model for agents: read-only identity, subscription and tenant scoping, Azure MCP allow-list per agent | ADR Accepted; Azure RBAC shows no write role for the agent identity (read-only query result recorded); allow-list written into agent `tools` | Subscription owner |
 | R3 | Isolation: evaluate terminal sandbox, dev container and assisted permissions | ADR with test results on this Windows machine; chosen mechanism documented in HARNESS-ARCHITECTURE | Owner |
 | R4 | GitHub remote with branch protection, required CI, secret scanning, CODEOWNERS on control-plane paths | CI run green on a pull request, recorded; protection rules listed from the API | Owner creates or authorises the remote |
 
 ## Stage 2: Use the harness for design (not harness building)
 
-Product architecture work (requirements, constraints, options, ADRs, VCDX-style design artefacts) using `architect` and `reviewer`. It needs [OPEN-QUESTIONS](OPEN-QUESTIONS.md) Q7 and Q12 answered first. Output goes to `docs/`. Phase stays 0 until an ADR accepts a reference architecture and proposes raising it.
+**Started 2026-10-28 with the requirements baseline** in [docs/context/](../context/) (see [DECISION-REGISTER](../context/DECISION-REGISTER.md) for what blocks the next step). Product architecture work (options analysis, ADRs, VCDX-style design artefacts) uses `architect` and `reviewer`. It cannot begin options analysis until the 17 M1 decisions in the register are answered or explicitly deferred by the owner. Output goes to `docs/`. Phase stays 0 until an ADR accepts a reference architecture and proposes raising it.
+
+| ID | Work | Exit criteria | Approval |
+|---|---|---|---|
+| R11 | Live test of context loading: give a specialist agent a task under each of three profiles and check the `Context:` line against what it actually read | Recorded results show whether agents follow the procedure; if not, a documented gap justifies a context-pack generator (ADR 0001) | Owner |
 
 ## Stage 3: Harness measurement and learning (only if needed)
 

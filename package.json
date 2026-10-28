@@ -6,6 +6,7 @@
   "engines": { "node": ">=20" },
   "scripts": {
     "validate": "node harness/scripts/validate-harness.mjs",
+    "stats": "node harness/scripts/validate-harness.mjs --stats",
     "test": "node --test"
   }
 }
