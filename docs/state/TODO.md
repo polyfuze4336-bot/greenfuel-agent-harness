@@ -65,6 +65,17 @@ The hardening stage built controls that need the owner to act before they enforc
 | T45 | **Open: owner decision.** Branch protection: upgrade the plan or accept detection-only (CI guard plus signed commits plus no credentials in the agent environment). Re-check `verify-github-protection` after any plan change | [APPROVER-ENROLLMENT](../security/APPROVER-ENROLLMENT.md#when-branch-protection-is-unavailable) | P-4; DEF-07 |
 | T46 | **Open: owner decision.** Whether to push the hardening branch and open a pull request. Nothing was pushed | this stage | none |
 | T47 | **Open, optional.** Decide whether to anchor the audit event log and the evidence chain head outside the machine (extends T16) | [EVIDENCE-INTEGRITY](../security/EVIDENCE-INTEGRITY.md) | A-7 |
+## Awaiting the owner (target architecture and business case, 2026-10-29)
+
+DES-0003 and ADRs 0016 to 0019 are **Proposed**; RV-0003 is **Blocked**. Nothing was approved. The business model is a scenario tool, not a validated case.
+
+| # | Item | Source | Blocks |
+|---|---|---|---|
+| T48 | **Open: needs names.** Name a human decider and a human reviewer for DES-0003 (extends T3, T37), enroll them as approvers (T43), then decide whether to accept ADRs 0016 to 0019. A model-written review is not a substitute | [RV-0003](../architecture/reviews/RV-0003-target-system-architecture.md), [09 Review and validation](../target-architecture/09-REVIEW-AND-VALIDATION.md) | Approval of the target architecture |
+| T49 | **Open: needs the owner's facts.** Supply or measure the business-case inputs in [COMMERCIAL-VALUE](../business/COMMERCIAL-VALUE.md) section 4 (premium revenue exposed to claims, volumes and invoiced premium by port, hours per certificate, disputes, audit effort, replaced costs), then re-run `npm run business:model`. Until then every result is a scenario figure | [BUSINESS-VALUE-MODEL](../business/BUSINESS-VALUE-MODEL.md), D-034 | Any funding decision |
+| T50 | **Open: owner decision.** Whether to grant a subscription and read-only identity so the service matrix can be verified per jurisdiction (extends T32, T33). Not granted; no Azure sign-in was used | [07 Azure service decision matrix](../target-architecture/07-AZURE-SERVICE-DECISION-MATRIX.md), [ADR 0019](../adr/0019-azure-service-selection-by-requirement.md) | Any service decision |
+| T51 | **Open: discovery.** Interview the eight candidate stakeholders and record answers to the unanswered questions; no stakeholder has been consulted | [STAKEHOLDERS](../business/STAKEHOLDERS.md) | Requirements confidence, business case |
+| T52 | **Open: owner decision.** Whether to push the `architecture/target-design` branch (nothing from this stage is pushed) | this stage | none |
 ## Decisions made
 
 | Date | Decision | Recorded in |

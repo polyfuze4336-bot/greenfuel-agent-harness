@@ -19,6 +19,7 @@ import { validateAzure } from './validate-azure.mjs';
 import { validateAcceptance } from './acceptance-reports.mjs';
 import { validateApprovals } from './validate-approvals.mjs';
 import { verifyEvidence } from './evidence.mjs';
+import { validateBusiness } from './business-model.mjs';
 
 const { distinctiveUser } = createRequire(import.meta.url)('../lib/local-paths.cjs');
 
@@ -90,6 +91,10 @@ export function frontmatter(text) {
 
 function validateEvidenceStore(root) {
   try { return verifyEvidence(root, null).findings.map((msg) => ({ check: 'evidence', msg })); } catch (e) { return [{ check: 'evidence', msg: `the evidence store could not be verified (${e.message})` }]; }
+}
+
+function validateBusinessModel(root) {
+  try { return validateBusiness(root).map((msg) => ({ check: 'business', msg })); } catch (e) { return [{ check: 'business', msg: `the business model could not be validated (${e.message})` }]; }
 }
 
 export function validate(root) {
@@ -199,7 +204,7 @@ export function validate(root) {
     for (const p of PILLARS) if (!text.includes(p)) fail('pillars', `${doc}: pillar '${p}' not represented`);
   }
 
-  return [...errors, ...validateContext(root), ...validateArchitecture(root), ...validateAgents(root), ...validateTools(root), ...validatePermissions(root), ...validateOrchestration(root), ...validateMemory(root), ...validateLoop(root), ...validateEvaluation(root), ...validateAzure(root), ...validateAcceptance(root), ...validateApprovals(root), ...validateEvidenceStore(root)];
+  return [...errors, ...validateContext(root), ...validateArchitecture(root), ...validateAgents(root), ...validateTools(root), ...validatePermissions(root), ...validateOrchestration(root), ...validateMemory(root), ...validateLoop(root), ...validateEvaluation(root), ...validateAzure(root), ...validateAcceptance(root), ...validateApprovals(root), ...validateEvidenceStore(root), ...validateBusinessModel(root)];
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

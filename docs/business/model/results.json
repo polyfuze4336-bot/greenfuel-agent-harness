@@ -1,0 +1,752 @@
+{
+  "schema": "greenfuel.business-results/v1",
+  "generatedFrom": [
+    "docs/business/model/model.json",
+    "docs/business/model/azure-prices.json"
+  ],
+  "note": "Scenario results, not a forecast. See BUSINESS-VALUE-MODEL.md.",
+  "pricesRetrievedAt": "2026-10-29T10:58:47.942Z",
+  "scenarios": {
+    "conservative": {
+      "figures": {
+        "cert_hours_base": {
+          "value": 10.5,
+          "unit": "hours",
+          "class": "scenario",
+          "label": "Manual hours per certificate, today"
+        },
+        "cert_hours_tobe": {
+          "value": 5.5,
+          "unit": "hours",
+          "class": "scenario",
+          "label": "Manual hours per certificate, with the platform"
+        },
+        "cert_cost_base": {
+          "value": 700,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Labour cost per certificate, today"
+        },
+        "cert_cost_tobe_labour": {
+          "value": 395,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Labour cost per certificate, with the platform"
+        },
+        "turnaround_base_hours": {
+          "value": 72,
+          "unit": "hours",
+          "class": "scenario",
+          "label": "Delivery-to-certificate turnaround, today"
+        },
+        "turnaround_tobe_hours": {
+          "value": 48,
+          "unit": "hours",
+          "class": "scenario",
+          "label": "Delivery-to-certificate turnaround, with the platform (bounded by the human approval)"
+        },
+        "platform_opex_y1": {
+          "value": 1730890.2653925,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Annual platform operating cost, year 1 (recommended option)"
+        },
+        "platform_opex_y3": {
+          "value": 1731090.6560175,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Annual platform operating cost, year 3 (recommended option)"
+        },
+        "one_time_cost": {
+          "value": 4027500,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "One-time cost (build, assurance, hardware, contingency)"
+        },
+        "tco3": {
+          "value": 9220471.382114999,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Three-year total cost of ownership (recommended option)"
+        },
+        "benefit_y1": {
+          "value": 42666,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Annual benefit, year 1 (after ramp)"
+        },
+        "benefit_y3": {
+          "value": 142220,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Annual benefit, year 3 (after ramp)"
+        },
+        "benefit3": {
+          "value": 284440,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Three-year benefit"
+        },
+        "net3": {
+          "value": -8936031.382114999,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Three-year net benefit (benefit minus TCO)"
+        },
+        "roi3": {
+          "value": -0.9691512517948128,
+          "unit": "ratio",
+          "class": "scenario",
+          "label": "Three-year ROI (net benefit divided by TCO)"
+        },
+        "npv3": {
+          "value": -8104285.968383114,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Three-year net present value"
+        },
+        "payback_months": {
+          "value": null,
+          "unit": "months",
+          "class": "scenario",
+          "label": "Payback period (months; null = not within 10 years; years 4 to 10 held at year 3)"
+        },
+        "cert_cost_tobe_run": {
+          "value": 6165.302186725,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Run cost per certificate with the platform (labour plus platform operating cost, year 3)"
+        },
+        "cert_cost_tobe_full": {
+          "value": 10640.302186724999,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Fully loaded cost per certificate with the platform (year 3 run cost plus the one-time cost spread over the certificates of years 1 to 3)"
+        },
+        "manual_hours_base": {
+          "value": 4150,
+          "unit": "hours",
+          "class": "scenario",
+          "label": "Annual manual hours, today (certificates, disputes, audits; year 3 volume)"
+        },
+        "manual_hours_tobe": {
+          "value": 2394,
+          "unit": "hours",
+          "class": "scenario",
+          "label": "Annual manual hours, with the platform (year 3 volume)"
+        },
+        "dispute_cost_base": {
+          "value": 5850,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Dispute handling cost per dispute, today (labour plus write-off)"
+        },
+        "dispute_cost_tobe": {
+          "value": 4490,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Dispute handling cost per dispute, with the platform"
+        },
+        "disputes_per_year": {
+          "value": 12,
+          "unit": "count",
+          "class": "scenario",
+          "label": "Disputes per year (year 3 volume)"
+        },
+        "audit_cost_base": {
+          "value": 10400,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Audit preparation cost per audit, today"
+        },
+        "audit_cost_tobe": {
+          "value": 7800,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Audit preparation cost per audit, with the platform"
+        },
+        "premium_protected_y3": {
+          "value": 24000.000000000007,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Green-fuel premium protected per year (year 3, before ramp)"
+        },
+        "incremental_margin_y3": {
+          "value": 0,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Incremental margin from volume enabled by auditor-grade evidence per year (year 3, before ramp)"
+        },
+        "premium_pool_y3": {
+          "value": 12000000,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Green-fuel premium revenue pool per year (year 3, for scale)"
+        },
+        "benefit_labour_y3": {
+          "value": 91500,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Benefit by source, year 3: certificate labour"
+        },
+        "benefit_dispute_y3": {
+          "value": 16320,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Benefit by source, year 3: disputes"
+        },
+        "benefit_audit_y3": {
+          "value": 10400,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Benefit by source, year 3: audit preparation"
+        },
+        "benefit_premium_y3": {
+          "value": 24000.000000000007,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Benefit by source, year 3: premium protected"
+        },
+        "benefit_incremental_y3": {
+          "value": 0,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Benefit by source, year 3: incremental margin"
+        },
+        "green_tonnes_y1": {
+          "value": 150000,
+          "unit": "tonnes",
+          "class": "scenario",
+          "label": "Green-fuel tonnes delivered per year (year 1)"
+        },
+        "share_of_sg_biobunker": {
+          "value": 0.10869565217391304,
+          "unit": "ratio",
+          "class": "scenario",
+          "label": "Group green tonnes as a share of Singapore 2025 biobunker sales (plausibility check only)"
+        }
+      },
+      "options": [
+        {
+          "id": "opt1",
+          "name": "Centralised Azure cloud",
+          "eligible": false,
+          "tco3": 4399132.4382,
+          "oneTime": 2940000,
+          "opexY3": 486447.7919
+        },
+        {
+          "id": "opt2",
+          "name": "Jurisdiction-local edge plus one Azure shore platform",
+          "eligible": "conditional",
+          "tco3": 5999632.438200001,
+          "oneTime": 4027500,
+          "opexY3": 657447.7919000001
+        },
+        {
+          "id": "opt3",
+          "name": "Hybrid sovereign evidence cells with federated coordination",
+          "eligible": true,
+          "tco3": 9220471.382114999,
+          "oneTime": 4027500,
+          "opexY3": 1731090.6560175
+        }
+      ],
+      "breakEvenDeliveries": 11835.46359192836
+    },
+    "base": {
+      "figures": {
+        "cert_hours_base": {
+          "value": 15,
+          "unit": "hours",
+          "class": "scenario",
+          "label": "Manual hours per certificate, today"
+        },
+        "cert_hours_tobe": {
+          "value": 4,
+          "unit": "hours",
+          "class": "scenario",
+          "label": "Manual hours per certificate, with the platform"
+        },
+        "cert_cost_base": {
+          "value": 985,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Labour cost per certificate, today"
+        },
+        "cert_cost_tobe_labour": {
+          "value": 282.5,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Labour cost per certificate, with the platform"
+        },
+        "turnaround_base_hours": {
+          "value": 144,
+          "unit": "hours",
+          "class": "scenario",
+          "label": "Delivery-to-certificate turnaround, today"
+        },
+        "turnaround_tobe_hours": {
+          "value": 24,
+          "unit": "hours",
+          "class": "scenario",
+          "label": "Delivery-to-certificate turnaround, with the platform (bounded by the human approval)"
+        },
+        "platform_opex_y1": {
+          "value": 985169.1653093749,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Annual platform operating cost, year 1 (recommended option)"
+        },
+        "platform_opex_y3": {
+          "value": 985308.2159685546,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Annual platform operating cost, year 3 (recommended option)"
+        },
+        "one_time_cost": {
+          "value": 2283325,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "One-time cost (build, assurance, hardware, contingency)"
+        },
+        "tco3": {
+          "value": 5239039.376177148,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Three-year total cost of ownership (recommended option)"
+        },
+        "benefit_y1": {
+          "value": 760680,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Annual benefit, year 1 (after ramp)"
+        },
+        "benefit_y3": {
+          "value": 1670103.9,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Annual benefit, year 3 (after ramp)"
+        },
+        "benefit3": {
+          "value": 3865310.1,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Three-year benefit"
+        },
+        "net3": {
+          "value": -1373729.2761771479,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Three-year net benefit (benefit minus TCO)"
+        },
+        "roi3": {
+          "value": -0.2622101453223928,
+          "unit": "ratio",
+          "class": "scenario",
+          "label": "Three-year ROI (net benefit divided by TCO)"
+        },
+        "npv3": {
+          "value": -1562379.3686783696,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Three-year net present value"
+        },
+        "payback_months": {
+          "value": 60.07251052909499,
+          "unit": "months",
+          "class": "scenario",
+          "label": "Payback period (months; null = not within 10 years; years 4 to 10 held at year 3)"
+        },
+        "cert_cost_tobe_run": {
+          "value": 1772.0059954173162,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Run cost per certificate with the platform (labour plus platform operating cost, year 3)"
+        },
+        "cert_cost_tobe_full": {
+          "value": 2979.1564051450455,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Fully loaded cost per certificate with the platform (year 3 run cost plus the one-time cost spread over the certificates of years 1 to 3)"
+        },
+        "manual_hours_base": {
+          "value": 13148.55,
+          "unit": "hours",
+          "class": "scenario",
+          "label": "Annual manual hours, today (certificates, disputes, audits; year 3 volume)"
+        },
+        "manual_hours_tobe": {
+          "value": 3482.2799999999997,
+          "unit": "hours",
+          "class": "scenario",
+          "label": "Annual manual hours, with the platform (year 3 volume)"
+        },
+        "dispute_cost_base": {
+          "value": 11025,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Dispute handling cost per dispute, today (labour plus write-off)"
+        },
+        "dispute_cost_tobe": {
+          "value": 3390,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Dispute handling cost per dispute, with the platform"
+        },
+        "disputes_per_year": {
+          "value": 39.69,
+          "unit": "count",
+          "class": "scenario",
+          "label": "Disputes per year (year 3 volume)"
+        },
+        "audit_cost_base": {
+          "value": 15600,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Audit preparation cost per audit, today"
+        },
+        "audit_cost_tobe": {
+          "value": 3900,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Audit preparation cost per audit, with the platform"
+        },
+        "premium_protected_y3": {
+          "value": 666792,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Green-fuel premium protected per year (year 3, before ramp)"
+        },
+        "incremental_margin_y3": {
+          "value": 165375,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Incremental margin from volume enabled by auditor-grade evidence per year (year 3, before ramp)"
+        },
+        "premium_pool_y3": {
+          "value": 39690000,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Green-fuel premium revenue pool per year (year 3, for scale)"
+        },
+        "benefit_labour_y3": {
+          "value": 464703.75,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Benefit by source, year 3: certificate labour"
+        },
+        "benefit_dispute_y3": {
+          "value": 303033.14999999997,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Benefit by source, year 3: disputes"
+        },
+        "benefit_audit_y3": {
+          "value": 70200,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Benefit by source, year 3: audit preparation"
+        },
+        "benefit_premium_y3": {
+          "value": 666792,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Benefit by source, year 3: premium protected"
+        },
+        "benefit_incremental_y3": {
+          "value": 165375,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Benefit by source, year 3: incremental margin"
+        },
+        "green_tonnes_y1": {
+          "value": 300000,
+          "unit": "tonnes",
+          "class": "scenario",
+          "label": "Green-fuel tonnes delivered per year (year 1)"
+        },
+        "share_of_sg_biobunker": {
+          "value": 0.21739130434782608,
+          "unit": "ratio",
+          "class": "scenario",
+          "label": "Group green tonnes as a share of Singapore 2025 biobunker sales (plausibility check only)"
+        }
+      },
+      "options": [
+        {
+          "id": "opt1",
+          "name": "Centralised Azure cloud",
+          "eligible": false,
+          "tco3": 2662569.063960938,
+          "oneTime": 1745700,
+          "opexY3": 305680.2381171875
+        },
+        {
+          "id": "opt2",
+          "name": "Jurisdiction-local edge plus one Azure shore platform",
+          "eligible": "conditional",
+          "tco3": 3759744.063960938,
+          "oneTime": 2427075,
+          "opexY3": 444280.2381171875
+        },
+        {
+          "id": "opt3",
+          "name": "Hybrid sovereign evidence cells with federated coordination",
+          "eligible": true,
+          "tco3": 5239039.376177148,
+          "oneTime": 2283325,
+          "opexY3": 985308.2159685546
+        }
+      ],
+      "breakEvenDeliveries": 900.7214781195195
+    },
+    "optimistic": {
+      "figures": {
+        "cert_hours_base": {
+          "value": 20.5,
+          "unit": "hours",
+          "class": "scenario",
+          "label": "Manual hours per certificate, today"
+        },
+        "cert_hours_tobe": {
+          "value": 2.75,
+          "unit": "hours",
+          "class": "scenario",
+          "label": "Manual hours per certificate, with the platform"
+        },
+        "cert_cost_base": {
+          "value": 1345,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Labour cost per certificate, today"
+        },
+        "cert_cost_tobe_labour": {
+          "value": 197.5,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Labour cost per certificate, with the platform"
+        },
+        "turnaround_base_hours": {
+          "value": 240,
+          "unit": "hours",
+          "class": "scenario",
+          "label": "Delivery-to-certificate turnaround, today"
+        },
+        "turnaround_tobe_hours": {
+          "value": 8,
+          "unit": "hours",
+          "class": "scenario",
+          "label": "Delivery-to-certificate turnaround, with the platform (bounded by the human approval)"
+        },
+        "platform_opex_y1": {
+          "value": 668320.21429375,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Annual platform operating cost, year 1 (recommended option)"
+        },
+        "platform_opex_y3": {
+          "value": 668457.1193230469,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Annual platform operating cost, year 3 (recommended option)"
+        },
+        "one_time_cost": {
+          "value": 1353000,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "One-time cost (build, assurance, hardware, contingency)"
+        },
+        "tco3": {
+          "value": 3358161.2246683594,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Three-year total cost of ownership (recommended option)"
+        },
+        "benefit_y1": {
+          "value": 5509378,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Annual benefit, year 1 (after ramp)"
+        },
+        "benefit_y3": {
+          "value": 10347997.899999999,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Annual benefit, year 3 (after ramp)"
+        },
+        "benefit3": {
+          "value": 24880221.9,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Three-year benefit"
+        },
+        "net3": {
+          "value": 21522060.675331637,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Three-year net benefit (benefit minus TCO)"
+        },
+        "roi3": {
+          "value": 6.408882491178512,
+          "unit": "ratio",
+          "class": "scenario",
+          "label": "Three-year ROI (net benefit divided by TCO)"
+        },
+        "npv3": {
+          "value": 18369852.419145174,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Three-year net present value"
+        },
+        "payback_months": {
+          "value": 3.3538124762605723,
+          "unit": "months",
+          "class": "scenario",
+          "label": "Payback period (months; null = not within 10 years; years 4 to 10 held at year 3)"
+        },
+        "cert_cost_tobe_run": {
+          "value": 618.7080146963119,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Run cost per certificate with the platform (labour plus platform operating cost, year 3)"
+        },
+        "cert_cost_tobe_full": {
+          "value": 943.4020391743536,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Fully loaded cost per certificate with the platform (year 3 run cost plus the one-time cost spread over the certificates of years 1 to 3)"
+        },
+        "manual_hours_base": {
+          "value": 43351.09999999999,
+          "unit": "hours",
+          "class": "scenario",
+          "label": "Annual manual hours, today (certificates, disputes, audits; year 3 volume)"
+        },
+        "manual_hours_tobe": {
+          "value": 5679.9299999999985,
+          "unit": "hours",
+          "class": "scenario",
+          "label": "Annual manual hours, with the platform (year 3 volume)"
+        },
+        "dispute_cost_base": {
+          "value": 17700,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Dispute handling cost per dispute, today (labour plus write-off)"
+        },
+        "dispute_cost_tobe": {
+          "value": 2560,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Dispute handling cost per dispute, with the platform"
+        },
+        "disputes_per_year": {
+          "value": 126.95999999999998,
+          "unit": "count",
+          "class": "scenario",
+          "label": "Disputes per year (year 3 volume)"
+        },
+        "audit_cost_base": {
+          "value": 20800,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Audit preparation cost per audit, today"
+        },
+        "audit_cost_tobe": {
+          "value": 1950,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Audit preparation cost per audit, with the platform"
+        },
+        "premium_protected_y3": {
+          "value": 5027616,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Green-fuel premium protected per year (year 3, before ramp)"
+        },
+        "incremental_margin_y3": {
+          "value": 1388625,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Incremental margin from volume enabled by auditor-grade evidence per year (year 3, before ramp)"
+        },
+        "premium_pool_y3": {
+          "value": 126959999.99999999,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Green-fuel premium revenue pool per year (year 3, for scale)"
+        },
+        "benefit_labour_y3": {
+          "value": 1821082.4999999998,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Benefit by source, year 3: certificate labour"
+        },
+        "benefit_dispute_y3": {
+          "value": 1922174.3999999997,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Benefit by source, year 3: disputes"
+        },
+        "benefit_audit_y3": {
+          "value": 188500,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Benefit by source, year 3: audit preparation"
+        },
+        "benefit_premium_y3": {
+          "value": 5027616,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Benefit by source, year 3: premium protected"
+        },
+        "benefit_incremental_y3": {
+          "value": 1388625,
+          "unit": "USD",
+          "class": "scenario",
+          "label": "Benefit by source, year 3: incremental margin"
+        },
+        "green_tonnes_y1": {
+          "value": 600000,
+          "unit": "tonnes",
+          "class": "scenario",
+          "label": "Green-fuel tonnes delivered per year (year 1)"
+        },
+        "share_of_sg_biobunker": {
+          "value": 0.43478260869565216,
+          "unit": "ratio",
+          "class": "scenario",
+          "label": "Group green tonnes as a share of Singapore 2025 biobunker sales (plausibility check only)"
+        }
+      },
+      "options": [
+        {
+          "id": "opt1",
+          "name": "Centralised Azure cloud",
+          "eligible": false,
+          "tco3": 1697369.1799718752,
+          "oneTime": 1086800,
+          "opexY3": 203585.321709375
+        },
+        {
+          "id": "opt2",
+          "name": "Jurisdiction-local edge plus one Azure shore platform",
+          "eligible": "conditional",
+          "tco3": 2494769.1799718747,
+          "oneTime": 1542200,
+          "opexY3": 317585.32170937496
+        },
+        {
+          "id": "opt3",
+          "name": "Hybrid sovereign evidence cells with federated coordination",
+          "eligible": true,
+          "tco3": 3358161.2246683594,
+          "oneTime": 1353000,
+          "opexY3": 668457.1193230469
+        }
+      ],
+      "breakEvenDeliveries": 152.02866290205856
+    }
+  }
+}

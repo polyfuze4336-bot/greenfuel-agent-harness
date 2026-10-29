@@ -1,0 +1,1381 @@
+{
+  "schema": "greenfuel.azure-prices/v1",
+  "source": "https://prices.azure.com/api/retail/prices",
+  "documentation": "https://learn.microsoft.com/rest/api/cost-management/retail-prices/azure-retail-prices",
+  "retrievedAt": "2026-10-29T10:58:47.942Z",
+  "currency": "USD",
+  "priceType": "Consumption list price (retail), no agreement or discount",
+  "regions": [
+    "southeastasia",
+    "eastasia",
+    "japaneast",
+    "koreacentral",
+    "australiaeast",
+    "centralindia",
+    "indonesiacentral",
+    "malaysiawest"
+  ],
+  "meters": [
+    {
+      "id": "aca-vcpu-active",
+      "what": "Container Apps, consumption, vCPU active",
+      "serviceName": "Azure Container Apps",
+      "productName": "Azure Container Apps",
+      "skuName": "Standard",
+      "meterName": "Standard vCPU Active Usage",
+      "unit": "1 Second",
+      "perRegion": {
+        "southeastasia": {
+          "retailPrice": 0.000034,
+          "unitOfMeasure": "1 Second",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2022-06-01T00:00:00Z",
+          "meterId": "5345ba68-7e2a-5eac-b829-98a6329c2272",
+          "tiersSeen": [
+            "0:0.000034"
+          ]
+        },
+        "eastasia": {
+          "retailPrice": 0.000024,
+          "unitOfMeasure": "1 Second",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2022-06-01T00:00:00Z",
+          "meterId": "c6ae6aa1-7d61-5e5b-8111-e8a0fab86f7b",
+          "tiersSeen": [
+            "0:0.000024"
+          ]
+        },
+        "japaneast": {
+          "retailPrice": 0.000024,
+          "unitOfMeasure": "1 Second",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2022-06-01T00:00:00Z",
+          "meterId": "4ef945a7-c73f-5825-9fe9-117d65d7b4a5",
+          "tiersSeen": [
+            "0:0.000024"
+          ]
+        },
+        "koreacentral": {
+          "retailPrice": 0.000024,
+          "unitOfMeasure": "1 Second",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2022-06-01T00:00:00Z",
+          "meterId": "deaa160f-1e76-5517-8739-8acf3543b7b0",
+          "tiersSeen": [
+            "0:0.000024"
+          ]
+        },
+        "australiaeast": {
+          "retailPrice": 0.000034,
+          "unitOfMeasure": "1 Second",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2022-06-01T00:00:00Z",
+          "meterId": "013772f8-63db-52a2-9c69-f2ae9012ef09",
+          "tiersSeen": [
+            "0:0.000034"
+          ]
+        },
+        "centralindia": {
+          "retailPrice": 0.000024,
+          "unitOfMeasure": "1 Second",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2022-06-01T00:00:00Z",
+          "meterId": "87620268-42d5-510b-8337-071b322131f8",
+          "tiersSeen": [
+            "0:0.000024"
+          ]
+        },
+        "indonesiacentral": {
+          "retailPrice": 0.000028,
+          "unitOfMeasure": "1 Second",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2026-01-01T00:00:00Z",
+          "meterId": "0615e95a-2d9e-5610-9fe0-1f85e246a50d",
+          "tiersSeen": [
+            "0:0.000028"
+          ]
+        },
+        "malaysiawest": {
+          "retailPrice": 0.000028,
+          "unitOfMeasure": "1 Second",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2026-02-01T00:00:00Z",
+          "meterId": "3bcf4424-48a0-5905-bd13-8b047f92911c",
+          "tiersSeen": [
+            "0:0.000028"
+          ]
+        }
+      }
+    },
+    {
+      "id": "aca-vcpu-idle",
+      "what": "Container Apps, consumption, vCPU idle",
+      "serviceName": "Azure Container Apps",
+      "productName": "Azure Container Apps",
+      "skuName": "Standard",
+      "meterName": "Standard vCPU Idle Usage",
+      "unit": "1 Second",
+      "perRegion": {
+        "southeastasia": {
+          "retailPrice": 0.000004,
+          "unitOfMeasure": "1 Second",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2022-06-01T00:00:00Z",
+          "meterId": "72c036f2-6920-5fae-8459-96038d34e82e",
+          "tiersSeen": [
+            "0:0.000004"
+          ]
+        },
+        "eastasia": {
+          "retailPrice": 0.000003,
+          "unitOfMeasure": "1 Second",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2022-06-01T00:00:00Z",
+          "meterId": "6156b929-5322-5561-aa99-e45fe88f45c2",
+          "tiersSeen": [
+            "0:0.000003"
+          ]
+        },
+        "japaneast": {
+          "retailPrice": 0.000003,
+          "unitOfMeasure": "1 Second",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2022-06-01T00:00:00Z",
+          "meterId": "eacf1fec-cb5e-5c31-a259-686c542d9d84",
+          "tiersSeen": [
+            "0:0.000003"
+          ]
+        },
+        "koreacentral": {
+          "retailPrice": 0.000003,
+          "unitOfMeasure": "1 Second",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2022-06-01T00:00:00Z",
+          "meterId": "a973a92b-0914-5280-8bbb-96083d4c052b",
+          "tiersSeen": [
+            "0:0.000003"
+          ]
+        },
+        "australiaeast": {
+          "retailPrice": 0.000004,
+          "unitOfMeasure": "1 Second",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2022-06-01T00:00:00Z",
+          "meterId": "d8b5c482-6b8b-5cd9-baea-9bba06a00b27",
+          "tiersSeen": [
+            "0:0.000004"
+          ]
+        },
+        "centralindia": {
+          "retailPrice": 0.000003,
+          "unitOfMeasure": "1 Second",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2022-06-01T00:00:00Z",
+          "meterId": "af0c7725-2773-5412-a9e2-b9ec687dc854",
+          "tiersSeen": [
+            "0:0.000003"
+          ]
+        },
+        "indonesiacentral": {
+          "retailPrice": 0.000004,
+          "unitOfMeasure": "1 Second",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2026-01-01T00:00:00Z",
+          "meterId": "e8265df8-76c1-59f8-a55f-8df856aa273c",
+          "tiersSeen": [
+            "0:0.000004"
+          ]
+        },
+        "malaysiawest": {
+          "retailPrice": 0.000004,
+          "unitOfMeasure": "1 Second",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2026-02-01T00:00:00Z",
+          "meterId": "4493709d-ee9b-5bd2-8710-a3248537f3c3",
+          "tiersSeen": [
+            "0:0.000004"
+          ]
+        }
+      }
+    },
+    {
+      "id": "aca-mem-active",
+      "what": "Container Apps, consumption, memory active",
+      "serviceName": "Azure Container Apps",
+      "productName": "Azure Container Apps",
+      "skuName": "Standard",
+      "meterName": "Standard Memory Active Usage",
+      "unit": "1 GiB Second",
+      "perRegion": {
+        "southeastasia": {
+          "retailPrice": 0.000004,
+          "unitOfMeasure": "1 GiB Second",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2022-06-01T00:00:00Z",
+          "meterId": "5d2b5080-8fa7-581a-b8ae-fec637063514",
+          "tiersSeen": [
+            "0:0.000004"
+          ]
+        },
+        "eastasia": {
+          "retailPrice": 0.000003,
+          "unitOfMeasure": "1 GiB Second",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2022-06-01T00:00:00Z",
+          "meterId": "c21827b7-fe3e-506f-aba6-2fc4dc954826",
+          "tiersSeen": [
+            "0:0.000003"
+          ]
+        },
+        "japaneast": {
+          "retailPrice": 0.000003,
+          "unitOfMeasure": "1 GiB Second",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2022-06-01T00:00:00Z",
+          "meterId": "5b8ebac4-2c47-523d-8559-a1e51867ad3c",
+          "tiersSeen": [
+            "0:0.000003"
+          ]
+        },
+        "koreacentral": {
+          "retailPrice": 0.000003,
+          "unitOfMeasure": "1 GiB Second",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2022-06-01T00:00:00Z",
+          "meterId": "68ff8448-e6b5-5ea5-aede-0805a37739f4",
+          "tiersSeen": [
+            "0:0.000003"
+          ]
+        },
+        "australiaeast": {
+          "retailPrice": 0.000004,
+          "unitOfMeasure": "1 GiB Second",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2022-06-01T00:00:00Z",
+          "meterId": "c35c8b99-9953-57cc-a67f-75365d560cb5",
+          "tiersSeen": [
+            "0:0.000004"
+          ]
+        },
+        "centralindia": {
+          "retailPrice": 0.000003,
+          "unitOfMeasure": "1 GiB Second",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2022-06-01T00:00:00Z",
+          "meterId": "2b14d956-df03-522c-b6b7-aea5ff0ab675",
+          "tiersSeen": [
+            "0:0.000003"
+          ]
+        },
+        "indonesiacentral": {
+          "retailPrice": 0.000004,
+          "unitOfMeasure": "1 GiB Second",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2026-01-01T00:00:00Z",
+          "meterId": "94bc0c51-fa18-580d-87a6-f83c1e36f706",
+          "tiersSeen": [
+            "0:0.000004"
+          ]
+        },
+        "malaysiawest": {
+          "retailPrice": 0.000004,
+          "unitOfMeasure": "1 GiB Second",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2026-02-01T00:00:00Z",
+          "meterId": "cb9fb698-abec-5237-8fa1-960fb558b10e",
+          "tiersSeen": [
+            "0:0.000004"
+          ]
+        }
+      }
+    },
+    {
+      "id": "aca-mem-idle",
+      "what": "Container Apps, consumption, memory idle",
+      "serviceName": "Azure Container Apps",
+      "productName": "Azure Container Apps",
+      "skuName": "Standard",
+      "meterName": "Standard Memory Idle Usage",
+      "unit": "1 GiB Second",
+      "perRegion": {
+        "southeastasia": {
+          "retailPrice": 0.000004,
+          "unitOfMeasure": "1 GiB Second",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2022-06-01T00:00:00Z",
+          "meterId": "375db157-0f59-520a-be46-d449cd6797ab",
+          "tiersSeen": [
+            "0:0.000004"
+          ]
+        },
+        "eastasia": {
+          "retailPrice": 0.000003,
+          "unitOfMeasure": "1 GiB Second",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2022-06-01T00:00:00Z",
+          "meterId": "f722f213-6cfd-5fd8-bc16-c1d9a8d48c9f",
+          "tiersSeen": [
+            "0:0.000003"
+          ]
+        },
+        "japaneast": {
+          "retailPrice": 0.000003,
+          "unitOfMeasure": "1 GiB Second",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2022-06-01T00:00:00Z",
+          "meterId": "5ea53005-8569-59a9-9b89-17b4b47f7872",
+          "tiersSeen": [
+            "0:0.000003"
+          ]
+        },
+        "koreacentral": {
+          "retailPrice": 0.000003,
+          "unitOfMeasure": "1 GiB Second",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2022-06-01T00:00:00Z",
+          "meterId": "406c15e1-638e-5d42-b202-b93ba4eb54f3",
+          "tiersSeen": [
+            "0:0.000003"
+          ]
+        },
+        "australiaeast": {
+          "retailPrice": 0.000004,
+          "unitOfMeasure": "1 GiB Second",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2022-06-01T00:00:00Z",
+          "meterId": "53c781b2-7598-580c-86ac-d0563f272ed8",
+          "tiersSeen": [
+            "0:0.000004"
+          ]
+        },
+        "centralindia": {
+          "retailPrice": 0.000003,
+          "unitOfMeasure": "1 GiB Second",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2022-06-01T00:00:00Z",
+          "meterId": "7f242f6b-eb46-5cb1-9121-575dc612d30c",
+          "tiersSeen": [
+            "0:0.000003"
+          ]
+        },
+        "indonesiacentral": {
+          "retailPrice": 0.000004,
+          "unitOfMeasure": "1 GiB Second",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2026-01-01T00:00:00Z",
+          "meterId": "5466fe07-71cc-5610-9c1a-58feee65e004",
+          "tiersSeen": [
+            "0:0.000004"
+          ]
+        },
+        "malaysiawest": {
+          "retailPrice": 0.000004,
+          "unitOfMeasure": "1 GiB Second",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2026-02-01T00:00:00Z",
+          "meterId": "b7739901-ea54-557a-aa87-07191935be92",
+          "tiersSeen": [
+            "0:0.000004"
+          ]
+        }
+      }
+    },
+    {
+      "id": "pg-gp-d4ds-v5",
+      "what": "PostgreSQL flexible server, General Purpose Ddsv5, 4 vCore compute",
+      "serviceName": "Azure Database for PostgreSQL",
+      "productName": "Azure Database for PostgreSQL Flexible Server General Purpose Ddsv5 Series Compute",
+      "skuName": "4 vCore",
+      "meterName": "vCore",
+      "unit": "1 Hour",
+      "perRegion": {
+        "southeastasia": {
+          "retailPrice": 0.488,
+          "unitOfMeasure": "1 Hour",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2023-03-01T00:00:00Z",
+          "meterId": "255aead7-c219-5996-a388-5aa532d73811",
+          "tiersSeen": [
+            "0:0.488"
+          ]
+        },
+        "eastasia": {
+          "retailPrice": 0.538,
+          "unitOfMeasure": "1 Hour",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2023-03-01T00:00:00Z",
+          "meterId": "14815d41-e32f-5fbf-8c5a-1260c3647688",
+          "tiersSeen": [
+            "0:0.538"
+          ]
+        },
+        "japaneast": {
+          "retailPrice": 0.488,
+          "unitOfMeasure": "1 Hour",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2023-03-01T00:00:00Z",
+          "meterId": "ba58fd53-87ea-5bce-bf80-09f8693ea681",
+          "tiersSeen": [
+            "0:0.488"
+          ]
+        },
+        "koreacentral": {
+          "retailPrice": 0.492,
+          "unitOfMeasure": "1 Hour",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2023-03-01T00:00:00Z",
+          "meterId": "818f01b3-f3fe-58c7-89ae-ff1a45528ff3",
+          "tiersSeen": [
+            "0:0.492"
+          ]
+        },
+        "australiaeast": {
+          "retailPrice": 0.488,
+          "unitOfMeasure": "1 Hour",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2023-03-01T00:00:00Z",
+          "meterId": "b7852494-7a26-521b-9cda-41c66ed174ba",
+          "tiersSeen": [
+            "0:0.488"
+          ]
+        },
+        "centralindia": {
+          "retailPrice": 0.502,
+          "unitOfMeasure": "1 Hour",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2023-03-01T00:00:00Z",
+          "meterId": "9c5c08ea-3507-5045-a61e-36d13334660e",
+          "tiersSeen": [
+            "0:0.502"
+          ]
+        },
+        "indonesiacentral": {
+          "retailPrice": 0.4392,
+          "unitOfMeasure": "1 Hour",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2025-05-01T00:00:00Z",
+          "meterId": "9c725079-1037-5c54-8be9-aba28d3b9d33",
+          "tiersSeen": [
+            "0:0.4392"
+          ]
+        },
+        "malaysiawest": {
+          "retailPrice": 0.4392,
+          "unitOfMeasure": "1 Hour",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2025-04-01T00:00:00Z",
+          "meterId": "a783a982-083c-521e-ad04-d9626d966830",
+          "tiersSeen": [
+            "0:0.4392"
+          ]
+        }
+      }
+    },
+    {
+      "id": "pg-storage",
+      "what": "PostgreSQL flexible server, storage",
+      "serviceName": "Azure Database for PostgreSQL",
+      "productName": "Azure Database for PostgreSQL Flex Server Storage",
+      "skuName": "Storage",
+      "meterName": "Storage Data Stored",
+      "unit": "1 GB/Month",
+      "perRegion": {
+        "southeastasia": {
+          "retailPrice": 0.138,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2021-06-01T00:00:00Z",
+          "meterId": "3dc8bdb7-8a94-5ffe-8836-6e80a540f61f",
+          "tiersSeen": [
+            "0:0.138"
+          ]
+        },
+        "eastasia": {
+          "retailPrice": 0.15,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2021-06-01T00:00:00Z",
+          "meterId": "3b64071f-14f4-5bb7-b1e4-a8839666bf33",
+          "tiersSeen": [
+            "0:0.15"
+          ]
+        },
+        "japaneast": {
+          "retailPrice": 0.138,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2021-06-01T00:00:00Z",
+          "meterId": "cf8269ac-0978-5c40-8dd5-0faf844f04b4",
+          "tiersSeen": [
+            "0:0.138"
+          ]
+        },
+        "koreacentral": {
+          "retailPrice": 0.131,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2021-06-01T00:00:00Z",
+          "meterId": "c8191f70-a3bb-5688-9a71-c0df8fd50a3f",
+          "tiersSeen": [
+            "0:0.131"
+          ]
+        },
+        "australiaeast": {
+          "retailPrice": 0.138,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2021-06-01T00:00:00Z",
+          "meterId": "61d63589-b712-54b9-9346-6977b4b5a24a",
+          "tiersSeen": [
+            "0:0.138"
+          ]
+        },
+        "centralindia": {
+          "retailPrice": 0.131,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2021-06-01T00:00:00Z",
+          "meterId": "94cadb5b-aa3f-5e96-a8db-7a4778b11616",
+          "tiersSeen": [
+            "0:0.131"
+          ]
+        },
+        "indonesiacentral": {
+          "retailPrice": 0.1242,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2025-05-01T00:00:00Z",
+          "meterId": "877105e7-1058-512d-b4db-69f8e0ca4002",
+          "tiersSeen": [
+            "0:0.1242"
+          ]
+        },
+        "malaysiawest": {
+          "retailPrice": 0.1242,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2025-04-01T00:00:00Z",
+          "meterId": "2e56ee9d-e19b-5a5d-ba43-eefcd3845e58",
+          "tiersSeen": [
+            "0:0.1242"
+          ]
+        }
+      }
+    },
+    {
+      "id": "pg-backup-lrs",
+      "what": "PostgreSQL flexible server, backup storage LRS",
+      "serviceName": "Azure Database for PostgreSQL",
+      "productName": "Azure Database for PostgreSQL Flexible Server Backup Storage",
+      "skuName": "Backup Storage LRS",
+      "meterName": "Backup Storage LRS Data Stored",
+      "unit": "1 GB/Month",
+      "perRegion": {
+        "southeastasia": {
+          "retailPrice": 0.095,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2021-06-01T00:00:00Z",
+          "meterId": "8bc358f5-11c3-5b79-96f6-cb240df036e6",
+          "tiersSeen": [
+            "0:0.095"
+          ]
+        },
+        "eastasia": {
+          "retailPrice": 0.095,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2021-06-01T00:00:00Z",
+          "meterId": "27164da8-064e-54fd-8f79-cb1968f82f39",
+          "tiersSeen": [
+            "0:0.095"
+          ]
+        },
+        "japaneast": {
+          "retailPrice": 0.095,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2021-06-01T00:00:00Z",
+          "meterId": "eb9fab5c-0978-5955-82e8-534eb375ca73",
+          "tiersSeen": [
+            "0:0.095"
+          ]
+        },
+        "koreacentral": {
+          "retailPrice": 0.095,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2021-06-01T00:00:00Z",
+          "meterId": "ec9da6e4-c448-5c89-8941-441c4efe7685",
+          "tiersSeen": [
+            "0:0.095"
+          ]
+        },
+        "australiaeast": {
+          "retailPrice": 0.095,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2021-06-01T00:00:00Z",
+          "meterId": "0b0a7bd8-085b-5917-8f19-179062d42e2e",
+          "tiersSeen": [
+            "0:0.095"
+          ]
+        },
+        "centralindia": {
+          "retailPrice": 0.095,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2021-06-01T00:00:00Z",
+          "meterId": "8eb0e6b9-b39e-5ab6-84fb-feb2f7453bb5",
+          "tiersSeen": [
+            "0:0.095"
+          ]
+        },
+        "indonesiacentral": {
+          "retailPrice": 0.095,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2025-02-01T00:00:00Z",
+          "meterId": "113b5eda-b2b6-514c-adf2-8f29e80f59c4",
+          "tiersSeen": [
+            "0:0.095"
+          ]
+        },
+        "malaysiawest": {
+          "retailPrice": 0.095,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2025-04-01T00:00:00Z",
+          "meterId": "3f564894-d4e1-57c4-a53f-bfa35b67830c",
+          "tiersSeen": [
+            "0:0.095"
+          ]
+        }
+      }
+    },
+    {
+      "id": "blob-hot-zrs",
+      "what": "Blob storage, general-purpose v2, Hot ZRS data stored",
+      "serviceName": "Storage",
+      "productName": "General Block Blob v2",
+      "skuName": "Hot ZRS",
+      "meterName": "Hot ZRS Data Stored",
+      "unit": "1 GB/Month",
+      "perRegion": {
+        "southeastasia": {
+          "retailPrice": 0.025,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2018-06-01T00:00:00Z",
+          "meterId": "e8bfc2f5-ebbe-463f-8778-a0a4753e7d01",
+          "tiersSeen": [
+            "0:0.025",
+            "512000:0.023",
+            "51200:0.024"
+          ]
+        },
+        "eastasia": {
+          "retailPrice": 0.03,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2018-07-01T00:00:00Z",
+          "meterId": "3dfb37c3-acb0-4193-9416-8518d69d97ab",
+          "tiersSeen": [
+            "0:0.03",
+            "512000:0.0276",
+            "51200:0.0288"
+          ]
+        },
+        "japaneast": {
+          "retailPrice": 0.025,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2018-07-01T00:00:00Z",
+          "meterId": "5a712324-6e55-4757-ae2d-2d274b189880",
+          "tiersSeen": [
+            "0:0.025",
+            "512000:0.023",
+            "51200:0.024"
+          ]
+        },
+        "koreacentral": {
+          "retailPrice": 0.025,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2018-07-01T00:00:00Z",
+          "meterId": "7546106d-b1da-4dc2-9838-3b9161a6f12e",
+          "tiersSeen": [
+            "0:0.025",
+            "512000:0.023",
+            "51200:0.024"
+          ]
+        },
+        "australiaeast": {
+          "retailPrice": 0.025,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2018-07-01T00:00:00Z",
+          "meterId": "29e9d88b-eeca-44be-94ed-d663a380c8ee",
+          "tiersSeen": [
+            "0:0.025",
+            "512000:0.023",
+            "51200:0.024"
+          ]
+        },
+        "centralindia": {
+          "retailPrice": 0.025,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2018-07-01T00:00:00Z",
+          "meterId": "838d4ad0-7ab3-4ce3-bbd7-c68165d82404",
+          "tiersSeen": [
+            "0:0.025",
+            "512000:0.023",
+            "51200:0.024"
+          ]
+        },
+        "indonesiacentral": {
+          "retailPrice": 0.0225,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2025-05-01T00:00:00Z",
+          "meterId": "b7c0476f-8c32-59f4-ae26-75d1b63defa0",
+          "tiersSeen": [
+            "0:0.0225",
+            "512000:0.0207",
+            "51200:0.0216"
+          ]
+        },
+        "malaysiawest": {
+          "retailPrice": 0.0225,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2025-04-01T00:00:00Z",
+          "meterId": "a836f9e6-146b-5f4e-9c1c-4c09a3c1f326",
+          "tiersSeen": [
+            "0:0.0225",
+            "512000:0.0207",
+            "51200:0.0216"
+          ]
+        }
+      }
+    },
+    {
+      "id": "blob-hot-lrs",
+      "what": "Blob storage, general-purpose v2, Hot LRS data stored",
+      "serviceName": "Storage",
+      "productName": "General Block Blob v2",
+      "skuName": "Hot LRS",
+      "meterName": "Hot LRS Data Stored",
+      "unit": "1 GB/Month",
+      "perRegion": {
+        "southeastasia": {
+          "retailPrice": 0.02,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2017-02-03T00:00:00Z",
+          "meterId": "fc203689-76e7-4fbe-86b9-968d73231c00",
+          "tiersSeen": [
+            "0:0.02",
+            "512000:0.0184",
+            "51200:0.0192"
+          ]
+        },
+        "eastasia": {
+          "retailPrice": 0.024,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2017-02-03T00:00:00Z",
+          "meterId": "d688b491-e031-4aa2-bb87-be3f346e2b8f",
+          "tiersSeen": [
+            "0:0.024",
+            "512000:0.02208",
+            "51200:0.02304"
+          ]
+        },
+        "japaneast": {
+          "retailPrice": 0.02,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2017-02-03T00:00:00Z",
+          "meterId": "696220f2-91da-4ca5-920b-151e51a6d103",
+          "tiersSeen": [
+            "0:0.02",
+            "512000:0.0184",
+            "51200:0.0192"
+          ]
+        },
+        "koreacentral": {
+          "retailPrice": 0.02,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2017-02-20T00:00:00Z",
+          "meterId": "d4b38a28-b8aa-449e-be8b-167b245967cb",
+          "tiersSeen": [
+            "0:0.02",
+            "512000:0.0184",
+            "51200:0.0192"
+          ]
+        },
+        "australiaeast": {
+          "retailPrice": 0.02,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2017-02-03T00:00:00Z",
+          "meterId": "2f968df1-9a17-4398-bcfb-ad8bf7922321",
+          "tiersSeen": [
+            "0:0.02",
+            "512000:0.0184",
+            "51200:0.0192"
+          ]
+        },
+        "centralindia": {
+          "retailPrice": 0.02,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2017-02-03T00:00:00Z",
+          "meterId": "5c7a80d0-80f2-45f7-9135-4b4ac42adf49",
+          "tiersSeen": [
+            "0:0.02",
+            "512000:0.0184",
+            "51200:0.0192"
+          ]
+        },
+        "indonesiacentral": {
+          "retailPrice": 0.018,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2025-05-01T00:00:00Z",
+          "meterId": "07051efe-029e-5bc2-a73a-a4e25917541a",
+          "tiersSeen": [
+            "0:0.018",
+            "512000:0.01656",
+            "51200:0.01728"
+          ]
+        },
+        "malaysiawest": {
+          "retailPrice": 0.018,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2025-04-01T00:00:00Z",
+          "meterId": "1ca6fa51-4c66-5fae-9be3-fe64d1e81b02",
+          "tiersSeen": [
+            "0:0.018",
+            "512000:0.01656",
+            "51200:0.01728"
+          ]
+        }
+      }
+    },
+    {
+      "id": "sb-premium-mu",
+      "what": "Service Bus Premium messaging unit",
+      "serviceName": "Service Bus",
+      "productName": "Service Bus",
+      "skuName": "Premium",
+      "meterName": "Premium Messaging Unit",
+      "unit": "1/Hour",
+      "perRegion": {
+        "southeastasia": {
+          "retailPrice": 0.9275,
+          "unitOfMeasure": "1/Hour",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2018-05-01T00:00:00Z",
+          "meterId": "176d7148-0033-48c7-8b18-7af4a9d1dca7",
+          "tiersSeen": [
+            "0:0.9275"
+          ]
+        },
+        "eastasia": {
+          "retailPrice": 0.9275,
+          "unitOfMeasure": "1/Hour",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2018-05-01T00:00:00Z",
+          "meterId": "176d7148-0033-48c7-8b18-7af4a9d1dca7",
+          "tiersSeen": [
+            "0:0.9275"
+          ]
+        },
+        "japaneast": {
+          "retailPrice": 0.9275,
+          "unitOfMeasure": "1/Hour",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2018-05-01T00:00:00Z",
+          "meterId": "176d7148-0033-48c7-8b18-7af4a9d1dca7",
+          "tiersSeen": [
+            "0:0.9275"
+          ]
+        },
+        "koreacentral": {
+          "retailPrice": 0.9275,
+          "unitOfMeasure": "1/Hour",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2018-05-01T00:00:00Z",
+          "meterId": "176d7148-0033-48c7-8b18-7af4a9d1dca7",
+          "tiersSeen": [
+            "0:0.9275"
+          ]
+        },
+        "australiaeast": {
+          "retailPrice": 0.9275,
+          "unitOfMeasure": "1/Hour",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2018-05-01T00:00:00Z",
+          "meterId": "176d7148-0033-48c7-8b18-7af4a9d1dca7",
+          "tiersSeen": [
+            "0:0.9275"
+          ]
+        },
+        "centralindia": {
+          "retailPrice": 0.9275,
+          "unitOfMeasure": "1/Hour",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2018-05-01T00:00:00Z",
+          "meterId": "176d7148-0033-48c7-8b18-7af4a9d1dca7",
+          "tiersSeen": [
+            "0:0.9275"
+          ]
+        },
+        "indonesiacentral": {
+          "retailPrice": 0.9275,
+          "unitOfMeasure": "1/Hour",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2025-02-01T00:00:00Z",
+          "meterId": "e47a1d64-02fc-5b45-8603-f07c667767dd",
+          "tiersSeen": [
+            "0:0.9275"
+          ]
+        },
+        "malaysiawest": {
+          "retailPrice": 0.9275,
+          "unitOfMeasure": "1/Hour",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2025-04-01T00:00:00Z",
+          "meterId": "0f4aa2c9-9f7e-548c-a4a2-f87cfb54b629",
+          "tiersSeen": [
+            "0:0.9275"
+          ]
+        }
+      }
+    },
+    {
+      "id": "sb-standard-base",
+      "what": "Service Bus Standard base unit",
+      "serviceName": "Service Bus",
+      "productName": "Service Bus",
+      "skuName": "Standard",
+      "meterName": "Standard Base Unit",
+      "unit": "1/Month",
+      "perRegion": {
+        "southeastasia": {
+          "retailPrice": 10,
+          "unitOfMeasure": "1/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2018-05-01T00:00:00Z",
+          "meterId": "d5034e45-00c1-48c6-8c00-c866f788e033",
+          "tiersSeen": [
+            "0:10"
+          ]
+        },
+        "eastasia": {
+          "retailPrice": 10,
+          "unitOfMeasure": "1/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2018-05-01T00:00:00Z",
+          "meterId": "d5034e45-00c1-48c6-8c00-c866f788e033",
+          "tiersSeen": [
+            "0:10"
+          ]
+        },
+        "japaneast": {
+          "retailPrice": 10,
+          "unitOfMeasure": "1/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2018-05-01T00:00:00Z",
+          "meterId": "d5034e45-00c1-48c6-8c00-c866f788e033",
+          "tiersSeen": [
+            "0:10"
+          ]
+        },
+        "koreacentral": {
+          "retailPrice": 10,
+          "unitOfMeasure": "1/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2018-05-01T00:00:00Z",
+          "meterId": "d5034e45-00c1-48c6-8c00-c866f788e033",
+          "tiersSeen": [
+            "0:10"
+          ]
+        },
+        "australiaeast": {
+          "retailPrice": 10,
+          "unitOfMeasure": "1/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2018-05-01T00:00:00Z",
+          "meterId": "d5034e45-00c1-48c6-8c00-c866f788e033",
+          "tiersSeen": [
+            "0:10"
+          ]
+        },
+        "centralindia": {
+          "retailPrice": 10,
+          "unitOfMeasure": "1/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2018-05-01T00:00:00Z",
+          "meterId": "d5034e45-00c1-48c6-8c00-c866f788e033",
+          "tiersSeen": [
+            "0:10"
+          ]
+        },
+        "indonesiacentral": null,
+        "malaysiawest": {
+          "retailPrice": 11.7,
+          "unitOfMeasure": "1/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2025-08-01T00:00:00Z",
+          "meterId": "ef663c66-57c8-550e-9897-3e152c12ad0d",
+          "tiersSeen": [
+            "0:11.7"
+          ]
+        }
+      }
+    },
+    {
+      "id": "akv-hsm-pool-b1",
+      "what": "Key Vault Managed HSM pool, Standard B1 instance",
+      "serviceName": "Key Vault",
+      "productName": "Key Vault HSM Pool",
+      "skuName": "Standard B1",
+      "meterName": "Standard B1 Instance",
+      "unit": "1 Hour",
+      "perRegion": {
+        "southeastasia": {
+          "retailPrice": 3.2,
+          "unitOfMeasure": "1 Hour",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2021-08-01T00:00:00Z",
+          "meterId": "83ff2c29-8dc0-5a1c-8fcb-b5894080ad31",
+          "tiersSeen": [
+            "0:3.2"
+          ]
+        },
+        "eastasia": {
+          "retailPrice": 3.2,
+          "unitOfMeasure": "1 Hour",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2021-08-01T00:00:00Z",
+          "meterId": "a2d46aee-fcc9-5f18-ade1-54259e8e8da8",
+          "tiersSeen": [
+            "0:3.2"
+          ]
+        },
+        "japaneast": {
+          "retailPrice": 3.2,
+          "unitOfMeasure": "1 Hour",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2021-09-01T00:00:00Z",
+          "meterId": "31a9f1f5-ac12-5f32-9e3f-9c2c16440a32",
+          "tiersSeen": [
+            "0:3.2"
+          ]
+        },
+        "koreacentral": {
+          "retailPrice": 3.2,
+          "unitOfMeasure": "1 Hour",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2021-08-01T00:00:00Z",
+          "meterId": "f73d22e3-9f45-5e0c-afff-95bf8863a2f0",
+          "tiersSeen": [
+            "0:3.2"
+          ]
+        },
+        "australiaeast": {
+          "retailPrice": 3.2,
+          "unitOfMeasure": "1 Hour",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2021-09-01T00:00:00Z",
+          "meterId": "ba217057-3740-5401-b3cf-1f4b8784131a",
+          "tiersSeen": [
+            "0:3.2"
+          ]
+        },
+        "centralindia": {
+          "retailPrice": 3.2,
+          "unitOfMeasure": "1 Hour",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2022-08-01T00:00:00Z",
+          "meterId": "a2278215-13ea-5587-a031-99937b489959",
+          "tiersSeen": [
+            "0:3.2"
+          ]
+        },
+        "indonesiacentral": {
+          "retailPrice": 3.2,
+          "unitOfMeasure": "1 Hour",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2025-02-01T00:00:00Z",
+          "meterId": "7f07c556-3493-5d68-a26e-a17c4976f20a",
+          "tiersSeen": [
+            "0:3.2"
+          ]
+        },
+        "malaysiawest": {
+          "retailPrice": 3.2,
+          "unitOfMeasure": "1 Hour",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2025-04-01T00:00:00Z",
+          "meterId": "2e0d8854-ae23-55c6-9d6f-ff7ced7b89bd",
+          "tiersSeen": [
+            "0:3.2"
+          ]
+        }
+      }
+    },
+    {
+      "id": "law-ingest",
+      "what": "Log Analytics, Analytics Logs ingestion (first charged tier)",
+      "serviceName": "Log Analytics",
+      "productName": "Log Analytics",
+      "skuName": "Analytics Logs",
+      "meterName": "Analytics Logs Data Ingestion",
+      "unit": "1 GB",
+      "perRegion": {
+        "southeastasia": {
+          "retailPrice": 2.99,
+          "unitOfMeasure": "1 GB",
+          "tierMinimumUnits": 5,
+          "effectiveStartDate": "2018-02-01T00:00:00Z",
+          "meterId": "7a4feecb-f730-49f8-a801-efe03d15b862",
+          "tiersSeen": [
+            "0:0",
+            "5:2.99"
+          ]
+        },
+        "eastasia": {
+          "retailPrice": 4.03,
+          "unitOfMeasure": "1 GB",
+          "tierMinimumUnits": 5,
+          "effectiveStartDate": "2018-02-01T00:00:00Z",
+          "meterId": "c9119dea-52ea-4dfb-a7ab-b15e65f95818",
+          "tiersSeen": [
+            "0:0",
+            "5:4.03"
+          ]
+        },
+        "japaneast": {
+          "retailPrice": 3.34,
+          "unitOfMeasure": "1 GB",
+          "tierMinimumUnits": 5,
+          "effectiveStartDate": "2018-02-01T00:00:00Z",
+          "meterId": "032c4095-250b-41e8-96ae-779a1df9e626",
+          "tiersSeen": [
+            "0:0",
+            "5:3.34"
+          ]
+        },
+        "koreacentral": {
+          "retailPrice": 3.11,
+          "unitOfMeasure": "1 GB",
+          "tierMinimumUnits": 5,
+          "effectiveStartDate": "2018-02-01T00:00:00Z",
+          "meterId": "a216d8ab-1da9-4012-9d49-411e04e6fb1c",
+          "tiersSeen": [
+            "0:0",
+            "5:3.11"
+          ]
+        },
+        "australiaeast": {
+          "retailPrice": 3.34,
+          "unitOfMeasure": "1 GB",
+          "tierMinimumUnits": 5,
+          "effectiveStartDate": "2018-02-01T00:00:00Z",
+          "meterId": "0d435df8-9c75-482e-a894-cd65c2160c7a",
+          "tiersSeen": [
+            "0:0",
+            "5:3.34"
+          ]
+        },
+        "centralindia": {
+          "retailPrice": 3.22,
+          "unitOfMeasure": "1 GB",
+          "tierMinimumUnits": 5,
+          "effectiveStartDate": "2018-02-01T00:00:00Z",
+          "meterId": "e4fa87b4-a2d2-48ec-b344-d9d3c008fbd8",
+          "tiersSeen": [
+            "0:0",
+            "5:3.22"
+          ]
+        },
+        "indonesiacentral": {
+          "retailPrice": 2.691,
+          "unitOfMeasure": "1 GB",
+          "tierMinimumUnits": 5,
+          "effectiveStartDate": "2025-05-01T00:00:00Z",
+          "meterId": "d569d9ec-7e6b-55d9-88a4-c941f9fdd0ec",
+          "tiersSeen": [
+            "0:0",
+            "5:2.691"
+          ]
+        },
+        "malaysiawest": {
+          "retailPrice": 2.691,
+          "unitOfMeasure": "1 GB",
+          "tierMinimumUnits": 5,
+          "effectiveStartDate": "2025-04-01T00:00:00Z",
+          "meterId": "53de4a8a-4768-5f74-a1f8-6ab32e21ba03",
+          "tiersSeen": [
+            "0:0",
+            "5:2.691"
+          ]
+        }
+      }
+    },
+    {
+      "id": "law-retention",
+      "what": "Log Analytics, Analytics Logs retention beyond the included period",
+      "serviceName": "Log Analytics",
+      "productName": "Log Analytics",
+      "skuName": "Analytics Logs",
+      "meterName": "Analytics Logs Data Retention",
+      "unit": "1 GB/Month",
+      "perRegion": {
+        "southeastasia": {
+          "retailPrice": 0.13,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2018-02-01T00:00:00Z",
+          "meterId": "78938a68-54ed-43c8-9d6d-796c3090f61a",
+          "tiersSeen": [
+            "0:0.13"
+          ]
+        },
+        "eastasia": {
+          "retailPrice": 0.18,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2018-02-01T00:00:00Z",
+          "meterId": "971367fb-1c15-4384-89ac-1c07599b10eb",
+          "tiersSeen": [
+            "0:0.18"
+          ]
+        },
+        "japaneast": {
+          "retailPrice": 0.15,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2018-02-01T00:00:00Z",
+          "meterId": "ebe763ee-be2d-498c-9b63-f79e1e74b16d",
+          "tiersSeen": [
+            "0:0.15"
+          ]
+        },
+        "koreacentral": {
+          "retailPrice": 0.14,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2018-02-01T00:00:00Z",
+          "meterId": "4f2f0486-c654-43fb-9da8-f031daddfdcb",
+          "tiersSeen": [
+            "0:0.14"
+          ]
+        },
+        "australiaeast": {
+          "retailPrice": 0.15,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2018-02-01T00:00:00Z",
+          "meterId": "a788c119-3091-4226-baba-b8966a937c62",
+          "tiersSeen": [
+            "0:0.15"
+          ]
+        },
+        "centralindia": {
+          "retailPrice": 0.14,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2018-02-01T00:00:00Z",
+          "meterId": "7ca1e74f-0243-48e5-bbf5-4318161561fd",
+          "tiersSeen": [
+            "0:0.14"
+          ]
+        },
+        "indonesiacentral": {
+          "retailPrice": 0.117,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2025-05-01T00:00:00Z",
+          "meterId": "53cf2e05-8ee0-5405-add1-0b73255e57e4",
+          "tiersSeen": [
+            "0:0.117"
+          ]
+        },
+        "malaysiawest": {
+          "retailPrice": 0.117,
+          "unitOfMeasure": "1 GB/Month",
+          "tierMinimumUnits": 0,
+          "effectiveStartDate": "2025-04-01T00:00:00Z",
+          "meterId": "ff3f5d26-7020-566e-b001-11ee3c0ccb4f",
+          "tiersSeen": [
+            "0:0.117"
+          ]
+        }
+      }
+    }
+  ],
+  "aiMeterNameHints": {
+    "southeastasia": {
+      "meters": 137,
+      "nameSuggestsGlobal": 56,
+      "nameSuggestsDataZone": 37,
+      "neitherMarker": 44
+    },
+    "eastasia": {
+      "meters": 41,
+      "nameSuggestsGlobal": 2,
+      "nameSuggestsDataZone": 34,
+      "neitherMarker": 5
+    },
+    "japaneast": {
+      "meters": 706,
+      "nameSuggestsGlobal": 619,
+      "nameSuggestsDataZone": 42,
+      "neitherMarker": 45
+    },
+    "koreacentral": {
+      "meters": 681,
+      "nameSuggestsGlobal": 617,
+      "nameSuggestsDataZone": 44,
+      "neitherMarker": 20
+    },
+    "australiaeast": {
+      "meters": 718,
+      "nameSuggestsGlobal": 623,
+      "nameSuggestsDataZone": 44,
+      "neitherMarker": 51
+    },
+    "centralindia": {
+      "meters": 47,
+      "nameSuggestsGlobal": 4,
+      "nameSuggestsDataZone": 34,
+      "neitherMarker": 9
+    },
+    "indonesiacentral": {
+      "meters": 75,
+      "nameSuggestsGlobal": 70,
+      "nameSuggestsDataZone": 0,
+      "neitherMarker": 5
+    },
+    "malaysiawest": {
+      "meters": 149,
+      "nameSuggestsGlobal": 147,
+      "nameSuggestsDataZone": 0,
+      "neitherMarker": 2
+    }
+  },
+  "limits": [
+    "List prices at the retrieval date; they change and differ by agreement.",
+    "A price meter in a region shows the item is sold there. It does not show the service meets any residency rule, runs in the zones needed, or supports private networking.",
+    "The model-meter hints come from abbreviations in meter names and are a heuristic, not a statement of where processing happens (D-028).",
+    "Services without a meter here (Microsoft Entra ID, private endpoints, API Management, defender tooling, edge hardware) are not priced and are scenario assumptions in the model."
+  ]
+}

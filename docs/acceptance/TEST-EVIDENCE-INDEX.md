@@ -85,7 +85,7 @@ Only the latest full run is kept in the tree; earlier runs remain in Git history
 |---|---|---|---|---|---|---|---|
 | EVRUN-9b6110b026 | `587d609` | no | 53 | 3 | 1 | 16 | G1 PASS, G2 FAIL, G3 FAIL, G4 BLOCKED, G5 BLOCKED, G6 BLOCKED, G7 BLOCKED |
 
-## C. Test files (40) run by `npm test`
+## C. Test files (41) run by `npm test`
 
 The count is the number of top-level `test(` declarations in the file. Generated cases (mutation tables) run several tests per declaration, so the executed total is larger; the executed total is in the evidence record for `npm test`.
 
@@ -97,6 +97,7 @@ The count is the number of top-level `test(` declarations in the file. Generated
 | tests/approvals.test.mjs | 12 |
 | tests/approver-enrollment.test.mjs | 10 |
 | tests/audit-denials.test.mjs | 4 |
+| tests/business-model.test.mjs | 17 |
 | tests/control-plane-guard.test.mjs | 8 |
 | tests/design-gate.test.mjs | 22 |
 | tests/enforcement-attestation.test.mjs | 5 |
@@ -154,6 +155,7 @@ The count is the number of top-level `test(` declarations in the file. Generated
 | validate:azure | `node harness/scripts/validate-azure.mjs` |
 | validate:approvals | `node harness/scripts/validate-approvals.mjs` |
 | validate:isolation | `node harness/scripts/validate-isolation.mjs` |
+| validate:business | `node harness/scripts/business-model.mjs check` |
 | test:guarded | `node harness/scripts/guarded-run.mjs -- node --test` |
 | evaluate | `node harness/scripts/evaluate.mjs` |
 | test | `node --test` |
