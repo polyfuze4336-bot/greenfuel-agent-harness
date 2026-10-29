@@ -1,0 +1,2119 @@
+{
+  "generatedBy": "harness/scripts/studio-inventory.mjs",
+  "git": {
+    "head": "392ac02d6e437a1152be63f272a9f50b98f25461",
+    "branch": "studio/discovery",
+    "originMain": "c6ff681810c2462144004c01ce2b79ed1e6f7d4f",
+    "commitsAheadOfOriginMain": 24,
+    "dirty": 2
+  },
+  "sources": {},
+  "counts": {
+    "decisionRegister": {
+      "source": "docs/context/DECISION-REGISTER.md",
+      "rule": "table rows whose first cell matches D-nnn",
+      "total": 37,
+      "byStatus": {
+        "Open": 37
+      },
+      "byKind": {
+        "C+D": 6,
+        "D": 1,
+        "C": 21,
+        "X": 7,
+        "X+C": 1,
+        "X+D": 1
+      },
+      "byMilestone": {
+        "M1": 17,
+        "M2": 20
+      },
+      "m1": [
+        "D-001",
+        "D-002",
+        "D-003",
+        "D-004",
+        "D-005",
+        "D-006",
+        "D-007",
+        "D-008",
+        "D-009",
+        "D-012",
+        "D-015",
+        "D-019",
+        "D-020",
+        "D-022",
+        "D-023",
+        "D-024",
+        "D-034"
+      ]
+    },
+    "adrOptions": {
+      "source": "docs/adr/*.md, section \"## Options considered\"",
+      "rule": "numbered list items; \"rejected-worded\" = the item text contains the word rejected (any case). Approximate: it is not a structured field",
+      "options": 71,
+      "rejectedWorded": 26
+    },
+    "businessModelInputs": {
+      "source": "docs/business/model/inputs.csv",
+      "rule": "one row per model input; class column (5th)",
+      "total": 92,
+      "byClass": {
+        "scenario": 79,
+        "benchmark": 1,
+        "verified": 12
+      }
+    },
+    "adr": {
+      "source": "docs/adr/NNNN-*.md (excluding 0000-template.md)",
+      "rule": "\"- **Status:** <word>\" line; first word decides the class",
+      "total": 20,
+      "byClass": {
+        "Accepted": 13,
+        "Proposed": 7
+      },
+      "acceptedByChatInstruction": 13,
+      "acceptedWithPartialScope": [
+        "0014"
+      ],
+      "acceptedByDelegation": [
+        "0013"
+      ],
+      "rejected": 0,
+      "superseded": 0,
+      "byType": {
+        "(none: pre-Type)": 2,
+        "Governance": 12,
+        "Design": 6
+      }
+    },
+    "designReviews": {
+      "source": "docs/architecture/designs/*.md, docs/architecture/reviews/*.md, harness/scripts/design-gate.mjs",
+      "rule": "declared status from the \"- **Status:**\" line; computed status by running the existing gate (read-only)",
+      "designs": 3,
+      "reviews": 3,
+      "declaredBlocked": 3,
+      "computedBlocked": 3,
+      "blockReasonsTotal": 177,
+      "distinctBlockingDecisions": [
+        "D-003",
+        "D-006",
+        "D-007",
+        "D-008",
+        "D-009",
+        "D-010",
+        "D-011",
+        "D-012",
+        "D-013",
+        "D-015",
+        "D-016",
+        "D-018",
+        "D-019",
+        "D-020",
+        "D-021",
+        "D-022",
+        "D-024",
+        "D-025",
+        "D-027",
+        "D-028",
+        "D-029",
+        "D-031",
+        "D-033",
+        "D-035",
+        "D-037"
+      ]
+    },
+    "optionDispositions": {
+      "source": "docs/architecture/designs/DES-*.md",
+      "rule": "table cells equal to a design-gate disposition word. \"Selected\" means the option under review, not an approved option: every review is Blocked",
+      "Selected": 3,
+      "Not selected": 5,
+      "Rejected (hard constraint)": 3,
+      "Deferred": 2,
+      "perDesign": {
+        "DES-0001": {
+          "Selected": 1,
+          "Not selected": 2,
+          "Rejected (hard constraint)": 1,
+          "Deferred": 1
+        },
+        "DES-0002": {
+          "Selected": 1,
+          "Not selected": 1,
+          "Rejected (hard constraint)": 1,
+          "Deferred": 1
+        },
+        "DES-0003": {
+          "Selected": 1,
+          "Not selected": 2,
+          "Rejected (hard constraint)": 1,
+          "Deferred": 0
+        }
+      }
+    },
+    "defenceQuestions": {
+      "source": "docs/architecture/reviews/RV-*.md",
+      "rule": "rows DQ-nn-nn; second cell is the answer state",
+      "Answered": 37,
+      "Unanswered": 17,
+      "Not applicable": 0
+    },
+    "todoTasks": {
+      "source": "docs/state/TODO.md",
+      "rule": "rows \"| Tn |\"; status = leading bold keyword, else \"deferred\" in the first section, else \"unmarked\"",
+      "total": 48,
+      "byStatus": {
+        "deferred": 15,
+        "decided": 2,
+        "agreed": 1,
+        "done": 2,
+        "open": 23,
+        "not-granted": 1,
+        "approved": 4
+      },
+      "bySection": {
+        "Owner has deferred (\"will answer later\", 2026-10-28)": 14,
+        "Awaiting the owner (memory stage, 2026-10-28)": 1,
+        "Awaiting the owner (evaluation stage, 2026-10-28)": 2,
+        "Awaiting the owner (Azure readiness stage, 2026-10-28; answered 2026-10-29)": 12,
+        "Awaiting the owner (hardening stage, 2026-10-30)": 6,
+        "Awaiting the owner (target architecture and business case, 2026-10-29)": 13
+      },
+      "ambiguousForReview": [
+        "T2"
+      ]
+    },
+    "todoDecisionsMade": {
+      "source": "docs/state/TODO.md \"Decisions made\" table",
+      "rule": "rows whose first cell is a date",
+      "total": 18
+    },
+    "otherTaskFamilies": {
+      "R": {
+        "source": "docs/harness/IMPLEMENTATION-ROADMAP.md",
+        "count": 17
+      },
+      "Q": {
+        "source": "docs/harness/OPEN-QUESTIONS.md",
+        "count": 13
+      },
+      "B": {
+        "source": "docs/capstone/PRIORITIZED-BACKLOG.md",
+        "count": 16
+      },
+      "G": {
+        "source": "docs/capstone/CRITICAL-GAPS.md",
+        "count": 24
+      }
+    },
+    "assumptions": {
+      "source": "docs/context/ASSUMPTIONS.md",
+      "rule": "rows AS-nnn; all are class B. Resolved only if the \"Replaced by\" cell names specific Accepted ADR number(s) and no open register decision; otherwise unresolved",
+      "total": 26,
+      "resolved": 0,
+      "replacedByDecisionRegister": 23,
+      "replacedByGenericAdr": 1,
+      "unresolved": 26,
+      "unresolvedIds": [
+        "AS-001",
+        "AS-002",
+        "AS-003",
+        "AS-004",
+        "AS-005",
+        "AS-006",
+        "AS-007",
+        "AS-008",
+        "AS-009",
+        "AS-010",
+        "AS-011",
+        "AS-012",
+        "AS-013",
+        "AS-014",
+        "AS-015",
+        "AS-016",
+        "AS-017",
+        "AS-018",
+        "AS-019",
+        "AS-020",
+        "AS-021",
+        "AS-022",
+        "AS-023",
+        "AS-024",
+        "AS-025",
+        "AS-026"
+      ]
+    },
+    "assumptionBullets": {
+      "rule": "lines starting \"- ASSUMPTION:\" in docs/**/*.md",
+      "total": 28,
+      "files": 20,
+      "byFile": {
+        "docs/adr/0001-native-first-harness.md": 1,
+        "docs/adr/0002-phase-gating-and-approval-enforcement.md": 1,
+        "docs/adr/0003-adopt-requirements-baseline-v0-1.md": 1,
+        "docs/adr/0004-delivery-measurement-storage-topology.md": 1,
+        "docs/adr/0005-approve-architecture-governance-v0-1.md": 1,
+        "docs/adr/0006-specialist-agent-roster-and-enforcement.md": 1,
+        "docs/adr/0007-tool-layer-mcp-and-output-controls.md": 1,
+        "docs/adr/0008-least-privilege-permission-model.md": 1,
+        "docs/adr/0009-task-execution-framework.md": 1,
+        "docs/adr/0010-persistent-memory.md": 1,
+        "docs/adr/0011-bounded-repair-loop.md": 1,
+        "docs/adr/0012-independent-evaluation-framework.md": 1,
+        "docs/adr/0013-evaluation-findings-effective-periods-and-timestamps.md": 1,
+        "docs/adr/0014-azure-readiness-scaffold-and-provisional-selection.md": 1,
+        "docs/adr/0015-evidence-ingestion-subsystem.md": 1,
+        "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md": 2,
+        "docs/adr/0017-deterministic-core-and-bounded-agents.md": 1,
+        "docs/adr/0018-evidence-integrity-and-certificate-mechanism-options.md": 1,
+        "docs/adr/0020-phase-1a-local-synthetic-vertical-slice.md": 1,
+        "docs/design/system/EVIDENCE-STORE-PROPOSAL.md": 8
+      }
+    },
+    "risks": {
+      "source": "docs/architecture/RISK-REGISTER.md",
+      "rule": "rows RK-nnn; status = 8th cell",
+      "total": 14,
+      "byStatus": {
+        "Open": 14
+      }
+    },
+    "requirements": {
+      "source": "docs/context/REQUIREMENTS.md, NON-FUNCTIONAL-REQUIREMENTS.md",
+      "rule": "rows whose first cell is BR|FR|SEC|DATA|AGT|NFR-nnn",
+      "total": 99,
+      "byPrefix": {
+        "BR": 9,
+        "FR": 33,
+        "SEC": 15,
+        "DATA": 10,
+        "AGT": 11,
+        "NFR": 21
+      },
+      "byPriority": {
+        "Must": 80,
+        "Should": 18,
+        "Could": 1
+      }
+    },
+    "requirementTraceRows": {
+      "source": "docs/context/REQUIREMENTS-TRACEABILITY.md",
+      "total": 99,
+      "matchesRequirements": true
+    },
+    "approvals": {
+      "sources": [
+        "harness/policy/approvers.json",
+        "docs/approvals/*.json",
+        "harness/scripts/validate-approvals.mjs"
+      ],
+      "rule": "enrolled approvers = entries in the registry; signed approval records = *.json files in docs/approvals; the validator output is quoted verbatim",
+      "enrolledApprovers": 0,
+      "signedApprovalRecords": 0,
+      "validatorOutput": "validate-approvals: OK. Registry: 0 trusted approver(s). ADRs accepted: 13 (13 grandfathered, unsigned, accepted by chat instruction before signing existed; 0 signed). Reviews approved: 0. Phase: 0. No approver is enrolled: no signed approval of any class can exist."
+    },
+    "recordedOwnerAcceptances": {
+      "source": "ADR status lines",
+      "rule": "ADR status Accepted by instruction in chat (grandfathered, unsigned)",
+      "total": 13,
+      "ids": [
+        "0001",
+        "0002",
+        "0003",
+        "0005",
+        "0006",
+        "0007",
+        "0008",
+        "0009",
+        "0010",
+        "0011",
+        "0012",
+        "0013",
+        "0014"
+      ]
+    },
+    "memory": {
+      "source": "memory/**",
+      "rule": "DEC-* records derived from ADRs by the importer; verified by memory.mjs verify",
+      "verifyOk": true,
+      "entries": 34,
+      "decisions": 15,
+      "decisionsByPosition": {
+        "accepted": 13,
+        "proposed": 2
+      },
+      "constraints": 12,
+      "lessons": 7,
+      "adrsNotInMemory": [
+        "0016",
+        "0017",
+        "0018",
+        "0019",
+        "0020"
+      ]
+    },
+    "evidenceRecords": {
+      "source": "docs/evidence/records/EV-*.json",
+      "rule": "one JSON file per run",
+      "total": 77,
+      "exitCode0": 62,
+      "nonZero": [
+        "EV-0008",
+        "EV-0010",
+        "EV-0012",
+        "EV-0013",
+        "EV-0020",
+        "EV-0026",
+        "EV-0043",
+        "EV-0050",
+        "EV-0052",
+        "EV-0053",
+        "EV-0054",
+        "EV-0060",
+        "EV-0069",
+        "EV-0074",
+        "EV-0076"
+      ]
+    },
+    "policyFiles": {
+      "source": "harness/policy/*.json",
+      "total": 12
+    },
+    "criticalBlockers": {
+      "rule": "a blocker is something that, by the repository's own gates, stops implementation or approval; each item below is computed or quoted, not judged",
+      "items": [
+        {
+          "id": "BLK-1",
+          "what": "No approver is enrolled, so no signed decision approval of any class can be valid",
+          "source": "harness/policy/approvers.json (empty), validate-approvals output"
+        },
+        {
+          "id": "BLK-2",
+          "what": "The phase is 0; raising it needs an architecture key and a deployment key from different enrolled approvers",
+          "source": "docs/state/STATE.md, harness/approvals/approval-gates.cjs"
+        },
+        {
+          "id": "BLK-3",
+          "what": "3 of 3 design reviews compute Blocked (177 blocking reasons in total)",
+          "source": "harness/scripts/design-gate.mjs on RV-0001 to RV-0003"
+        },
+        {
+          "id": "BLK-4",
+          "what": "25 distinct open decisions are named in gate blocking reasons",
+          "ids": [
+            "D-003",
+            "D-006",
+            "D-007",
+            "D-008",
+            "D-009",
+            "D-010",
+            "D-011",
+            "D-012",
+            "D-013",
+            "D-015",
+            "D-016",
+            "D-018",
+            "D-019",
+            "D-020",
+            "D-021",
+            "D-022",
+            "D-024",
+            "D-025",
+            "D-027",
+            "D-028",
+            "D-029",
+            "D-031",
+            "D-033",
+            "D-035",
+            "D-037"
+          ],
+          "source": "design-gate output"
+        },
+        {
+          "id": "BLK-5",
+          "what": "17 register decisions are marked needed-by M1 (before options analysis)",
+          "ids": [
+            "D-001",
+            "D-002",
+            "D-003",
+            "D-004",
+            "D-005",
+            "D-006",
+            "D-007",
+            "D-008",
+            "D-009",
+            "D-012",
+            "D-015",
+            "D-019",
+            "D-020",
+            "D-022",
+            "D-023",
+            "D-024",
+            "D-034"
+          ],
+          "source": "docs/context/DECISION-REGISTER.md"
+        },
+        {
+          "id": "BLK-6",
+          "what": "Branch protection cannot be enabled on the current plan; merge discipline is human and CI only detects",
+          "source": "gh api (HTTP 403), harness/policy/github-protection.json"
+        }
+      ]
+    }
+  },
+  "review": [
+    {
+      "id": "ADR-0013",
+      "why": "accepted by the architect on the owner's instruction: confirm this is the owner's own decision",
+      "where": "docs/adr/0013-evaluation-findings-effective-periods-and-timestamps.md"
+    },
+    {
+      "id": "ADR-0014",
+      "why": "accepted with part of the scope excluded or deferred: the Accepted label does not cover the whole subject",
+      "where": "docs/adr/0014-azure-readiness-scaffold-and-provisional-selection.md"
+    },
+    {
+      "id": "T2",
+      "why": "task status is ambiguous (deferred; keywords: open, deferred, approved)",
+      "where": "docs/state/TODO.md"
+    },
+    {
+      "id": "AS-001",
+      "why": "\"Replaced by\" names no decision or specific ADR (\"ADR\")",
+      "where": "docs/context/ASSUMPTIONS.md"
+    },
+    {
+      "id": "AS-021",
+      "why": "\"Replaced by\" names no decision or specific ADR (\"AGT-003, AGT-004\")",
+      "where": "docs/context/ASSUMPTIONS.md"
+    },
+    {
+      "id": "AS-025",
+      "why": "\"Replaced by\" names no decision or specific ADR (\"AGT-011\")",
+      "where": "docs/context/ASSUMPTIONS.md"
+    },
+    {
+      "id": "ADR-0016",
+      "why": "ADR exists but has no derived memory record: the memory store lags the ADR set",
+      "where": "memory/decisions"
+    },
+    {
+      "id": "ADR-0017",
+      "why": "ADR exists but has no derived memory record: the memory store lags the ADR set",
+      "where": "memory/decisions"
+    },
+    {
+      "id": "ADR-0018",
+      "why": "ADR exists but has no derived memory record: the memory store lags the ADR set",
+      "where": "memory/decisions"
+    },
+    {
+      "id": "ADR-0019",
+      "why": "ADR exists but has no derived memory record: the memory store lags the ADR set",
+      "where": "memory/decisions"
+    },
+    {
+      "id": "ADR-0020",
+      "why": "ADR exists but has no derived memory record: the memory store lags the ADR set",
+      "where": "memory/decisions"
+    }
+  ],
+  "registerIds": [
+    "D-001",
+    "D-002",
+    "D-003",
+    "D-004",
+    "D-005",
+    "D-006",
+    "D-007",
+    "D-008",
+    "D-009",
+    "D-010",
+    "D-011",
+    "D-012",
+    "D-013",
+    "D-014",
+    "D-015",
+    "D-016",
+    "D-017",
+    "D-018",
+    "D-019",
+    "D-020",
+    "D-021",
+    "D-022",
+    "D-023",
+    "D-024",
+    "D-025",
+    "D-026",
+    "D-027",
+    "D-028",
+    "D-029",
+    "D-030",
+    "D-031",
+    "D-032",
+    "D-033",
+    "D-034",
+    "D-035",
+    "D-036",
+    "D-037"
+  ],
+  "adrs": [
+    {
+      "id": "0001",
+      "file": "docs/adr/0001-native-first-harness.md",
+      "title": "ADR 0001: Native-first harness; custom code only for documented gaps",
+      "status": "Accepted (2026-10-28, programme owner, by instruction in chat after reviewing the Stage 0 summary)",
+      "cls": "Accepted",
+      "type": "(none: pre-Type)",
+      "date": "2026-10-28",
+      "deciders": "Programme owner",
+      "supersedes": "none",
+      "hasSupersedes": false,
+      "chatAcceptance": true,
+      "delegated": false,
+      "partial": false,
+      "factBullets": 2,
+      "assumptionBullets": 1,
+      "openRefs": [],
+      "revisit": true
+    },
+    {
+      "id": "0002",
+      "file": "docs/adr/0002-phase-gating-and-approval-enforcement.md",
+      "title": "ADR 0002: Phase gating and human-approval enforcement via hooks",
+      "status": "Accepted (2026-10-28, programme owner, by instruction in chat after reviewing the Stage 0 summary)",
+      "cls": "Accepted",
+      "type": "(none: pre-Type)",
+      "date": "2026-10-28",
+      "deciders": "Programme owner",
+      "supersedes": "none",
+      "hasSupersedes": false,
+      "chatAcceptance": true,
+      "delegated": false,
+      "partial": false,
+      "factBullets": 4,
+      "assumptionBullets": 1,
+      "openRefs": [],
+      "revisit": true
+    },
+    {
+      "id": "0003",
+      "file": "docs/adr/0003-adopt-requirements-baseline-v0-1.md",
+      "title": "ADR 0003: Adopt requirements baseline v0.1 as the design input",
+      "status": "Accepted (2026-10-28, programme owner, by instruction in chat)",
+      "cls": "Accepted",
+      "type": "Governance",
+      "date": "2026-10-28",
+      "deciders": "Programme owner",
+      "supersedes": "none",
+      "hasSupersedes": false,
+      "chatAcceptance": true,
+      "delegated": false,
+      "partial": false,
+      "factBullets": 2,
+      "assumptionBullets": 1,
+      "openRefs": [],
+      "revisit": true
+    },
+    {
+      "id": "0004",
+      "file": "docs/adr/0004-delivery-measurement-storage-topology.md",
+      "title": "ADR 0004: Hold delivery measurements in jurisdiction-local authoritative stores",
+      "status": "Proposed",
+      "cls": "Proposed",
+      "type": "Design",
+      "date": "2026-10-28",
+      "deciders": "Programme owner and enterprise architect (roles; named humans pending)",
+      "supersedes": "none",
+      "hasSupersedes": false,
+      "chatAcceptance": false,
+      "delegated": false,
+      "partial": false,
+      "factBullets": 3,
+      "assumptionBullets": 1,
+      "openRefs": [
+        "D-003",
+        "D-009",
+        "D-010",
+        "D-011",
+        "D-020",
+        "D-018",
+        "D-013",
+        "D-019",
+        "D-027",
+        "D-031",
+        "D-028",
+        "D-033"
+      ],
+      "revisit": true
+    },
+    {
+      "id": "0005",
+      "file": "docs/adr/0005-approve-architecture-governance-v0-1.md",
+      "title": "ADR 0005: Approve architecture governance capability v0.1",
+      "status": "Accepted (2026-10-28, programme owner, by instruction in chat after reviewing the stage summary)",
+      "cls": "Accepted",
+      "type": "Governance",
+      "date": "2026-10-28",
+      "deciders": "Programme owner",
+      "supersedes": "none",
+      "hasSupersedes": false,
+      "chatAcceptance": true,
+      "delegated": false,
+      "partial": false,
+      "factBullets": 3,
+      "assumptionBullets": 1,
+      "openRefs": [],
+      "revisit": true
+    },
+    {
+      "id": "0006",
+      "file": "docs/adr/0006-specialist-agent-roster-and-enforcement.md",
+      "title": "ADR 0006: Specialist custom-agent roster and enforcement model",
+      "status": "Accepted (2026-10-28, programme owner, by instruction in chat: \"approved\")",
+      "cls": "Accepted",
+      "type": "Governance",
+      "date": "2026-10-28",
+      "deciders": "Programme owner",
+      "supersedes": "none. Replaces the earlier `architect`, `reviewer` and `design-challenger` agent files, which were consolidated into this roster.",
+      "hasSupersedes": false,
+      "chatAcceptance": true,
+      "delegated": false,
+      "partial": false,
+      "factBullets": 3,
+      "assumptionBullets": 1,
+      "openRefs": [],
+      "revisit": true
+    },
+    {
+      "id": "0007",
+      "file": "docs/adr/0007-tool-layer-mcp-and-output-controls.md",
+      "title": "ADR 0007: Tool layer, MCP configuration and output controls",
+      "status": "Accepted (2026-10-28, programme owner, by instruction in chat: \"approve and document it\")",
+      "cls": "Accepted",
+      "type": "Governance",
+      "date": "2026-10-28",
+      "deciders": "Programme owner",
+      "supersedes": "none",
+      "hasSupersedes": false,
+      "chatAcceptance": true,
+      "delegated": false,
+      "partial": false,
+      "factBullets": 4,
+      "assumptionBullets": 1,
+      "openRefs": [
+        "D-013"
+      ],
+      "revisit": true
+    },
+    {
+      "id": "0008",
+      "file": "docs/adr/0008-least-privilege-permission-model.md",
+      "title": "ADR 0008: Least-privilege permission model for the coding harness",
+      "status": "Accepted (2026-10-28, programme owner, by instruction in chat: \"accept and document it\")",
+      "cls": "Accepted",
+      "type": "Governance",
+      "date": "2026-10-28",
+      "deciders": "Programme owner",
+      "supersedes": "none",
+      "hasSupersedes": false,
+      "chatAcceptance": true,
+      "delegated": false,
+      "partial": false,
+      "factBullets": 5,
+      "assumptionBullets": 1,
+      "openRefs": [
+        "D-037"
+      ],
+      "revisit": true
+    },
+    {
+      "id": "0009",
+      "file": "docs/adr/0009-task-execution-framework.md",
+      "title": "ADR 0009: Task-execution framework",
+      "status": "Accepted (2026-10-28, programme owner, by instruction in chat: \"accept and document it\")",
+      "cls": "Accepted",
+      "type": "Governance",
+      "date": "2026-10-28",
+      "deciders": "Programme owner",
+      "supersedes": "none",
+      "hasSupersedes": false,
+      "chatAcceptance": true,
+      "delegated": false,
+      "partial": false,
+      "factBullets": 4,
+      "assumptionBullets": 1,
+      "openRefs": [],
+      "revisit": true
+    },
+    {
+      "id": "0010",
+      "file": "docs/adr/0010-persistent-memory.md",
+      "title": "ADR 0010: Persistent memory for the coding harness",
+      "status": "Accepted (2026-10-28, programme owner, by instruction in chat: \"accept and document it\"; working values confirmed and T23 decided in the same reply)",
+      "cls": "Accepted",
+      "type": "Governance",
+      "date": "2026-10-28",
+      "deciders": "Programme owner",
+      "supersedes": "none",
+      "hasSupersedes": false,
+      "chatAcceptance": true,
+      "delegated": false,
+      "partial": false,
+      "factBullets": 4,
+      "assumptionBullets": 1,
+      "openRefs": [],
+      "revisit": true
+    },
+    {
+      "id": "0011",
+      "file": "docs/adr/0011-bounded-repair-loop.md",
+      "title": "ADR 0011: Bounded Plan, Execute, Verify, Critique, Repair loop",
+      "status": "Accepted (2026-10-28, programme owner, by instruction in chat: \"accept and document it\"; T24 allowed in the same reply)",
+      "cls": "Accepted",
+      "type": "Governance",
+      "date": "2026-10-28",
+      "deciders": "Programme owner",
+      "supersedes": "none",
+      "hasSupersedes": false,
+      "chatAcceptance": true,
+      "delegated": false,
+      "partial": false,
+      "factBullets": 4,
+      "assumptionBullets": 1,
+      "openRefs": [],
+      "revisit": true
+    },
+    {
+      "id": "0012",
+      "file": "docs/adr/0012-independent-evaluation-framework.md",
+      "title": "ADR 0012: Independent evaluation framework",
+      "status": "Accepted (2026-10-28, programme owner, by instruction in chat: \"accept and document\"; T29 decided in the same reply: CI re-runs the evaluation)",
+      "cls": "Accepted",
+      "type": "Governance",
+      "date": "2026-10-28",
+      "deciders": "Programme owner",
+      "supersedes": "none",
+      "hasSupersedes": false,
+      "chatAcceptance": true,
+      "delegated": false,
+      "partial": false,
+      "factBullets": 4,
+      "assumptionBullets": 1,
+      "openRefs": [],
+      "revisit": true
+    },
+    {
+      "id": "0013",
+      "file": "docs/adr/0013-evaluation-findings-effective-periods-and-timestamps.md",
+      "title": "ADR 0013: Evaluation findings, effective periods, timestamp rules and the unapproved design",
+      "status": "Accepted (2026-10-28, programme owner, by instruction in chat: \"decide the best and document it\"; the decision is the architect's, made on the owner's instruction)",
+      "cls": "Accepted",
+      "type": "Governance",
+      "date": "2026-10-28",
+      "deciders": "Programme owner (delegated to the architect for this decision)",
+      "supersedes": "none",
+      "hasSupersedes": false,
+      "chatAcceptance": true,
+      "delegated": true,
+      "partial": false,
+      "factBullets": 3,
+      "assumptionBullets": 1,
+      "openRefs": [
+        "D-001",
+        "D-002"
+      ],
+      "revisit": true
+    },
+    {
+      "id": "0014",
+      "file": "docs/adr/0014-azure-readiness-scaffold-and-provisional-selection.md",
+      "title": "ADR 0014: Azure readiness stage: non-deployable IaC scaffold and provisional service selection",
+      "status": "Accepted (2026-10-29, programme owner, by instruction in chat: \"accept and approve all decision with the exception of actual azure deployment\"). Actual Azure deployment is not approved: it is deferred (TODO T36)",
+      "cls": "Accepted",
+      "type": "Governance",
+      "date": "2026-10-28",
+      "deciders": "Programme owner",
+      "supersedes": "none",
+      "hasSupersedes": false,
+      "chatAcceptance": true,
+      "delegated": false,
+      "partial": true,
+      "factBullets": 4,
+      "assumptionBullets": 1,
+      "openRefs": [
+        "D-003",
+        "D-009",
+        "D-010",
+        "D-018",
+        "D-013",
+        "D-028",
+        "D-031",
+        "D-037",
+        "D-034"
+      ],
+      "revisit": true
+    },
+    {
+      "id": "0015",
+      "file": "docs/adr/0015-evidence-ingestion-subsystem.md",
+      "title": "ADR 0015: Jurisdiction-local, tamper-evident evidence ingestion by an edge hash-chained log with store-and-forward",
+      "status": "Proposed",
+      "cls": "Proposed",
+      "type": "Design",
+      "date": "2026-10-29",
+      "deciders": "Design approver (not yet named, T3), with the quality manager and the security architect",
+      "supersedes": "none",
+      "hasSupersedes": false,
+      "chatAcceptance": false,
+      "delegated": false,
+      "partial": false,
+      "factBullets": 5,
+      "assumptionBullets": 1,
+      "openRefs": [
+        "D-013",
+        "D-018",
+        "D-019",
+        "D-020",
+        "D-021",
+        "D-009",
+        "D-011",
+        "D-010",
+        "D-033"
+      ],
+      "revisit": true
+    },
+    {
+      "id": "0016",
+      "file": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md",
+      "title": "ADR 0016: Sovereign evidence cells per jurisdiction with federated coordination",
+      "status": "Proposed",
+      "cls": "Proposed",
+      "type": "Design",
+      "date": "2026-10-29",
+      "deciders": "Design approver (not yet named, T3), with the quality manager, the compliance lead and the security architect",
+      "supersedes": "none",
+      "hasSupersedes": false,
+      "chatAcceptance": false,
+      "delegated": false,
+      "partial": false,
+      "factBullets": 4,
+      "assumptionBullets": 2,
+      "openRefs": [
+        "D-011",
+        "D-003",
+        "D-009",
+        "D-010",
+        "D-013",
+        "D-031",
+        "D-015",
+        "D-012",
+        "D-020",
+        "D-033"
+      ],
+      "revisit": true
+    },
+    {
+      "id": "0017",
+      "file": "docs/adr/0017-deterministic-core-and-bounded-agents.md",
+      "title": "ADR 0017: Deterministic core and bounded business agents",
+      "status": "Proposed",
+      "cls": "Proposed",
+      "type": "Design",
+      "date": "2026-10-29",
+      "deciders": "Design approver (not yet named, T3), with the quality manager, the security architect and the AI evaluation owner",
+      "supersedes": "none",
+      "hasSupersedes": false,
+      "chatAcceptance": false,
+      "delegated": false,
+      "partial": false,
+      "factBullets": 4,
+      "assumptionBullets": 1,
+      "openRefs": [
+        "D-008",
+        "D-028",
+        "D-027",
+        "D-030",
+        "D-015",
+        "D-007",
+        "D-022",
+        "D-019",
+        "D-024"
+      ],
+      "revisit": true
+    },
+    {
+      "id": "0018",
+      "file": "docs/adr/0018-evidence-integrity-and-certificate-mechanism-options.md",
+      "title": "ADR 0018: Evidence integrity and certificate mechanism, required properties and option set",
+      "status": "Proposed",
+      "cls": "Proposed",
+      "type": "Design",
+      "date": "2026-10-29",
+      "deciders": "Design approver (not yet named, T3), with the quality manager, the security architect and an independent auditor representative",
+      "supersedes": "none",
+      "hasSupersedes": false,
+      "chatAcceptance": false,
+      "delegated": false,
+      "partial": false,
+      "factBullets": 4,
+      "assumptionBullets": 1,
+      "openRefs": [
+        "D-013",
+        "D-012",
+        "D-006",
+        "D-016",
+        "D-022",
+        "D-011",
+        "D-025",
+        "D-021"
+      ],
+      "revisit": true
+    },
+    {
+      "id": "0019",
+      "file": "docs/adr/0019-azure-service-selection-by-requirement.md",
+      "title": "ADR 0019: Azure services are selected by requirement and verified per jurisdiction",
+      "status": "Proposed",
+      "cls": "Proposed",
+      "type": "Design",
+      "date": "2026-10-29",
+      "deciders": "Design approver (not yet named, T3), with the platform architect, the compliance lead and the sponsor",
+      "supersedes": "none",
+      "hasSupersedes": false,
+      "chatAcceptance": false,
+      "delegated": false,
+      "partial": false,
+      "factBullets": 5,
+      "assumptionBullets": 0,
+      "openRefs": [
+        "D-037",
+        "D-009",
+        "D-010",
+        "D-028",
+        "D-027",
+        "D-033"
+      ],
+      "revisit": true
+    },
+    {
+      "id": "0020",
+      "file": "docs/adr/0020-phase-1a-local-synthetic-vertical-slice.md",
+      "title": "ADR 0020: Phase 1a, a local synthetic-data vertical slice inside this repository",
+      "status": "Proposed",
+      "cls": "Proposed",
+      "type": "Governance",
+      "date": "2026-10-29",
+      "deciders": "Programme owner (to decide with a signed approval once an approver is enrolled); a named design decider for DES-0003 (not yet named, T3, T48)",
+      "supersedes": "none",
+      "hasSupersedes": false,
+      "chatAcceptance": false,
+      "delegated": false,
+      "partial": false,
+      "factBullets": 5,
+      "assumptionBullets": 1,
+      "openRefs": [
+        "D-003",
+        "D-006",
+        "D-007",
+        "D-009",
+        "D-013",
+        "D-027",
+        "D-010",
+        "D-011",
+        "D-012"
+      ],
+      "revisit": true
+    }
+  ],
+  "designs": [
+    {
+      "id": "DES-0001",
+      "review": "RV-0001",
+      "adrs": [
+        "ADR-0004"
+      ],
+      "tags": "DATA, EDGE, OPS"
+    },
+    {
+      "id": "DES-0002",
+      "review": "RV-0002",
+      "adrs": [
+        "ADR-0015"
+      ],
+      "tags": "DATA, EDGE"
+    },
+    {
+      "id": "DES-0003",
+      "review": "RV-0003",
+      "adrs": [
+        "ADR-0016",
+        "ADR-0017",
+        "ADR-0018",
+        "ADR-0019"
+      ],
+      "tags": "DATA, EDGE, AGENT, CERT, CALC, OPS, INTEG, COST"
+    }
+  ],
+  "reviews": [
+    {
+      "id": "RV-0001",
+      "design": "DES-0001",
+      "declared": "Blocked",
+      "decider": "pending",
+      "computed": "Blocked",
+      "computedLine": "Computed: Blocked   Declared: Blocked",
+      "blockReasons": 50,
+      "rejectReasons": 0,
+      "blockingDecisions": [
+        "D-003",
+        "D-006",
+        "D-007",
+        "D-009",
+        "D-010",
+        "D-011",
+        "D-012",
+        "D-013",
+        "D-015",
+        "D-016",
+        "D-018",
+        "D-019",
+        "D-020",
+        "D-025",
+        "D-027",
+        "D-031",
+        "D-033"
+      ]
+    },
+    {
+      "id": "RV-0002",
+      "design": "DES-0002",
+      "declared": "Blocked",
+      "decider": "pending",
+      "computed": "Blocked",
+      "computedLine": "Computed: Blocked   Declared: Blocked",
+      "blockReasons": 42,
+      "rejectReasons": 0,
+      "blockingDecisions": [
+        "D-003",
+        "D-006",
+        "D-007",
+        "D-009",
+        "D-010",
+        "D-011",
+        "D-013",
+        "D-015",
+        "D-018",
+        "D-019",
+        "D-020",
+        "D-021",
+        "D-025",
+        "D-031",
+        "D-033"
+      ]
+    },
+    {
+      "id": "RV-0003",
+      "design": "DES-0003",
+      "declared": "Blocked",
+      "decider": "pending",
+      "computed": "Blocked",
+      "computedLine": "Computed: Blocked   Declared: Blocked",
+      "blockReasons": 85,
+      "rejectReasons": 0,
+      "blockingDecisions": [
+        "D-003",
+        "D-006",
+        "D-007",
+        "D-008",
+        "D-009",
+        "D-010",
+        "D-011",
+        "D-012",
+        "D-013",
+        "D-015",
+        "D-016",
+        "D-018",
+        "D-019",
+        "D-020",
+        "D-022",
+        "D-024",
+        "D-025",
+        "D-027",
+        "D-028",
+        "D-029",
+        "D-031",
+        "D-033",
+        "D-035",
+        "D-037"
+      ]
+    }
+  ],
+  "tasks": [
+    {
+      "id": "T1",
+      "section": "Owner has deferred (\"will answer later\", 2026-10-28)",
+      "status": "deferred",
+      "tokens": [],
+      "title": "Answer harness open questions Q1-Q13 | [OPEN-QUESTIONS](../harness/OPEN-QUESTIONS.md) | R1"
+    },
+    {
+      "id": "T2",
+      "section": "Owner has deferred (\"will answer later\", 2026-10-28)",
+      "status": "deferred",
+      "tokens": [
+        "open",
+        "deferred",
+        "approved"
+      ],
+      "ambiguous": true,
+      "title": "Answer stakeholder clarification items in the unresolved decision register (all `Open` ent"
+    },
+    {
+      "id": "T3",
+      "section": "Owner has deferred (\"will answer later\", 2026-10-28)",
+      "status": "deferred",
+      "tokens": [
+        "deferred",
+        "approved"
+      ],
+      "title": "Name the deciders for ADR acceptance, phase changes, CP4 design approval and each approval"
+    },
+    {
+      "id": "T4",
+      "section": "Owner has deferred (\"will answer later\", 2026-10-28)",
+      "status": "deferred",
+      "tokens": [],
+      "title": "Confirm which standards and regulations are in scope, and nominate a qualified person to v"
+    },
+    {
+      "id": "T5",
+      "section": "Owner has deferred (\"will answer later\", 2026-10-28)",
+      "status": "deferred",
+      "tokens": [],
+      "title": "Decide whether to move the repository out of the OneDrive-synced folder | Q1 | Repository "
+    },
+    {
+      "id": "T8",
+      "section": "Owner has deferred (\"will answer later\", 2026-10-28)",
+      "status": "deferred",
+      "tokens": [],
+      "title": "Run or watch the remaining R1 checks in VS Code chat, the R11 context-loading test and the"
+    },
+    {
+      "id": "T9",
+      "section": "Owner has deferred (\"will answer later\", 2026-10-28)",
+      "status": "deferred",
+      "tokens": [
+        "deferred"
+      ],
+      "title": "Agent checks not yet observed: agent-scoped hooks in VS Code chat; a write attempted insid"
+    },
+    {
+      "id": "T11",
+      "section": "Owner has deferred (\"will answer later\", 2026-10-28)",
+      "status": "deferred",
+      "tokens": [
+        "deferred"
+      ],
+      "title": "Decide whether and when to approve the pending MCP candidates (Azure MCP pinned to 3.0.0; "
+    },
+    {
+      "id": "T12",
+      "section": "Owner has deferred (\"will answer later\", 2026-10-28)",
+      "status": "deferred",
+      "tokens": [
+        "deferred"
+      ],
+      "title": "Verify in VS Code chat: MCP server start and trust prompts, `server/tool` entries in agent"
+    },
+    {
+      "id": "T13",
+      "section": "Owner has deferred (\"will answer later\", 2026-10-28)",
+      "status": "deferred",
+      "tokens": [
+        "deferred"
+      ],
+      "title": "Name the human approvers, enroll them with `approval.mjs enroll` and `register` (key outsi"
+    },
+    {
+      "id": "T14",
+      "section": "Owner has deferred (\"will answer later\", 2026-10-28)",
+      "status": "deferred",
+      "tokens": [
+        "deferred"
+      ],
+      "title": "Make GitHub branch protection possible: upgrade the plan, make the repository public (only"
+    },
+    {
+      "id": "T15",
+      "section": "Owner has deferred (\"will answer later\", 2026-10-28)",
+      "status": "deferred",
+      "tokens": [
+        "deferred"
+      ],
+      "title": "Decide how to isolate agent sessions at the operating-system level (dev container, separat"
+    },
+    {
+      "id": "T16",
+      "section": "Owner has deferred (\"will answer later\", 2026-10-28)",
+      "status": "deferred",
+      "tokens": [
+        "deferred"
+      ],
+      "title": "Name the break-glass declarer and second approver contacts, the owner and retention for th"
+    },
+    {
+      "id": "T17",
+      "section": "Owner has deferred (\"will answer later\", 2026-10-28)",
+      "status": "deferred",
+      "tokens": [
+        "deferred"
+      ],
+      "title": "After the subscription decision (D-037): create the scoped Azure identities, custom role, "
+    },
+    {
+      "id": "T23",
+      "section": "Awaiting the owner (memory stage, 2026-10-28)",
+      "status": "decided",
+      "tokens": [
+        "decided",
+        "open"
+      ],
+      "ambiguous": false,
+      "title": "Decided 2026-10-28 (architect, on the owner's instruction). Interim: owner reviews every c"
+    },
+    {
+      "id": "T27",
+      "section": "Awaiting the owner (evaluation stage, 2026-10-28)",
+      "status": "decided",
+      "tokens": [
+        "decided",
+        "open"
+      ],
+      "ambiguous": false,
+      "title": "Decided 2026-10-28 (architect, on the owner's instruction), [ADR 0013](../adr/0013-evaluat"
+    },
+    {
+      "id": "T28",
+      "section": "Awaiting the owner (evaluation stage, 2026-10-28)",
+      "status": "agreed",
+      "tokens": [
+        "open"
+      ],
+      "ambiguous": false,
+      "title": "Agreed 2026-10-28: no response-time, volume, recovery, cost or budget figure is invented, "
+    },
+    {
+      "id": "T30",
+      "section": "Awaiting the owner (Azure readiness stage, 2026-10-28; answered 2026-10-29)",
+      "status": "done",
+      "tokens": [
+        "done"
+      ],
+      "ambiguous": false,
+      "title": "Done 2026-10-29: [ADR 0014](../adr/0014-azure-readiness-scaffold-and-provisional-selection"
+    },
+    {
+      "id": "T31",
+      "section": "Awaiting the owner (Azure readiness stage, 2026-10-28; answered 2026-10-29)",
+      "status": "open",
+      "tokens": [
+        "open"
+      ],
+      "ambiguous": false,
+      "title": "Open: approval cannot supply the facts. Name the ports and the legal entity in each (D-003"
+    },
+    {
+      "id": "T32",
+      "section": "Awaiting the owner (Azure readiness stage, 2026-10-28; answered 2026-10-29)",
+      "status": "open",
+      "tokens": [
+        "open"
+      ],
+      "ambiguous": false,
+      "title": "Open: needs the owner's facts. Decide the Azure tenant, subscription, landing zone and dev"
+    },
+    {
+      "id": "T33",
+      "section": "Awaiting the owner (Azure readiness stage, 2026-10-28; answered 2026-10-29)",
+      "status": "not-granted",
+      "tokens": [
+        "not granted"
+      ],
+      "ambiguous": false,
+      "title": "Not granted. The owner's blanket approval does not name a read-only identity, a tenant or "
+    },
+    {
+      "id": "T34",
+      "section": "Awaiting the owner (Azure readiness stage, 2026-10-28; answered 2026-10-29)",
+      "status": "open",
+      "tokens": [
+        "open"
+      ],
+      "ambiguous": false,
+      "title": "Open: needs the owner's facts. Decide key custody and the tamper-evidence mechanism (D-013"
+    },
+    {
+      "id": "T35",
+      "section": "Awaiting the owner (Azure readiness stage, 2026-10-28; answered 2026-10-29)",
+      "status": "approved",
+      "tokens": [
+        "approved"
+      ],
+      "ambiguous": false,
+      "title": "Approved 2026-10-29 as work: a design record and review for the Azure reference architectu"
+    },
+    {
+      "id": "T36",
+      "section": "Awaiting the owner (Azure readiness stage, 2026-10-28; answered 2026-10-29)",
+      "status": "deferred",
+      "tokens": [
+        "deferred"
+      ],
+      "ambiguous": false,
+      "title": "Deferred by the owner 2026-10-29: actual Azure deployment. Raise the phase, recorded in an"
+    },
+    {
+      "id": "T37",
+      "section": "Awaiting the owner (Azure readiness stage, 2026-10-28; answered 2026-10-29)",
+      "status": "open",
+      "tokens": [
+        "open"
+      ],
+      "ambiguous": false,
+      "title": "Open: approval cannot supply the names (owner reply 2026-10-29: approve all). Name a human"
+    },
+    {
+      "id": "T38",
+      "section": "Awaiting the owner (Azure readiness stage, 2026-10-28; answered 2026-10-29)",
+      "status": "approved",
+      "tokens": [
+        "approved"
+      ],
+      "ambiguous": false,
+      "title": "Approved 2026-10-29 as work, not started. Re-run the end-to-end scenario with the harness'"
+    },
+    {
+      "id": "T39",
+      "section": "Awaiting the owner (Azure readiness stage, 2026-10-28; answered 2026-10-29)",
+      "status": "approved",
+      "tokens": [
+        "approved"
+      ],
+      "ambiguous": false,
+      "title": "Approved 2026-10-29 as work, not started; blocked on D-013, D-020, D-031 being decided. De"
+    },
+    {
+      "id": "T40",
+      "section": "Awaiting the owner (Azure readiness stage, 2026-10-28; answered 2026-10-29)",
+      "status": "approved",
+      "tokens": [
+        "approved"
+      ],
+      "ambiguous": false,
+      "title": "Approved 2026-10-29 as work, not started (the next stage). Decide whether to remediate the"
+    },
+    {
+      "id": "T41",
+      "section": "Awaiting the owner (Azure readiness stage, 2026-10-28; answered 2026-10-29)",
+      "status": "done",
+      "tokens": [
+        "done"
+      ],
+      "ambiguous": false,
+      "title": "Done 2026-10-30 for the recorder; cause still unknown. The recorder now keeps failing-test"
+    },
+    {
+      "id": "T42",
+      "section": "Awaiting the owner (hardening stage, 2026-10-30)",
+      "status": "open",
+      "tokens": [
+        "open"
+      ],
+      "ambiguous": false,
+      "title": "Open: owner machine. Start Docker Desktop, install Dev Containers, switch off Git credenti"
+    },
+    {
+      "id": "T43",
+      "section": "Awaiting the owner (hardening stage, 2026-10-30)",
+      "status": "open",
+      "tokens": [
+        "open"
+      ],
+      "ambiguous": false,
+      "title": "Open: owner action. Enroll yourself as an approver (class architecture and repository at l"
+    },
+    {
+      "id": "T44",
+      "section": "Awaiting the owner (hardening stage, 2026-10-30)",
+      "status": "open",
+      "tokens": [
+        "open"
+      ],
+      "ambiguous": false,
+      "title": "Open: owner in VS Code. Run the live-validation protocol (probes LV-01 to LV-08 and LV-M1 "
+    },
+    {
+      "id": "T45",
+      "section": "Awaiting the owner (hardening stage, 2026-10-30)",
+      "status": "open",
+      "tokens": [
+        "open"
+      ],
+      "ambiguous": false,
+      "title": "Open: owner decision. Branch protection: upgrade the plan or accept detection-only (CI gua"
+    },
+    {
+      "id": "T46",
+      "section": "Awaiting the owner (hardening stage, 2026-10-30)",
+      "status": "open",
+      "tokens": [
+        "open"
+      ],
+      "ambiguous": false,
+      "title": "Open: owner decision. Whether to push the hardening branch and open a pull request. Nothin"
+    },
+    {
+      "id": "T47",
+      "section": "Awaiting the owner (hardening stage, 2026-10-30)",
+      "status": "open",
+      "tokens": [
+        "open"
+      ],
+      "ambiguous": false,
+      "title": "Open, optional. Decide whether to anchor the audit event log and the evidence chain head o"
+    },
+    {
+      "id": "T48",
+      "section": "Awaiting the owner (target architecture and business case, 2026-10-29)",
+      "status": "open",
+      "tokens": [
+        "open"
+      ],
+      "ambiguous": false,
+      "title": "Open: needs names. Name a human decider and a human reviewer for DES-0003 (extends T3, T37"
+    },
+    {
+      "id": "T49",
+      "section": "Awaiting the owner (target architecture and business case, 2026-10-29)",
+      "status": "open",
+      "tokens": [
+        "open"
+      ],
+      "ambiguous": false,
+      "title": "Open: needs the owner's facts. Supply or measure the business-case inputs in [COMMERCIAL-V"
+    },
+    {
+      "id": "T50",
+      "section": "Awaiting the owner (target architecture and business case, 2026-10-29)",
+      "status": "open",
+      "tokens": [
+        "open",
+        "not granted"
+      ],
+      "ambiguous": false,
+      "title": "Open: owner decision. Whether to grant a subscription and read-only identity so the servic"
+    },
+    {
+      "id": "T51",
+      "section": "Awaiting the owner (target architecture and business case, 2026-10-29)",
+      "status": "open",
+      "tokens": [
+        "open"
+      ],
+      "ambiguous": false,
+      "title": "Open: discovery. Interview the eight candidate stakeholders and record answers to the unan"
+    },
+    {
+      "id": "T52",
+      "section": "Awaiting the owner (target architecture and business case, 2026-10-29)",
+      "status": "open",
+      "tokens": [
+        "open"
+      ],
+      "ambiguous": false,
+      "title": "Open: owner decision. Whether to push the `architecture/target-design` branch (nothing fro"
+    },
+    {
+      "id": "T53",
+      "section": "Awaiting the owner (target architecture and business case, 2026-10-29)",
+      "status": "open",
+      "tokens": [
+        "open"
+      ],
+      "ambiguous": false,
+      "title": "Open: owner's next steps (replied 2026-10-29: \"will do next\"). Enroll as approver, set up "
+    },
+    {
+      "id": "T54",
+      "section": "Awaiting the owner (target architecture and business case, 2026-10-29)",
+      "status": "open",
+      "tokens": [
+        "open"
+      ],
+      "ambiguous": false,
+      "title": "Open: owner decision. Database for local persistence tests: start Docker (the daemon was n"
+    },
+    {
+      "id": "T55",
+      "section": "Awaiting the owner (target architecture and business case, 2026-10-29)",
+      "status": "open",
+      "tokens": [
+        "open",
+        "not run"
+      ],
+      "ambiguous": false,
+      "title": "Open: needed before the production agents can be built or evaluated. Confirm the autonomy "
+    },
+    {
+      "id": "T56",
+      "section": "Awaiting the owner (target architecture and business case, 2026-10-29)",
+      "status": "open",
+      "tokens": [
+        "open"
+      ],
+      "ambiguous": false,
+      "title": "Open: hardening follow-ups that need a person. (a) Approver key enrollment and custody for"
+    },
+    {
+      "id": "T57",
+      "section": "Awaiting the owner (target architecture and business case, 2026-10-29)",
+      "status": "open",
+      "tokens": [
+        "open"
+      ],
+      "ambiguous": false,
+      "title": "Open: owner decisions needed before any Azure deployment (request of 2026-10-29: deploy to"
+    },
+    {
+      "id": "T58",
+      "section": "Awaiting the owner (target architecture and business case, 2026-10-29)",
+      "status": "open",
+      "tokens": [
+        "open",
+        "not run"
+      ],
+      "ambiguous": false,
+      "title": "Open: owner decisions for the agent evaluation (framework built 2026-10-29; LLM arms NOT R"
+    },
+    {
+      "id": "T59",
+      "section": "Awaiting the owner (target architecture and business case, 2026-10-29)",
+      "status": "open",
+      "tokens": [
+        "open"
+      ],
+      "ambiguous": false,
+      "title": "Open: human steps for the capstone presentation package (prepared 2026-10-29, not rehearse"
+    },
+    {
+      "id": "T60",
+      "section": "Awaiting the owner (target architecture and business case, 2026-10-29)",
+      "status": "open",
+      "tokens": [
+        "open"
+      ],
+      "ambiguous": false,
+      "title": "Open: thought-leadership accelerator (built 2026-10-29 as a separate local repository `evi"
+    }
+  ],
+  "phaseFromState": "0",
+  "idFamilies": {
+    "A": {
+      "distinctIds": 45,
+      "files": [
+        "docs/acceptance/HARNESS-ACCEPTANCE-REPORT.md",
+        "docs/acceptance/NEXT-PHASE-IMPLEMENTATION-PLAN.md",
+        "docs/capstone/RUBRIC-TRACEABILITY.md",
+        "docs/context/AGENT-AUTONOMY-MATRIX.md"
+      ],
+      "fileCount": 6
+    },
+    "AGT": {
+      "distinctIds": 11,
+      "files": [
+        "docs/acceptance/REQUIREMENTS-COVERAGE.md",
+        "docs/architecture/designs/DES-0001-delivery-measurement-storage-topology.md",
+        "docs/architecture/designs/DES-0002-evidence-ingestion-subsystem.md",
+        "docs/architecture/designs/DES-0003-target-system-architecture.md"
+      ],
+      "fileCount": 7
+    },
+    "AS": {
+      "distinctIds": 26,
+      "files": [
+        "docs/context/ASSUMPTIONS.md"
+      ],
+      "fileCount": 1
+    },
+    "AU": {
+      "distinctIds": 1,
+      "files": [
+        "docs/target-architecture/10-CONTROL-MATRIX.md"
+      ],
+      "fileCount": 1
+    },
+    "B": {
+      "distinctIds": 7,
+      "files": [
+        "docs/acceptance/NEXT-PHASE-IMPLEMENTATION-PLAN.md",
+        "docs/capstone/RUBRIC-TRACEABILITY.md"
+      ],
+      "fileCount": 2
+    },
+    "BL": {
+      "distinctIds": 5,
+      "files": [
+        "docs/architecture/DESIGN-REVIEW-GATE.md"
+      ],
+      "fileCount": 1
+    },
+    "BR": {
+      "distinctIds": 9,
+      "files": [
+        "docs/acceptance/REQUIREMENTS-COVERAGE.md",
+        "docs/architecture/designs/DES-0001-delivery-measurement-storage-topology.md",
+        "docs/architecture/designs/DES-0002-evidence-ingestion-subsystem.md",
+        "docs/architecture/designs/DES-0003-target-system-architecture.md"
+      ],
+      "fileCount": 9
+    },
+    "C": {
+      "distinctIds": 11,
+      "files": [
+        "docs/acceptance/HARNESS-ACCEPTANCE-REPORT.md",
+        "docs/capstone/RUBRIC-TRACEABILITY.md",
+        "docs/design/ai/AGENTIC-AUTONOMY-DESIGN-RECORD.md",
+        "docs/harness/CAPABILITY-MATRIX.md"
+      ],
+      "fileCount": 4
+    },
+    "CB": {
+      "distinctIds": 4,
+      "files": [
+        "docs/acceptance/HARNESS-ACCEPTANCE-REPORT.md"
+      ],
+      "fileCount": 1
+    },
+    "CC": {
+      "distinctIds": 11,
+      "files": [
+        "docs/target-architecture/10-CONTROL-MATRIX.md"
+      ],
+      "fileCount": 1
+    },
+    "CL": {
+      "distinctIds": 15,
+      "files": [
+        "docs/target-architecture/10-CONTROL-MATRIX.md"
+      ],
+      "fileCount": 1
+    },
+    "CN": {
+      "distinctIds": 7,
+      "files": [
+        "docs/architecture/designs/DES-0001-delivery-measurement-storage-topology.md",
+        "docs/architecture/designs/DES-0002-evidence-ingestion-subsystem.md",
+        "docs/architecture/designs/DES-0003-target-system-architecture.md",
+        "docs/architecture/templates/DESIGN.template.md"
+      ],
+      "fileCount": 4
+    },
+    "CP": {
+      "distinctIds": 5,
+      "files": [
+        "docs/architecture/REVIEW-CHECKPOINTS.md"
+      ],
+      "fileCount": 1
+    },
+    "D": {
+      "distinctIds": 42,
+      "files": [
+        "docs/acceptance/NEXT-PHASE-IMPLEMENTATION-PLAN.md",
+        "docs/architecture-studio/DECISION-INVENTORY.md",
+        "docs/capstone/RUBRIC-TRACEABILITY.md",
+        "docs/context/DECISION-REGISTER.md"
+      ],
+      "fileCount": 4
+    },
+    "DA": {
+      "distinctIds": 9,
+      "files": [
+        "docs/architecture/designs/DES-0001-delivery-measurement-storage-topology.md",
+        "docs/architecture/designs/DES-0002-evidence-ingestion-subsystem.md",
+        "docs/architecture/designs/DES-0003-target-system-architecture.md",
+        "docs/architecture/templates/DESIGN.template.md"
+      ],
+      "fileCount": 4
+    },
+    "DATA": {
+      "distinctIds": 10,
+      "files": [
+        "docs/acceptance/REQUIREMENTS-COVERAGE.md",
+        "docs/architecture/designs/DES-0001-delivery-measurement-storage-topology.md",
+        "docs/architecture/designs/DES-0002-evidence-ingestion-subsystem.md",
+        "docs/architecture/designs/DES-0003-target-system-architecture.md"
+      ],
+      "fileCount": 7
+    },
+    "DC": {
+      "distinctIds": 18,
+      "files": [
+        "docs/context/DATA-CLASSIFICATION.md"
+      ],
+      "fileCount": 1
+    },
+    "DEF": {
+      "distinctIds": 9,
+      "files": [
+        "docs/security/ENFORCEMENT-STATUS.md",
+        "docs/security/PERMISSION-MODEL.md"
+      ],
+      "fileCount": 2
+    },
+    "DES": {
+      "distinctIds": 1,
+      "files": [
+        "docs/target-architecture/09-REVIEW-AND-VALIDATION.md"
+      ],
+      "fileCount": 1
+    },
+    "DG": {
+      "distinctIds": 12,
+      "files": [
+        "docs/azure/DEPLOYMENT-STRATEGY.md"
+      ],
+      "fileCount": 1
+    },
+    "E": {
+      "distinctIds": 3,
+      "files": [
+        "docs/acceptance/HARNESS-ACCEPTANCE-REPORT.md"
+      ],
+      "fileCount": 1
+    },
+    "EM": {
+      "distinctIds": 8,
+      "files": [
+        "docs/target-architecture/10-CONTROL-MATRIX.md"
+      ],
+      "fileCount": 1
+    },
+    "EV": {
+      "distinctIds": 77,
+      "files": [
+        "docs/acceptance/TEST-EVIDENCE-INDEX.md",
+        "docs/capstone/EVIDENCE-REGISTER.md",
+        "docs/target-architecture/13-SECURITY-REVIEW.md"
+      ],
+      "fileCount": 3
+    },
+    "F": {
+      "distinctIds": 24,
+      "files": [
+        "docs/acceptance/HARNESS-ACCEPTANCE-REPORT.md",
+        "docs/context/SOVEREIGNTY-MATRIX.md",
+        "docs/target-architecture/12-DATA-MOVEMENT-AND-RESIDENCY-VALIDATION.md"
+      ],
+      "fileCount": 3
+    },
+    "FR": {
+      "distinctIds": 33,
+      "files": [
+        "docs/acceptance/REQUIREMENTS-COVERAGE.md",
+        "docs/architecture/designs/DES-0001-delivery-measurement-storage-topology.md",
+        "docs/architecture/designs/DES-0002-evidence-ingestion-subsystem.md",
+        "docs/architecture/designs/DES-0003-target-system-architecture.md"
+      ],
+      "fileCount": 9
+    },
+    "G": {
+      "distinctIds": 39,
+      "files": [
+        "docs/capstone/CRITICAL-GAPS.md",
+        "docs/evaluation/EVALUATION-FRAMEWORK.md",
+        "docs/harness/CAPABILITY-MATRIX.md",
+        "docs/phase/PHASE-1-BLOCKER-REPORT.md"
+      ],
+      "fileCount": 5
+    },
+    "H": {
+      "distinctIds": 5,
+      "files": [
+        "docs/acceptance/HARNESS-ACCEPTANCE-REPORT.md"
+      ],
+      "fileCount": 1
+    },
+    "HC": {
+      "distinctIds": 12,
+      "files": [
+        "docs/architecture/HARD-CONSTRAINTS.md",
+        "docs/design/system/EVIDENCE-STORE-PROPOSAL.md",
+        "docs/evaluation/EVALUATION-REPORT.md",
+        "docs/state/runs/RUN-afb2a0466e/results/T2-s1.md"
+      ],
+      "fileCount": 5
+    },
+    "HR": {
+      "distinctIds": 17,
+      "files": [
+        "docs/acceptance/REMAINING-RISKS.md"
+      ],
+      "fileCount": 1
+    },
+    "IC": {
+      "distinctIds": 16,
+      "files": [
+        "docs/target-architecture/04-INTEGRATION-CONTRACTS.md"
+      ],
+      "fileCount": 1
+    },
+    "IS": {
+      "distinctIds": 9,
+      "files": [
+        "docs/target-architecture/10-CONTROL-MATRIX.md"
+      ],
+      "fileCount": 1
+    },
+    "L": {
+      "distinctIds": 9,
+      "files": [
+        "docs/acceptance/HARNESS-ACCEPTANCE-REPORT.md",
+        "docs/context/AGENT-AUTONOMY-MATRIX.md",
+        "docs/design/ai/AGENTIC-AUTONOMY-DESIGN-RECORD.md"
+      ],
+      "fileCount": 3
+    },
+    "LV": {
+      "distinctIds": 8,
+      "files": [
+        "docs/security/LIVE-VALIDATION.md"
+      ],
+      "fileCount": 1
+    },
+    "M": {
+      "distinctIds": 24,
+      "files": [
+        "docs/acceptance/HARNESS-ACCEPTANCE-REPORT.md",
+        "docs/capstone/presentation/SPEAKER-NOTES.md",
+        "docs/design/ai/AGENT-EVALUATION-PLAN.md",
+        "docs/harness/CAPABILITY-MATRIX.md"
+      ],
+      "fileCount": 4
+    },
+    "N": {
+      "distinctIds": 4,
+      "files": [
+        "docs/target-architecture/13-SECURITY-REVIEW.md"
+      ],
+      "fileCount": 1
+    },
+    "NFR": {
+      "distinctIds": 21,
+      "files": [
+        "docs/acceptance/REQUIREMENTS-COVERAGE.md",
+        "docs/architecture/designs/DES-0001-delivery-measurement-storage-topology.md",
+        "docs/architecture/designs/DES-0002-evidence-ingestion-subsystem.md",
+        "docs/architecture/designs/DES-0003-target-system-architecture.md"
+      ],
+      "fileCount": 7
+    },
+    "O": {
+      "distinctIds": 5,
+      "files": [
+        "docs/design/ai/ORCHESTRATION-OPTIONS.md",
+        "docs/harness/CAPABILITY-MATRIX.md"
+      ],
+      "fileCount": 2
+    },
+    "OQ": {
+      "distinctIds": 10,
+      "files": [
+        "docs/architecture-studio/IMPLEMENTATION-PLAN.md"
+      ],
+      "fileCount": 1
+    },
+    "ORCH": {
+      "distinctIds": 1,
+      "files": [
+        "docs/orchestration/ORCHESTRATION.md"
+      ],
+      "fileCount": 1
+    },
+    "P": {
+      "distinctIds": 16,
+      "files": [
+        "docs/acceptance/HARNESS-ACCEPTANCE-REPORT.md",
+        "docs/architecture/designs/DES-0002-evidence-ingestion-subsystem.md",
+        "docs/design/ai/AGENTIC-AUTONOMY-DESIGN-RECORD.md",
+        "docs/harness/REFERENCE-ASSESSMENT.md"
+      ],
+      "fileCount": 5
+    },
+    "PV": {
+      "distinctIds": 10,
+      "files": [
+        "docs/architecture/REVIEW-PERSPECTIVES.md",
+        "docs/architecture/reviews/RV-0001-delivery-measurement-storage-topology.md",
+        "docs/architecture/reviews/RV-0002-evidence-ingestion-subsystem.md",
+        "docs/architecture/reviews/RV-0003-target-system-architecture.md"
+      ],
+      "fileCount": 5
+    },
+    "Q": {
+      "distinctIds": 59,
+      "files": [
+        "docs/capstone/presentation/QA-PANEL-50.md",
+        "docs/harness/OPEN-QUESTIONS.md"
+      ],
+      "fileCount": 2
+    },
+    "R": {
+      "distinctIds": 18,
+      "files": [
+        "docs/capstone/presentation/REHEARSAL-PLAN-AND-SCORECARD.md",
+        "docs/harness/IMPLEMENTATION-ROADMAP.md"
+      ],
+      "fileCount": 2
+    },
+    "RA": {
+      "distinctIds": 7,
+      "files": [
+        "docs/target-architecture/10-CONTROL-MATRIX.md"
+      ],
+      "fileCount": 1
+    },
+    "RJ": {
+      "distinctIds": 2,
+      "files": [
+        "docs/architecture/DESIGN-REVIEW-GATE.md"
+      ],
+      "fileCount": 1
+    },
+    "RK": {
+      "distinctIds": 14,
+      "files": [
+        "docs/architecture/designs/DES-0001-delivery-measurement-storage-topology.md",
+        "docs/architecture/designs/DES-0002-evidence-ingestion-subsystem.md",
+        "docs/architecture/designs/DES-0003-target-system-architecture.md",
+        "docs/architecture/RISK-REGISTER.md"
+      ],
+      "fileCount": 4
+    },
+    "S": {
+      "distinctIds": 16,
+      "files": [
+        "docs/design/ai/AGENT-EVALUATION-PLAN.md",
+        "docs/harness/REFERENCE-ASSESSMENT.md"
+      ],
+      "fileCount": 2
+    },
+    "SEC": {
+      "distinctIds": 15,
+      "files": [
+        "docs/acceptance/REQUIREMENTS-COVERAGE.md",
+        "docs/architecture/designs/DES-0001-delivery-measurement-storage-topology.md",
+        "docs/architecture/designs/DES-0002-evidence-ingestion-subsystem.md",
+        "docs/architecture/designs/DES-0003-target-system-architecture.md"
+      ],
+      "fileCount": 9
+    },
+    "ST": {
+      "distinctIds": 12,
+      "files": [
+        "docs/architecture/DESIGN-REVIEW-GATE.md"
+      ],
+      "fileCount": 1
+    },
+    "SV": {
+      "distinctIds": 8,
+      "files": [
+        "docs/target-architecture/10-CONTROL-MATRIX.md"
+      ],
+      "fileCount": 1
+    },
+    "T": {
+      "distinctIds": 54,
+      "files": [
+        "docs/acceptance/HARNESS-ACCEPTANCE-REPORT.md",
+        "docs/harness/CAPABILITY-MATRIX.md",
+        "docs/harness/REFERENCE-ASSESSMENT.md",
+        "docs/state/runs/RUN-afb2a0466e/REPORT.md"
+      ],
+      "fileCount": 6
+    },
+    "TD": {
+      "distinctIds": 6,
+      "files": [
+        "docs/architecture/designs/DES-0001-delivery-measurement-storage-topology.md",
+        "docs/architecture/designs/DES-0002-evidence-ingestion-subsystem.md",
+        "docs/architecture/designs/DES-0003-target-system-architecture.md",
+        "docs/architecture/templates/DESIGN.template.md"
+      ],
+      "fileCount": 4
+    },
+    "TM": {
+      "distinctIds": 39,
+      "files": [
+        "docs/target-architecture/06-THREAT-MODEL.md"
+      ],
+      "fileCount": 1
+    },
+    "V": {
+      "distinctIds": 39,
+      "files": [
+        "docs/context/CERTIFICATION-SCHEMES.md",
+        "docs/harness/CAPABILITY-MATRIX.md",
+        "docs/target-architecture/12-DATA-MOVEMENT-AND-RESIDENCY-VALIDATION.md"
+      ],
+      "fileCount": 3
+    },
+    "Z": {
+      "distinctIds": 7,
+      "files": [
+        "docs/context/SOVEREIGNTY-MATRIX.md"
+      ],
+      "fileCount": 1
+    }
+  },
+  "workflows": [
+    {
+      "file": ".github/workflows/infra-validate.yml",
+      "name": "infra-validate",
+      "onPush": true,
+      "onPullRequest": true,
+      "branches": "main",
+      "permissions": "contents: read",
+      "usesPinnedSha": true
+    },
+    {
+      "file": ".github/workflows/validate.yml",
+      "name": "validate",
+      "onPush": true,
+      "onPullRequest": true,
+      "branches": "main",
+      "permissions": "contents: read",
+      "usesPinnedSha": true
+    }
+  ],
+  "machineReadableByFolder": {
+    ".devcontainer": 1,
+    ".github": 3,
+    ".mcp.json": 1,
+    ".vscode": 2,
+    "docs/architecture-studio": 1,
+    "docs/azure": 2,
+    "docs/business": 3,
+    "docs/capstone": 9,
+    "docs/context": 1,
+    "docs/evidence": 1,
+    "docs/orchestration": 1,
+    "evaluation": 2,
+    "harness": 35,
+    "infra": 3,
+    "memory": 36,
+    "package.json": 1,
+    "tests": 22
+  }
+}
