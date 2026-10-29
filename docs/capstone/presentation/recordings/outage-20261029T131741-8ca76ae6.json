@@ -1,0 +1,46 @@
+{
+  "schema": "greenfuel.demo-recording/v1",
+  "kind": "RECORDED-RUN",
+  "notLive": true,
+  "scenario": "outage",
+  "title": "Edge outage and recovery",
+  "recordedAt": "2026-10-29T13:17:41.962Z",
+  "gitHead": "26c988577e02b7fead0f2b35a5f9083e2acc64be",
+  "node": "v22.23.4",
+  "banner": "CANDIDATE ORACLES, SYNTHETIC DATA, TEST-ONLY KEYS. NOT THE PLATFORM (it does not exist). No Azure resource is involved.",
+  "lines": [
+    {
+      "kind": "step",
+      "text": "Link up: 2 events reach the cell. The barge keeps capturing; the link then drops."
+    },
+    {
+      "kind": "note",
+      "text": "Link down: events 3, 4 and 5 are captured and signed at the edge, buffered, and cannot be sent. The transfer completes at sea."
+    },
+    {
+      "kind": "ok",
+      "text": "Link returns; the buffer replays the LAST event first -> gap (the cell refuses to accept it ahead of its predecessors)."
+    },
+    {
+      "kind": "ok",
+      "text": "The buffer resends in order, including already-sent event 2 -> accepted 3, duplicates ignored 1, rejected 0."
+    },
+    {
+      "kind": "ok",
+      "text": "A full replay of everything -> accepted 0, duplicates 5 (idempotent: nothing is counted twice)."
+    },
+    {
+      "kind": "ok",
+      "text": "Evidence complete and independently verified: ok=true, complete=true, delivered 2500.0 kg."
+    },
+    {
+      "kind": "note",
+      "text": "Receipt times come from the cell's clock, not the device: first 2026-03-10T09:15:00.000Z, last 2026-03-10T11:45:00.000Z. Late data is visible as late, never back-dated."
+    },
+    {
+      "kind": "note",
+      "text": "Limit: this is the contract on one in-memory verifier. Real edge hardware, storage, retry behaviour and the trusted time source are not built (D-018, D-021)."
+    }
+  ],
+  "outputSha256": "8ca76ae6d1d0db3159cc8349cc63c1b6056a7654e9eca9dcbce68dab65ab6240"
+}

@@ -1,0 +1,42 @@
+{
+  "schema": "greenfuel.demo-recording/v1",
+  "kind": "RECORDED-RUN",
+  "notLive": true,
+  "scenario": "azure",
+  "title": "Azure infrastructure and deployment gate",
+  "recordedAt": "2026-10-29T13:17:43.032Z",
+  "gitHead": "26c988577e02b7fead0f2b35a5f9083e2acc64be",
+  "node": "v22.23.4",
+  "banner": "CANDIDATE ORACLES, SYNTHETIC DATA, TEST-ONLY KEYS. NOT THE PLATFORM (it does not exist). No Azure resource is involved.",
+  "lines": [
+    {
+      "kind": "step",
+      "text": "Deployment-readiness gate, run just now (read-only): deployment-readiness: NOT-READY (1 item(s) checked)"
+    },
+    {
+      "kind": "refused",
+      "text": "- Phase 0: application code, infrastructure and Azure changes are not permitted; raising the phase is a human decision recorded in an ADR"
+    },
+    {
+      "kind": "refused",
+      "text": "- The only infrastructure is a non-deployable scaffold (ADR 0014): it has no approved design, no real parameter values and no what-if"
+    },
+    {
+      "kind": "refused",
+      "text": "- No design review has status Approved (3 review record(s) exist)"
+    },
+    {
+      "kind": "refused",
+      "text": "- 17 milestone-1 decisions are still open: D-001, D-002, D-003, D-004, D-005, D-006, D-007, D-008, D-009, D-012, D-015, D-019, D-020, D-022, D-023, D-024, D-034"
+    },
+    {
+      "kind": "refused",
+      "text": "- No human decider is named (TODO T3), so nothing can be approved"
+    },
+    {
+      "kind": "note",
+      "text": "... 25 more blockers. No Azure resource was created; the harness has not deployed anything."
+    }
+  ],
+  "outputSha256": "b9958dcf0f6447e4ba3f777aa51b4690d569e3343554b55c0781248d6b4155d0"
+}

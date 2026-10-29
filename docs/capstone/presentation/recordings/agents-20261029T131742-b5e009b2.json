@@ -1,0 +1,54 @@
+{
+  "schema": "greenfuel.demo-recording/v1",
+  "kind": "RECORDED-RUN",
+  "notLive": true,
+  "scenario": "agents",
+  "title": "Agent orchestration and evaluation",
+  "recordedAt": "2026-10-29T13:17:42.363Z",
+  "gitHead": "26c988577e02b7fead0f2b35a5f9083e2acc64be",
+  "node": "v22.23.4",
+  "banner": "CANDIDATE ORACLES, SYNTHETIC DATA, TEST-ONLY KEYS. NOT THE PLATFORM (it does not exist). No Azure resource is involved.",
+  "lines": [
+    {
+      "kind": "step",
+      "text": "Conventional deterministic workflow on 42 synthetic cases, run just now: verified completion 97.6 percent (41 of 42); emissions 15 of 15; escalation recall 1; hard gates: HARD-GATES-PASS-SOFT-THRESHOLDS-NOT-SET."
+    },
+    {
+      "kind": "note",
+      "text": "The case it fails: AE-035 (a free-text relative date). That is the only measured place the rules fell short."
+    },
+    {
+      "kind": "refused",
+      "text": "llm-single-agent: NOT_RUN (no verified model deployment is registered (D-028, T55))"
+    },
+    {
+      "kind": "refused",
+      "text": "llm-multi-agent: NOT_RUN (no verified model deployment is registered (D-028, T55))"
+    },
+    {
+      "kind": "ok",
+      "text": "scorer check: control-naive-completer -> FAIL (a bad arm must fail)"
+    },
+    {
+      "kind": "ok",
+      "text": "scorer check: control-injectable -> FAIL (a bad arm must fail)"
+    },
+    {
+      "kind": "ok",
+      "text": "scorer check: control-fabricator -> FAIL (a bad arm must fail)"
+    },
+    {
+      "kind": "ok",
+      "text": "scorer check: control-leaker -> FAIL (a bad arm must fail)"
+    },
+    {
+      "kind": "note",
+      "text": "Honest reading: no AI arm has run, so AI value is unproven. The orchestration shown is a fixed workflow behind a tool gateway, not an LLM."
+    },
+    {
+      "kind": "note",
+      "text": "Limit: expected outcomes are author-proposed and UNREVIEWED; the holdout is not blind."
+    }
+  ],
+  "outputSha256": "b5e009b22c3410775b414a7deb270ed90ff327c21dd43201e91959cff3979f51"
+}

@@ -1,0 +1,54 @@
+{
+  "schema": "greenfuel.demo-recording/v1",
+  "kind": "RECORDED-RUN",
+  "notLive": true,
+  "scenario": "lineage",
+  "title": "Evidence lineage reconstruction",
+  "recordedAt": "2026-10-29T13:17:42.045Z",
+  "gitHead": "26c988577e02b7fead0f2b35a5f9083e2acc64be",
+  "node": "v22.23.4",
+  "banner": "CANDIDATE ORACLES, SYNTHETIC DATA, TEST-ONLY KEYS. NOT THE PLATFORM (it does not exist). No Azure resource is involved.",
+  "lines": [
+    {
+      "kind": "step",
+      "text": "Certificate C-D-1 (hash 4f5d014bc53c), issued 2026-03-10T09:50:00.000Z, approver qm-1"
+    },
+    {
+      "kind": "ok",
+      "text": "-> calculation record 1fcc17d2c9dc: method method:M-SYNTH@1 (content 81761535b9d7), factor set factorSet:F-SYNTH@1 (content 2a89370e81f5), inputs hash 256d3f836e3c; re-run matches: true"
+    },
+    {
+      "kind": "ok",
+      "text": "-> evidence manifest dbb6a27d82bc recomputed from the 5 custody events: MATCH"
+    },
+    {
+      "kind": "note",
+      "text": "     event #1 transfer-start            device-time 09:00  hash 10e456d7303c  receipt e43e8cd6e65f at 09:45"
+    },
+    {
+      "kind": "note",
+      "text": "     event #2 meter-reading 1000.0 kg  device-time 09:10  hash dfd5e9144e9a  receipt 0614d364518d at 09:45"
+    },
+    {
+      "kind": "note",
+      "text": "     event #3 meter-reading 1000.0 kg  device-time 09:20  hash e0de1172722c  receipt aa3bf9bcdbc6 at 09:45"
+    },
+    {
+      "kind": "note",
+      "text": "     event #4 meter-reading 500.0 kg   device-time 09:30  hash dea34e2446fe  receipt eec263b178a6 at 09:45"
+    },
+    {
+      "kind": "note",
+      "text": "     event #5 transfer-end             device-time 09:40  hash c755cc185a9d  receipt 09ccb044388d at 09:45"
+    },
+    {
+      "kind": "ok",
+      "text": "Quantity on the certificate 2500.0 kg = sum of the meter readings above. Reconstruction used the files only; no database was queried."
+    },
+    {
+      "kind": "note",
+      "text": "Not in this lineage: the feedstock evidence (a stand-in verifier was used; no oracle exists) and any raw document storage."
+    }
+  ],
+  "outputSha256": "c767005e9990f3f3149654996577f4b6eb9bdcc380b431fe2d111c9fb13e9fe1"
+}

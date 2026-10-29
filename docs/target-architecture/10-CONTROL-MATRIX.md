@@ -126,7 +126,7 @@ These are limits of the candidate oracles themselves, found by the [independent 
 
 | Gap | What is missing |
 |---|---|
-| G-1 | The oracles are not wired together. The lifecycle's validators are injected stand-ins; the custody verifier does not yet return a manifest hash or quantities, and the calculation service does not return the figures the lifecycle compares. An integration test between them does not exist. |
+| G-1 | **Partly closed for the candidates only.** The lifecycle's validators are still injected, but `harness/demo/pipeline.mjs` now supplies them from the real custody verifier and methodology registry (manifest hash and quantities derived from the custody bundle, figures from the calculation record) and `tests/demo-pipeline.test.mjs` runs the composed flow, including withdrawing the evidence after validation. This shows the candidate contracts compose. It is glue in a demo, not a service, and feedstock verification is still a stand-in. |
 | G-2 | The independent custody verifier computes `complete` from any device and does not check ordering across devices (a meter reading before the start, events after the end). The accepting verifier does; the offline one does not. |
 | G-3 | Approver keys, the approver registry and key custody (CL-15) are not modelled. Approvals are verified against a supplied key map. |
 | G-4 | In-process objects stand in for services. Immutability, copy-on-read and tenant checks are properties of the model, not of a database or an API. |

@@ -95,7 +95,7 @@ Only the latest full run is kept in the tree; earlier runs remain in Git history
 |---|---|---|---|---|---|---|---|
 | EVRUN-9b6110b026 | `587d609` | no | 53 | 3 | 1 | 16 | G1 PASS, G2 FAIL, G3 FAIL, G4 BLOCKED, G5 BLOCKED, G6 BLOCKED, G7 BLOCKED |
 
-## C. Test files (48) run by `npm test`
+## C. Test files (50) run by `npm test`
 
 The count is the number of top-level `test(` declarations in the file. Generated cases (mutation tables) run several tests per declaration, so the executed total is larger; the executed total is in the evidence record for `npm test`.
 
@@ -112,6 +112,7 @@ The count is the number of top-level `test(` declarations in the file. Generated
 | tests/certificate-lifecycle-contract.test.mjs | 40 |
 | tests/control-plane-guard.test.mjs | 8 |
 | tests/custody-chain-contract.test.mjs | 26 |
+| tests/demo-pipeline.test.mjs | 14 |
 | tests/design-gate.test.mjs | 22 |
 | tests/enforcement-attestation.test.mjs | 5 |
 | tests/evaluation-engine.test.mjs | 28 |
@@ -133,6 +134,7 @@ The count is the number of top-level `test(` declarations in the file. Generated
 | tests/permission-negative.test.mjs | 10 |
 | tests/permissions-engine.test.mjs | 12 |
 | tests/policy-guard.test.mjs | 5 |
+| tests/presentation.test.mjs | 15 |
 | tests/record-evidence.test.mjs | 8 |
 | tests/security-scenarios.test.mjs | 1 |
 | tests/sovereignty-placement-contract.test.mjs | 17 |

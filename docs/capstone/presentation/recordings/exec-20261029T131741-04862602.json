@@ -1,0 +1,46 @@
+{
+  "schema": "greenfuel.demo-recording/v1",
+  "kind": "RECORDED-RUN",
+  "notLive": true,
+  "scenario": "exec",
+  "title": "Executive demo: delivery to verified certificate",
+  "recordedAt": "2026-10-29T13:17:41.727Z",
+  "gitHead": "26c988577e02b7fead0f2b35a5f9083e2acc64be",
+  "node": "v22.23.4",
+  "banner": "CANDIDATE ORACLES, SYNTHETIC DATA, TEST-ONLY KEYS. NOT THE PLATFORM (it does not exist). No Azure resource is involved.",
+  "lines": [
+    {
+      "kind": "note",
+      "text": "Methodology method:M-SYNTH@1 and factor set factorSet:F-SYNTH@1 were proposed, reviewed and approved by three different people (SYNTHETIC values, not any scheme's method). approved=true"
+    },
+    {
+      "kind": "step",
+      "text": "1. TRANSFER COMPLETED: 5 signed events (start, 3 meter readings, end) accepted for D-1, 0 rejected."
+    },
+    {
+      "kind": "ok",
+      "text": "2. EVIDENCE BOUND: chain verified independently (ok=true, complete=true); evidence manifest cd15c2d08d49; delivered 2500.0 kg; 5 signed receipts."
+    },
+    {
+      "kind": "ok",
+      "text": "3. EMISSIONS ATTRIBUTE: 3.75 synthetic-units from method:M-SYNTH@1 and factorSet:F-SYNTH@1 (deterministic code, no model). Re-run reproduces it: true."
+    },
+    {
+      "kind": "ok",
+      "text": "4a. DRAFTED by an agent, VALIDATED by the validator service (state VALIDATED). The agent cannot validate, approve or issue."
+    },
+    {
+      "kind": "ok",
+      "text": "4b. APPROVED by a human quality manager (signed with their key, bound to this exact content), then ISSUED by the issuer service (state ISSUED)."
+    },
+    {
+      "kind": "ok",
+      "text": "5. SHIPOWNER VERIFIES: VALID-AS-OF (2026-03-10T09:50:00.000Z), using only the signer's public key and the certificate file. Certificate hash 5a020359436e."
+    },
+    {
+      "kind": "simulated",
+      "text": "6. TIME SAVED: not measured. The platform does not exist; the scenario model assumes the figures shown on the slide, labelled SCENARIO."
+    }
+  ],
+  "outputSha256": "048626022f7cf0ceab6ba4ffa696f737c061290e307ad60ff74706ce488a05a3"
+}

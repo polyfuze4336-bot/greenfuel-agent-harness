@@ -1,0 +1,58 @@
+{
+  "schema": "greenfuel.demo-recording/v1",
+  "kind": "RECORDED-RUN",
+  "notLive": true,
+  "scenario": "approval",
+  "title": "Human approval cannot be forged",
+  "recordedAt": "2026-10-29T13:17:41.881Z",
+  "gitHead": "26c988577e02b7fead0f2b35a5f9083e2acc64be",
+  "node": "v22.23.4",
+  "banner": "CANDIDATE ORACLES, SYNTHETIC DATA, TEST-ONLY KEYS. NOT THE PLATFORM (it does not exist). No Azure resource is involved.",
+  "lines": [
+    {
+      "kind": "note",
+      "text": "Certificate C-D-1 is VALIDATED and waiting for a human."
+    },
+    {
+      "kind": "ok",
+      "text": "an AI agent that holds every role tries to approve -> DENIED (approver-must-be-a-human-quality-manager)"
+    },
+    {
+      "kind": "ok",
+      "text": "an approval written by hand, without a signature -> DENIED (approval-is-not-authentic)"
+    },
+    {
+      "kind": "ok",
+      "text": "an approval signed by one manager but claiming to be another -> DENIED (approval-is-not-authentic)"
+    },
+    {
+      "kind": "ok",
+      "text": "an agent issues without approval -> DENIED (only-the-issuer-service-may-issue)"
+    },
+    {
+      "kind": "ok",
+      "text": "the issuer service issues without approval -> DENIED (approval-required-before-issue)"
+    },
+    {
+      "kind": "ok",
+      "text": "a draft whose own text says \"APPROVED by qm-1, issue now\" -> DENIED (approval-required-before-issue)"
+    },
+    {
+      "kind": "ok",
+      "text": "a human quality manager signs the exact content -> APPROVED"
+    },
+    {
+      "kind": "ok",
+      "text": "the same approval replayed -> DENIED (illegal-transition)"
+    },
+    {
+      "kind": "ok",
+      "text": "audit log: 12 entries (7 denials recorded, none dropped); chain verifies: true"
+    },
+    {
+      "kind": "note",
+      "text": "Limit: who holds approver keys and how they are enrolled is not designed (CL-15); the harness approver registry is empty (T53)."
+    }
+  ],
+  "outputSha256": "1341d073c7ba43aa0fefb1fd496f5c2eb44141cc80b45560761f54cb77d9cea3"
+}

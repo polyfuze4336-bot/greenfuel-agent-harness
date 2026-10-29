@@ -1,0 +1,46 @@
+{
+  "schema": "greenfuel.demo-recording/v1",
+  "kind": "RECORDED-RUN",
+  "notLive": true,
+  "scenario": "observability",
+  "title": "Observability and tracing (what exists, what does not)",
+  "recordedAt": "2026-10-29T13:17:42.459Z",
+  "gitHead": "26c988577e02b7fead0f2b35a5f9083e2acc64be",
+  "node": "v22.23.4",
+  "banner": "CANDIDATE ORACLES, SYNTHETIC DATA, TEST-ONLY KEYS. NOT THE PLATFORM (it does not exist). No Azure resource is involved.",
+  "lines": [
+    {
+      "kind": "refused",
+      "text": "NOT IMPLEMENTED: no correlation ids, structured logs, distributed traces, metrics, token usage, queue depth or dashboards exist. There is no running system to instrument."
+    },
+    {
+      "kind": "note",
+      "text": "What does exist and runs: a hash-chained audit trail of every lifecycle action, allowed or denied. Real entries from the flow just executed:"
+    },
+    {
+      "kind": "note",
+      "text": "     #1 09:45  agent   agent-evidence  create   NONE -> DRAFT  allowed  888ba68d9380"
+    },
+    {
+      "kind": "note",
+      "text": "     #2 09:45  agent   agent-evidence  submit   DRAFT -> EVIDENCE_PENDING  allowed  8129ec485215"
+    },
+    {
+      "kind": "note",
+      "text": "     #3 09:45  service svc-validator   validate EVIDENCE_PENDING -> VALIDATED  allowed  bd88222eb882"
+    },
+    {
+      "kind": "note",
+      "text": "     #4 09:50  human   qm-1            approve  VALIDATED -> APPROVED  allowed  83a9bbfb8c03"
+    },
+    {
+      "kind": "note",
+      "text": "     #5 09:50  service svc-issuer      issue    APPROVED -> ISSUED  allowed  a2d87f429e67"
+    },
+    {
+      "kind": "ok",
+      "text": "chain verifies: true. The specification the future build must meet is in docs/phase/AZURE-DEPLOYMENT-READINESS-REVIEW.md section 7."
+    }
+  ],
+  "outputSha256": "b48a4268d7e6093f4235ae6bc8080c80550a60aff9d83559dc8465fc40d2350c"
+}

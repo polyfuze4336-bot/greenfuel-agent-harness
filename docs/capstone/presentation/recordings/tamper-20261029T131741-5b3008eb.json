@@ -1,0 +1,42 @@
+{
+  "schema": "greenfuel.demo-recording/v1",
+  "kind": "RECORDED-RUN",
+  "notLive": true,
+  "scenario": "tamper",
+  "title": "Certificate and evidence tampering detection",
+  "recordedAt": "2026-10-29T13:17:41.800Z",
+  "gitHead": "26c988577e02b7fead0f2b35a5f9083e2acc64be",
+  "node": "v22.23.4",
+  "banner": "CANDIDATE ORACLES, SYNTHETIC DATA, TEST-ONLY KEYS. NOT THE PLATFORM (it does not exist). No Azure resource is involved.",
+  "lines": [
+    {
+      "kind": "ok",
+      "text": "genuine certificate -> valid-as-of"
+    },
+    {
+      "kind": "ok",
+      "text": "A. quantity edited to 9999.0 kg -> invalid: the certificate was altered (content does not match its hash)"
+    },
+    {
+      "kind": "ok",
+      "text": "B. edited AND hashes recomputed -> invalid: the signature does not verify under the trusted key"
+    },
+    {
+      "kind": "ok",
+      "text": "C. re-signed with the attacker's own key (their key put inside the file) -> invalid: the signing key is not in the trust set"
+    },
+    {
+      "kind": "ok",
+      "text": "D. a meter reading inside the evidence bundle changed -> ok=false: mfm-1#3: altered (content does not match its hash)"
+    },
+    {
+      "kind": "ok",
+      "text": "E. one meter event deleted -> ok=false: mfm-1#4: sequence is not contiguous from 1 (an event is missing, inserted or reordered)"
+    },
+    {
+      "kind": "note",
+      "text": "Limit: tamper EVIDENCE, not prevention. Key custody, trusted time and where the audit head is anchored are undecided (D-013, D-021)."
+    }
+  ],
+  "outputSha256": "5b3008eb76afbd7d1d482744c96a6cc071c28ee33f00fb037efd05726110dbac"
+}
