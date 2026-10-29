@@ -1,0 +1,31 @@
+deployment-readiness: NOT-READY (1 item(s) checked)
+  - Phase 0: application code, infrastructure and Azure changes are not permitted; raising the phase is a human decision recorded in an ADR
+  - The only infrastructure is a non-deployable scaffold (ADR 0014): it has no approved design, no real parameter values and no what-if
+  - No design review has status Approved (3 review record(s) exist)
+  - 17 milestone-1 decisions are still open: D-001, D-002, D-003, D-004, D-005, D-006, D-007, D-008, D-009, D-012, D-015, D-019, D-020, D-022, D-023, D-024, D-034
+  - No human decider is named (TODO T3), so nothing can be approved
+  - [DG-12] Phase 0: infrastructure, application and Azure changes are not permitted; raising the phase is a human decision recorded in an ADR
+  - [DG-01] No design review has status Approved, so no Azure design is approved
+  - [DG-02] No port is named (D-003), so no residency assessment exists and no hosting option can be chosen
+  - [DG-11] D-037 is open: the Azure tenant, subscription and landing zone
+  - [DG-02] D-003 is open: the ports and jurisdictions
+  - [DG-02] D-009 is open: the residency interpretation per port
+  - [DG-02] D-010 is open: the hosting model per port
+  - [DG-04] D-013 is open: tamper evidence and key custody
+  - [DG-02] D-028 is open: where AI inference runs
+  - [DG-09] D-031 is open: availability, recovery and latency targets
+  - [DG-09] D-033 is open: the operating model and support access
+  - [DG-02] D-018 is open: the edge platform
+  - [DG-04] No approver is registered (T13), so no signed approval can exist for a billable or Azure change
+  - [DG-03] No live verification of region and service availability exists: it needs read-only Azure access that has not been approved (T11, D-037)
+  - [DG-04] The scoped deployment identities, custom role, locks and policy have not been created (T17); nothing exists in Azure
+  - [DG-05] infra/params/dev.parameters.json still has unresolved REQUIRES-APPROVAL values
+  - [DG-05] infra/params/test.parameters.json still has unresolved REQUIRES-APPROVAL values
+  - [DG-05] infra/params/prod.parameters.json still has unresolved REQUIRES-APPROVAL values
+  - [DG-06] No what-if result is recorded for any environment, so no infrastructure change has been reviewed
+  - [DG-07] No sourced cost estimate and no agreed budget exist; any figure now would be invented (HC-12)
+  - [DG-08] No signed approval record exists for creating resources or for any billable change
+  - [DG-09] No runbook, rollback or recovery procedure has been exercised in a non-production environment
+  - [DG-10] No post-deployment smoke or integration test has run: nothing is deployed
+  note: Checks the preconditions recorded in the specifications. It tests no application and cannot show that anything is ready.
+  note: Deployment is a human-run action (HC-11). No result here authorises it, and NO-BLOCKERS-FOUND is not an approval.

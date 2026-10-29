@@ -1,0 +1,34 @@
+{
+  "id": "EV-0076",
+  "claim": "Deployment-readiness gate evaluated before the Azure deployment request: result NOT-READY (phase 0, no approver, open decisions, unresolved parameters, no what-if). Recorded as the gate output, not as a pass",
+  "argv": [
+    "node",
+    "harness/scripts/spec-validators.mjs",
+    "deployment-readiness"
+  ],
+  "exitCode": 2,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-29T12:43:16.799Z",
+  "durationMs": 495,
+  "outputSha256": "77699876348ba9ba36eca933332dc65cfbcc4ccf887f2900bc5cffcea69263a4",
+  "outputBytes": 2912,
+  "outputTail": "ent exists and no hosting option can be chosen\n  - [DG-11] D-037 is open: the Azure tenant, subscription and landing zone\n  - [DG-02] D-003 is open: the ports and jurisdictions\n  - [DG-02] D-009 is open: the residency interpretation per port\n  - [DG-02] D-010 is open: the hosting model per port\n  - [DG-04] D-013 is open: tamper evidence and key custody\n  - [DG-02] D-028 is open: where AI inference runs\n  - [DG-09] D-031 is open: availability, recovery and latency targets\n  - [DG-09] D-033 is open: the operating model and support access\n  - [DG-02] D-018 is open: the edge platform\n  - [DG-04] No approver is registered (T13), so no signed approval can exist for a billable or Azure change\n  - [DG-03] No live verification of region and service availability exists: it needs read-only Azure access that has not been approved (T11, D-037)\n  - [DG-04] The scoped deployment identities, custom role, locks and policy have not been created (T17); nothing exists in Azure\n  - [DG-05] infra/params/dev.parameters.json still has unresolved REQUIRES-APPROVAL values\n  - [DG-05] infra/params/test.parameters.json still has unresolved REQUIRES-APPROVAL values\n  - [DG-05] infra/params/prod.parameters.json still has unresolved REQUIRES-APPROVAL values\n  - [DG-06] No what-if result is recorded for any environment, so no infrastructure change has been reviewed\n  - [DG-07] No sourced cost estimate and no agreed budget exist; any figure now would be invented (HC-12)\n  - [DG-08] No signed approval record exists for creating resources or for any billable change\n  - [DG-09] No runbook, rollback or recovery procedure has been exercised in a non-production environment\n  - [DG-10] No post-deployment smoke or integration test has run: nothing is deployed\n  note: Checks the preconditions recorded in the specifications. It tests no application and cannot show that anything is ready.\n  note: Deployment is a human-run action (HC-11). No result here authorises it, and NO-BLOCKERS-FOUND is not an approval.\n",
+  "gitHead": "dffe85adfe3f40e6cf332dc60c87c57762aca7dd",
+  "treeClean": true,
+  "dirtyFileCount": 0,
+  "treeCleanAfter": true,
+  "dirtyFileCountAfter": 0,
+  "headUnchanged": true,
+  "headAfter": "dffe85adfe3f40e6cf332dc60c87c57762aca7dd",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  },
+  "failureKind": "nonzero-exit",
+  "logFile": "docs/evidence/logs/EV-0076.log",
+  "logSha256": "77699876348ba9ba36eca933332dc65cfbcc4ccf887f2900bc5cffcea69263a4",
+  "prevRecordSha256": "56f83e2c59e3e12f30f3f3a029d3ebb18e419b08b38712dc5273d2bea15aae3d",
+  "recordSha256": "c07ebeefa1a08d7c5beebdeec4838b44e5cb504855847e52ae76068e08e6921d"
+}
