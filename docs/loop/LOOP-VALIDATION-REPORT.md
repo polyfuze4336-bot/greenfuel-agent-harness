@@ -1,6 +1,6 @@
 # Loop validation report
 
-What was run to validate the [bounded repair loop](./LOOP.md) ([ADR 0011](../adr/0011-bounded-repair-loop.md), Proposed), what each run showed, and what was **not** shown. Counts and commit hashes are in the recorded evidence (`EV-0035` to `EV-0038`, listed in [STATE](../state/STATE.md)); this report does not repeat numbers that an evidence record holds.
+What was run to validate the [bounded repair loop](./LOOP.md) ([ADR 0011](../adr/0011-bounded-repair-loop.md), Accepted), what each run showed, and what was **not** shown. Counts and commit hashes are in the recorded evidence (`EV-0035` to `EV-0038`, listed in [STATE](../state/STATE.md)); this report does not repeat numbers that an evidence record holds.
 
 ## What was run
 

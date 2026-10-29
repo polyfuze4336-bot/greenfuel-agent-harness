@@ -76,6 +76,33 @@
       "remediation": "Add time-order and plausibility rules, and a recorded trusted-time source, to the lineage contract (decision needed from the principal architect and maritime-domain)"
     },
     {
+      "id": "EVAL-PRC-DAT-007", "domain": "DAT", "scope": "production-contract", "severity": "critical", "mode": "executable", "entry": false, "gate": "G3", "redTeam": "RT-08",
+      "title": "An offline edge with delayed synchronisation loses, duplicates and reorders nothing; replacement, deletion and tamper are refused or detected; missing readings are reported (ingestion contract, DES-0002)",
+      "scenario": "Synthetic batches through the candidate ingestion contract and reference model: a later batch arrives before its predecessor, a batch is redelivered, a fully re-hashed replacement of an accepted event is replayed, a payload is altered or made non-finite, an event is removed, an accepted record is deleted or edited in the store, and a delivery ends with no meter reading",
+      "expected": "The later batch is held with its gap and age recorded, every event is stored once, a redelivery changes nothing, the replacement and alterations are refused, store deletion and editing are detected by verifyStore, missing readings are reported and never estimated, and every accepted record is marked unauthenticated",
+      "requirements": ["NFR-004", "NFR-005", "FR-006", "DATA-002"], "hardConstraints": ["HC-06", "HC-07", "HC-08"],
+      "runner": { "type": "eval-test", "file": "evaluation/checks/ingestion-contract.eval.mjs" },
+      "remediation": "Tighten the ingestion contract or its reference model so the case is handled"
+    },
+    {
+      "id": "EVAL-PRC-DAT-008", "domain": "DAT", "scope": "production-contract", "severity": "critical", "mode": "executable", "entry": false, "gate": "G3", "redTeam": "RT-07",
+      "title": "The ingestion contract rejects a manipulated timestamp against the verifier's own clock and skew (ADR 0013 rules applied to ingestion)",
+      "scenario": "Synthetic batches: a reading timed before its predecessor, a reading timed in the far future, a reading just beyond the verifier's skew, a sender that supplies its own receiving time or skew, a batch that goes back in time across batches, and no verifier clock, beside a reading inside the skew",
+      "expected": "Each manipulated case is rejected, a refused future-dated batch cannot lock the source out, and the in-skew reading is accepted. This is the ingestion contract only: the lineage contract still lacks the rule (EVAL-PRC-DAT-006)",
+      "requirements": ["NFR-017", "DATA-002"], "hardConstraints": ["HC-08"],
+      "runner": { "type": "eval-test", "file": "evaluation/checks/ingestion-contract.eval.mjs" },
+      "remediation": "Tighten the ingestion contract so the manipulation is rejected"
+    },
+    {
+      "id": "EVAL-PRC-SOV-004", "domain": "SOV", "scope": "production-contract", "severity": "critical", "mode": "executable", "entry": false, "gate": "G3",
+      "title": "The ingestion contract compares every jurisdiction and zone claim with the verifier's identity and refuses a batch that leaves it, an unregistered source or device, and a model origin",
+      "scenario": "Synthetic batches with a destination or source in another jurisdiction, a batch that is self-consistent in the wrong jurisdiction, a zone outside the cell (Z3 to Z7), an unregistered source or device, a model origin, a prototype-polluting identifier, and a known source that changes jurisdiction, beside an in-jurisdiction batch",
+      "expected": "Each is rejected, the verifier cannot register a source from another jurisdiction, and the in-jurisdiction batch is accepted",
+      "requirements": ["SEC-001", "SEC-002", "NFR-009", "AGT-003"], "hardConstraints": ["HC-01", "HC-06"],
+      "runner": { "type": "eval-test", "file": "evaluation/checks/ingestion-contract.eval.mjs" },
+      "remediation": "Tighten the ingestion contract so the flow is refused"
+    },
+    {
       "id": "EVAL-PRC-SEC-001", "domain": "SEC", "scope": "production-contract", "severity": "critical", "mode": "executable", "entry": false, "gate": "G3", "redTeam": "RT-10",
       "title": "A certificate cannot be issued or filed without a human quality-manager approval",
       "scenario": "Synthetic certificate fixtures with no approval, an agent as approver and a wrong role, both in the chain and in the lineage",

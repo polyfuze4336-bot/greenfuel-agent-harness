@@ -14,6 +14,7 @@ import { validateMemory } from './validate-memory.mjs';
 import { validateLoop } from './validate-loop.mjs';
 import { validateEvaluation } from './validate-evaluation.mjs';
 import { validateAzure } from './validate-azure.mjs';
+import { validateAcceptance } from './acceptance-reports.mjs';
 
 export const PILLARS = [
   'Context & Instructions',
@@ -45,8 +46,10 @@ const REQUIRED = [
   'harness/policy/loop-policy.json', 'harness/loop/loop.cjs', 'harness/scripts/loop.mjs', 'harness/scripts/validate-loop.mjs', 'docs/loop/LOOP.md', 'docs/loop/LOOP-VALIDATION-REPORT.md',
   'harness/policy/evaluation-policy.json', 'harness/eval/eval.cjs', 'harness/scripts/evaluate.mjs', 'harness/scripts/validate-evaluation.mjs', 'evaluation/catalogue/harness.json', 'evaluation/catalogue/production.json',
   'evaluation/checks/harness.eval.mjs', 'evaluation/checks/production-contract.eval.mjs', 'docs/evaluation/EVALUATION-FRAMEWORK.md', 'docs/evaluation/EVALUATION-REPORT.md',
-  'harness/scripts/validate-azure.mjs', 'infra/main.bicep', 'infra/README.md', '.github/workflows/infra-validate.yml', 'docs/azure/data/port-assessments.json', 'docs/azure/data/deployment-gates.json',
+  'harness/scripts/validate-azure.mjs', 'harness/scripts/acceptance-reports.mjs', 'harness/contracts/ingestion-contract.mjs', 'infra/main.bicep', 'infra/README.md', '.github/workflows/infra-validate.yml', 'docs/azure/data/port-assessments.json', 'docs/azure/data/deployment-gates.json',
   ...['AZURE-REFERENCE-ARCHITECTURE', 'REGIONAL-AVAILABILITY', 'SOVEREIGNTY-DEPLOYMENT-MATRIX', 'DEPLOYMENT-STRATEGY', 'RESOURCE-INVENTORY', 'COST-AND-CAPACITY', 'OPERATIONS-AND-DR', 'AZURE-READINESS-ASSESSMENT'].map((n) => `docs/azure/${n}.md`),
+  ...['HARNESS-ACCEPTANCE-REPORT', 'ARCHITECTURE-DEFENSE', 'REQUIREMENTS-COVERAGE', 'TEST-EVIDENCE-INDEX', 'REMAINING-RISKS', 'NEXT-PHASE-IMPLEMENTATION-PLAN', 'E2E-ACCEPTANCE-TRACE'].map((n) => `docs/acceptance/${n}.md`),
+  'docs/architecture/designs/DES-0002-evidence-ingestion-subsystem.md', 'docs/architecture/reviews/RV-0002-evidence-ingestion-subsystem.md', 'docs/adr/0015-evidence-ingestion-subsystem.md',
   ...['PERMISSION-MODEL', 'APPROVAL-WORKFLOWS', 'BREAK-GLASS', 'SECRETS-HANDLING', 'ENFORCEMENT-STATUS', 'DENIED-ACTION-AUDIT', 'NEGATIVE-TESTS'].map((n) => `docs/security/${n}.md`),
 ];
 const SKIP_DIRS = new Set(['.git', 'node_modules', '.harness-logs', '.harness-work', '.harness-toolchain']);
@@ -172,7 +175,7 @@ export function validate(root) {
     for (const p of PILLARS) if (!text.includes(p)) fail('pillars', `${doc}: pillar '${p}' not represented`);
   }
 
-  return [...errors, ...validateContext(root), ...validateArchitecture(root), ...validateAgents(root), ...validateTools(root), ...validatePermissions(root), ...validateOrchestration(root), ...validateMemory(root), ...validateLoop(root), ...validateEvaluation(root), ...validateAzure(root)];
+  return [...errors, ...validateContext(root), ...validateArchitecture(root), ...validateAgents(root), ...validateTools(root), ...validatePermissions(root), ...validateOrchestration(root), ...validateMemory(root), ...validateLoop(root), ...validateEvaluation(root), ...validateAzure(root), ...validateAcceptance(root)];
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

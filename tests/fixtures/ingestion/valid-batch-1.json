@@ -1,0 +1,65 @@
+{
+  "schema": "greenfuel.ingestion-batch/v0-candidate",
+  "synthetic": true,
+  "batchId": "BATCH-SYN-1",
+  "source": {
+    "sourceId": "EDGE-SYN-1",
+    "jurisdictionCode": "JUR-SYN",
+    "zone": "Z1",
+    "clockSource": "CLOCK-SYN-1"
+  },
+  "routing": {
+    "destinationJurisdictionCode": "JUR-SYN",
+    "destinationZone": "Z2"
+  },
+  "events": [
+    {
+      "eventId": "EDGE-SYN-1-1",
+      "sourceId": "EDGE-SYN-1",
+      "deviceId": "DEV-SYN-1",
+      "deliveryId": "DEL-SYN-1",
+      "sequence": 1,
+      "kind": "transfer-start",
+      "origin": "device",
+      "trustedTime": "2030-01-01T00:00:00Z",
+      "payload": {
+        "note": "synthetic"
+      },
+      "prevEventSha256": null,
+      "eventSha256": "a2bedc671aaf0346814863a9ece0e2eae1787b7410c2251e973f999d65eedd2c"
+    },
+    {
+      "eventId": "EDGE-SYN-1-2",
+      "sourceId": "EDGE-SYN-1",
+      "deviceId": "DEV-SYN-1",
+      "deliveryId": "DEL-SYN-1",
+      "sequence": 2,
+      "kind": "meter-reading",
+      "origin": "device",
+      "trustedTime": "2030-01-01T00:00:10Z",
+      "payload": {
+        "unit": "kg",
+        "value": 1001
+      },
+      "prevEventSha256": "a2bedc671aaf0346814863a9ece0e2eae1787b7410c2251e973f999d65eedd2c",
+      "eventSha256": "02ba2e374234297f78c715003d404e19ab8b6dd72342ef081dd49d80b11cc05b"
+    },
+    {
+      "eventId": "EDGE-SYN-1-3",
+      "sourceId": "EDGE-SYN-1",
+      "deviceId": "DEV-SYN-1",
+      "deliveryId": "DEL-SYN-1",
+      "sequence": 3,
+      "kind": "meter-reading",
+      "origin": "device",
+      "trustedTime": "2030-01-01T00:00:20Z",
+      "payload": {
+        "unit": "kg",
+        "value": 1002
+      },
+      "prevEventSha256": "02ba2e374234297f78c715003d404e19ab8b6dd72342ef081dd49d80b11cc05b",
+      "eventSha256": "df51361d01e2f4dacee72eebeb7312facf51a0d9d61d70999c221641daa686c9"
+    }
+  ],
+  "batchSha256": "c01f8b52c6df111e2f8c4b4d29befb02f5b02c20372b9146eac41183ff72b622"
+}
