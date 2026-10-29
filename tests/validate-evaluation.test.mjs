@@ -11,7 +11,7 @@ import { validateEvaluation } from '../harness/scripts/validate-evaluation.mjs';
 import { fakeRun, ROOT } from './support/eval-fake.mjs';
 
 const require = createRequire(import.meta.url);
-const FILES = ['harness/policy', 'harness/eval', 'harness/lib', 'harness/hooks', 'harness/scripts/evaluate.mjs', 'evaluation', 'docs/evaluation/EVALUATION-FRAMEWORK.md', 'docs/context/REQUIREMENTS.md', 'docs/context/NON-FUNCTIONAL-REQUIREMENTS.md', 'package.json', '.github/workflows/validate.yml'];
+const FILES = ['harness/policy', 'harness/eval', 'harness/lib', 'harness/hooks', 'harness/approvals', 'harness/scripts/evaluate.mjs', 'evaluation', 'docs/evaluation/EVALUATION-FRAMEWORK.md', 'docs/context/REQUIREMENTS.md', 'docs/context/NON-FUNCTIONAL-REQUIREMENTS.md', 'package.json', '.github/workflows/validate.yml'];
 
 function sandbox() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'gf-ve-'));

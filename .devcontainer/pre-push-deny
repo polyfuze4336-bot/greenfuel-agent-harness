@@ -1,0 +1,6 @@
+#!/bin/sh
+# Installed as the system-wide git pre-push hook in the isolated environment. Pushing is a P2 operation that needs a signed approval
+# and the repository owner's credentials, neither of which exist here. Defence in depth: it is not a security boundary, because a
+# process can bypass hooks, but the firewall and the absence of credentials do not depend on it.
+echo "pre-push denied: pushing from the isolated environment is not permitted. Push from the owner's own machine after review." >&2
+exit 1

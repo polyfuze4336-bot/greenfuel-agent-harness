@@ -118,7 +118,7 @@ Prerequisites: VS Code with GitHub Copilot, Node.js 20 or later. No packages to 
    npm run validate
    ```
 
-Verified so far: the hook denies in Copilot CLI 1.0.102 in a trusted folder. Not yet verified: VS Code chat behaviour, agent tool restrictions, and skill and instruction loading (roadmap R1).
+Verified so far: the hook denies in Copilot CLI 1.0.102 in a trusted folder, and the hook, permission, approval, evidence and isolation-configuration logic is covered by automated tests. **Not verified: any behaviour in a VS Code chat session** (agent loading, tool restrictions, delegation, instruction loading, MCP), and **the dev container has not been built or run**. A protocol and a log-based verifier for the VS Code check are in [LIVE-VALIDATION](docs/security/LIVE-VALIDATION.md); the isolation design and its limits are in [ISOLATION](docs/security/ISOLATION.md); approval enrollment is in [APPROVER-ENROLLMENT](docs/security/APPROVER-ENROLLMENT.md). No approver is enrolled.
 
 ## Principles
 

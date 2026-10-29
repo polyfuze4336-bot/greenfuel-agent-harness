@@ -12,7 +12,7 @@ import { engine, repo, realModel, registry, AGENTS, tmpDir, agentHook } from './
 import { validateMemory, ledgerAnchorProblems } from '../harness/scripts/validate-memory.mjs';
 import { callTool, handle, resetForTests, TOOLS } from '../harness/mcp/greenfuel-tools-server.mjs';
 
-const FILES = ['harness/policy', 'harness/memory', 'harness/hooks', 'harness/scripts/memory.mjs', 'harness/tools/tool-registry.json', '.mcp.json', '.github/agents', 'docs/memory', 'docs/adr', 'docs/architecture/HARD-CONSTRAINTS.md', 'memory'];
+const FILES = ['harness/policy', 'harness/memory', 'harness/hooks', 'harness/approvals', 'harness/scripts/memory.mjs', 'harness/tools/tool-registry.json', '.mcp.json', '.github/agents', 'docs/memory', 'docs/adr', 'docs/architecture/HARD-CONSTRAINTS.md', 'memory'];
 function sandbox() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'gf-vm-'));
   for (const f of FILES) { mkdirSync(path.dirname(path.join(root, f)), { recursive: true }); cpSync(path.join(repo, f), path.join(root, f), { recursive: true, filter: (s) => !s.includes('.lock') }); }

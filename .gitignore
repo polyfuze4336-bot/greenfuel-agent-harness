@@ -9,6 +9,7 @@ node_modules/
 local.settings.json
 .azure/
 *.log
+!docs/evidence/logs/*.log
 .harness-logs/
 memory/.lock/
 memory/**/*.tmp-*

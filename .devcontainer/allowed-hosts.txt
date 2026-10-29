@@ -1,0 +1,14 @@
+# Hosts the isolated environment may reach over HTTPS (port 443). One per line. Everything else is dropped.
+# This file is read by init-firewall.sh and is a control-plane file: change it on the host in a reviewed commit.
+#
+# Deliberately NOT listed: github.com, api.github.com, *.githubusercontent.com (Git push/pull and the GitHub REST API: the container
+# has no remote credentials and must not be able to use any that leak in), management.azure.com, login.microsoftonline.com (no
+# Azure control plane: deployment is a human-approved action outside this environment), registry.npmjs.org (no dependencies).
+#
+# The Copilot service hosts below must be confirmed by the owner on the first real run (the firewall logs blocked traffic with
+# the prefix "harness-egress-denied"). They are what the Copilot client is documented to need; none was observed on this machine.
+learn.microsoft.com
+api.githubcopilot.com
+api.individual.githubcopilot.com
+copilot-proxy.githubusercontent.com
+default.exp-tas.com

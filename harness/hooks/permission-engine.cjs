@@ -385,7 +385,7 @@ function writeAudit(model, event, decision, extra = {}) {
 // ---------- decision and outcome events (hash chained, metadata only) ----------
 // Denials alone cannot answer "what did the agents do". This chain records every hook decision (allow, ask, deny), every approval
 // outcome and every tool result summary. It holds names, classes and hashes: never arguments, contents, tool output or secrets.
-const EVENT_KINDS = new Set(['decision', 'outcome', 'approval', 'approval-admin', 'attestation']);
+const EVENT_KINDS = new Set(['decision', 'outcome', 'approval', 'approval-admin', 'attestation', 'evidence']);
 function writeEvent(model, kind, fields = {}, extra = {}) {
   if (!EVENT_KINDS.has(kind)) return null;
   const dir = logDir(model, extra.logDir);
@@ -416,7 +416,9 @@ function writeEvent(model, kind, fields = {}, extra = {}) {
 function decisionEvent(model, event, verdict, extra = {}) {
   const args = typeof event.toolArgs === 'string' ? event.toolArgs : JSON.stringify(event.toolArgs ?? event.tool_input ?? {});
   const cls = extra.decision ?? null;
+  let fp = null; try { fp = require('../lib/enforcement.cjs').hostFingerprint(); } catch { /* attribution is best effort */ }
   return writeEvent(model, 'decision', {
+    host: fp?.host ?? null, hostVersion: fp?.termProgramVersion ?? null, hostPlatform: fp?.platform ?? null,
     session: event.sessionId ? String(event.sessionId).slice(0, 64) : null, agent: extra.agent ?? null, hook: extra.hook ?? null, tool: String(event.toolName ?? event.tool_name ?? ''),
     decision: verdict?.decision ?? 'allow', rule: verdict?.id ?? null, operations: cls?.operations?.map((o) => o.op) ?? [], tier: cls?.tier ?? null,
     pathClasses: [...new Set((cls?.targets ?? []).flatMap((t) => t.classes ?? []))], approvals: cls?.approvals ?? [], argsSha256: sha256(args),

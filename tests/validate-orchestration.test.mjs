@@ -5,7 +5,7 @@ import path from 'node:path';
 import { repo, tmp, engine, setup, examplePlan } from './support/orchestration-fixtures.mjs';
 import { validateOrchestration } from '../harness/scripts/validate-orchestration.mjs';
 
-const FILES = ['harness/policy', 'harness/orchestration', 'harness/hooks', 'harness/scripts/tasks.mjs', 'harness/tools/tool-registry.json', '.github/hooks', '.github/agents/orchestrator.agent.md', 'docs/orchestration', 'docs/context/REQUIREMENTS.md', 'docs/context/NON-FUNCTIONAL-REQUIREMENTS.md', 'docs/architecture/HARD-CONSTRAINTS.md'];
+const FILES = ['harness/policy', 'harness/orchestration', 'harness/hooks', 'harness/approvals', 'harness/lib', 'harness/scripts/tasks.mjs', 'harness/tools/tool-registry.json', '.github/hooks', '.github/agents/orchestrator.agent.md', 'docs/orchestration', 'docs/context/REQUIREMENTS.md', 'docs/context/NON-FUNCTIONAL-REQUIREMENTS.md', 'docs/architecture/HARD-CONSTRAINTS.md'];
 function sandbox() {
   const root = tmp('gf-vo-');
   for (const f of FILES) { mkdirSync(path.dirname(path.join(root, f)), { recursive: true }); cpSync(path.join(repo, f), path.join(root, f), { recursive: true }); }

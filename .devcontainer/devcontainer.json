@@ -1,0 +1,82 @@
+// Isolated execution environment for coding agents. See docs/security/ISOLATION.md for what this does and does not protect.
+// It is configuration only: it has been validated statically (harness/scripts/validate-isolation.mjs) and has NOT been built or run on this machine.
+{
+  "name": "greenfuel-agent-harness (isolated)",
+  "build": { "dockerfile": "Dockerfile", "context": "." },
+
+  // The image entrypoint runs the firewall as root, then idles. VS Code attaches as the non-root user, which has no capability to change it.
+  "overrideCommand": false,
+  "containerUser": "root",
+  "remoteUser": "node",
+  "updateRemoteUserUID": false,
+
+  "runArgs": [
+    "--cap-drop=ALL",
+    "--cap-add=NET_ADMIN",
+    "--cap-add=NET_RAW",
+    "--security-opt=no-new-privileges",
+    "--pids-limit=1024",
+    "--memory=6g"
+  ],
+
+  // No host credential mounts and no Docker socket. The only mounts are the workspace and read-only overlays on the control plane,
+  // so a process in the container (a test, a script, an agent) cannot edit the policy engine, the tests' assertions or the CI gate.
+  // Change those files on the host, outside the container, in a reviewed commit.
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/greenfuel-agent-harness,type=bind,consistency=cached",
+  "workspaceFolder": "/workspaces/greenfuel-agent-harness",
+  "mounts": [
+    "source=${localWorkspaceFolder}/harness,target=/workspaces/greenfuel-agent-harness/harness,type=bind,readonly",
+    "source=${localWorkspaceFolder}/tests,target=/workspaces/greenfuel-agent-harness/tests,type=bind,readonly",
+    "source=${localWorkspaceFolder}/evaluation,target=/workspaces/greenfuel-agent-harness/evaluation,type=bind,readonly",
+    "source=${localWorkspaceFolder}/.github,target=/workspaces/greenfuel-agent-harness/.github,type=bind,readonly",
+    "source=${localWorkspaceFolder}/.vscode,target=/workspaces/greenfuel-agent-harness/.vscode,type=bind,readonly",
+    "source=${localWorkspaceFolder}/.devcontainer,target=/workspaces/greenfuel-agent-harness/.devcontainer,type=bind,readonly",
+    "source=${localWorkspaceFolder}/.git/hooks,target=/workspaces/greenfuel-agent-harness/.git/hooks,type=bind,readonly",
+    "source=${localWorkspaceFolder}/.git/config,target=/workspaces/greenfuel-agent-harness/.git/config,type=bind,readonly",
+    "source=${localWorkspaceFolder}/docs/evidence,target=/workspaces/greenfuel-agent-harness/docs/evidence,type=bind,readonly",
+    "source=${localWorkspaceFolder}/docs/approvals,target=/workspaces/greenfuel-agent-harness/docs/approvals,type=bind,readonly",
+    "source=${localWorkspaceFolder}/docs/adr,target=/workspaces/greenfuel-agent-harness/docs/adr,type=bind,readonly",
+    "source=${localWorkspaceFolder}/memory,target=/workspaces/greenfuel-agent-harness/memory,type=bind,readonly",
+    "source=${localWorkspaceFolder}/package.json,target=/workspaces/greenfuel-agent-harness/package.json,type=bind,readonly",
+    "source=${localWorkspaceFolder}/.mcp.json,target=/workspaces/greenfuel-agent-harness/.mcp.json,type=bind,readonly",
+    "source=${localWorkspaceFolder}/.gitignore,target=/workspaces/greenfuel-agent-harness/.gitignore,type=bind,readonly",
+    "source=${localWorkspaceFolder}/.gitattributes,target=/workspaces/greenfuel-agent-harness/.gitattributes,type=bind,readonly"
+  ],
+
+  // Nothing from the host environment is forwarded, and cloud and Git tokens are explicitly blanked.
+  "containerEnv": {
+    "HARNESS_AGENT_SESSION": "1",
+    "HARNESS_ISOLATED": "1",
+    "AZURE_CONFIG_DIR": "/nonexistent",
+    "AZD_CONFIG_DIR": "/nonexistent",
+    "GH_CONFIG_DIR": "/nonexistent",
+    "GIT_TERMINAL_PROMPT": "0",
+    "GH_TOKEN": "",
+    "GITHUB_TOKEN": "",
+    "AZURE_CLIENT_SECRET": "",
+    "AZURE_CLIENT_ID": "",
+    "AZURE_TENANT_ID": "",
+    "AZURE_SUBSCRIPTION_ID": "",
+    "ARM_CLIENT_SECRET": "",
+    "SSH_AUTH_SOCK": ""
+  },
+  "remoteEnv": { "SSH_AUTH_SOCK": "", "GH_TOKEN": "", "GITHUB_TOKEN": "" },
+
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "chat.tools.global.autoApprove": false,
+        "chat.useHooks": true,
+        "terminal.integrated.inheritEnv": false,
+        "git.terminalAuthentication": false,
+        "git.autofetch": false,
+        "task.allowAutomaticTasks": "off",
+        "security.workspace.trust.enabled": true
+      }
+    }
+  },
+
+  // The harness has no dependencies to install. Nothing runs on start except the isolation self-check, which only reads.
+  "postStartCommand": "node harness/scripts/validate-isolation.mjs --runtime",
+  "forwardPorts": []
+}

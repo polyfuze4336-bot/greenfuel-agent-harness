@@ -55,8 +55,8 @@ Classes: **IMPLEMENTED AND VERIFIED** (built, and a recorded run or test shows i
 | E-3 | The end-to-end scenario run through the harness's own agents | PARTIALLY IMPLEMENTED | The trace and its evidence | The harness agents were not invoked in this session (section 2) |
 | **Pillar 4: Permissions** | | | | |
 | P-1 | Policy-as-code decision engine behind the hooks, with negative tests | IMPLEMENTED AND VERIFIED | EV-0024, EV-0025 | A regular-expression screen, not a boundary; evasion is possible and documented |
-| P-2 | Signed human approvals for tier P2 and above | PARTIALLY IMPLEMENTED | Engine and tests with test keys | No real approver is registered, so no real approval has ever been verified (T13) |
-| P-3 | Operating-system isolation or sandbox | NOT IMPLEMENTED | none | Agents run as the user's account (T15, R15) |
+| P-2 | Signed human approvals for tier P2 and above | PARTIALLY IMPLEMENTED | Engine and tests with test keys; the hardening stage added an approver registry with proof of possession, classes and separation rules (`tests/approver-enrollment.test.mjs`) | No real approver is registered, so no real approval has ever been verified (T13). Registry integrity depends on the CI control-plane guard, which is report-only (H-3) |
+| P-3 | Operating-system isolation or sandbox | PARTIALLY IMPLEMENTED | `.devcontainer/` configuration, statically validated by 33 mutation tests; see [ISOLATION](../security/ISOLATION.md) | **Not built or run**: Docker was not running. Host Git credential and SSH forwarding must be switched off in the owner's VS Code user settings (human step). Unverified until the in-container self-check passes (T15) |
 | P-4 | GitHub branch protection and required review on control-plane paths | BLOCKED | EV-0026 reports it unavailable on this plan | Needs a plan upgrade or a public or organisation repository (T14) |
 | P-5 | Azure identities, custom role, locks and policy | BLOCKED | Specifications only, nothing created | Needs the subscription decision (D-037, T17, T33) |
 | **Pillar 5: Memory** | | | | |
@@ -66,7 +66,7 @@ Classes: **IMPLEMENTED AND VERIFIED** (built, and a recorded run or test shows i
 | **Pillar 6: Loop** | | | | |
 | L-1 | Plan, execute, verify, critique, repair loop with budgets, failure classes, escalation and recovery | IMPLEMENTED AND VERIFIED | EV-0035 to EV-0038; LOOP-VALIDATION-REPORT; six scenarios | The TypeScript scenario is skipped in CI (allowed, recorded difference) |
 | L-2 | Independent review inside the loop | IMPLEMENTED AND VERIFIED | Loop tests (self-review refused, wrong reviewer refused, rework counts as repair) | The reviewing agent is a model |
-| L-3 | Sandboxed execution of code under test | NOT IMPLEMENTED | none | Code under test can replace the test runner's assertions (R15) |
+| L-3 | Sandboxed execution of code under test | PARTIALLY IMPLEMENTED | `guarded-run.mjs` detects any change to the policy engine, hooks, workflows or tests during a run (6 tests; the full suite ran under it with 281 protected files unchanged); the dev container mounts the control plane read-only | Detection works on any machine; prevention exists only inside the container, which has not been built or run (R15) |
 
 ### 3.2 Additional validation areas
 
@@ -77,14 +77,24 @@ Classes: **IMPLEMENTED AND VERIFIED** (built, and a recorded run or test shows i
 | A-3 | Azure deployment controls (static): non-deployable scaffold, twelve computed gates, approval requirement | IMPLEMENTED AND VERIFIED | EV-0020, EV-0044, EV-0045, EV-0050 | Static checks only; nothing ran against Azure |
 | A-4 | Actual Azure deployment | BLOCKED | Deferred by the owner (T36) | Also needs T32, T33 and signed approvals |
 | A-5 | Prompt-injection resistance | PARTIALLY IMPLEMENTED | Hook, output guard and memory tests; contract tests for hostile payloads | No model-level test and no production agent exists |
-| A-6 | Deterministic test execution | PARTIALLY IMPLEMENTED | EV-0055 (762 tests, all pass); two further unrecorded full runs also passed; CI green on the pushed commits | **One unexplained intermittent failure:** EV-0054 recorded 1 failed test of 762 on a clean tree and it did not recur in three later full runs, so determinism is not shown. The recorder keeps only the output tail, so the test was not identified (finding F-9, TODO T41). EV-0052 and EV-0053 are explained failures from running before the generated evidence index was regenerated. One scenario is skipped in CI |
-| A-7 | Audit-log completeness | PARTIALLY IMPLEMENTED | The denial log chain verifies | It is local, git-ignored, denial-only and not anchored outside the machine (T16) |
+| A-6 | Deterministic test execution | PARTIALLY IMPLEMENTED | EV-0055 (762 tests, all pass); eight further full runs of 770 tests in fresh clones, four of them under contention and two in the OneDrive folder where EV-0054 happened, all passed ([EVIDENCE-INTEGRITY](../security/EVIDENCE-INTEGRITY.md)) | **One unexplained intermittent failure, not reproduced and not diagnosed:** EV-0054 recorded 1 failed test of 762 and the failing test's name was lost. The recorder now keeps failing-test names, diagnostics and a full redacted log, so the next occurrence is diagnosable. EV-0052 and EV-0053 are explained failures. One scenario is skipped in CI |
+| A-7 | Audit-log completeness | PARTIALLY IMPLEMENTED | The denial log chain verifies; a hash-chained event log now records every hook decision (allow, ask, deny) with host and version, tool outcomes, approval and enrollment events and evidence records, metadata only | Local, git-ignored and not anchored outside the machine (T16); a same-user process can delete it. Records what hooks saw, not what happened outside hooks |
 | A-8 | Reproducible setup | IMPLEMENTED AND VERIFIED | Fresh clone (EV-0057) and CI | One local operating system; the toolchain for TypeScript and Bicep is optional |
 | A-9 | Documentation quality | IMPLEMENTED BUT NOT VERIFIED | Link, figure and compliance-claim lints | No human reader. This review found stale status labels, now fixed |
 | A-10 | Production-agent security and evaluation tests | NOT IMPLEMENTED | Tests are catalogued as pending | No production agent exists |
 | A-11 | Evaluation gates G2 to G7 | BLOCKED | The committed run | G2 and G3 fail on real findings; G4 to G7 are blocked behind them |
 
 Classification totals are in [section 7](#7-classification-totals).
+
+### 3.3 Added by the hardening stage
+
+| ID | Capability | Class | Evidence | Limit |
+|---|---|---|---|---|
+| H-1 | Fail-closed enforcement: hook crash returns a deny, the output guard withholds what it cannot sanitise, MCP tool calls are refused without a fresh hook heartbeat, credential-store and `gh auth token` reads are denied | IMPLEMENTED AND VERIFIED | `tests/hook-gap-regression.test.mjs`, `tests/enforcement-attestation.test.mjs`, the hook-bypass probe re-run (0 misses for the default session and the QA engineer) | Detects accidental loss of enforcement; a same-user process can forge a heartbeat. Not observed in VS Code (H-5) |
+| H-2 | Approver registry, class-bound keys and signed decision approvals (ADR acceptance, review approval, phase raise) | PARTIALLY IMPLEMENTED | `tests/approver-enrollment.test.mjs` (10 tests, synthetic keys); `validate-approvals` in the validator and CI | **No approver is enrolled.** Text cannot satisfy a gate, but a registry entry added by an unverified commit passes the local validator until H-3 is enforced |
+| H-3 | CI control-plane guard: control-plane commits must be GitHub-verified and by an enrolled owner, judged against the base commit | IMPLEMENTED BUT NOT VERIFIED | `tests/control-plane-guard.test.mjs` (8 tests, mocked GitHub API, one real Git history) | Never run against real GitHub. **Report-only**, owner list empty; enforces nothing until the owner enables it. Branch protection (P-4) remains unavailable |
+| H-4 | Evidence store integrity: sealed baseline, hash chain, failure logs with full diagnostics, append-only against a base ref | IMPLEMENTED AND VERIFIED | `tests/evidence-integrity.test.mjs` (12 tests); the real store verifies | Tamper-evident, not tamper-proof; says nothing about whether a claim is true |
+| H-5 | Live validation protocol and log-based verifier for VS Code | IMPLEMENTED BUT NOT VERIFIED | `tests/live-validation.test.mjs` (5 tests, simulated host) | **No VS Code session was run or observed.** Every probe is NOT OBSERVED until the owner runs the protocol ([LIVE-VALIDATION](../security/LIVE-VALIDATION.md)) |
 
 ## 4. Evaluation result
 
@@ -109,8 +119,8 @@ The three tests added by this stage (EVAL-PRC-DAT-007, EVAL-PRC-DAT-008, EVAL-PR
 | F-5 | A forged consistent continuation advances the chain and stalls the real edge; the whole store can be rewritten by whoever can write it; storage is unbounded across many small batches | High | **Open by design:** needs signing, quarantine, an external anchor and quotas (D-013, D-020, D-031). Disclosed in DES-0002 and RV-0002 |
 | F-6 | Stale ADR status labels in four documents (ADR 0010, 0011, 0012, 0014 shown as Proposed after acceptance) | Low | Fixed in this stage |
 | F-7 | The committed evaluation run became stale when three tests were added to the catalogue | Process | Fixed: a new full run was recorded |
-| F-8 | The audit log is denial-only and local, so the question "what did agents do" is answered only by evidence records and run stores | Medium | Open (T16) |
-| F-9 | One full test run (EV-0054) recorded 1 failed test of 762 on a clean tree. It did not recur in three later full runs. The recorder keeps only the last part of the output, so the failing test was not identified | Medium | **Open:** cause unknown. The recorder should keep failing-test names (TODO T41) |
+| F-8 | The audit log was denial-only and local, so the question "what did agents do" was answered only by evidence records and run stores | Medium | Partly fixed in the hardening stage: a chained event log records decisions, outcomes, approvals and evidence. Still local and unanchored (T16) |
+| F-9 | One full test run (EV-0054) recorded 1 failed test of 762 on a clean tree; the failing test was not identified | Medium | **Open: cause unknown.** Not reproduced in eight full runs under contention and in the OneDrive folder. The recorder now preserves failing-test identity and a full log (done), so the next occurrence will be diagnosable |
 
 ## 6. What needs the owner
 
@@ -124,11 +134,25 @@ The three tests added by this stage (EVAL-PRC-DAT-007, EVAL-PRC-DAT-008, EVAL-PR
 
 | Class | Count |
 |---|---|
-| IMPLEMENTED AND VERIFIED | 12 |
-| IMPLEMENTED BUT NOT VERIFIED | 4 |
-| PARTIALLY IMPLEMENTED | 8 |
-| NOT IMPLEMENTED | 4 |
+| IMPLEMENTED AND VERIFIED | 14 |
+| IMPLEMENTED BUT NOT VERIFIED | 6 |
+| PARTIALLY IMPLEMENTED | 11 |
+| NOT IMPLEMENTED | 2 |
 | BLOCKED | 5 |
-| **Total capabilities assessed** | **33** |
+| **Total capabilities assessed** | **38** |
 
-No capability is classified higher than its recorded evidence supports. The twelve verified rows are verified for what the evidence covers and each states its limit.
+No capability is classified higher than its recorded evidence supports. The fourteen verified rows are verified for what the evidence covers and each states its limit.
+
+## 8. Hardening stage update
+
+The hardening stage (branch `hardening/governance-controls`, not pushed) resolved weaknesses from the forensic audit without rebuilding the harness. **The phase gate stays closed.** Critical blockers CB-1 to CB-3 are unchanged. CB-4 (isolation) is narrowed, not closed: the configuration exists and is statically validated, but no container was built or run.
+
+| Workstream | Done and tested | Not done or not verified | Owner action |
+|---|---|---|---|
+| 1 Isolation | Dev container configuration, firewall allowlist, read-only control-plane mounts, 33-mutation static validator, integrity guard around test runs | Container not built or run; Copilot hosts in the allowlist unconfirmed; image not digest-pinned | Start Docker, switch off Git credential and SSH forwarding in VS Code user settings, build, run the self-check ([ISOLATION](../security/ISOLATION.md)) |
+| 2 Permissions | Fail-closed hooks, credential-store denials, shell-variant normalisation, MCP attestation, regression tests for the audit's bypasses | Not observed in VS Code; hook timeouts still fail open; branch protection unavailable on this plan | Decide plan upgrade or detection-only; enable the CI guard |
+| 3 Approval | Registry with proof of possession, four classes, separation rules, signed decision approvals for ADR, review and phase, enrollment tooling that refuses non-interactive use | **No approver enrolled**; filing gate not built | Enroll yourself ([APPROVER-ENROLLMENT](../security/APPROVER-ENROLLMENT.md)); enable signed commits |
+| 4 Evidence | Failure identifiers and full logs, sealed baseline, chain, append-only check, chained audit events | EV-0054 cause not found; audit log not anchored off the machine | none |
+| 5 Live validation | Protocol and verifier, versions recorded | **Not run in VS Code.** The building session ran outside the repository folder, so no harness hook applied to its own actions | Run the protocol in VS Code and record the output |
+
+Unauthorized operations are blocked in hook tests, the approval path rejects repository text, and the test-time tamper check works; but "demonstrably blocked in a real session" and "tests run in isolation" are **not yet shown**, because they need the two owner-run steps above.

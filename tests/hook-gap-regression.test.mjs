@@ -78,7 +78,7 @@ test('fail closed: a corrupt policy, a missing policy or an unparseable event bl
 
 test('fail closed: when the output sanitiser itself cannot run (its pattern file is corrupt), the raw result is withheld', () => {
   const root = tmpDir('gf-og-root-');
-  for (const d of ['hooks', 'policy', 'tools', 'lib']) cpSync(path.join(repo, 'harness', d), path.join(root, 'harness', d), { recursive: true });
+  for (const d of ['hooks', 'policy', 'tools', 'lib', 'approvals']) cpSync(path.join(repo, 'harness', d), path.join(root, 'harness', d), { recursive: true });
   writeFileSync(path.join(root, 'harness/policy/secret-patterns.json'), '{ this is not json');
   const r = spawnSync(process.execPath, [path.join(root, 'harness/hooks/tool-output-guard.cjs')], { input: JSON.stringify({ sessionId: 's', toolName: 'view', toolArgs: {}, toolResult: { resultType: 'success', textResultForLlm: 'RAW CONTENT THAT MUST NOT PASS' } }), encoding: 'utf8', cwd: root, env: { ...process.env, HARNESS_LOG_DIR: tmpDir('gf-og-') } });
   const out = r.stdout.trim() ? JSON.parse(r.stdout) : {};
