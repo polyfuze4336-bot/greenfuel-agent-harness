@@ -37,7 +37,7 @@ Generated from the requirements baseline, the design trace tables, the ADRs, the
 | BR-006 | Must | SOV | HC-01 | DES-0001 Partial; DES-0002 Partial; DES-0003 Partial | ADR-0004, ADR-0015, ADR-0016 | - | - | **DESIGNED ONLY** |
 | BR-007 | Must | EDG | HC-07 | DES-0001 Addressed; DES-0002 Partial; DES-0003 Partial | ADR-0004, ADR-0015, ADR-0016 | - | - | **DESIGNED ONLY** |
 | BR-008 | Should | XC | HC-12 | DES-0003 Partial | - | - | PRD-CST-001 | **PENDING TEST ONLY** |
-| BR-009 | Must | XC | HC-11 | DES-0003 Addressed | - | HRN-AZR-001 PASS; HRN-AZR-002 PASS; HRN-AZR-004 PASS; HRN-AZR-005 PASS; PRC-SEC-003 PASS; PRC-AZR-001 BLOCKED | PRD-FUN-001; PRD-SEC-003; PRD-AZR-002 | **TESTED, A TEST BLOCKED** |
+| BR-009 | Must | XC | HC-11 | DES-0003 Addressed | ADR-0020 | HRN-AZR-001 PASS; HRN-AZR-002 PASS; HRN-AZR-004 PASS; HRN-AZR-005 PASS; PRC-SEC-003 PASS; PRC-AZR-001 BLOCKED | PRD-FUN-001; PRD-SEC-003; PRD-AZR-002 | **TESTED, A TEST BLOCKED** |
 | FR-001 | Must | DEA,EDG | - | DES-0001 Addressed; DES-0002 Partial; DES-0003 Partial | ADR-0004, ADR-0015 | - | - | **DESIGNED ONLY** |
 | FR-002 | Must | DEA | - | DES-0002 Partial | ADR-0015 | - | - | **DESIGNED ONLY** |
 | FR-003 | Must | DEA | - | - | - | - | - | **SPECIFIED ONLY** |
@@ -94,7 +94,7 @@ Generated from the requirements baseline, the design trace tables, the ADRs, the
 | DATA-006 | Must | XC,SOV | - | DES-0001 Unresolved; DES-0003 Unresolved | - | - | - | **DESIGNED ONLY** |
 | DATA-007 | Must | EAA,MBA | - | - | - | - | - | **SPECIFIED ONLY** |
 | DATA-008 | Should | XC | - | DES-0003 Partial | - | - | - | **DESIGNED ONLY** |
-| DATA-009 | Must | XC,SOV | - | DES-0001 Partial; DES-0003 Partial | ADR-0019 | - | - | **DESIGNED ONLY** |
+| DATA-009 | Must | XC,SOV | - | DES-0001 Partial; DES-0003 Partial | ADR-0019, ADR-0020 | - | - | **DESIGNED ONLY** |
 | DATA-010 | Should | XC | - | DES-0003 Unresolved | - | - | - | **DESIGNED ONLY** |
 | AGT-001 | Must | XC | - | DES-0003 Partial | ADR-0017 | - | - | **DESIGNED ONLY** |
 | AGT-002 | Must | XC | HC-09 | DES-0003 Partial | ADR-0017 | HRN-SEC-006 PASS; HRN-SEC-009 PASS | - | **TESTED AND PASSING** |

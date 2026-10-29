@@ -83,3 +83,26 @@ Delivery created, measurement received, evidence validated, certificate record g
 - Verified the gate state from the repository (phase 0, empty approver registry, ADRs Proposed, 37 open decisions).
 - Wrote this report.
 - **Not done, by design:** repository creation, application code, database schema, APIs, frontend, tests, any Azure action, any change to a gate.
+
+## 9. Owner replies and what they change
+
+The owner replied to decisions R, S, T, I and A on 2026-10-29. Recorded as stated; **none is a signed approval and none opens a gate**.
+
+| Decision | Reply | Effect |
+|---|---|---|
+| R repository | A folder inside this repository, not a separate repository | No new remote repository. The application goes under `src/` (already phase-gated by the hook) with tests under `tests/product/` |
+| S scope | Adopt the proposed Phase 1a scope | Drafted as [ADR 0020](../adr/0020-phase-1a-local-synthetic-vertical-slice.md), **Proposed** |
+| T technology | TypeScript and Node API, React or Next.js, PostgreSQL | Recorded as a lean. **Open:** the database for local persistence tests (Docker, an approved embedded-PostgreSQL package, or a native install) |
+| I isolation | Accept hook-only protection and record it as a decision | Written into ADR 0020 item 9 for the owner's signature; it does not make the risk low and does not build the dev container |
+| A approvers | Will enroll next | The next step is the owner's: enrollment, signed commits, naming the decider and reviewer |
+
+**Still blocking, and still the owner's to do:** G1 phase raised, G2 approver registry, G3 architecture approved (or ADR 0020 explicitly accepting the build against Proposed ADRs and their risk), G6 identity and roles (satisfied for the slice only by the fixture-role limit in ADR 0020). Application work starts after the signed approvals exist and `validate-approvals` accepts the phase.
+
+### Exact sequence once you have enrolled
+
+1. `node harness/scripts/approval.mjs decision --type adr --id 0020 --reason "..." --out docs/approvals/AP-<id>.json`, then `sign` with your architecture-class key, after reading the ADR.
+2. `node harness/scripts/approval.mjs decision --type phase --id phase-1 --reason "Phase 1a per ADR 0020" --out docs/approvals/AP-<id>.json`, signed with an architecture-class key and, separately, a deployment-class key (different keys).
+3. In one signed commit, set ADR 0020 to Accepted and `"phase": 1` in `harness/policy/command-policy.json`. `validate-approvals` and the CI guard check it.
+4. Tell me; I then start the slice and stop when its acceptance tests pass.
+
+Because the phase approval binds only to `phase-1` and not to the scope text, review ADR 0020 yourself before signing.
