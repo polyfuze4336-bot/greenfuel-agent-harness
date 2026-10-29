@@ -94,4 +94,12 @@ The reviewer listed eleven statements in documents 10, 11 and 12 that claimed mo
 
 ## 8. Evidence
 
-Test runs recorded with the evidence recorder are listed in the [evidence index](../evidence/README.md) and the generated [test evidence index](../acceptance/TEST-EVIDENCE-INDEX.md). Record ids for this stage are EV-0073 (the six new test files) and EV-0074 (the full suite). A passing run shows that the oracles behave as the tests state; it is not a security assessment of a product.
+Test runs recorded with the evidence recorder are listed in the [evidence index](../evidence/README.md) and the generated [test evidence index](../acceptance/TEST-EVIDENCE-INDEX.md). Record ids for this stage:
+
+| Record | What it is | Result |
+|---|---|---|
+| EV-0073 | The six new test files, run on a dirty working tree | 136 of 136 passed |
+| EV-0074 | The full suite, run on a dirty working tree | **Failed: 3 of 1026**, all from one cause: the generated acceptance index had not yet been regenerated after the new records. Kept as recorded, not overwritten |
+| EV-0075 | The full suite, on the clean committed tree after the index was regenerated | 1026 of 1026 passed, none skipped |
+
+A passing run shows that the oracles behave as the tests state; it is not a security assessment of a product. The remediation fixes N-1 to N-4 were made before EV-0073 and had no third review pass (section 4).

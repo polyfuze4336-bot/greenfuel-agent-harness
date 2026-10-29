@@ -1,0 +1,38 @@
+{
+  "id": "EV-0075",
+  "claim": "Full npm test suite on a clean committed tree after the hardening stage and its remediation; includes the candidate-oracle security tests; supersedes the stale-index failure recorded in EV-0074",
+  "argv": [
+    "npm",
+    "test"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-29T12:34:10.916Z",
+  "durationMs": 417344,
+  "outputSha256": "87e2ac9ae083a006c20b15942443c7909f55719d9376c8114f8ca82d3d47520b",
+  "outputBytes": 234862,
+  "outputTail": "ry, no loader variables, no undeclared properties\nok 1019 - candidates: env must equal the registry, no loader variables, no undeclared properties\n  ---\n  duration_ms: 555.3588\n  type: 'test'\n  ...\n# Subtest: servers whose names collide after normalisation are rejected\nok 1020 - servers whose names collide after normalisation are rejected\n  ---\n  duration_ms: 1331.8649\n  type: 'test'\n  ...\n# Subtest: candidates: exactly the pending servers, matching the registry, never carrying credentials\nok 1021 - candidates: exactly the pending servers, matching the registry, never carrying credentials\n  ---\n  duration_ms: 3209.3405\n  type: 'test'\n  ...\n# Subtest: agent grants: exact server/tool names, enabled tools only, privilege by class, external only with web access\nok 1022 - agent grants: exact server/tool names, enabled tools only, privilege by class, external only with web access\n  ---\n  duration_ms: 2537.113\n  type: 'test'\n  ...\n# Subtest: agent grants: web hosts in the registry and policy must agree and be plain hosts\nok 1023 - agent grants: web hosts in the registry and policy must agree and be plain hosts\n  ---\n  duration_ms: 1224.6442\n  type: 'test'\n  ...\n# Subtest: hook, log ignore and generated documents are enforced\nok 1024 - hook, log ignore and generated documents are enforced\n  ---\n  duration_ms: 2424.6839\n  type: 'test'\n  ...\n# Subtest: generated tables: complete, free of pipes inside cells, and idempotent under --write\nok 1025 - generated tables: complete, free of pipes inside cells, and idempotent under --write\n  ---\n  duration_ms: 757.6231\n  type: 'test'\n  ...\n# Subtest: helpers: grants resolve by alias, command substring and MCP name; server tool lists derive from enabled tools\nok 1026 - helpers: grants resolve by alias, command substring and MCP name; server tool lists derive from enabled tools\n  ---\n  duration_ms: 8.4993\n  type: 'test'\n  ...\n1..1026\n# tests 1026\n# suites 0\n# pass 1026\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 412846.6514\n",
+  "gitHead": "8ef68875ccc01c4454c3c9b948584f8217826735",
+  "treeClean": true,
+  "dirtyFileCount": 0,
+  "treeCleanAfter": true,
+  "dirtyFileCountAfter": 0,
+  "headUnchanged": true,
+  "headAfter": "8ef68875ccc01c4454c3c9b948584f8217826735",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  },
+  "tapSummary": {
+    "tests": 1026,
+    "pass": 1026,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "prevRecordSha256": "52628c5d54d90f1bdcd667e06d71fec35a8bfcec7aea27313b0f6b0b521c2a43",
+  "recordSha256": "9ac5ae1fd1399ded3694818709faa938740432096dba04d1ed3c36af4fa4adb1"
+}
