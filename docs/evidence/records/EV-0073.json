@@ -1,0 +1,44 @@
+{
+  "id": "EV-0073",
+  "claim": "The six hardening candidate-oracle test files (custody, lifecycle, methodology, tenant boundary, sovereignty placement, scenario guard) pass on synthetic data with test-only keys; this shows the candidate rules behave as the tests state, not that any product is secure or compliant",
+  "argv": [
+    "node",
+    "--test",
+    "tests/security-scenarios.test.mjs",
+    "tests/tenant-boundary-contract.test.mjs",
+    "tests/certificate-lifecycle-contract.test.mjs",
+    "tests/custody-chain-contract.test.mjs",
+    "tests/methodology-registry-contract.test.mjs",
+    "tests/sovereignty-placement-contract.test.mjs"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-29T12:20:29.275Z",
+  "durationMs": 512,
+  "outputSha256": "bd3291e5dcfa991a82e2e9d427b891cb92df36e3fb85d9ed40cc82782634d113",
+  "outputBytes": 37154,
+  "outputTail": "a document or message instructing the agent is only ever fenced data, in every run\nok 131 - ST-09 prompt injection: a document or message instructing the agent is only ever fenced data, in every run\n  ---\n  duration_ms: 0.2494\n  type: 'test'\n  ...\n# Subtest: ST-09 prompt injection: untrusted is the default; only system and policy sources are trusted, and a document cannot close its own fence\nok 132 - ST-09 prompt injection: untrusted is the default; only system and policy sources are trusted, and a document cannot close its own fence\n  ---\n  duration_ms: 0.3631\n  type: 'test'\n  ...\n# Subtest: tool gateway: prototype-named or extra argument keys never reach a handler, and handlers get a frozen copy and a narrowed API\nok 133 - tool gateway: prototype-named or extra argument keys never reach a handler, and handlers get a frozen copy and a narrowed API\n  ---\n  duration_ms: 0.3469\n  type: 'test'\n  ...\n# Subtest: ST-06 cross-shipowner access: returned records are copies, the raw store is not exposed, and mutating a result changes nothing\nok 134 - ST-06 cross-shipowner access: returned records are copies, the raw store is not exposed, and mutating a result changes nothing\n  ---\n  duration_ms: 0.7871\n  type: 'test'\n  ...\n# Subtest: ST-06 cross-shipowner access: every denial on list, search and cache is audited, never just those on get\nok 135 - ST-06 cross-shipowner access: every denial on list, search and cache is audited, never just those on get\n  ---\n  duration_ms: 0.216\n  type: 'test'\n  ...\n# Subtest: ST-09 prompt injection: grounding rejects substring numbers, number words, exponents, zero-width and reworded claims, and a status the record does not hold\nok 136 - ST-09 prompt injection: grounding rejects substring numbers, number words, exponents, zero-width and reworded claims, and a status the record does not hold\n  ---\n  duration_ms: 0.7088\n  type: 'test'\n  ...\n1..136\n# tests 136\n# suites 0\n# pass 136\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 289.0869\n",
+  "gitHead": "b18daf77dd246379c1766b020183f4aef6880366",
+  "treeClean": false,
+  "dirtyFileCount": 19,
+  "treeCleanAfter": false,
+  "dirtyFileCountAfter": 19,
+  "headUnchanged": true,
+  "headAfter": "b18daf77dd246379c1766b020183f4aef6880366",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  },
+  "tapSummary": {
+    "tests": 136,
+    "pass": 136,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "prevRecordSha256": "f3ea6825b493d8587b24d13f3ba323e5684195f688e62b96765ab2e803ba9e82",
+  "recordSha256": "2cc26bfb1e21632a963b99e80b77918bf3cc8a9438d613cf3928fdc991a039d8"
+}

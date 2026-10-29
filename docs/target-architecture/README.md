@@ -21,6 +21,10 @@ Build the platform as **sovereign evidence cells**, one per port jurisdiction, e
 | [07 Azure service decision matrix](07-AZURE-SERVICE-DECISION-MATRIX.md) | Each candidate service against the role, the alternatives, the residency checks and the evidence |
 | [08 Design defence](08-DESIGN-DEFENSE.md) | What happens in the seven required failure and attack scenarios |
 | [09 Review and validation](09-REVIEW-AND-VALIDATION.md) | Governance checks run, the independent review, the business-case validation and what is still unvalidated |
+| [10 Control matrix (hardening)](10-CONTROL-MATRIX.md) | Controls by area (sovereignty, isolation, custody, certificate, methodology, responsible AI, audit) with threat, requirement, layer, candidate-oracle test and honest status |
+| [11 Attack trees](11-ATTACK-TREES.md) | Six attacker goals decomposed into branches, each leaf marked ORACLE, DESIGN, OUT or OPEN |
+| [12 Data movement and residency validation](12-DATA-MOVEMENT-AND-RESIDENCY-VALIDATION.md) | Designed flows, the per-cell validation procedure V-1 to V-12 (all NOT RUN), result states |
+| [13 Security review](13-SECURITY-REVIEW.md) | The independent review of the candidate oracles, every finding, its remediation and what remains |
 | [Stakeholders](../business/STAKEHOLDERS.md) | Eight candidate stakeholders, objectives, authority, constraints, measures, discovery questions |
 | [Commercial value](../business/COMMERCIAL-VALUE.md) | Why trustworthy certification carries money, what the model counts and does not |
 | [Business value model](../business/BUSINESS-VALUE-MODEL.md) | Generated from an editable model; every figure labelled |

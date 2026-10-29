@@ -64,3 +64,15 @@ Malicious or careless insider (operator, support, engineer); compromised edge de
 3. **Key custody (TM-10).** An undecided mechanism (D-013) is the biggest open design decision for HC-03 and HC-08.
 4. **The human approver (TM-23).** The platform can bind an approval to a hash; it cannot make the quality manager read it.
 5. **Unbuilt tests.** Every production-agent threat above has a pending test. Nothing in this model has been demonstrated against a running system.
+
+## Hardening addendum (2026-10-29)
+
+The hardening stage added candidate oracles and executable tests ([10 control matrix](10-CONTROL-MATRIX.md), [11 attack trees](11-ATTACK-TREES.md), [13 security review](13-SECURITY-REVIEW.md)). Attack-tree analysis and the independent review surfaced five threats not in the list above. Existing rows keep their text; their validation column is now partly met by candidate-oracle tests, **not** by tests against a running system.
+
+| ID | Boundary | Threat | STRIDE | Impact | Control | Gap | Validation | Requirements |
+|---|---|---|---|---|---|---|---|---|
+| TM-35 | TB6, Identity | An approval record is built by hand (any approver id, any fields), by an agent or a script, and accepted as a human approval | S, E | A filing or certificate proceeds without a real decision (extends TM-11 and TM-23) | An approval is a record signed with the approver's registered key; type, role, key, meaning, decision, content binding, age and single use are all checked | Who holds approver keys, enrollment and rotation are not designed (CL-15, T53) | Candidate oracle, ST-10 | SEC-009, SEC-010 |
+| TM-36 | TB6 | Time of check is not time of use: evidence is withdrawn, or an approval lapses, between validation or approval and issue | T | A certificate is issued on stale evidence | Evidence and approval age are checked again at the moment of issue | The freshness limits are policy inputs (D-012) | Candidate oracle, lifecycle tests | FR-028 |
+| TM-37 | All | A caller mutates an object it was handed (a filing, a record, a stored event) and thereby changes state or approval | T, E | Immutability claims hold only for callers who behave | Stored and returned objects are copies; no raw store is exposed; handlers get a narrowed API | In a real system this is a data-layer and API property, not an object property | Candidate oracle, tenant and lifecycle tests | SEC-008 |
+| TM-38 | TB6 | Supersession is used to retire an unrelated or revoked certificate, or two drafts supersede one certificate | T | A valid certificate is silently replaced | Supersession declared in the approved content, same delivery only, re-checked at issue, one live certificate per delivery | Rules for partial or multi-delivery certificates are undecided (D-006) | Candidate oracle | FR-030, FR-031 |
+| TM-39 | TB6, TB5 | One person edits a draft or a methodology proposal and then approves or reviews it, because separation of duties tracked only the original creator | E, R | Four-eyes control defeated by an editor | Every person who created or edited a draft is an author and cannot approve it | Needs a real identity and role model (D-015) | Candidate oracle | SEC-010, FR-012 |

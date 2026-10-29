@@ -1,0 +1,61 @@
+{
+  "id": "EV-0074",
+  "claim": "Full npm test suite passes after the hardening stage (candidate oracles, remediation of the independent review, and the existing harness tests); recorded with failures kept if any",
+  "argv": [
+    "npm",
+    "test"
+  ],
+  "exitCode": 1,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-29T12:20:33.597Z",
+  "durationMs": 769387,
+  "outputSha256": "6b49b645559bd390052f28a10fde261b5e2165f76e225506ed1655c0859ff96c",
+  "outputBytes": 238957,
+  "outputTail": "no loader variables, no undeclared properties\nok 1019 - candidates: env must equal the registry, no loader variables, no undeclared properties\n  ---\n  duration_ms: 2899.7851\n  type: 'test'\n  ...\n# Subtest: servers whose names collide after normalisation are rejected\nok 1020 - servers whose names collide after normalisation are rejected\n  ---\n  duration_ms: 1911.4221\n  type: 'test'\n  ...\n# Subtest: candidates: exactly the pending servers, matching the registry, never carrying credentials\nok 1021 - candidates: exactly the pending servers, matching the registry, never carrying credentials\n  ---\n  duration_ms: 5824.6615\n  type: 'test'\n  ...\n# Subtest: agent grants: exact server/tool names, enabled tools only, privilege by class, external only with web access\nok 1022 - agent grants: exact server/tool names, enabled tools only, privilege by class, external only with web access\n  ---\n  duration_ms: 6866.1114\n  type: 'test'\n  ...\n# Subtest: agent grants: web hosts in the registry and policy must agree and be plain hosts\nok 1023 - agent grants: web hosts in the registry and policy must agree and be plain hosts\n  ---\n  duration_ms: 2208.8072\n  type: 'test'\n  ...\n# Subtest: hook, log ignore and generated documents are enforced\nok 1024 - hook, log ignore and generated documents are enforced\n  ---\n  duration_ms: 4922.4809\n  type: 'test'\n  ...\n# Subtest: generated tables: complete, free of pipes inside cells, and idempotent under --write\nok 1025 - generated tables: complete, free of pipes inside cells, and idempotent under --write\n  ---\n  duration_ms: 1136.8062\n  type: 'test'\n  ...\n# Subtest: helpers: grants resolve by alias, command substring and MCP name; server tool lists derive from enabled tools\nok 1026 - helpers: grants resolve by alias, command substring and MCP name; server tool lists derive from enabled tools\n  ---\n  duration_ms: 32.3991\n  type: 'test'\n  ...\n1..1026\n# tests 1026\n# suites 0\n# pass 1023\n# fail 3\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 765041.5018\n",
+  "gitHead": "b18daf77dd246379c1766b020183f4aef6880366",
+  "treeClean": false,
+  "dirtyFileCount": 20,
+  "treeCleanAfter": false,
+  "dirtyFileCountAfter": 20,
+  "headUnchanged": true,
+  "headAfter": "b18daf77dd246379c1766b020183f4aef6880366",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  },
+  "tapSummary": {
+    "tests": 1026,
+    "pass": 1023,
+    "fail": 3,
+    "cancelled": 0,
+    "skipped": 0,
+    "todo": 0
+  },
+  "failureKind": "nonzero-exit",
+  "failures": [
+    {
+      "number": 1,
+      "depth": 0,
+      "name": "the committed coverage and evidence index are exactly what the generator produces",
+      "detail": "  ---\n  duration_ms: 363.1589\n  type: 'test'\n  location: '<repo>\\\\tests\\\\acceptance-reports.test.mjs:16:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    Expected values to be strictly deep-equal:\n    + actual - expected\n    \n    + [\n    +   {\n    +     check: 'acceptance',\n    +     msg: 'docs/acceptance/TEST-EVIDENCE-INDEX.md does not match what the generator produces from the repository; regenerate it with acceptance-reports.mjs --write, never edit it'\n    +   }\n    + ]\n    - []\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected:\n  actual:\n    0:\n      check: 'acceptance'\n      msg: 'docs/acceptance/TEST-EVIDENCE-INDEX.md does not match what the generator produces from the repository; regenerate it with acceptance-reports.mjs --write, never edit it'\n  operator: 'deepStrictEqual'\n  stack: |-\n    TestContext.<anonymous> (<repo>/tests/acceptance-reports.test.mjs:17:10)\n    Test.runInAsyncScope (node:async_hooks:214:14)\n    Test.run (node:internal/test_runner/test:1047:25)\n    Test.start (node:internal/test_runner/test:944:17)\n    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)\n  ..."
+    },
+    {
+      "number": 3,
+      "depth": 0,
+      "name": "a hand-edited generated document, a changed evidence record and a missing document are all rejected",
+      "detail": "  ---\n  duration_ms: 3636.2874\n  type: 'test'\n  location: '<repo>\\\\tests\\\\acceptance-reports.test.mjs:27:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    Expected values to be strictly deep-equal:\n    + actual - expected\n    \n    + [\n    +   {\n    +     check: 'acceptance',\n    +     msg: 'docs/acceptance/TEST-EVIDENCE-INDEX.md does not match what the generator produces from the repository; regenerate it with acceptance-reports.mjs --write, never edit it'\n    +   }\n    + ]\n    - []\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected:\n  actual:\n    0:\n      check: 'acceptance'\n      msg: 'docs/acceptance/TEST-EVIDENCE-INDEX.md does not match what the generator produces from the repository; regenerate it with acceptance-reports.mjs --write, never edit it'\n  operator: 'deepStrictEqual'\n  stack: |-\n    TestContext.<anonymous> (<repo>/tests/acceptance-reports.test.mjs:30:12)\n    Test.runInAsyncScope (node:async_hooks:214:14)\n    Test.run (node:internal/test_runner/test:1047:25)\n    Test.processPendingSubtests (node:internal/test_runner/test:744:18)\n    Test.postRun (node:internal/test_runner/test:1173:19)\n    Test.run (node:internal/test_runner/test:1101:12)\n    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)\n  ..."
+    },
+    {
+      "number": 860,
+      "depth": 0,
+      "name": "real repository validates cleanly",
+      "detail": "  ---\n  duration_ms: 43071.7088\n  type: 'test'\n  location: '<repo>\\\\tests\\\\validate-harness.test.mjs:18:1'\n  failureType: 'testCodeFailure'\n  error: |-\n    Expected values to be strictly deep-equal:\n    + actual - expected\n    \n    + [\n    +   {\n    +     check: 'acceptance',\n    +     msg: 'docs/acceptance/TEST-EVIDENCE-INDEX.md does not match what the generator produces from the repository; regenerate it with acceptance-reports.mjs --write, never edit it'\n    +   }\n    + ]\n    - []\n    \n  code: 'ERR_ASSERTION'\n  name: 'AssertionError'\n  expected:\n  actual:\n    0:\n      check: 'acceptance'\n      msg: 'docs/acceptance/TEST-EVIDENCE-INDEX.md does not match what the generator produces from the repository; regenerate it with acceptance-reports.mjs --write, never edit it'\n  operator: 'deepStrictEqual'\n  stack: |-\n    TestContext.<anonymous> (<repo>/tests/validate-harness.test.mjs:19:10)\n    Test.runInAsyncScope (node:async_hooks:214:14)\n    Test.run (node:internal/test_runner/test:1047:25)\n    Test.start (node:internal/test_runner/test:944:17)\n    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)\n  ..."
+    }
+  ],
+  "logFile": "docs/evidence/logs/EV-0074.log",
+  "logSha256": "72e505d4c1ad57e73be544c2e5fbeaf43b532ad2e74c6e4e246511fbf677e6c2",
+  "prevRecordSha256": "c50c702ed109e392abed343d504d6504fb61c11d78635840332d6d2ef03c093f",
+  "recordSha256": "9e37e8c71ea6986e3ec3ee6ffff968d18dd8060c0fdb212b7a1708c824eb3624"
+}

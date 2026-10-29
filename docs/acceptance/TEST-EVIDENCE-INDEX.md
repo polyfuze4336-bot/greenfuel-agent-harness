@@ -5,7 +5,7 @@ Generated from the evidence records, the committed evaluation runs, the test fol
 
 **What an evidence record is.** The recorder runs a command and stores what happened: arguments, exit code, duration, an output hash and the output tail, the Git commit and the runtime. It records facts about a run; it does not judge whether the command proves the claim. A claim is only as good as the command that backs it. A record with no exit code is a timeout or a kill, and is kept (append-only).
 
-## A. Evidence records (72)
+## A. Evidence records (74)
 
 | ID | Recorded | Commit | Command | Outcome | Claim |
 |---|---|---|---|---|---|
@@ -81,6 +81,8 @@ Generated from the evidence records, the committed evaluation runs, the test fol
 | EV-0070 | 2026-10-29 | `e7e1e56` | `node harness/scripts/business-model.mjs check` | exit 0 | business-model check: inputs classed, price file valid, report current |
 | EV-0071 | 2026-10-29 | `e2bc996` | `node harness/scripts/validate-harness.mjs` | exit 0 | validate-harness rerun after regenerating the evidence index (EV-0069 failed only because the generated index was stale after EV-0068) |
 | EV-0072 | 2026-10-29 | `1b8c2af` | `npm test` | exit 0 | npm test on the architecture branch (full suite incl. business model and price tests) |
+| EV-0073 | 2026-10-29 | `b18daf7` | `node --test tests/security-scenarios.test.mjs tests/tenant-boundary-co` | exit 0 | The six hardening candidate-oracle test files (custody, lifecycle, methodology, tenant boundary, sovereignty placement, scenario guard) pass on synthe |
+| EV-0074 | 2026-10-29 | `b18daf7` | `npm test` | exit 1 | Full npm test suite passes after the hardening stage (candidate oracles, remediation of the independent review, and the existing harness tests); recor |
 
 ## B. Committed evaluation runs (1)
 
@@ -90,7 +92,7 @@ Only the latest full run is kept in the tree; earlier runs remain in Git history
 |---|---|---|---|---|---|---|---|
 | EVRUN-9b6110b026 | `587d609` | no | 53 | 3 | 1 | 16 | G1 PASS, G2 FAIL, G3 FAIL, G4 BLOCKED, G5 BLOCKED, G6 BLOCKED, G7 BLOCKED |
 
-## C. Test files (41) run by `npm test`
+## C. Test files (47) run by `npm test`
 
 The count is the number of top-level `test(` declarations in the file. Generated cases (mutation tables) run several tests per declaration, so the executed total is larger; the executed total is in the evidence record for `npm test`.
 
@@ -103,7 +105,9 @@ The count is the number of top-level `test(` declarations in the file. Generated
 | tests/approver-enrollment.test.mjs | 10 |
 | tests/audit-denials.test.mjs | 4 |
 | tests/business-model.test.mjs | 17 |
+| tests/certificate-lifecycle-contract.test.mjs | 40 |
 | tests/control-plane-guard.test.mjs | 8 |
+| tests/custody-chain-contract.test.mjs | 26 |
 | tests/design-gate.test.mjs | 22 |
 | tests/enforcement-attestation.test.mjs | 5 |
 | tests/evaluation-engine.test.mjs | 28 |
@@ -117,6 +121,7 @@ The count is the number of top-level `test(` declarations in the file. Generated
 | tests/mcp-names.test.mjs | 5 |
 | tests/mcp-server.test.mjs | 15 |
 | tests/memory.test.mjs | 23 |
+| tests/methodology-registry-contract.test.mjs | 21 |
 | tests/orchestration-durability.test.mjs | 12 |
 | tests/orchestration-engine.test.mjs | 35 |
 | tests/orchestration-hook-cli.test.mjs | 9 |
@@ -125,7 +130,10 @@ The count is the number of top-level `test(` declarations in the file. Generated
 | tests/permissions-engine.test.mjs | 12 |
 | tests/policy-guard.test.mjs | 5 |
 | tests/record-evidence.test.mjs | 8 |
+| tests/security-scenarios.test.mjs | 1 |
+| tests/sovereignty-placement-contract.test.mjs | 17 |
 | tests/spec-validators.test.mjs | 21 |
+| tests/tenant-boundary-contract.test.mjs | 22 |
 | tests/tool-output-guard.test.mjs | 12 |
 | tests/validate-agents.test.mjs | 25 |
 | tests/validate-azure.test.mjs | 9 |
