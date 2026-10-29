@@ -1,0 +1,17 @@
+{
+  "schema": "greenfuel.agent-eval-registry/v1",
+  "note": "Model and prompt version registry for the LLM arms. Empty on purpose: no model deployment is verified and no budget is approved (D-028, T55). A run of an LLM arm is refused unless its model entry is VERIFIED here and its prompt sha256 is registered. Prices must carry a source and a retrieval date; none is invented.",
+  "models": [],
+  "prompts": [],
+  "budget": { "approvedBy": null, "currency": null, "limit": null },
+  "modelSlotTemplate": {
+    "id": "model-a",
+    "provider": null,
+    "deploymentName": null,
+    "modelVersion": null,
+    "region": null,
+    "processingLocationVerified": false,
+    "status": "NOT-CONFIGURED",
+    "price": { "perMillionInputTokens": null, "perMillionOutputTokens": null, "source": null, "retrievedOn": null }
+  }
+}

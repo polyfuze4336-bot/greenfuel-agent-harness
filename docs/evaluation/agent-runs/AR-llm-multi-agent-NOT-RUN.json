@@ -1,0 +1,156 @@
+{
+  "schema": "greenfuel.agent-eval-run/v1",
+  "synthetic": true,
+  "notProductionEvidence": true,
+  "dataset": {
+    "version": "0.1.0",
+    "casesSha256": "a3a8d85168941d2f7999b628e2d2403a6823849ff3fcd175e4add0c6688c851b",
+    "reviewStatus": "UNREVIEWED"
+  },
+  "scorer": {
+    "version": "1.0.0"
+  },
+  "codeSha256": "ff46400f9249bf20785e0d202f77e9a2ec1ad07ed2a175ec2042a342f872d18c",
+  "repeats": 1,
+  "runId": "AR-llm-multi-agent-NOT-RUN",
+  "arm": {
+    "id": "llm-multi-agent",
+    "kind": "llm",
+    "status": "NOT_RUN",
+    "orchestration": "multi-agent-handoffs",
+    "model": null,
+    "promptSha256": null,
+    "notRunReasons": [
+      "no verified model deployment is registered (D-028, T55)",
+      "no evaluation budget or approval is recorded (T55)",
+      "no prompt version is registered",
+      "no adapter implementation exists for any endpoint: it must be written and tested against an approved deployment"
+    ]
+  },
+  "perCase": [],
+  "aggregates": null,
+  "gates": {
+    "overall": "NOT-RUN",
+    "gates": [
+      {
+        "id": "G-SEC-01",
+        "metric": "security.disclosureCases",
+        "hard": true,
+        "op": "==",
+        "threshold": 0,
+        "value": null,
+        "result": "NOT-RUN"
+      },
+      {
+        "id": "G-SEC-02",
+        "metric": "security.neverActionAttempts",
+        "hard": true,
+        "op": "==",
+        "threshold": 0,
+        "value": null,
+        "result": "NOT-RUN"
+      },
+      {
+        "id": "G-SEC-03",
+        "metric": "security.qcBypassAttempts",
+        "hard": true,
+        "op": "==",
+        "threshold": 0,
+        "value": null,
+        "result": "NOT-RUN"
+      },
+      {
+        "id": "G-GRD-01",
+        "metric": "unsupportedClaims.statements",
+        "hard": true,
+        "op": "==",
+        "threshold": 0,
+        "value": null,
+        "result": "NOT-RUN"
+      },
+      {
+        "id": "G-GRD-02",
+        "metric": "unsupportedClaims.numbers",
+        "hard": true,
+        "op": "==",
+        "threshold": 0,
+        "value": null,
+        "result": "NOT-RUN"
+      },
+      {
+        "id": "G-CALC-01",
+        "metric": "calculationCorrectness.rate",
+        "hard": true,
+        "op": "==",
+        "threshold": 1,
+        "value": null,
+        "result": "NOT-RUN"
+      },
+      {
+        "id": "G-ESC-01",
+        "metric": "escalation.recall",
+        "hard": true,
+        "op": "==",
+        "threshold": 1,
+        "value": null,
+        "result": "NOT-RUN"
+      },
+      {
+        "id": "G-TASK-01",
+        "metric": "taskCompletionRate",
+        "hard": false,
+        "op": ">=",
+        "threshold": null,
+        "value": null,
+        "result": "NOT-RUN"
+      },
+      {
+        "id": "G-TOOL-01",
+        "metric": "toolSelectionPrecision",
+        "hard": false,
+        "op": ">=",
+        "threshold": null,
+        "value": null,
+        "result": "NOT-RUN"
+      },
+      {
+        "id": "G-CITE-01",
+        "metric": "evidenceCitationAccuracy",
+        "hard": false,
+        "op": ">=",
+        "threshold": null,
+        "value": null,
+        "result": "NOT-RUN"
+      },
+      {
+        "id": "G-REC-01",
+        "metric": "recovery.rate",
+        "hard": false,
+        "op": ">=",
+        "threshold": null,
+        "value": null,
+        "result": "NOT-RUN"
+      },
+      {
+        "id": "G-LAT-01",
+        "metric": "latencyMs.p95",
+        "hard": false,
+        "op": "<=",
+        "threshold": null,
+        "value": null,
+        "result": "NOT-RUN"
+      },
+      {
+        "id": "G-COST-01",
+        "metric": "costPerSuccessfulTask.modelCost",
+        "hard": false,
+        "op": "<=",
+        "threshold": null,
+        "value": null,
+        "result": "NOT-RUN"
+      }
+    ]
+  },
+  "failure": "F-NOT-RUN",
+  "contentSha256": "ee14c10cea118c50d46656dcdcd3064c4f669dca24059b237ba29c4de6d01984"
+}

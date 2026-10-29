@@ -8,4 +8,5 @@ Owner: `ai-engineer`. Charters, workflows, grounding and evaluation plans for th
 |---|---|
 | [AGENTIC-AUTONOMY-DESIGN-RECORD](AGENTIC-AUTONOMY-DESIGN-RECORD.md) | Proposed design for the five production agents: goals, tools, autonomy levels and why, handoffs, checkpoints, bounds, recovery. **Nothing implemented** |
 | [ORCHESTRATION-OPTIONS](ORCHESTRATION-OPTIONS.md) | Evaluation of state graphs, event-driven orchestration and managed runtimes, with a recommendation. **Nothing prototyped** |
-| [AGENT-EVALUATION-PLAN](AGENT-EVALUATION-PLAN.md) | Metrics, scenarios and protocol. **Every result NOT RUN** |
+| [AGENT-EVALUATION-PLAN](AGENT-EVALUATION-PLAN.md) | Metrics, scenarios and protocol. Production-agent results remain NOT RUN; the synthetic framework is in the report below |
+| [AGENT-EVALUATION-REPORT](AGENT-EVALUATION-REPORT.md) | Executable synthetic evaluation framework, baseline and control results, LLM arms **NOT RUN**, where AI may and may not add value, architecture recommendation (for the owner to accept or reject) |

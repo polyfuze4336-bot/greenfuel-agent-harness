@@ -1,6 +1,6 @@
 # Agent evaluation plan
 
-Status: **protocol only, Phase 0, 2026-10-29. No agent exists and nothing has been run. Every result in this document is NOT RUN.** This is how the five production business agents will be evaluated so that the report cannot be written before the evidence exists. It extends the production suite of the [evaluation framework](../../evaluation/EVALUATION-FRAMEWORK.md) (all production tests are currently PENDING) and its rule that a test is never reported as passed unless it ran. It is separate from the coding-harness evaluation. It supports the [autonomy design record](AGENTIC-AUTONOMY-DESIGN-RECORD.md) and [ORCHESTRATION-OPTIONS](ORCHESTRATION-OPTIONS.md).
+Status: **protocol only, Phase 0, 2026-10-29. No agent exists and nothing has been run. Every result in this document is NOT RUN.** *(Update: an executable synthetic framework and a conventional-baseline run now exist; see [AGENT-EVALUATION-REPORT](AGENT-EVALUATION-REPORT.md). No LLM arm has run, and no production agent exists.)* This is how the five production business agents will be evaluated so that the report cannot be written before the evidence exists. It extends the production suite of the [evaluation framework](../../evaluation/EVALUATION-FRAMEWORK.md) (all production tests are currently PENDING) and its rule that a test is never reported as passed unless it ran. It is separate from the coding-harness evaluation. It supports the [autonomy design record](AGENTIC-AUTONOMY-DESIGN-RECORD.md) and [ORCHESTRATION-OPTIONS](ORCHESTRATION-OPTIONS.md).
 
 ## 1. Purpose and limits
 

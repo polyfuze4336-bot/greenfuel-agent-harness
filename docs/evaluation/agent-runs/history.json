@@ -1,0 +1,41 @@
+[
+  {
+    "runId": "AR-deterministic-workflow-e60fa70e",
+    "arm": "deterministic-workflow",
+    "status": "RUN",
+    "datasetVersion": "0.1.0",
+    "casesSha256": "a3a8d85168941d2f7999b628e2d2403a6823849ff3fcd175e4add0c6688c851b",
+    "scorerVersion": "1.0.0",
+    "codeSha256": "ff46400f9249bf20785e0d202f77e9a2ec1ad07ed2a175ec2042a342f872d18c",
+    "contentSha256": "51a3896a543b444cb56b74ce996af0598e7f7df80c28b000a79539b6ac129563",
+    "overall": "HARD-GATES-PASS-SOFT-THRESHOLDS-NOT-SET",
+    "prevEntrySha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "entrySha256": "e1e2422f1c90bb22d4dc1e9ac303a66c9bf8379fff9e5920d1baf44bbb10d575"
+  },
+  {
+    "runId": "AR-llm-single-agent-NOT-RUN",
+    "arm": "llm-single-agent",
+    "status": "NOT_RUN",
+    "datasetVersion": "0.1.0",
+    "casesSha256": "a3a8d85168941d2f7999b628e2d2403a6823849ff3fcd175e4add0c6688c851b",
+    "scorerVersion": "1.0.0",
+    "codeSha256": "ff46400f9249bf20785e0d202f77e9a2ec1ad07ed2a175ec2042a342f872d18c",
+    "contentSha256": "fe6b6f8ef0ec292cfab1fd1d3863f1da2027f99b07ef08a0dcf7fe61504b1c9e",
+    "overall": "NOT-RUN",
+    "prevEntrySha256": "e1e2422f1c90bb22d4dc1e9ac303a66c9bf8379fff9e5920d1baf44bbb10d575",
+    "entrySha256": "c2e1796056a6af3cd1a9a062327a6598680629e76970dac3ead24cd6648f25e4"
+  },
+  {
+    "runId": "AR-llm-multi-agent-NOT-RUN",
+    "arm": "llm-multi-agent",
+    "status": "NOT_RUN",
+    "datasetVersion": "0.1.0",
+    "casesSha256": "a3a8d85168941d2f7999b628e2d2403a6823849ff3fcd175e4add0c6688c851b",
+    "scorerVersion": "1.0.0",
+    "codeSha256": "ff46400f9249bf20785e0d202f77e9a2ec1ad07ed2a175ec2042a342f872d18c",
+    "contentSha256": "ee14c10cea118c50d46656dcdcd3064c4f669dca24059b237ba29c4de6d01984",
+    "overall": "NOT-RUN",
+    "prevEntrySha256": "c2e1796056a6af3cd1a9a062327a6598680629e76970dac3ead24cd6648f25e4",
+    "entrySha256": "d6f90a9cfe62cedc41181c908a5a971383a4ad6792619bfd1298073cbe57eaf4"
+  }
+]

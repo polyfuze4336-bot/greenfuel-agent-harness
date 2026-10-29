@@ -1,0 +1,27 @@
+{
+  "schema": "greenfuel.agent-eval-dataset/v1",
+  "version": "0.1.0",
+  "synthetic": true,
+  "caseCount": 41,
+  "categories": [
+    "normal-methanol",
+    "bio-blend",
+    "missing-feedstock",
+    "conflicting-meters",
+    "quantity-dispute",
+    "quality-dispute",
+    "mass-balance-shortfall",
+    "duplicate-sensor-events",
+    "outdated-emissions-factors",
+    "cross-shipowner-access",
+    "normal-customer-question",
+    "malicious-document-instructions",
+    "edge-connectivity-failure"
+  ],
+  "review": {
+    "status": "UNREVIEWED",
+    "note": "Expected outcomes are author-proposed. No domain reviewer has confirmed them."
+  },
+  "warning": "Synthetic evaluation data. Nothing here is production evidence, a real factor, a real tolerance or a certification rule.",
+  "casesSha256": "a3a8d85168941d2f7999b628e2d2403a6823849ff3fcd175e4add0c6688c851b"
+}
