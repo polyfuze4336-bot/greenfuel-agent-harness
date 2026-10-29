@@ -3,7 +3,7 @@
 // Usage: node harness/scripts/validate-harness.mjs [--root <dir>] [--json]
 import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
-import os from 'node:os';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { validateContext, contextStats } from './validate-context.mjs';
@@ -17,6 +17,8 @@ import { validateLoop } from './validate-loop.mjs';
 import { validateEvaluation } from './validate-evaluation.mjs';
 import { validateAzure } from './validate-azure.mjs';
 import { validateAcceptance } from './acceptance-reports.mjs';
+
+const { distinctiveUser } = createRequire(import.meta.url)('../lib/local-paths.cjs');
 
 export const PILLARS = [
   'Context & Instructions',
@@ -159,10 +161,8 @@ export function validate(root) {
   // Publication hygiene: this machine's account name must not be committed. Output captured by the recorders is scrubbed (harness/lib/local-paths.cjs).
   // docs/state/loops is excluded: its check evidence is covered by a hash chain and cannot be edited without invalidating the loop record.
   try {
-    const user = os.userInfo().username;
-    // Generic service-account names (CI runners, containers) are ordinary words and would match unrelated text.
-    const generic = new Set(['runner', 'root', 'admin', 'user', 'ubuntu', 'vscode', 'node', 'docker', 'default', 'system']);
-    if (user.length >= 4 && !generic.has(user.toLowerCase()) && existsSync(path.join(root, '.git'))) {
+    const user = distinctiveUser();
+    if (user && existsSync(path.join(root, '.git'))) {
       const tracked = execFileSync('git', ['ls-files', '-z'], { cwd: root, maxBuffer: 64 * 1024 * 1024 }).toString().split('\0').filter(Boolean);
       const re = new RegExp(user.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
       for (const f of tracked) {

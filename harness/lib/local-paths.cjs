@@ -14,6 +14,15 @@ function variants(p) {
   return [...new Set([p, p.replace(/\\/g, '\\\\'), fwd, `file:///${encodeURI(fwd)}`, `file://${encodeURI(fwd)}`, encodeURI(fwd)])];
 }
 
+// The account name, or '' when it is absent or a generic service-account name (CI runners, containers). Generic names are ordinary words
+// and would change or flag unrelated text.
+function distinctiveUser() {
+  let user = '';
+  try { user = os.userInfo().username; } catch { /* no account name available */ }
+  const generic = new Set(['runner', 'root', 'admin', 'user', 'ubuntu', 'vscode', 'node', 'docker', 'default', 'system']);
+  return user.length >= 4 && !generic.has(user.toLowerCase()) ? user : '';
+}
+
 function scrub(text, extraRoots = []) {
   let out = String(text);
   const roots = [...new Set([ROOT, ...extraRoots.map((r) => path.resolve(r))])];
@@ -23,12 +32,9 @@ function scrub(text, extraRoots = []) {
   // longest first so a repository path is replaced before the home folder that contains it
   swaps.sort((a, b) => b[0].length - a[0].length);
   for (const [from, to] of swaps) if (from.length > 3) out = out.replace(new RegExp(esc(from), 'gi'), to);
-  let user = '';
-  try { user = os.userInfo().username; } catch { /* no account name available */ }
-  // generic service-account names (CI runners, containers) are ordinary words and would change unrelated text
-  const generic = new Set(['runner', 'root', 'admin', 'user', 'ubuntu', 'vscode', 'node', 'docker', 'default', 'system']);
-  if (user.length >= 4 && !generic.has(user.toLowerCase())) out = out.replace(new RegExp(esc(user), 'gi'), '<user>');
+  const user = distinctiveUser();
+  if (user) out = out.replace(new RegExp(esc(user), 'gi'), '<user>');
   return out;
 }
 
-module.exports = { scrub };
+module.exports = { scrub, distinctiveUser };
