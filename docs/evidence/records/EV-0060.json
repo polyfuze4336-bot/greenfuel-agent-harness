@@ -1,0 +1,22 @@
+{
+  "id": "EV-0060",
+  "claim": "GitHub branch protection spec check after the repository became public: read-only comparison of the live settings with github-protection.json",
+  "argv": [
+    "node",
+    "harness/scripts/verify-github-protection.mjs"
+  ],
+  "exitCode": 1,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-29T08:49:56.692Z",
+  "durationMs": 580,
+  "outputSha256": "a69a6814c27d99fdd16cb05c8df96439cd5379abff35f7b807a42fb3bf331883",
+  "outputBytes": 77,
+  "outputTail": "verify-github-protection: NOT-PROTECTED. gh: Branch not protected (HTTP 404)\n",
+  "gitHead": "09913a85eb7eda5cb5da34a66f096432b6f6aaf1",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}

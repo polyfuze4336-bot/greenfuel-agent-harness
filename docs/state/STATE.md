@@ -69,6 +69,8 @@ Phase 0. Baseline v0.1 is **approved** (ADR 0003); the 37 decisions stay open, d
   - Stale ADR status labels found and fixed (ADR 0010, 0011, 0012, 0014 shown as Proposed after acceptance).
   - **Not done:** the harness's own agents were not invoked in this session; no human review of any design; VS Code not observed; no Azure use.
   - Owner reply this turn on stage 11: ADR 0014 Accepted with actual Azure deployment deferred (T36); pushed at `5bc45e4`, CI green.
+  - Owner reply on stage 12 (2026-10-29): approve all except Azure deployment (deferred, T36); draw the agent connectivity diagram; make the repository public; push. Done: [AGENT-CONNECTIVITY](../harness/AGENT-CONNECTIVITY.md) (three Mermaid diagrams, a drift test, the roster diagram also in the README; **not rendered locally**, GitHub renders Mermaid); MIT licence added on the owner's choice; a pre-publication scan of all 44 commits found no credentials; the owner chose to keep history as is, so the commit author name and email stay visible; local paths and the account name were removed from the current files and captured output is now scrubbed ([local-paths.cjs](../../harness/lib/local-paths.cjs)) with a privacy check in `validate-harness`; the only remaining occurrences are in `docs/state/loops` (two loop demonstration records whose evidence is hash-protected and cannot be edited without invalidating them). The repository was **made public** after CI passed on `09913a8`; an anonymous request returns HTTP 200. Evaluation run replaced by `EVRUN-9b6110b026`. Evidence `EV-0058` (npm test), `EV-0059` (validate), `EV-0060` (branch protection: now possible, **not applied**).
+  - "Approve all" did not change: ADR 0015 stays Proposed (its review computes Blocked and the validator forbids accepting a Design ADR without an Approved review), and T37 still needs named people. T38 to T41 are approved as work, not started.
 
 ## Claimed, unverified
 - VS Code chat behaviour for agents, hooks, MCP server start and trust prompts, and `server/tool` in agent `tools:` (TODO T8, T12). Whether the CLI kills a server at its `timeout`.
@@ -99,7 +101,7 @@ Phase 0. Baseline v0.1 is **approved** (ADR 0003); the 37 decisions stay open, d
 
 ## Open approvals
 - none for memory (ADR 0010 Accepted)
-- Pushing the Stage 12 commits (`5bc45e4` is the last pushed commit)
+- Applying GitHub branch protection (T14): now possible because the repository is public (`verify-github-protection` reports NOT-PROTECTED, no longer a plan limit). Not applied: changing remote settings needs your approval, and the spec should be checked against how you push (direct to main today)
 - ADR 0015 (Proposed; cannot be Accepted while RV-0002 is Blocked)
 - The Azure approvals and decisions in TODO T31 to T34 (ports and legal basis, subscription, read-only sign-in, key custody and AI location and targets). None requested yet. Deployment is deferred (T36)
 - Azure and GitHub sign-in, and any pending MCP candidate (none approved)
