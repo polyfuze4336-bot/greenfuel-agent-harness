@@ -1,0 +1,29 @@
+{
+  "schema": "greenfuel.eval-evidence/v1",
+  "testId": "EVAL-HRN-AZR-005",
+  "ran": true,
+  "argv": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/validate-azure.test.mjs"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-29T08:27:57.131Z",
+  "durationMs": 12018,
+  "outputSha256": "6148c031992626b1c9f81ab63cbc3d3c215a470eaa4cfae1c9e6434f7c6b264b",
+  "outputBytes": 10606,
+  "outputTail": "13\n  type: 'test'\n  ...\n# Subtest: validate-azure rejects an undetermined port hosted in a cloud region\nok 47 - validate-azure rejects an undetermined port hosted in a cloud region\n  ---\n  duration_ms: 198.3141\n  type: 'test'\n  ...\n# Subtest: validate-azure rejects a port with a validation missing\nok 48 - validate-azure rejects a port with a validation missing\n  ---\n  duration_ms: 191.1379\n  type: 'test'\n  ...\n# Subtest: validate-azure rejects the default hosting changed to a region\nok 49 - validate-azure rejects the default hosting changed to a region\n  ---\n  duration_ms: 222.1882\n  type: 'test'\n  ...\n# Subtest: a fully evidenced port with a legal basis and a non-region basis is accepted by the register contract\nok 50 - a fully evidenced port with a legal basis and a non-region basis is accepted by the register contract\n  ---\n  duration_ms: 0.2201\n  type: 'test'\n  ...\n# Subtest: iacProblems accepts a clean module and rejects each insecure fixture\nok 51 - iacProblems accepts a clean module and rejects each insecure fixture\n  ---\n  duration_ms: 0.1826\n  type: 'test'\n  ...\n# Subtest: readiness: every gate has at least one recorded blocker today, and the result is never an approval\nok 52 - readiness: every gate has at least one recorded blocker today, and the result is never an approval\n  ---\n  duration_ms: 19.9728\n  type: 'test'\n  ...\n# Subtest: readiness: a verified port removes only its own blockers, and the other gates stay blocked\nok 53 - readiness: a verified port removes only its own blockers, and the other gates stay blocked\n  ---\n  duration_ms: 222.6012\n  type: 'test'\n  ...\n# Subtest: readiness: raising the phase, an approver, a what-if record and approvals each clear only their own blocker\nok 54 - readiness: raising the phase, an approver, a what-if record and approvals each clear only their own blocker\n  ---\n  duration_ms: 518.4919\n  type: 'test'\n  ...\n1..54\n# tests 54\n# suites 0\n# pass 54\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 11944.6741\n",
+  "parsed": {
+    "tests": 54,
+    "pass": 54,
+    "fail": 0,
+    "skipped": 0,
+    "todo": 0,
+    "cancelled": 0
+  },
+  "status": "PASS",
+  "actual": "ran and passed: 54 tests, 0 failed, 0 skipped"
+}

@@ -1,0 +1,966 @@
+{
+  "schema": "greenfuel.eval-run/v1",
+  "runId": "EVRUN-9b6110b026",
+  "startedAt": "2026-10-29T08:28:10.789Z",
+  "partial": false,
+  "selection": {},
+  "gitHead": "587d6092723669342d439ec03508df17d54f7fd3",
+  "workingTreeDirty": false,
+  "node": "v22.23.4",
+  "platform": "win32",
+  "catalogueSha256": "7281c9810eb34bf5cb3fc3476d8ac2b1adeff5ea90707c21e4ddf28f41a0882a",
+  "policySha256": "396bd757f5dbcd17b6a38d5ac3ecc6ebcc5e70e805fd3c918b7b5831d1cbaa28",
+  "tests": [
+    {
+      "id": "EVAL-HRN-ARC-001",
+      "status": "PASS",
+      "actual": "ran and passed: exit 0, output contained /architecture: PASS/",
+      "evidenceRef": "results/EVAL-HRN-ARC-001.json",
+      "evidenceSha256": "762e6f66d9750affdcc98c6a6dad209bf7bf1d49123fcee6f1de4fe4ba571466"
+    },
+    {
+      "id": "EVAL-HRN-ARC-002",
+      "status": "PASS",
+      "actual": "ran and passed: exit 0, output contained /Computed: Blocked/",
+      "evidenceRef": "results/EVAL-HRN-ARC-002.json",
+      "evidenceSha256": "90a84aa616d87003fb6bf5e471d9affa07936076308c8f5245b63b64d2662e92"
+    },
+    {
+      "id": "EVAL-HRN-ARC-003",
+      "status": "PASS",
+      "actual": "ran and passed: exit 0, output contained /validate-memory: OK/",
+      "evidenceRef": "results/EVAL-HRN-ARC-003.json",
+      "evidenceSha256": "3a5a71b84bbdcde6db4d2f3521d9d78c19de51f09a074893c4d9fd186fde5d30"
+    },
+    {
+      "id": "EVAL-HRN-AZR-001",
+      "status": "PASS",
+      "actual": "ran and passed: exit 2, output contained /NOT-READY/",
+      "evidenceRef": "results/EVAL-HRN-AZR-001.json",
+      "evidenceSha256": "ce6d4d57bc166ca21be10043d59b25e4914487163f87acda387dcf2b75471bc3"
+    },
+    {
+      "id": "EVAL-HRN-AZR-002",
+      "status": "PASS",
+      "actual": "ran and passed: the only infrastructure code is the non-deployable scaffold: no deployment configuration, no deploying workflow, no deployable parameter value, and the phase is still 0",
+      "evidenceRef": "results/EVAL-HRN-AZR-002.json",
+      "evidenceSha256": "22991c41547af6a02cd61f5ff425be10dfbcbf372b280ec95c23321e594f4682"
+    },
+    {
+      "id": "EVAL-HRN-AZR-003",
+      "status": "PASS",
+      "actual": "ran and passed: only the local read-only tool server and Microsoft Learn are configured; no Azure or GitHub MCP server is configured or authenticated",
+      "evidenceRef": "results/EVAL-HRN-AZR-003.json",
+      "evidenceSha256": "572393767a6d28c7e7f80e22f6438dded0498343c5cea9df0f8f773937e6ccfa"
+    },
+    {
+      "id": "EVAL-HRN-AZR-004",
+      "status": "PASS",
+      "actual": "ran and passed: exit 0, output contained /validate-azure: OK/",
+      "evidenceRef": "results/EVAL-HRN-AZR-004.json",
+      "evidenceSha256": "182ea414767b41cee867712ea8edfd01ed1ad22797df17b9bd55c6438e980de7"
+    },
+    {
+      "id": "EVAL-HRN-AZR-005",
+      "status": "PASS",
+      "actual": "ran and passed: 54 tests, 0 failed, 0 skipped",
+      "evidenceRef": "results/EVAL-HRN-AZR-005.json",
+      "evidenceSha256": "75783236ab94b01f63c557f66488aebdd411eae221c0c90368a1997edbe3ab7e"
+    },
+    {
+      "id": "EVAL-HRN-CST-001",
+      "status": "PASS",
+      "actual": "ran and passed: the harness has no runtime or development dependencies to pin, review or keep current",
+      "evidenceRef": "results/EVAL-HRN-CST-001.json",
+      "evidenceSha256": "35fd97525233c8924f37493f7f9204552d26763cdd5776b9eeab292d90b08384"
+    },
+    {
+      "id": "EVAL-HRN-CST-002",
+      "status": "PASS",
+      "actual": "ran and passed: exit 0, output contained /validate-tools: OK/",
+      "evidenceRef": "results/EVAL-HRN-CST-002.json",
+      "evidenceSha256": "9ebf1832a9f4a5727c6ac96c6eae4b15aef902badbb7140302709be0c8c7a344"
+    },
+    {
+      "id": "EVAL-HRN-DAT-001",
+      "status": "PASS",
+      "actual": "ran and passed: 8 tests, 0 failed, 0 skipped",
+      "evidenceRef": "results/EVAL-HRN-DAT-001.json",
+      "evidenceSha256": "a05a49a0eaa7bdf2079e0cfde4217ec6f0f3854f4be8067241108f61339200ca"
+    },
+    {
+      "id": "EVAL-HRN-DAT-002",
+      "status": "PASS",
+      "actual": "ran and passed: 66 tests, 0 failed, 0 skipped",
+      "evidenceRef": "results/EVAL-HRN-DAT-002.json",
+      "evidenceSha256": "210761ab8c4c737e55655eb8672696c93f6cf3a9dae09680ff28ff5729f06422"
+    },
+    {
+      "id": "EVAL-HRN-DAT-003",
+      "status": "PASS",
+      "actual": "ran and passed: the framework never reports PASS for a test that did not run, was skipped, found nothing, or cannot show evidence",
+      "evidenceRef": "results/EVAL-HRN-DAT-003.json",
+      "evidenceSha256": "494300a39103eec3a3a3e86651dd5be1676bf2b63bae944ebe5983f8c6a18aea"
+    },
+    {
+      "id": "EVAL-HRN-FUN-001",
+      "status": "PASS",
+      "actual": "ran and passed: 43 tests, 0 failed, 0 skipped",
+      "evidenceRef": "results/EVAL-HRN-FUN-001.json",
+      "evidenceSha256": "e665e0f70cf6ea762b87778fb33ff4d3d4f086f1beb6d9c8d6d2b46788bb0457"
+    },
+    {
+      "id": "EVAL-HRN-FUN-002",
+      "status": "PASS",
+      "actual": "ran and passed: 67 tests, 0 failed, 0 skipped",
+      "evidenceRef": "results/EVAL-HRN-FUN-002.json",
+      "evidenceSha256": "db84b1566efa6863bd6e6b44e2ee1e8548829d60570ab4ff449f1a0a845371c5"
+    },
+    {
+      "id": "EVAL-HRN-FUN-003",
+      "status": "PASS",
+      "actual": "ran and passed: 111 tests, 0 failed, 0 skipped",
+      "evidenceRef": "results/EVAL-HRN-FUN-003.json",
+      "evidenceSha256": "b5a07dfd84e84db45e2ba660aa507d0d7364d5f049098a752c6100d9f1b9d07a"
+    },
+    {
+      "id": "EVAL-HRN-FUN-004",
+      "status": "PASS",
+      "actual": "ran and passed: 31 tests, 0 failed, 0 skipped",
+      "evidenceRef": "results/EVAL-HRN-FUN-004.json",
+      "evidenceSha256": "b8b65faf9450026f7d098077d935b5f15d011a8a68efff1949db29be398af6ee"
+    },
+    {
+      "id": "EVAL-HRN-FUN-005",
+      "status": "PASS",
+      "actual": "ran and passed: 32 tests, 0 failed, 0 skipped",
+      "evidenceRef": "results/EVAL-HRN-FUN-005.json",
+      "evidenceSha256": "1ebc274e21273a0509490f8bc18468b1ca138f257f7ba7a32633c3dcf6936e0e"
+    },
+    {
+      "id": "EVAL-HRN-OBS-001",
+      "status": "PASS",
+      "actual": "ran and passed: every denied action is written to a hash-chained audit log that detects a later edit",
+      "evidenceRef": "results/EVAL-HRN-OBS-001.json",
+      "evidenceSha256": "8a5670811951df16dbd05e94ffaa66f12f34f13e0ae35cce510008a4f7fed13b"
+    },
+    {
+      "id": "EVAL-HRN-OBS-002",
+      "status": "PASS",
+      "actual": "ran and passed: the denial log records who, what and why without keeping secret or customer content",
+      "evidenceRef": "results/EVAL-HRN-OBS-002.json",
+      "evidenceSha256": "155861e5734b5e6dce46e866f521bdcfab8bfbc3d863ab56764a163d7149850d"
+    },
+    {
+      "id": "EVAL-HRN-OBS-003",
+      "status": "PASS",
+      "actual": "ran and passed: 4 tests, 0 failed, 0 skipped",
+      "evidenceRef": "results/EVAL-HRN-OBS-003.json",
+      "evidenceSha256": "a8840dd11d4dfca65ee500ec3d8dfcd4a7986668a469b051a208b3ce469b4ae3"
+    },
+    {
+      "id": "EVAL-HRN-OPS-001",
+      "status": "PASS",
+      "actual": "ran and passed: exit 0, output contained /validate-permissions: OK/",
+      "evidenceRef": "results/EVAL-HRN-OPS-001.json",
+      "evidenceSha256": "cef60c6a05fe87a08f7bc855c01feb3f8513fed8f77ced1aac71ec9886d684a0"
+    },
+    {
+      "id": "EVAL-HRN-OPS-002",
+      "status": "PASS",
+      "actual": "ran and passed: exit 0, output contained /validate-loop: OK/",
+      "evidenceRef": "results/EVAL-HRN-OPS-002.json",
+      "evidenceSha256": "c1437531a19afd3dc846eed6840adceae6f4a04b38d6a8fd732ae1cbe94f0ee9"
+    },
+    {
+      "id": "EVAL-HRN-PRF-001",
+      "status": "PENDING",
+      "actual": "Not run: No budget or reference machine has been agreed, and no figure may be invented; a measurement without a budget cannot pass or fail",
+      "evidenceRef": "results/EVAL-HRN-PRF-001.json",
+      "evidenceSha256": "2218c72116df39c5e70831742df09deffea4158ac4e4ab17f460209e41ec209c"
+    },
+    {
+      "id": "EVAL-HRN-REL-001",
+      "status": "PASS",
+      "actual": "ran and passed: 12 tests, 0 failed, 0 skipped",
+      "evidenceRef": "results/EVAL-HRN-REL-001.json",
+      "evidenceSha256": "070e977aa84a58d2f21c3a6e193345b8e1ae03532f4e71c78d2162a22e810907"
+    },
+    {
+      "id": "EVAL-HRN-REQ-001",
+      "status": "PASS",
+      "actual": "ran and passed: exit 0, output contained /requirements: PASS/",
+      "evidenceRef": "results/EVAL-HRN-REQ-001.json",
+      "evidenceSha256": "0418e37a74ae8757a1635cd1985d97ed2b0be16e979b589c96f2d391519fd8c3"
+    },
+    {
+      "id": "EVAL-HRN-REQ-002",
+      "status": "PASS",
+      "actual": "ran and passed: 12 tests, 0 failed, 0 skipped",
+      "evidenceRef": "results/EVAL-HRN-REQ-002.json",
+      "evidenceSha256": "4114875529371a9d215d1b3789bafd6409ad9b9523991cdc41b889047cfa7df5"
+    },
+    {
+      "id": "EVAL-HRN-SEC-001",
+      "status": "PASS",
+      "actual": "ran and passed: unauthorized Azure resource deletion is denied for every agent and for a session, with or without a raised phase",
+      "evidenceRef": "results/EVAL-HRN-SEC-001.json",
+      "evidenceSha256": "1e8cf3dd01e6a9e3922a49ab09f634578b386b0912e5f9b8620fc7c73907406b"
+    },
+    {
+      "id": "EVAL-HRN-SEC-002",
+      "status": "PASS",
+      "actual": "ran and passed: an Azure deployment or change without a signed approval is denied for every agent and for a session",
+      "evidenceRef": "results/EVAL-HRN-SEC-002.json",
+      "evidenceSha256": "729eaad717e91960895f7d301cdcb4641d448068f5065721d213ff3f7b199b85"
+    },
+    {
+      "id": "EVAL-HRN-SEC-003",
+      "status": "PASS",
+      "actual": "ran and passed: filing a certification or settling a commercial dispute cannot be authorised for an agent, so quality-manager approval cannot be bypassed by one",
+      "evidenceRef": "results/EVAL-HRN-SEC-003.json",
+      "evidenceSha256": "780b11548d3eedf1c0ae4ae0c70fc0deda56e6d12f7355f493dd502eb89b618a"
+    },
+    {
+      "id": "EVAL-HRN-SEC-004",
+      "status": "PASS",
+      "actual": "ran and passed: reading a simulated secret, a credential file or a token is denied for every agent and for a session",
+      "evidenceRef": "results/EVAL-HRN-SEC-004.json",
+      "evidenceSha256": "b607dd2e49b376c8b2c15c7a982bafd01b4eef78cb6b8644fa6ab370b0fbc0c0"
+    },
+    {
+      "id": "EVAL-HRN-SEC-005",
+      "status": "PASS",
+      "actual": "ran and passed: malicious instructions embedded in a synthetic feedstock certificate are marked as data by the output guard, and cannot be stored as an agent record or a trusted memory entry",
+      "evidenceRef": "results/EVAL-HRN-SEC-005.json",
+      "evidenceSha256": "4768105c3880733c039d9b1ec82d7dc5deea3519775aa48cebb656d06e696f59"
+    },
+    {
+      "id": "EVAL-HRN-SEC-006",
+      "status": "PASS",
+      "actual": "ran and passed: 101 tests, 0 failed, 0 skipped",
+      "evidenceRef": "results/EVAL-HRN-SEC-006.json",
+      "evidenceSha256": "c2c5a5c3ea80fdbc0af7de5f20550f4f3ea753d39a2d2cae8bb67f03f5fb80e9"
+    },
+    {
+      "id": "EVAL-HRN-SEC-007",
+      "status": "PASS",
+      "actual": "ran and passed: 10 tests, 0 failed, 0 skipped",
+      "evidenceRef": "results/EVAL-HRN-SEC-007.json",
+      "evidenceSha256": "a4e21d6b953ecfe41fbe32b0a31f4dbbdb9ced76a661b7d5f9c1f4f4ebedcaaf"
+    },
+    {
+      "id": "EVAL-HRN-SEC-008",
+      "status": "PASS",
+      "actual": "ran and passed: no agent can write the control plane: policy, hooks, memory, loop records, the evaluation catalogue or its results",
+      "evidenceRef": "results/EVAL-HRN-SEC-008.json",
+      "evidenceSha256": "10e05a97d313265a964836eb010a837c0a1a222c7b528f17010bc8a9b792e77c"
+    },
+    {
+      "id": "EVAL-HRN-SEC-009",
+      "status": "PASS",
+      "actual": "ran and passed: exit 0, output contained /validate-agents: OK/",
+      "evidenceRef": "results/EVAL-HRN-SEC-009.json",
+      "evidenceSha256": "b3a2decf2abb3ea97f0fb9b1a909ce82a6d0fdd73bbe0b1bfd3f9e982575c29d"
+    },
+    {
+      "id": "EVAL-HRN-SEC-011",
+      "status": "PASS",
+      "actual": "ran and passed: no credential-shaped string is committed to the repository",
+      "evidenceRef": "results/EVAL-HRN-SEC-011.json",
+      "evidenceSha256": "bd633f096076eca8e32066d7eb99298f328e1d1c4d2bc9b777fe4fcb7d2793ab"
+    },
+    {
+      "id": "EVAL-HRN-SOV-001",
+      "status": "PASS",
+      "actual": "ran and passed: another shipowner's fixture cannot be read by any agent or by a scoped session, while the session's own shipowner can",
+      "evidenceRef": "results/EVAL-HRN-SOV-001.json",
+      "evidenceSha256": "bd89c6374f0506a55ea5951b00af156842df4af13c1500dc74ffc8511d5f52b6"
+    },
+    {
+      "id": "EVAL-HRN-SOV-002",
+      "status": "PASS",
+      "actual": "ran and passed: another jurisdiction's fixture cannot be read by any agent or by a session scoped to a different jurisdiction",
+      "evidenceRef": "results/EVAL-HRN-SOV-002.json",
+      "evidenceSha256": "8b4ef285ee79053ab9cf613f7d989bcbc523adf4ced22830af45d5e4b574c48f"
+    },
+    {
+      "id": "EVAL-HRN-SOV-004",
+      "status": "PASS",
+      "actual": "ran and passed: harness memory refuses customer data, vessel identifiers and personal contact details, even from a human writer",
+      "evidenceRef": "results/EVAL-HRN-SOV-004.json",
+      "evidenceSha256": "31bed1b9083d7366a288fb324d25f11e73c95c6705f4c3eb2225c337e6cbe7c8"
+    },
+    {
+      "id": "EVAL-PRC-ARC-001",
+      "status": "FAIL",
+      "actual": "exit 0 as expected but the output did not contain /Computed: Approved/",
+      "evidenceRef": "results/EVAL-PRC-ARC-001.json",
+      "evidenceSha256": "9b652afc1b8b114f9cdd3955d35cb377146e1965649af140b4a8e4d5537647ce"
+    },
+    {
+      "id": "EVAL-PRC-AZR-001",
+      "status": "BLOCKED",
+      "actual": "Not run: required gate G5 is BLOCKED; this test must not run before it passes",
+      "evidenceRef": "results/EVAL-PRC-AZR-001.json",
+      "evidenceSha256": "e7269ff7a9ba74850a0f526265829eee8fb0741ebe4c3c8621de6441d070dbba"
+    },
+    {
+      "id": "EVAL-PRC-DAT-001",
+      "status": "PASS",
+      "actual": "ran and passed: a delivery whose mass-flow-meter readings are missing cannot reach a calculation, an evidence package or a certificate",
+      "evidenceRef": "results/EVAL-PRC-DAT-001.json",
+      "evidenceSha256": "3a5b8fa13d1545f979e604a18d24788a54b8f86e4a6b77266f003445ca6edfbd"
+    },
+    {
+      "id": "EVAL-PRC-DAT-002",
+      "status": "PASS",
+      "actual": "ran and passed: a duplicated or replayed delivery event is rejected, so raw data stays append-only",
+      "evidenceRef": "results/EVAL-PRC-DAT-002.json",
+      "evidenceSha256": "02b8672a3b205437f368774a963aa99e3f202a55d547d09efab418b50bc013a3"
+    },
+    {
+      "id": "EVAL-PRC-DAT-003",
+      "status": "PASS",
+      "actual": "ran and passed: an altered, re-hashed or replaced certificate is detected by the hash chain",
+      "evidenceRef": "results/EVAL-PRC-DAT-003.json",
+      "evidenceSha256": "1b0abbaadcf8283f4c1c1bdbeb8e1f22e064adf8cc375d5035de5569dbb9d031"
+    },
+    {
+      "id": "EVAL-PRC-DAT-004",
+      "status": "PASS",
+      "actual": "ran and passed: an invented, unsourced, unverified or silently changed emissions factor is rejected",
+      "evidenceRef": "results/EVAL-PRC-DAT-004.json",
+      "evidenceSha256": "b2b3d6948f26eb232cb3a53ce8c440a52dc08f8d9aa4f454ad3e354f075f1e64"
+    },
+    {
+      "id": "EVAL-PRC-DAT-005",
+      "status": "FAIL",
+      "actual": "'the candidate contracts accept a calculation that uses a factor set whose validity ended before the delivery: they have no effective-period rule (FR-012, DATA-005)' TestContext.<anonymous> (<home>/OneDrive%20-%20Microsoft/Desktop/MISC%20Work/GithubAgentHarness/greenfuel-agent-harn",
+      "evidenceRef": "results/EVAL-PRC-DAT-005.json",
+      "evidenceSha256": "8b2269c49934445bea5ef212d89b001d2081bd16a614bb4a6dab300244b008b8"
+    },
+    {
+      "id": "EVAL-PRC-DAT-006",
+      "status": "FAIL",
+      "actual": "'the candidate lineage contract accepts a reading timed before the reading that precedes it in sequence: it checks that trustedTime is a valid ISO time but not that time is ordered or plausible (NFR-017, DATA-002)' TestContext.<anonymous> (<home>/OneDrive%20-%20Microsoft/Desktop/MI",
+      "evidenceRef": "results/EVAL-PRC-DAT-006.json",
+      "evidenceSha256": "216d4b013df9f91a2d91a27f1dbf63d73469bf814cb584bf0a75af9d6d599faf"
+    },
+    {
+      "id": "EVAL-PRC-DAT-007",
+      "status": "PASS",
+      "actual": "ran and passed: an offline edge with delayed synchronisation loses nothing, duplicates nothing and reorders nothing; replacement, deletion and tamper are refused or detected; missing readings are reported",
+      "evidenceRef": "results/EVAL-PRC-DAT-007.json",
+      "evidenceSha256": "77f68cff261065abc8e105dafd459d1be8af7c22da478919dfeec5cc72719dc7"
+    },
+    {
+      "id": "EVAL-PRC-DAT-008",
+      "status": "PASS",
+      "actual": "ran and passed: the ingestion contract rejects a manipulated timestamp against the VERIFIER's clock and skew, so a sender cannot move either",
+      "evidenceRef": "results/EVAL-PRC-DAT-008.json",
+      "evidenceSha256": "354ebcb648fa1950f3ea39054fe543ab03262a30706d19a3c529633f1d01699c"
+    },
+    {
+      "id": "EVAL-PRC-REQ-001",
+      "status": "PASS",
+      "actual": "ran and passed: exit 0, output contained /requirements: PASS/",
+      "evidenceRef": "results/EVAL-PRC-REQ-001.json",
+      "evidenceSha256": "cf32cf4ebb94f439927322b20e7f5c24d023fa7f4b414fa46e9c91305afa0a99"
+    },
+    {
+      "id": "EVAL-PRC-SEC-001",
+      "status": "PASS",
+      "actual": "ran and passed: a certificate cannot be issued or filed without a human quality-manager approval, and an agent cannot be the approver",
+      "evidenceRef": "results/EVAL-PRC-SEC-001.json",
+      "evidenceSha256": "7fb78c61d69d1f4032e2b114cefdfac1307a1d1b5bb0805ac98d584fc9ccbeb4"
+    },
+    {
+      "id": "EVAL-PRC-SEC-002",
+      "status": "PASS",
+      "actual": "ran and passed: a certificate that is not locally hosted, or whose methodology version cannot be traced, is rejected",
+      "evidenceRef": "results/EVAL-PRC-SEC-002.json",
+      "evidenceSha256": "0aa26393ae94b9ad6b12528fe4d21758b7b19f0a7de56c3ef9350e9c1f891e56"
+    },
+    {
+      "id": "EVAL-PRC-SEC-003",
+      "status": "PASS",
+      "actual": "ran and passed: the infrastructure policy rejects public access, shared keys, geo-redundant copies, key reads, broad roles and default decisions, and accepts the committed modules",
+      "evidenceRef": "results/EVAL-PRC-SEC-003.json",
+      "evidenceSha256": "e34ad30045f7f865de36453e96e78cd4204194e20007a7f2e2ddba9d68a058a6"
+    },
+    {
+      "id": "EVAL-PRC-SOV-001",
+      "status": "PASS",
+      "actual": "ran and passed: a placement that names a cloud region as its residency basis is rejected: a region is not a residency control",
+      "evidenceRef": "results/EVAL-PRC-SOV-001.json",
+      "evidenceSha256": "2222abf4e9d982fd175c733ed86a22d59d2c84c42799002e288d1d2267df42e1"
+    },
+    {
+      "id": "EVAL-PRC-SOV-002",
+      "status": "PASS",
+      "actual": "ran and passed: a measurement, calculation or document that claims a model as its origin is rejected, so AI cannot invent evidence",
+      "evidenceRef": "results/EVAL-PRC-SOV-002.json",
+      "evidenceSha256": "3a7f65b9e1d61de101a921275abc1cb7f722fbf053e0fead6bd616e0d0586164"
+    },
+    {
+      "id": "EVAL-PRC-SOV-003",
+      "status": "PASS",
+      "actual": "ran and passed: the port assessment register never lets a port be Established by region alone, without a legal basis or evidence, or by an agent",
+      "evidenceRef": "results/EVAL-PRC-SOV-003.json",
+      "evidenceSha256": "f4fcc46d14401df638b5f11cb51a1b008820ab826c6c0d9040d4c5fb1421270e"
+    },
+    {
+      "id": "EVAL-PRC-SOV-004",
+      "status": "PASS",
+      "actual": "ran and passed: the ingestion contract compares every jurisdiction and zone claim with the verifier's own identity and refuses a batch that leaves it, an unregistered source or device, and a model as the origin",
+      "evidenceRef": "results/EVAL-PRC-SOV-004.json",
+      "evidenceSha256": "c70da8dc1fc8350053c53ea410ef43d1b1a1bed69a9dcb185366e064ac65983b"
+    },
+    {
+      "id": "EVAL-PRD-AZR-002",
+      "status": "PENDING",
+      "actual": "Not run: Only a non-deployable scaffold exists (ADR 0014). No design is approved, no Azure sign-in is approved, and no what-if may run before they are",
+      "evidenceRef": "results/EVAL-PRD-AZR-002.json",
+      "evidenceSha256": "fab0ae315c01d2a351a5e07ebf0b4e75cd6c05949d6ef1a6f227d0a5f1b62943"
+    },
+    {
+      "id": "EVAL-PRD-CST-001",
+      "status": "PENDING",
+      "actual": "Not run: There is no approved design, no volume and no budget; any estimate now would be fabricated",
+      "evidenceRef": "results/EVAL-PRD-CST-001.json",
+      "evidenceSha256": "e2d24be182f261485c5cfa4f6ebf6712e3a795a945d2b53968c9021af0f28009"
+    },
+    {
+      "id": "EVAL-PRD-DAT-007",
+      "status": "PENDING",
+      "actual": "Not run: No mass-balance model, agent or storage exists, and no harness validator for mass balance exists",
+      "evidenceRef": "results/EVAL-PRD-DAT-007.json",
+      "evidenceSha256": "3eee6ce9e7a167b58c878b83f33c5664585522106115e198384bef780104381c"
+    },
+    {
+      "id": "EVAL-PRD-FUN-001",
+      "status": "PENDING",
+      "actual": "Not run: No application code exists. The bunkering application must not be built until a human raises the phase",
+      "evidenceRef": "results/EVAL-PRD-FUN-001.json",
+      "evidenceSha256": "5e95c8387ae632a3b7c2cb19221c5de334cb29844d3339fa27cef5fd67569cbb"
+    },
+    {
+      "id": "EVAL-PRD-FUN-002",
+      "status": "PENDING",
+      "actual": "Not run: No calculation engine exists and no methodology is verified (decision register D-002); a scheme-specific expected result cannot be defined yet",
+      "evidenceRef": "results/EVAL-PRD-FUN-002.json",
+      "evidenceSha256": "d072402948927e36c4cd622b6716e1c8a80f5ff9f0dad0e57a134ec22400dafb"
+    },
+    {
+      "id": "EVAL-PRD-OBS-001",
+      "status": "PENDING",
+      "actual": "Not run: No audit store, agent or evidence package exists. The contract-level analogues are EVAL-PRC-DAT-001 to EVAL-PRC-DAT-006",
+      "evidenceRef": "results/EVAL-PRD-OBS-001.json",
+      "evidenceSha256": "1a7490e4531576df167d5d2b81420ab9dd9cb4cb03ed9608196216d5482cca0a"
+    },
+    {
+      "id": "EVAL-PRD-OPS-001",
+      "status": "PENDING",
+      "actual": "Not run: No runbook, system or on-call arrangement exists",
+      "evidenceRef": "results/EVAL-PRD-OPS-001.json",
+      "evidenceSha256": "bf23f2530f18428d7db41e2515089af2b7bf1f500547dfbd610a3e5617b7959b"
+    },
+    {
+      "id": "EVAL-PRD-PRF-001",
+      "status": "PENDING",
+      "actual": "Not run: No volumes or targets have been agreed (open decisions) and nothing is deployed. No figure may be invented",
+      "evidenceRef": "results/EVAL-PRD-PRF-001.json",
+      "evidenceSha256": "86d1c30261caa5e586e57c982f04546a100d9323b622b8d408ba2442fadf7e33"
+    },
+    {
+      "id": "EVAL-PRD-REL-001",
+      "status": "PENDING",
+      "actual": "Not run: No edge component or synchronisation exists, and the edge platform is an open decision",
+      "evidenceRef": "results/EVAL-PRD-REL-001.json",
+      "evidenceSha256": "dfc8b3297e757ab9066dc0e480706706d9032f0d2e94c37cb95bdeef447bc791"
+    },
+    {
+      "id": "EVAL-PRD-REL-002",
+      "status": "PENDING",
+      "actual": "Not run: No recovery objectives are agreed, nothing is deployed and no backup exists. Any objective now would be fabricated",
+      "evidenceRef": "results/EVAL-PRD-REL-002.json",
+      "evidenceSha256": "86b6839216c527b49b503562ad28c8557f84abd3baf0d540988760f882cd7cc3"
+    },
+    {
+      "id": "EVAL-PRD-SEC-001",
+      "status": "PENDING",
+      "actual": "Not run: No production agent exists. The harness-side analogue is EVAL-HRN-SEC-005",
+      "evidenceRef": "results/EVAL-PRD-SEC-001.json",
+      "evidenceSha256": "81eb01fc606b2eee5096fe9657f48f0c178bf21e433cef69ac72219d87fef7ad"
+    },
+    {
+      "id": "EVAL-PRD-SEC-002",
+      "status": "PENDING",
+      "actual": "Not run: No filing workflow, identity or approval service exists. The contract-level analogue is EVAL-PRC-SEC-001 and the harness analogue is EVAL-HRN-SEC-003",
+      "evidenceRef": "results/EVAL-PRD-SEC-002.json",
+      "evidenceSha256": "a76dfbceed625566f30d4ccedaa5ace34ad47a1002f46f1d44922b98991a0009"
+    },
+    {
+      "id": "EVAL-PRD-SEC-003",
+      "status": "PENDING",
+      "actual": "Not run: No Azure resource, role assignment or policy exists and none may be created without explicit approval. The harness analogues are EVAL-HRN-SEC-001 and EVAL-HRN-SEC-002",
+      "evidenceRef": "results/EVAL-PRD-SEC-003.json",
+      "evidenceSha256": "ee89dd8f528585f541cd392f0ff189f423306080ef28fd7198e15eb02e307e98"
+    },
+    {
+      "id": "EVAL-PRD-SOV-001",
+      "status": "PENDING",
+      "actual": "Not run: No Customer Compliance Agent, tenant store or identity exists. The harness-side analogue is EVAL-HRN-SOV-001",
+      "evidenceRef": "results/EVAL-PRD-SOV-001.json",
+      "evidenceSha256": "971ac684a765d8c151f599aa6852d053ae8888b3dcf7a96de4d65e188b631a18"
+    },
+    {
+      "id": "EVAL-PRD-SOV-002",
+      "status": "PENDING",
+      "actual": "Not run: No placement, store or deployment exists, and the jurisdictions and legal basis are open decisions (D-009, D-011)",
+      "evidenceRef": "results/EVAL-PRD-SOV-002.json",
+      "evidenceSha256": "31181c35c531363a1bb14f5bbe258bb2811567665bf7bd9d30cbff7be24a31e1"
+    }
+  ],
+  "gates": [
+    {
+      "id": "G1",
+      "title": "Requirements baseline complete",
+      "status": "PASS",
+      "critical": false,
+      "reason": "all 1 required tests are PASS",
+      "tests": 1,
+      "pass": 1,
+      "failing": [],
+      "blockedBy": [],
+      "progression": "allowed"
+    },
+    {
+      "id": "G2",
+      "title": "Architecture reviewed and approved",
+      "status": "FAIL",
+      "critical": true,
+      "reason": "1 failing test(s): EVAL-PRC-ARC-001 (critical)",
+      "tests": 1,
+      "pass": 0,
+      "failing": [
+        "EVAL-PRC-ARC-001"
+      ],
+      "blockedBy": [],
+      "progression": "blocked"
+    },
+    {
+      "id": "G3",
+      "title": "Security and sovereignty design validated",
+      "status": "FAIL",
+      "critical": true,
+      "reason": "2 failing test(s): EVAL-PRC-DAT-005, EVAL-PRC-DAT-006 (critical)",
+      "tests": 15,
+      "pass": 13,
+      "failing": [
+        "EVAL-PRC-DAT-005",
+        "EVAL-PRC-DAT-006"
+      ],
+      "blockedBy": [
+        "G2"
+      ],
+      "progression": "blocked"
+    },
+    {
+      "id": "G4",
+      "title": "Implementation tests pass",
+      "status": "BLOCKED",
+      "critical": false,
+      "reason": "G3 is not PASS",
+      "tests": 2,
+      "pass": 0,
+      "failing": [],
+      "blockedBy": [
+        "G3"
+      ],
+      "progression": "blocked"
+    },
+    {
+      "id": "G5",
+      "title": "Integration and agent evaluations pass",
+      "status": "BLOCKED",
+      "critical": false,
+      "reason": "G4 is not PASS",
+      "tests": 7,
+      "pass": 0,
+      "failing": [],
+      "blockedBy": [
+        "G4"
+      ],
+      "progression": "blocked"
+    },
+    {
+      "id": "G6",
+      "title": "Azure deployment readiness approved",
+      "status": "BLOCKED",
+      "critical": false,
+      "reason": "G5 is not PASS",
+      "tests": 4,
+      "pass": 0,
+      "failing": [],
+      "blockedBy": [
+        "G5"
+      ],
+      "progression": "blocked"
+    },
+    {
+      "id": "G7",
+      "title": "Operational and architecture defence evidence complete",
+      "status": "BLOCKED",
+      "critical": false,
+      "reason": "G6 is not PASS",
+      "tests": 3,
+      "pass": 0,
+      "failing": [],
+      "blockedBy": [
+        "G6"
+      ],
+      "progression": "blocked"
+    }
+  ],
+  "hardConstraints": [
+    {
+      "id": "HC-01",
+      "verdict": "PARTIAL",
+      "failing": [],
+      "tests": [
+        {
+          "id": "EVAL-HRN-SOV-002",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-HRN-AZR-004",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-PRC-SOV-004",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-PRC-SOV-001",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-PRC-SOV-003",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-PRC-SEC-003",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-PRD-SOV-002",
+          "status": "PENDING"
+        }
+      ]
+    },
+    {
+      "id": "HC-02",
+      "verdict": "PARTIAL",
+      "failing": [],
+      "tests": [
+        {
+          "id": "EVAL-HRN-SOV-001",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-HRN-SOV-004",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-PRD-SOV-001",
+          "status": "PENDING"
+        }
+      ]
+    },
+    {
+      "id": "HC-03",
+      "verdict": "NO TEST FAILED",
+      "failing": [],
+      "tests": [
+        {
+          "id": "EVAL-PRC-DAT-003",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-PRC-SEC-002",
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "id": "HC-04",
+      "verdict": "PARTIAL",
+      "failing": [],
+      "tests": [
+        {
+          "id": "EVAL-HRN-SEC-003",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-PRC-SEC-001",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-PRD-SEC-002",
+          "status": "PENDING"
+        }
+      ]
+    },
+    {
+      "id": "HC-05",
+      "verdict": "PARTIAL",
+      "failing": [],
+      "tests": [
+        {
+          "id": "EVAL-PRC-DAT-004",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-PRC-SEC-002",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-PRD-FUN-002",
+          "status": "PENDING"
+        }
+      ]
+    },
+    {
+      "id": "HC-06",
+      "verdict": "PARTIAL",
+      "failing": [],
+      "tests": [
+        {
+          "id": "EVAL-HRN-SEC-005",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-PRC-DAT-001",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-PRC-DAT-004",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-PRC-DAT-007",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-PRC-SOV-004",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-PRC-SOV-002",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-PRD-SEC-001",
+          "status": "PENDING"
+        },
+        {
+          "id": "EVAL-PRD-DAT-007",
+          "status": "PENDING"
+        }
+      ]
+    },
+    {
+      "id": "HC-07",
+      "verdict": "PARTIAL",
+      "failing": [],
+      "tests": [
+        {
+          "id": "EVAL-PRC-DAT-007",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-PRD-REL-001",
+          "status": "PENDING"
+        }
+      ]
+    },
+    {
+      "id": "HC-08",
+      "verdict": "VIOLATED",
+      "failing": [
+        "EVAL-PRC-DAT-006"
+      ],
+      "tests": [
+        {
+          "id": "EVAL-HRN-SEC-008",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-HRN-OBS-001",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-PRC-DAT-001",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-PRC-DAT-002",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-PRC-DAT-003",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-PRC-DAT-006",
+          "status": "FAIL"
+        },
+        {
+          "id": "EVAL-PRC-DAT-007",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-PRC-DAT-008",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-PRD-DAT-007",
+          "status": "PENDING"
+        },
+        {
+          "id": "EVAL-PRD-OBS-001",
+          "status": "PENDING"
+        },
+        {
+          "id": "EVAL-PRD-REL-002",
+          "status": "PENDING"
+        }
+      ]
+    },
+    {
+      "id": "HC-09",
+      "verdict": "PARTIAL",
+      "failing": [],
+      "tests": [
+        {
+          "id": "EVAL-HRN-SEC-001",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-HRN-SEC-003",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-HRN-SEC-007",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-PRC-SEC-003",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-PRD-SEC-002",
+          "status": "PENDING"
+        },
+        {
+          "id": "EVAL-PRD-SEC-003",
+          "status": "PENDING"
+        }
+      ]
+    },
+    {
+      "id": "HC-10",
+      "verdict": "NO TEST FAILED",
+      "failing": [],
+      "tests": [
+        {
+          "id": "EVAL-HRN-ARC-001",
+          "status": "PASS"
+        }
+      ]
+    },
+    {
+      "id": "HC-11",
+      "verdict": "PARTIAL",
+      "failing": [],
+      "tests": [
+        {
+          "id": "EVAL-HRN-SEC-001",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-HRN-SEC-002",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-HRN-AZR-001",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-HRN-AZR-002",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-HRN-AZR-004",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-HRN-AZR-005",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-HRN-AZR-003",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-PRC-SEC-003",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-PRD-SEC-003",
+          "status": "PENDING"
+        },
+        {
+          "id": "EVAL-PRC-AZR-001",
+          "status": "BLOCKED"
+        },
+        {
+          "id": "EVAL-PRD-AZR-002",
+          "status": "PENDING"
+        }
+      ]
+    },
+    {
+      "id": "HC-12",
+      "verdict": "PARTIAL",
+      "failing": [],
+      "tests": [
+        {
+          "id": "EVAL-HRN-ARC-001",
+          "status": "PASS"
+        },
+        {
+          "id": "EVAL-PRD-PRF-001",
+          "status": "PENDING"
+        },
+        {
+          "id": "EVAL-PRD-CST-001",
+          "status": "PENDING"
+        },
+        {
+          "id": "EVAL-PRD-REL-002",
+          "status": "PENDING"
+        }
+      ]
+    }
+  ],
+  "counts": {
+    "PASS": 53,
+    "FAIL": 3,
+    "BLOCKED": 1,
+    "PENDING": 16
+  },
+  "integritySha256": "ea0ca506f1d25e42ab4021692bbc31b47e1a9ea4f6ad61ef543da032f189be50"
+}

@@ -1,0 +1,29 @@
+{
+  "schema": "greenfuel.eval-evidence/v1",
+  "testId": "EVAL-HRN-SEC-007",
+  "ran": true,
+  "argv": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/permission-negative.test.mjs"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-29T08:27:20.785Z",
+  "durationMs": 33555,
+  "outputSha256": "1c7900cd1443ca6fe9849e189b603358abc73a1ccf567f0a7d9e24832bfcaf14",
+  "outputBytes": 3025,
+  "outputTail": "gh output\nok 4 - negative 3: a simulated secret cannot be read, searched, copied, listed by a tool, or leaked through output\n  ---\n  duration_ms: 11836.8013\n  type: 'test'\n  ...\n# Subtest: negative 4: deployment without approval is denied, and a signed approval is honoured only inside its exact scope\nok 5 - negative 4: deployment without approval is denied, and a signed approval is honoured only inside its exact scope\n  ---\n  duration_ms: 1769.0776\n  type: 'test'\n  ...\n# Subtest: negative 5: a blocked operation cannot be reached through another agent, a delegation, a written script, or a borrowed approval\nok 6 - negative 5: a blocked operation cannot be reached through another agent, a delegation, a written script, or a borrowed approval\n  ---\n  duration_ms: 8436.623\n  type: 'test'\n  ...\n# Subtest: regulatory filings and commercial settlements are never autonomous, even with a valid P4 approval\nok 7 - regulatory filings and commercial settlements are never autonomous, even with a valid P4 approval\n  ---\n  duration_ms: 533.0309\n  type: 'test'\n  ...\n# Subtest: protected branches cannot be changed by an agent, with or without an approval\nok 8 - protected branches cannot be changed by an agent, with or without an approval\n  ---\n  duration_ms: 7.9012\n  type: 'test'\n  ...\n# Subtest: the denial of each simulated attack is recorded in a tamper-evident log without contents or secrets\nok 9 - the denial of each simulated attack is recorded in a tamper-evident log without contents or secrets\n  ---\n  duration_ms: 380.8051\n  type: 'test'\n  ...\n# Subtest: review findings: runtime-built commands, direct ARM REST, Az PowerShell and dynamic paths are refused, and ordinary commands are not\nok 10 - review findings: runtime-built commands, direct ARM REST, Az PowerShell and dynamic paths are refused, and ordinary commands are not\n  ---\n  duration_ms: 2815.7728\n  type: 'test'\n  ...\n1..10\n# tests 10\n# suites 0\n# pass 10\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 33487.0941\n",
+  "parsed": {
+    "tests": 10,
+    "pass": 10,
+    "fail": 0,
+    "skipped": 0,
+    "todo": 0,
+    "cancelled": 0
+  },
+  "status": "PASS",
+  "actual": "ran and passed: 10 tests, 0 failed, 0 skipped"
+}

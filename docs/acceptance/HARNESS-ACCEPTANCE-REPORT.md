@@ -88,7 +88,7 @@ Classification totals are in [section 7](#7-classification-totals).
 
 ## 4. Evaluation result
 
-The committed run is `EVRUN-36a72c3e30` (made at the clean commit `e4a2f82`): PASS 53, FAIL 3, BLOCKED 1, PENDING 16, of 73 tests. Gate G1 passes, G2 and G3 fail, G4 to G7 are blocked, and hard constraint HC-08 is marked violated. The failing tests are findings, not defects of the framework, and none was edited to pass:
+The committed run is `EVRUN-9b6110b026` (made at the clean commit `587d609`; it replaced `EVRUN-36a72c3e30` because captured output now has local paths removed): PASS 53, FAIL 3, BLOCKED 1, PENDING 16, of 73 tests. Gate G1 passes, G2 and G3 fail, G4 to G7 are blocked, and hard constraint HC-08 is marked violated. The failing tests are findings, not defects of the framework, and none was edited to pass:
 
 | Test | Finding | Remediation owner |
 |---|---|---|

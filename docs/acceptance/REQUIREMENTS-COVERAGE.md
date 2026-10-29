@@ -1,7 +1,7 @@
 <!-- generated: node harness/scripts/acceptance-reports.mjs --write -->
 # Requirements coverage
 
-Generated from the requirements baseline, the design trace tables, the ADRs, the evaluation catalogue and the committed evaluation run `EVRUN-36a72c3e30` (commit `e4a2f82`). Do not edit: `validate-harness` regenerates this file and fails on any difference.
+Generated from the requirements baseline, the design trace tables, the ADRs, the evaluation catalogue and the committed evaluation run `EVRUN-9b6110b026` (commit `587d609`). Do not edit: `validate-harness` regenerates this file and fails on any difference.
 
 **What a class means.** It says what a test that actually ran has shown. It never says a requirement is satisfied. A passing test of a candidate contract or of the harness shows that contract or harness behaves as the test states; it does not show that a production system meets the requirement, and no production system exists. TESTED AND PASSING is therefore the strongest class that can exist today.
 

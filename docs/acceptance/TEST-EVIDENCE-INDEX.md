@@ -73,7 +73,7 @@ Only the latest full run is kept in the tree; earlier runs remain in Git history
 
 | Run | Commit | Partial | PASS | FAIL | BLOCKED | PENDING | Gates |
 |---|---|---|---|---|---|---|---|
-| EVRUN-36a72c3e30 | `e4a2f82` | no | 53 | 3 | 1 | 16 | G1 PASS, G2 FAIL, G3 FAIL, G4 BLOCKED, G5 BLOCKED, G6 BLOCKED, G7 BLOCKED |
+| EVRUN-9b6110b026 | `587d609` | no | 53 | 3 | 1 | 16 | G1 PASS, G2 FAIL, G3 FAIL, G4 BLOCKED, G5 BLOCKED, G6 BLOCKED, G7 BLOCKED |
 
 ## C. Test files (33) run by `npm test`
 

@@ -1,0 +1,20 @@
+{
+  "schema": "greenfuel.eval-evidence/v1",
+  "testId": "EVAL-HRN-OPS-002",
+  "ran": true,
+  "argv": [
+    "node",
+    "harness/scripts/validate-loop.mjs"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-29T08:28:09.252Z",
+  "durationMs": 161,
+  "outputSha256": "f7f4d19e873e65c731a8638f51e9dbe04202e0a4df9381c98fbfc55c75ca1127",
+  "outputBytes": 18,
+  "outputTail": "validate-loop: OK\n",
+  "matched": true,
+  "status": "PASS",
+  "actual": "ran and passed: exit 0, output contained /validate-loop: OK/"
+}

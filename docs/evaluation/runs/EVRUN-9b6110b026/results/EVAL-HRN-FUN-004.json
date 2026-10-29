@@ -1,0 +1,29 @@
+{
+  "schema": "greenfuel.eval-evidence/v1",
+  "testId": "EVAL-HRN-FUN-004",
+  "ran": true,
+  "argv": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/loop-engine.test.mjs"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-29T08:26:05.296Z",
+  "durationMs": 38189,
+  "outputSha256": "2c3416a02e79a32037ed2aab4c17a0db59af71dc91acccd2cc78bec3b9ee8316",
+  "outputBytes": 8339,
+  "outputTail": "numbers and paths differ\nok 25 - a failure has the same fingerprint when only times, line numbers and paths differ\n  ---\n  duration_ms: 0.1853\n  type: 'test'\n  ...\n# Subtest: agents may run only the granted loop commands: qa-engineer status, verify and verify-store, nothing else, and nobody may write the loop store\nok 26 - agents may run only the granted loop commands: qa-engineer status, verify and verify-store, nothing else, and nobody may write the loop store\n  ---\n  duration_ms: 18107.3519\n  type: 'test'\n  ...\n# Subtest: the CLI drives a loop to PASSED with meaningful exit codes, and to a stop with exit 3\nok 27 - the CLI drives a loop to PASSED with meaningful exit codes, and to a stop with exit 3\n  ---\n  duration_ms: 2559.7148\n  type: 'test'\n  ...\n# Subtest: a check that rewrites workspace files while it runs cannot produce PASSED: the files are compared again after the checks\nok 28 - a check that rewrites workspace files while it runs cannot produce PASSED: the files are compared again after the checks\n  ---\n  duration_ms: 508.4521\n  type: 'test'\n  ...\n# Subtest: no folder is exempt from observation: a dependency folder is seen, and a large one is refused\nok 29 - no folder is exempt from observation: a dependency folder is seen, and a large one is refused\n  ---\n  duration_ms: 665.2277\n  type: 'test'\n  ...\n# Subtest: node options that load code are not accepted in a check, and NODE_OPTIONS from the environment is not passed to checks\nok 30 - node options that load code are not accepted in a check, and NODE_OPTIONS from the environment is not passed to checks\n  ---\n  duration_ms: 549.3591\n  type: 'test'\n  ...\n# Subtest: a customer marker is found in a large or binary changed file, not only in small text files\nok 31 - a customer marker is found in a large or binary changed file, not only in small text files\n  ---\n  duration_ms: 635.6757\n  type: 'test'\n  ...\n1..31\n# tests 31\n# suites 0\n# pass 31\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 38114.6329\n",
+  "parsed": {
+    "tests": 31,
+    "pass": 31,
+    "fail": 0,
+    "skipped": 0,
+    "todo": 0,
+    "cancelled": 0
+  },
+  "status": "PASS",
+  "actual": "ran and passed: 31 tests, 0 failed, 0 skipped"
+}

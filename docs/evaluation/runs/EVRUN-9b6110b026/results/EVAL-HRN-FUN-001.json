@@ -1,0 +1,30 @@
+{
+  "schema": "greenfuel.eval-evidence/v1",
+  "testId": "EVAL-HRN-FUN-001",
+  "ran": true,
+  "argv": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/spec-validators.test.mjs",
+    "tests/design-gate.test.mjs"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-29T08:22:13.166Z",
+  "durationMs": 131500,
+  "outputSha256": "4535ea75c2bab514d8d9827eed0bd21724cc0c8cdf295c1afd1d11b3a85516f9",
+  "outputBytes": 9327,
+  "outputTail": "out a new version, and a real method needs a source and a verifier\nok 36 - methods: a record cannot change without a new version, and a real method needs a source and a verifier\n  ---\n  duration_ms: 1119.8788\n  type: 'test'\n  ...\n# Subtest: methods: Verified needs a named human, evidence and a verified scheme; duplicates are refused\nok 37 - methods: Verified needs a named human, evidence and a verified scheme; duplicates are refused\n  ---\n  duration_ms: 2101.7988\n  type: 'test'\n  ...\n# Subtest: certificates: tampering with a payload, a field or the order breaks the chain\nok 38 - certificates: tampering with a payload, a field or the order breaks the chain\n  ---\n  duration_ms: 3564.2196\n  type: 'test'\n  ...\n# Subtest: certificates: local hosting, human approval and methodology traceability are mandatory\nok 39 - certificates: local hosting, human approval and methodology traceability are mandatory\n  ---\n  duration_ms: 6050.3972\n  type: 'test'\n  ...\n# Subtest: readiness: the real repository is NOT-READY and lists why\nok 40 - readiness: the real repository is NOT-READY and lists why\n  ---\n  duration_ms: 217.433\n  type: 'test'\n  ...\n# Subtest: readiness: each blocker clears only when its own recorded condition is met, and a self-declared approval does not count\nok 41 - readiness: each blocker clears only when its own recorded condition is met, and a self-declared approval does not count\n  ---\n  duration_ms: 5499.6386\n  type: 'test'\n  ...\n# Subtest: command line: exit codes distinguish pass, fail, empty, not-ready and misuse\nok 42 - command line: exit codes distinguish pass, fail, empty, not-ready and misuse\n  ---\n  duration_ms: 1121.1571\n  type: 'test'\n  ...\n# Subtest: the schemas are marked candidate so nobody mistakes them for decisions\nok 43 - the schemas are marked candidate so nobody mistakes them for decisions\n  ---\n  duration_ms: 0.4337\n  type: 'test'\n  ...\n1..43\n# tests 43\n# suites 0\n# pass 43\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 131406.9019\n",
+  "parsed": {
+    "tests": 43,
+    "pass": 43,
+    "fail": 0,
+    "skipped": 0,
+    "todo": 0,
+    "cancelled": 0
+  },
+  "status": "PASS",
+  "actual": "ran and passed: 43 tests, 0 failed, 0 skipped"
+}

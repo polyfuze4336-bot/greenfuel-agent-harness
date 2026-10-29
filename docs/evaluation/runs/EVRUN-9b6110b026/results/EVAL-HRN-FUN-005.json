@@ -1,0 +1,31 @@
+{
+  "schema": "greenfuel.eval-evidence/v1",
+  "testId": "EVAL-HRN-FUN-005",
+  "ran": true,
+  "argv": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/mcp-server.test.mjs",
+    "tests/mcp-names.test.mjs",
+    "tests/tool-output-guard.test.mjs"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-29T08:26:43.489Z",
+  "durationMs": 2186,
+  "outputSha256": "a4c7d0b69443d24b802131be97831f21cda84ca24a2287cbd8759c0dc9eff282",
+  "outputBytes": 11751,
+  "outputTail": "sted external content is wrapped, stripped of hidden characters and HTML comments, and flagged when it gives orders\n  ---\n  duration_ms: 12.8941\n  type: 'test'\n  ...\n# Subtest: an attacker cannot forge the closing boundary, however many times or in whatever spelling\nok 25 - an attacker cannot forge the closing boundary, however many times or in whatever spelling\n  ---\n  duration_ms: 5.8295\n  type: 'test'\n  ...\n# Subtest: lookalike servers and unlisted tools of a registered server are treated as untrusted\nok 26 - lookalike servers and unlisted tools of a registered server are treated as untrusted\n  ---\n  duration_ms: 2.7024\n  type: 'test'\n  ...\n# Subtest: size limits: untrusted and MCP output is capped and says so\nok 27 - size limits: untrusted and MCP output is capped and says so\n  ---\n  duration_ms: 14.8159\n  type: 'test'\n  ...\n# Subtest: reading a saved copy of a large untrusted result is treated as untrusted too\nok 28 - reading a saved copy of a large untrusted result is treated as untrusted too\n  ---\n  duration_ms: 4.3289\n  type: 'test'\n  ...\n# Subtest: results without text are left alone\nok 29 - results without text are left alone\n  ---\n  duration_ms: 0.2912\n  type: 'test'\n  ...\n# Subtest: the injection heuristics catch the common phrasings and ignore ordinary prose\nok 30 - the injection heuristics catch the common phrasings and ignore ordinary prose\n  ---\n  duration_ms: 0.9792\n  type: 'test'\n  ...\n# Subtest: process level: JSON in, modifiedResult out, audit line written without content or arguments\nok 31 - process level: JSON in, modifiedResult out, audit line written without content or arguments\n  ---\n  duration_ms: 85.6507\n  type: 'test'\n  ...\n# Subtest: process level: garbage input passes through without crashing or blocking\nok 32 - process level: garbage input passes through without crashing or blocking\n  ---\n  duration_ms: 64.278\n  type: 'test'\n  ...\n1..32\n# tests 32\n# suites 0\n# pass 32\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 2120.9048\n",
+  "parsed": {
+    "tests": 32,
+    "pass": 32,
+    "fail": 0,
+    "skipped": 0,
+    "todo": 0,
+    "cancelled": 0
+  },
+  "status": "PASS",
+  "actual": "ran and passed: 32 tests, 0 failed, 0 skipped"
+}
