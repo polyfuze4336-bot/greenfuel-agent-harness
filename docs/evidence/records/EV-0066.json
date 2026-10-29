@@ -1,0 +1,22 @@
+{
+  "id": "EV-0066",
+  "claim": "npm test on branch capstone/rubric-enhancement with the audit documents: all tests pass, none skipped (capstone audit)",
+  "argv": [
+    "npm",
+    "test"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-29T09:27:52.249Z",
+  "durationMs": 366285,
+  "outputSha256": "0b06f8b40fa06c3564b38c9313c390cf78d93cfc98b98d9045bbdc78237d007d",
+  "outputBytes": 165749,
+  "outputTail": "al the registry, no loader variables, no undeclared properties\nok 763 - candidates: env must equal the registry, no loader variables, no undeclared properties\n  ---\n  duration_ms: 613.829\n  type: 'test'\n  ...\n# Subtest: servers whose names collide after normalisation are rejected\nok 764 - servers whose names collide after normalisation are rejected\n  ---\n  duration_ms: 313.9526\n  type: 'test'\n  ...\n# Subtest: candidates: exactly the pending servers, matching the registry, never carrying credentials\nok 765 - candidates: exactly the pending servers, matching the registry, never carrying credentials\n  ---\n  duration_ms: 2066.4641\n  type: 'test'\n  ...\n# Subtest: agent grants: exact server/tool names, enabled tools only, privilege by class, external only with web access\nok 766 - agent grants: exact server/tool names, enabled tools only, privilege by class, external only with web access\n  ---\n  duration_ms: 3075.6685\n  type: 'test'\n  ...\n# Subtest: agent grants: web hosts in the registry and policy must agree and be plain hosts\nok 767 - agent grants: web hosts in the registry and policy must agree and be plain hosts\n  ---\n  duration_ms: 471.6237\n  type: 'test'\n  ...\n# Subtest: hook, log ignore and generated documents are enforced\nok 768 - hook, log ignore and generated documents are enforced\n  ---\n  duration_ms: 4043.5717\n  type: 'test'\n  ...\n# Subtest: generated tables: complete, free of pipes inside cells, and idempotent under --write\nok 769 - generated tables: complete, free of pipes inside cells, and idempotent under --write\n  ---\n  duration_ms: 377.3672\n  type: 'test'\n  ...\n# Subtest: helpers: grants resolve by alias, command substring and MCP name; server tool lists derive from enabled tools\nok 770 - helpers: grants resolve by alias, command substring and MCP name; server tool lists derive from enabled tools\n  ---\n  duration_ms: 4.6192\n  type: 'test'\n  ...\n1..770\n# tests 770\n# suites 0\n# pass 770\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 365631.8282\n",
+  "gitHead": "45c0f1332d8f83e19b78eedd89d356965d57f57e",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}
