@@ -91,3 +91,37 @@ test('tablet: landscape 1024, portrait 820, and the navigation sheet', async ({ 
   await page.getByRole('button', { name: 'Open navigation' }).click();
   await shot(page, '24-tablet-portrait-navigation');
 });
+
+test('decision intelligence: register health, provenance, compare, source preview, sync', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await ready(page, '/decisions');
+  const health = page.getByTestId('register-health');
+  await health.getByText('How complete is the register?').click();
+  await health.getByText(/Duplicate and overlap candidates/).click();
+  await shot(page, '25-register-health', true);
+  await ready(page, '/decisions?id=ADR-0004');
+  await page.getByRole('dialog').getByText(/Field provenance/).click();
+  await shot(page, '26-adr-0004-detail-provenance');
+  await ready(page, '/decisions/ADR-0004/compare');
+  await expect(page.getByTestId('compare-table')).toBeVisible();
+  await shot(page, '27-compare-alternatives-adr-0004', true);
+  await ready(page, '/decisions/D-010/compare');
+  await expect(page.getByTestId('compare-table')).toBeVisible();
+  await shot(page, '28-compare-alternatives-d-010-ai-suggestions', true);
+  await ready(page, '/decisions?id=D-013');
+  await page.getByRole('button', { name: 'Preview source' }).click();
+  await expect(page.locator('tr[data-highlight="true"]')).toHaveCount(1);
+  await shot(page, '29-source-preview');
+  await page.keyboard.press('Escape');
+  await ready(page, '/decisions');
+  const h2 = page.getByTestId('register-health');
+  await h2.getByText('Repository changes and synchronisation').click();
+  await h2.getByRole('button', { name: 'Sync now' }).click();
+  await h2.getByRole('button', { name: 'Sync now' }).click();
+  await expect(h2.getByTestId('changes-result')).toContainText('57 unchanged');
+  await h2.getByLabel('Compare with').selectOption('origin/main');
+  await h2.getByRole('button', { name: 'Show changes' }).click();
+  await expect(h2.getByTestId('changes-result')).toContainText(/\d+ added/);
+  await page.waitForTimeout(350);
+  await h2.screenshot({ path: path.join(dir, '30-sync-and-changes.png'), animations: 'disabled' });
+});

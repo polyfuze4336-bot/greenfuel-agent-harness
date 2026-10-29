@@ -30,7 +30,7 @@ test.describe('error handling', () => {
   });
 
   test('the API is read-only: write methods are not accepted', async ({ request }) => {
-    for (const path of ['/api/v1/decisions', '/api/v1/tasks', '/api/v1/approvals', '/api/v1/search', '/api/v1/repository']) {
+    for (const path of ['/api/v1/decisions', '/api/v1/tasks', '/api/v1/approvals', '/api/v1/search', '/api/v1/repository', '/api/v1/register', '/api/v1/register/changes', '/api/v1/source']) {
       for (const method of ['POST', 'PUT', 'PATCH', 'DELETE'] as const) {
         const res = await request.fetch(path, { method });
         expect(res.status(), `${method} ${path}`).toBe(405);

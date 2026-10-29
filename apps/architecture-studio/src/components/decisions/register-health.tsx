@@ -26,7 +26,10 @@ async function call<T>(url: string, init?: RequestInit): Promise<T> {
   return body;
 }
 
+const CHANGE_PREVIEW = 10;
+
 function Changes({ c }: { c: ChangeSet }) {
+  const [all, setAll] = useState(false);
   if (c.initial)
     return (
       <p role="status" className="text-[13.5px] text-ink-2">
@@ -34,6 +37,9 @@ function Changes({ c }: { c: ChangeSet }) {
       </p>
     );
   const none = c.records.length === 0 && c.files.length === 0;
+  // Records with alerts (a changed status or a removed record) are always listed first so a preview never hides them.
+  const ordered = [...c.records].sort((a, b) => b.alerts.length - a.alerts.length);
+  const shown = all ? ordered : ordered.slice(0, CHANGE_PREVIEW);
   return (
     <div data-testid="changes-result">
       <p role="status" className="mb-3 text-[13.5px] text-ink-2">
@@ -52,7 +58,7 @@ function Changes({ c }: { c: ChangeSet }) {
       </p>
       {none ? <p className="text-[13.5px] text-ink-3">The register and its source files are unchanged.</p> : null}
       <ul className="space-y-2">
-        {c.records.map((r) => (
+        {shown.map((r) => (
           <li key={r.id} className="rounded-xl border border-hairline px-3.5 py-2.5 text-[13px] leading-5">
             <span className="flex flex-wrap items-center gap-2">
               <Link href={`/decisions?id=${r.id}`} className="font-mono text-[12.5px] font-medium text-accent hover:underline">
@@ -80,6 +86,11 @@ function Changes({ c }: { c: ChangeSet }) {
           </li>
         ))}
       </ul>
+      {ordered.length > CHANGE_PREVIEW ? (
+        <button type="button" className={`${btn} mt-3`} aria-expanded={all} onClick={() => setAll((v) => !v)}>
+          {all ? `Show the first ${CHANGE_PREVIEW}` : `Show all ${ordered.length} records`}
+        </button>
+      ) : null}
       {c.files.length ? (
         <details className="mt-3 rounded-xl border border-hairline">
           <summary className="cursor-pointer px-3.5 py-2 text-[13px] font-medium">{c.files.length} source file(s) differ</summary>

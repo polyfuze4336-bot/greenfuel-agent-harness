@@ -167,8 +167,8 @@ export function Section({ id, title, aside, children }: { id?: string; title: st
   );
 }
 
-export function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return <div className={`rounded-2xl border border-hairline bg-surface ${className}`}>{children}</div>;
+export function Card({ children, className = '', 'data-testid': testId }: { children: ReactNode; className?: string; 'data-testid'?: string }) {
+  return <div data-testid={testId} className={`rounded-2xl border border-hairline bg-surface ${className}`}>{children}</div>;
 }
 
 export function EmptyState({ icon: I, title, children, action }: { icon: Icon; title: string; children?: ReactNode; action?: ReactNode }) {

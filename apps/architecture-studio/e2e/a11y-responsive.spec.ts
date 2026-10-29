@@ -50,6 +50,25 @@ test.describe('accessibility (axe, WCAG 2.1 A and AA)', () => {
     expect(outline).not.toBe('none');
   });
 
+  test('compare alternatives, source preview and the register health panel have no violations', async ({ page }) => {
+    for (const p of ['/decisions/ADR-0004/compare', '/decisions/D-010/compare']) {
+      await ready(page, p);
+      await expectNoAxeViolations(page, p);
+    }
+    await ready(page, '/decisions');
+    const section = page.getByTestId('register-health');
+    await section.getByText('How complete is the register?').click();
+    await section.getByText('Repository changes and synchronisation').click();
+    await section.getByRole('button', { name: 'Sync now' }).click();
+    await expect(section.getByText(/First synchronisation|unchanged/)).toBeVisible();
+    await expectNoAxeViolations(page, 'register health');
+    await ready(page, '/decisions?id=D-013');
+    await expectNoAxeViolations(page, 'D-013 panel with AI suggestions');
+    await page.getByRole('button', { name: 'Preview source' }).click();
+    await expect(page.locator('tr[data-highlight="true"]')).toHaveCount(1);
+    await expectNoAxeViolations(page, 'source preview');
+  });
+
   test('colour is never the only status signal: every status pill carries text', async ({ page }) => {
     await ready(page, '/decisions');
     const bare = await page.locator('tbody td span.rounded-full').evaluateAll((els) => els.filter((e) => !(e.textContent ?? '').trim()).length);

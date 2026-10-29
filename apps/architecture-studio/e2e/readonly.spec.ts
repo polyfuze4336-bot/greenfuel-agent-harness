@@ -8,7 +8,7 @@ test.describe('read-only proof', () => {
     page.on('request', (r) => {
       const u = new URL(r.url());
       if (u.origin !== 'http://localhost:3100') writes.push(`EXTERNAL ${r.method()} ${r.url()}`);
-      else if (r.method() !== 'GET' && !(r.method() === 'POST' && u.pathname === '/api/v1/refresh')) writes.push(`${r.method()} ${u.pathname}`);
+      else if (r.method() !== 'GET' && !(r.method() === 'POST' && (u.pathname === '/api/v1/refresh' || u.pathname === '/api/v1/register/sync'))) writes.push(`${r.method()} ${u.pathname}`);
     });
     for (const r of ROUTES) await ready(page, r.path);
     await ready(page, '/decisions?id=D-003');

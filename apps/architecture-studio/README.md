@@ -24,6 +24,7 @@ npm start          # http://localhost:3100, loopback only
 | `STUDIO_REF` | `HEAD` | Branch, tag or commit to read. Only plain ref names are accepted |
 | `STUDIO_ALLOWED_HOSTS` | none | Extra `Host` header values to accept, comma separated. Leave unset |
 | `STUDIO_E2E_DELAY_MS` | `0` | Test only: delays repository reads so loading states can be shown |
+| `STUDIO_CACHE_DIR` | `<working directory>/.studio-cache` (git-ignored) | Where the sync baseline is saved. Never inside the tracked tree |
 
 ## What it shows
 
@@ -36,7 +37,7 @@ npm start          # http://localhost:3100, loopback only
 | Architecture & Evidence | design reviews, requirements and traceability, risks, assumptions, evidence records, documents |
 | Presentation Studio | `docs/capstone/presentation/` |
 
-Counting and status rules are in [DATA-MAPPING](../../docs/architecture-studio/DATA-MAPPING.md). A test compares the Studio's counts with the independent discovery snapshot.
+Counting and status rules are in [DATA-MAPPING](../../docs/architecture-studio/DATA-MAPPING.md). The Decision Register uses the Decision Intelligence Engine (`src/lib/intel/`), documented in [DECISION-INTELLIGENCE](../../docs/architecture-studio/DECISION-INTELLIGENCE.md): seven statuses, provenance for every field, duplicate and overlap candidates, change detection, Compare Alternatives, and clearly labelled AI suggestions that never alter a record. A test compares the Studio's counts with the independent discovery snapshot.
 
 ## How it is built
 
@@ -58,8 +59,13 @@ git objects at one commit ──► GitRepositoryAdapter (read-only allowlist)
 | Method and path | Returns |
 |---|---|
 | `GET /api/v1/repository` | repository facts, metrics, blockers, attention items |
-| `GET /api/v1/decisions?status=&type=&milestone=` | decisions |
-| `GET /api/v1/decisions/{id}` | one decision, or a 404 problem |
+| `GET /api/v1/decisions?status=&type=&milestone=` | normalized register records; `status` is one of the seven statuses, otherwise 400 |
+| `GET /api/v1/decisions/{id}` | one record with duplicates, labelled AI suggestions and alternatives, or a 404 problem |
+| `GET /api/v1/register` | register health: counts, validation, duplicate candidates, suggestion count |
+| `GET /api/v1/register/changes?from=` | what changed since the saved baseline, or since a ref such as `origin/main` |
+| `GET /api/v1/register/sync` | the saved baseline |
+| `POST /api/v1/register/sync` | incremental sync: re-reads changed files only and saves the baseline in `STUDIO_CACHE_DIR`. Writes nothing to the repository |
+| `GET /api/v1/source?path=&line=&context=` | read-only source preview (`docs/`, `harness/policy/`, `harness/scripts/`; text extensions only) |
 | `GET /api/v1/tasks?status=&blocked=` | tasks |
 | `GET /api/v1/approvals` | approval authority, pending approvals, reviews |
 | `GET /api/v1/search?q=&kind=` | search hits |

@@ -26,11 +26,11 @@ test.describe('navigation', () => {
 
   test('browser back and forward restore filter state from the URL', async ({ page }) => {
     await ready(page, '/decisions');
-    await page.getByRole('button', { name: /^Open\b/ }).click();
-    await expect(page).toHaveURL(/status=open/);
+    await page.getByRole('button', { name: /^Proposed\b/ }).click();
+    await expect(page).toHaveURL(/status=Proposed/);
     await page.goto('/queue');
     await page.goBack();
-    await expect(page.getByRole('button', { name: /^Open\b/ })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByRole('button', { name: /^Proposed\b/ })).toHaveAttribute('aria-pressed', 'true');
   });
 });
 
@@ -43,7 +43,7 @@ test.describe('overview shows repository-derived figures only', () => {
     const expectations: [RegExp, string][] = [
       [/Total decisions/, String(m.decisions.total)],
       [/Pending decisions/, String(m.decisions.pending)],
-      [/Accepted decisions/, String(m.decisions.accepted)],
+      [/Approved decisions/, String(m.decisions.accepted)],
       [/Rejected decisions/, String(m.decisions.rejected)],
       [/Deferred decisions/, String(m.decisions.deferred)],
       [/Blocked tasks/, String(m.tasks.blocked)],
@@ -66,7 +66,7 @@ test.describe('overview shows repository-derived figures only', () => {
     const t = ((await (await request.get('/api/v1/repository')).json()) as { metrics: { tasks: { blocked: number; total: number } } }).metrics.tasks;
     await ready(page, '/');
     await page.getByRole('link', { name: /Pending decisions/ }).click();
-    await expect(page).toHaveURL(/\/decisions\?status=open,proposed/);
+    await expect(page).toHaveURL(/\/decisions\?status=Proposed,Pending(%20| )Review,Blocked/);
     await expect(page.getByTestId('result-count')).toContainText('44 of 57');
     await page.goto('/');
     await page.getByRole('link', { name: /Blocked tasks/ }).click();
@@ -89,14 +89,17 @@ test.describe('Decision Register', () => {
     await expect(rows).toHaveCount(57);
 
     await page.getByRole('button', { name: /^Proposed\b/ }).click();
+    await expect(rows).toHaveCount(1);
+    await page.getByRole('button', { name: /^Blocked\b/ }).click();
     await expect(rows).toHaveCount(7);
-    await page.getByRole('button', { name: /^Open\b/ }).click();
+    await page.getByRole('button', { name: /^Pending Review\b/ }).click();
     await expect(rows).toHaveCount(44);
-    await page.getByRole('button', { name: /^Open\b/ }).click();
+    await page.getByRole('button', { name: /^Pending Review\b/ }).click();
+    await page.getByRole('button', { name: /^Blocked\b/ }).click();
     await page.getByRole('button', { name: /^Proposed\b/ }).click();
     await expect(rows).toHaveCount(57);
 
-    await page.getByLabel('Type').selectOption('register');
+    await page.getByLabel('Type').selectOption('register-entry');
     await expect(rows).toHaveCount(37);
     await page.getByLabel('Needed by').selectOption('M1');
     await expect(rows).toHaveCount(17);
@@ -104,17 +107,17 @@ test.describe('Decision Register', () => {
     await expect(rows).toHaveCount(57);
 
     await page.getByLabel('Group by').selectOption('status');
-    await expect(page.locator('th[scope="colgroup"]')).toHaveCount(3);
-    await expect(page.locator('th[scope="colgroup"]').first()).toContainText('Open');
+    await expect(page.locator('th[scope="colgroup"]')).toHaveCount(4);
+    await expect(page.locator('th[scope="colgroup"]').first()).toContainText('Proposed');
     await page.getByLabel('Group by').selectOption('none');
 
     const statusSort = page.getByRole('columnheader', { name: 'Status' });
     await statusSort.getByRole('button').click();
     await expect(statusSort).toHaveAttribute('aria-sort', 'ascending');
-    await expect(rows.first()).toContainText('Open');
+    await expect(rows.first()).toContainText('Proposed');
     await statusSort.getByRole('button').click();
     await expect(statusSort).toHaveAttribute('aria-sort', 'descending');
-    await expect(rows.first()).toContainText('Accepted');
+    await expect(rows.first()).toContainText('Blocked');
   });
 
   test('search narrows results across id, title and text', async ({ page }) => {
@@ -135,9 +138,9 @@ test.describe('Decision Register', () => {
     await expect(dialog).toBeVisible();
     await expect(page).toHaveURL(/id=D-003/);
     await expect(dialog.getByTestId('decision-detail').getByRole('heading', { level: 2 })).toContainText('Ports and jurisdictions');
-    await expect(dialog.getByText('Status line, verbatim')).toBeVisible();
-    await expect(dialog.getByText('No signed approval record exists')).toBeVisible();
-    await expect(dialog.getByText('docs/context/DECISION-REGISTER.md')).toBeVisible();
+    await expect(dialog.getByText('Status, verbatim from the source')).toBeVisible();
+    await expect(dialog.getByText('No approval is recorded for this decision.')).toBeVisible();
+    await expect(dialog.getByText('Source in the repository')).toBeVisible();
     await expect(dialog.getByText('Recent commits touching this file')).toBeVisible();
     await expect(dialog.locator('ol li').first()).toBeVisible({ timeout: 10_000 });
     await page.keyboard.press('Escape');
@@ -149,10 +152,12 @@ test.describe('Decision Register', () => {
   test('a Proposed ADR is never presented as approved; a grandfathered ADR is labelled unsigned', async ({ page }) => {
     await ready(page, '/decisions?id=ADR-0016');
     const d = page.getByRole('dialog');
-    await expect(d).toContainText('Proposed');
-    await expect(d).not.toContainText('Accepted by the owner');
+    await expect(d).toContainText('Blocked');
+    await expect(d.getByText('Status, verbatim from the source')).toBeVisible();
+    await expect(d.locator('blockquote')).toHaveText('Proposed');
+    await expect(d).not.toContainText('Approved on the owner');
     await page.goto('/decisions?id=ADR-0001');
-    await expect(page.getByRole('dialog')).toContainText('unsigned');
+    await expect(page.getByRole('dialog')).toContainText(/unsigned/i);
     await expect(page.getByRole('dialog')).toContainText('No signed approval record exists');
   });
 

@@ -120,7 +120,7 @@ Recorded because they show what the test suite is for.
 
 | # | Needed | Why |
 |---|---|---|
-| 1 | **Confirm the Studio is not "the application" for HC-11**, and that `apps/architecture-studio/` is the right place (discovery question OQ-1). The Studio is not under a phase-gated path (`src/`, `infra/`, `db/`, `ops/`, `evals/`, `tests/product/`), but HC-11 is a rule about intent | The build followed your instruction; it is not a signature |
+| 1 | ~~Confirm the Studio is not "the application" for HC-11~~ **Answered by the owner on 2026-10-30: yes.** All other decisions below are deferred by the owner | The owner's answer is recorded in T61; it is not a signed approval |
 | 2 | **Accept or reject the dependency set** (97 packages, listed in section 1). TypeScript 7.0.2 and Next.js 16.4.2 are new major versions I did not previously use here | New third-party code in the repository. Scripts were not run at install |
 | 3 | **An authorising ADR for the Studio** (status Proposed until an approver is enrolled) | None exists. I did not draft one as Accepted |
 | 4 | **Whether to push `studio/ui-readonly`** and `studio/discovery` | Nothing from this stage is on GitHub. Until it is, the Studio correctly shows its own files as Local only |

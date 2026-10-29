@@ -47,7 +47,7 @@ function ClaimList({ claims, empty }: { claims: Claim[]; empty: string }) {
 function OptionCard({ o, recommended }: { o: OptionInfo; recommended: boolean }) {
   const n = o.pros.length + o.cons.length + o.conditional.length + o.unknown.length;
   return (
-    <details className="group rounded-xl border border-hairline bg-surface" open={recommended}>
+    <details data-testid="option-card" className="group rounded-xl border border-hairline bg-surface" open={recommended}>
       <summary className="flex cursor-pointer list-none flex-wrap items-center gap-2 rounded-xl px-3.5 py-2.5 [&::-webkit-details-marker]:hidden">
         <Tag>{o.key}</Tag>
         <span className="min-w-0 flex-1 text-[14px] font-medium">{o.name}</span>

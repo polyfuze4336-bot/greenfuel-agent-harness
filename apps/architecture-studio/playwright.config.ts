@@ -1,10 +1,12 @@
+import os from 'node:os';
+import path from 'node:path';
 import { defineConfig, devices } from '@playwright/test';
 
 // Three production servers, each started by Playwright so the run is repeatable:
 //   3100  normal, reads HEAD
 //   3101  STUDIO_REF points at a ref that does not exist, to prove the error state
 //   3102  adds a 700 ms delay to repository reads (test-only), to prove the loading skeletons
-const serve = (port: number, env: Record<string, string> = {}) => ({ command: `npx next start --hostname localhost --port ${port}`, port, reuseExistingServer: false, timeout: 120_000, env, gracefulShutdown: { signal: 'SIGTERM' as const, timeout: 3000 } });
+const serve = (port: number, env: Record<string, string> = {}) => ({ command: `npx next start --hostname localhost --port ${port}`, port, reuseExistingServer: false, timeout: 120_000, env: { STUDIO_CACHE_DIR: path.join(os.tmpdir(), `studio-e2e-cache-${process.pid}-${port}`), ...env }, gracefulShutdown: { signal: 'SIGTERM' as const, timeout: 3000 } });
 
 export default defineConfig({
   testDir: './e2e',
