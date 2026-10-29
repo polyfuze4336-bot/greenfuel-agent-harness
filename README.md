@@ -123,7 +123,3 @@ Verified so far: the hook denies in Copilot CLI 1.0.102 in a trusted folder. Not
 ## Principles
 
 Azure-first and Microsoft-native where practical. Architecture decisions before implementation. Secure by default. Human approval for high-impact actions. Harness and business agents kept separate. Persistent, resumable state in git. Evidence, not self-declared success. Minimal dependencies. No fabricated Azure resources, results or status. No autonomous production deployment.
-
-## Provenance
-
-Informed by an assessment of [astha29may/AICodingAgentHarness](https://github.com/astha29may/AICodingAgentHarness). No code or text was copied (that repository has no licence). What was reused as an idea, adapted, rejected or newly written is recorded in the [disposition register](docs/harness/REFERENCE-ASSESSMENT.md#5-component-disposition-register).
