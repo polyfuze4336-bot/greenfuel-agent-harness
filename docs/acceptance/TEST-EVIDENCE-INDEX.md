@@ -5,7 +5,7 @@ Generated from the evidence records, the committed evaluation runs, the test fol
 
 **What an evidence record is.** The recorder runs a command and stores what happened: arguments, exit code, duration, an output hash and the output tail, the Git commit and the runtime. It records facts about a run; it does not judge whether the command proves the claim. A claim is only as good as the command that backs it. A record with no exit code is a timeout or a kill, and is kept (append-only).
 
-## A. Evidence records (64)
+## A. Evidence records (65)
 
 | ID | Recorded | Commit | Command | Outcome | Claim |
 |---|---|---|---|---|---|
@@ -73,6 +73,7 @@ Generated from the evidence records, the committed evaluation runs, the test fol
 | EV-0062 | 2026-10-29 | `1a500f7` | `node docs/capstone/probes/hook-bypass-probe.mjs session` | exit 0 | Simulated hook probe, default session: which tool calls the always-on guard stops (allow/ask/deny); MISS lines are candidate control gaps |
 | EV-0063 | 2026-10-29 | `1a500f7` | `node docs/capstone/probes/hook-bypass-probe.mjs qa-engineer` | exit 0 | Simulated hook probe, qa-engineer agent guard |
 | EV-0064 | 2026-10-29 | `1a500f7` | `node docs/capstone/probes/hook-bypass-probe.mjs azure-platform` | exit 0 | Simulated hook probe, azure-platform agent guard |
+| EV-0065 | 2026-10-29 | `726d8e5` | `node harness/scripts/evaluate.mjs verify --run EVRUN-9b6110b026` | exit 0 | evaluate.mjs verify of the current committed run EVRUN-9b6110b026 re-derives every status, gate and hard-constraint verdict (capstone audit) |
 
 ## B. Committed evaluation runs (1)
 

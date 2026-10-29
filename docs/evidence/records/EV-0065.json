@@ -1,0 +1,25 @@
+{
+  "id": "EV-0065",
+  "claim": "evaluate.mjs verify of the current committed run EVRUN-9b6110b026 re-derives every status, gate and hard-constraint verdict (capstone audit)",
+  "argv": [
+    "node",
+    "harness/scripts/evaluate.mjs",
+    "verify",
+    "--run",
+    "EVRUN-9b6110b026"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-29T09:27:51.261Z",
+  "durationMs": 233,
+  "outputSha256": "72719c035331ea6020bd6a0bcfbce5c704f0fb52e8741edb15879ff87018231d",
+  "outputBytes": 81,
+  "outputTail": "{\n  \"ok\": true,\n  \"problems\": [],\n  \"runId\": \"EVRUN-9b6110b026\",\n  \"tests\": 73\n}\n",
+  "gitHead": "726d8e5b74cbc8265fdb23fcb7d734c678435ff1",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}
