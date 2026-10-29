@@ -1,7 +1,10 @@
 const COLOR: Record<string, string> = {
+  approved: 'var(--s-accepted-fg)',
   accepted: 'var(--s-accepted-fg)',
   proposed: 'var(--s-proposed-fg)',
+  'pending-review': 'var(--s-open-fg)',
   open: 'var(--s-open-fg)',
+  blocked: '#c2410c',
   deferred: 'var(--s-deferred-fg)',
   rejected: 'var(--s-rejected-fg)',
   superseded: 'var(--s-neutral-fg)',

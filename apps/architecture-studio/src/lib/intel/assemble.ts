@@ -224,6 +224,7 @@ export function assemble(input: AssembleInput): { records: NormalizedDecision[];
       conditional: [],
       unknown: [],
       mapping: null,
+      matrixColumn: null,
       src: { path: a.path, line: o.line },
     }));
     // comparison table from the design, tied to options by letter, or by position when unambiguous
@@ -238,6 +239,7 @@ export function assemble(input: AssembleInput): { records: NormalizedDecision[];
           const opt = byLetter ? opts.find((o) => o.key === col) : opts[i];
           if (opt) {
             opt.mapping = mapping;
+            opt.matrixColumn = col;
             claimsFor(opt, { designId: design.id, src: { path: design.path, line: design.comparison!.line }, columns: cols, rows: design.comparison!.rows.map((r) => ({ criterion: r.criterion, cells: r.cells, line: r.line })), mapping }, col, design.path);
           }
         });
@@ -341,7 +343,7 @@ export function assemble(input: AssembleInput): { records: NormalizedDecision[];
     }
     rec.milestone = d.milestone ?? null;
     if (d.milestone) rec.tags = [`Needed by ${d.milestone}`];
-    rec.options = d.options.map((o, i) => ({ key: `#${i + 1}`, name: o, summary: null, disposition: null, recommended: false, tradeoffs: null, pros: [], cons: [], conditional: [], unknown: [], mapping: null, src: { path: d.src.path, line: d.src.line } }));
+    rec.options = d.options.map((o, i) => ({ key: `#${i + 1}`, name: o, summary: null, disposition: null, recommended: false, tradeoffs: null, pros: [], cons: [], conditional: [], unknown: [], mapping: null, matrixColumn: null, src: { path: d.src.path, line: d.src.line } }));
     if (rec.options.length) fs('options', 'Register "Known options (none chosen)" column, split on semicolons');
     if (d.owner) {
       rec.decisionOwner = d.owner;

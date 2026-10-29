@@ -1,8 +1,9 @@
 'use client';
 
 import { createContext, useCallback, useContext, useState, type ComponentType, type ReactNode } from 'react';
-import { AlertTriangle, Check, CircleCheck, CircleDashed, CircleDot, CircleHelp, CircleMinus, CirclePause, CircleX, Copy, ExternalLink, GitBranch, OctagonAlert, Replace, type LucideProps } from 'lucide-react';
+import { AlertTriangle, Bot, Check, CircleCheck, CircleDashed, CircleDot, CircleHelp, CircleMinus, CirclePause, CircleX, Copy, ExternalLink, GitBranch, OctagonAlert, Replace, type LucideProps } from 'lucide-react';
 import { srcLink, type GitHubCtx } from '@/lib/links.ts';
+import type { NormStatus, Verdict } from '@/lib/intel/schema.ts';
 import { STATUS_LABEL, TASK_STATUS_LABEL, type DecisionStatus, type Src, type TaskStatus } from '@/lib/repo/types.ts';
 
 const Ctx = createContext<GitHubCtx>({ githubUrl: null, links: {} });
@@ -55,6 +56,35 @@ export const BlockedPill = ({ reason }: { reason?: string }) => (
   </Pill>
 );
 export const NeutralPill = ({ children, title }: { children: ReactNode; title?: string }) => <Pill t={tone('neutral', CircleMinus)} title={title}>{children}</Pill>;
+
+const NORM_TONE: Record<NormStatus, Tone> = {
+  Proposed: tone('proposed', CircleDot),
+  'Pending Review': tone('open', CircleDashed),
+  Approved: tone('accepted', CircleCheck),
+  Rejected: tone('rejected', CircleX),
+  Deferred: tone('deferred', CirclePause),
+  Superseded: tone('neutral', Replace),
+  Blocked: tone('blocked', OctagonAlert),
+};
+export const NormStatusPill = ({ status }: { status: NormStatus }) => <Pill t={NORM_TONE[status]}>{status}</Pill>;
+
+const VERDICT_TONE: Record<Verdict, { t: Tone; label: string }> = {
+  meets: { t: tone('accepted', CircleCheck), label: 'Meets' },
+  conditional: { t: tone('open', CircleDashed), label: 'Conditional' },
+  'does-not-meet': { t: tone('rejected', CircleX), label: 'Does not meet' },
+  unknown: { t: tone('neutral', CircleHelp), label: 'Unknown' },
+};
+export const VerdictPill = ({ verdict }: { verdict: Verdict }) => <Pill t={VERDICT_TONE[verdict].t}>{VERDICT_TONE[verdict].label}</Pill>;
+
+/** Marks AI-written material. It is always visible, never colour-only, and says what the material is not. */
+export function AiBadge({ className = '' }: { className?: string }) {
+  return (
+    <span className={`inline-flex items-center gap-1.5 rounded-md border border-dashed border-hairline-strong bg-surface-2 px-1.5 py-px text-[10.5px] font-semibold tracking-wide whitespace-nowrap text-ink-2 uppercase ${className}`}>
+      <Bot aria-hidden className="size-3" />
+      AI suggestion · unreviewed · not evidence
+    </span>
+  );
+}
 
 /** A pill chosen by name, so server components can use it (they cannot pass icon functions to client components). */
 export const TonePill = ({ name, children }: { name: 'blocked' | 'neutral' | 'open' | 'accepted'; children: ReactNode }) => <Pill t={tone(name, name === 'blocked' ? OctagonAlert : name === 'accepted' ? CircleCheck : name === 'open' ? CircleDashed : CircleMinus)}>{children}</Pill>;

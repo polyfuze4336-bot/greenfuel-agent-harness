@@ -13,6 +13,7 @@ export interface ComparedOption {
   recorded: { pros: Claim[]; cons: Claim[]; conditional: Claim[]; unknown: Claim[] };
   suggested: { pros: Suggestion[]; cons: Suggestion[] };
   mapping: OptionInfo['mapping'];
+  matrixColumn: string | null;
   src: OptionInfo['src'];
 }
 
@@ -46,6 +47,7 @@ export function compareAlternatives(rec: NormalizedDecision, suggestions: Sugges
       recorded: { pros: o.pros, cons: o.cons, conditional: o.conditional, unknown: o.unknown },
       suggested: { pros: mine.filter((s) => s.optionKey === o.key && s.kind === 'pro'), cons: mine.filter((s) => s.optionKey === o.key && s.kind === 'con') },
       mapping: o.mapping,
+      matrixColumn: o.matrixColumn,
       src: o.src,
     }))
     .sort((a, b) => Number(b.recommended) - Number(a.recommended));

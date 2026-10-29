@@ -4,11 +4,11 @@ import { Card, PageHeader, Section, Tag } from '@/components/ui.tsx';
 import { StatusBar } from '@/components/status-bar.tsx';
 import { utcDate } from '@/lib/format.ts';
 import { getModel } from '@/lib/repo/index.ts';
-import { STATUS_LABEL, type DecisionStatus } from '@/lib/repo/types.ts';
+import { STATUSES, type NormStatus } from '@/lib/intel/schema.ts';
 
 export const dynamic = 'force-dynamic';
 
-const ORDER: DecisionStatus[] = ['accepted', 'proposed', 'open', 'deferred', 'rejected', 'superseded'];
+const ORDER: NormStatus[] = ['Approved', 'Proposed', 'Pending Review', 'Blocked', 'Deferred', 'Rejected', 'Superseded'];
 
 function Metric({ label, value, caption, href, tone }: { label: string; value: string | number; caption: string; href: string; tone?: 'bad' }) {
   return (
@@ -25,11 +25,13 @@ function Metric({ label, value, caption, href, tone }: { label: string; value: s
 
 export default async function Overview() {
   const m = await getModel();
-  const { decisions: d, tasks: t, approvals: a, readiness: r } = m.metrics;
+  const { tasks: t, approvals: a, readiness: r } = m.metrics;
   const t2 = m.tasks.find((x) => x.id === 'T2');
-  const m1 = m.decisions.filter((x) => x.type === 'register' && x.milestone === 'M1' && x.status === 'open');
-  const counts = Object.fromEntries(ORDER.map((s) => [s, m.decisions.filter((x) => x.status === s).length])) as Record<DecisionStatus, number>;
-  const grandfathered = m.approvals.grandfatheredAccepted.length;
+  const m1 = m.register.records.filter((x) => x.kind === 'register-entry' && x.milestone === 'M1' && x.status === 'Pending Review');
+  const counts = m.register.stats.byStatus;
+  const rs = m.register.stats;
+  const approvedUnsigned = m.register.records.filter((x) => x.status === 'Approved' && x.approvalBasis !== 'signed').length;
+  const pendingN = rs.byStatus.Proposed + rs.byStatus['Pending Review'] + rs.byStatus.Blocked;
 
   return (
     <>
@@ -55,9 +57,9 @@ export default async function Overview() {
             <p className="mt-4 text-[12.5px] leading-5 text-ink-3">This is a statement of what the design gate and approval registry say, not a percentage. It changes only when those records change.</p>
           </div>
           <div className="p-6">
-            <p className="mb-3 text-[13px] font-medium text-ink-2">All {d.total} decisions by recorded status</p>
-            <StatusBar parts={ORDER.map((s) => ({ key: s, label: STATUS_LABEL[s], value: counts[s] }))} />
-            <p className="mt-4 text-[12.5px] leading-5 text-ink-3">{d.adrs} ADRs and {d.register} open register entries. Accepted means the status line says Accepted; it does not mean signed.</p>
+            <p className="mb-3 text-[13px] font-medium text-ink-2">All {rs.total} decisions by normalized status</p>
+            <StatusBar parts={ORDER.map((s) => ({ key: s.toLowerCase().replace(' ', '-'), label: s, value: counts[s] }))} />
+            <p className="mt-4 text-[12.5px] leading-5 text-ink-3">{rs.byKind.adr} ADRs and {rs.byKind['register-entry']} open register entries. Approved means the source says Accepted; it does not mean signed. A Proposed ADR whose design review is Blocked is shown as Blocked.</p>
           </div>
         </div>
       </Card>
@@ -65,11 +67,11 @@ export default async function Overview() {
       <Section title="Key figures" aside="Select a figure to see its records">
         <Card className="overflow-hidden">
           <div className="grid grid-cols-1 gap-px bg-hairline sm:grid-cols-2 lg:grid-cols-4">
-            <Metric label="Total decisions" value={d.total} caption={`${d.adrs} ADRs plus ${d.register} register entries`} href="/decisions" />
-            <Metric label="Pending decisions" value={d.pending} caption={`${d.open} Open and ${d.proposed} Proposed`} href="/decisions?status=open,proposed" />
-            <Metric label="Accepted decisions" value={d.accepted} caption={`${d.acceptedSigned} with a signed approval record. ${grandfathered} were accepted by owner instruction before signing existed.`} href="/decisions?status=accepted" />
-            <Metric label="Rejected decisions" value={d.rejected} caption="No ADR or register entry has a Rejected status." href="/decisions?status=rejected" />
-            <Metric label="Deferred decisions" value={d.deferred} caption={t2 && t2.status === 'deferred' ? 'No decision has a Deferred status. Owner task T2 records that answering the register was deferred.' : 'No decision has a Deferred status.'} href="/decisions?status=deferred" />
+            <Metric label="Total decisions" value={rs.total} caption={`${rs.byKind.adr} ADRs plus ${rs.byKind['register-entry']} register entries`} href="/decisions" />
+            <Metric label="Pending decisions" value={pendingN} caption={`${rs.byStatus['Pending Review']} Pending Review, ${rs.byStatus.Proposed} Proposed and ${rs.byStatus.Blocked} Blocked`} href="/decisions?status=Proposed,Pending%20Review,Blocked" />
+            <Metric label="Approved decisions" value={rs.byStatus.Approved} caption={`${rs.byStatus.Approved - approvedUnsigned} with a signed approval record. ${approvedUnsigned} were approved on the owner's instruction without a signature.`} href="/decisions?status=Approved" />
+            <Metric label="Rejected decisions" value={rs.byStatus.Rejected} caption="No ADR or register entry has a Rejected status." href="/decisions?status=Rejected" />
+            <Metric label="Deferred decisions" value={rs.byStatus.Deferred} caption={t2 && t2.status === 'deferred' ? 'No decision has a Deferred status. Owner task T2 records that answering the register was deferred.' : 'No decision has a Deferred status.'} href="/decisions?status=Deferred" />
             <Metric label="Blocked tasks" value={t.blocked} caption={`of ${t.ownerTodo} owner tasks state an unmet prerequisite (rule-based)`} href="/queue?blocked=1" tone={t.blocked > 0 ? 'bad' : undefined} />
             <Metric label="Outstanding approvals" value={a.outstanding} caption={`${a.adrs} Proposed ADRs and ${a.reviews} design reviews`} href="/approvals" />
             <Metric label="Architecture readiness" value={r.reviewsApproved === r.reviewsTotal && r.reviewsTotal > 0 ? 'Gate passed' : 'Not ready'} caption={`${r.reviewsApproved} of ${r.reviewsTotal} design reviews Approved`} href="/architecture#reviews" tone={r.reviewsApproved < r.reviewsTotal ? 'bad' : undefined} />
@@ -124,7 +126,7 @@ export default async function Overview() {
                       <Link prefetch={false} href={`/decisions?id=${x.id}`} className="font-mono text-[12.5px] font-medium text-accent hover:underline">{x.id}</Link>
                     </td>
                     <td className="py-2.5 pr-4 align-top">{x.title}</td>
-                    <td className="py-2.5 pr-5 align-top text-ink-2">{x.owner}</td>
+                    <td className="py-2.5 pr-5 align-top text-ink-2">{x.decisionOwner}</td>
                   </tr>
                 ))}
               </tbody>

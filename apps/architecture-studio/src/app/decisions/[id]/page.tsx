@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { ChevronLeft } from 'lucide-react';
 import { DecisionDetail } from '@/components/decisions/decision-detail.tsx';
 import { Card } from '@/components/ui.tsx';
+import { duplicatesFor } from '@/lib/intel/duplicates.ts';
 import { buildLookup } from '@/lib/lookup.ts';
 import { getModel } from '@/lib/repo/index.ts';
 
@@ -16,7 +17,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 export default async function DecisionPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const m = await getModel();
-  const d = m.decisions.find((x) => x.id === decodeURIComponent(id));
+  const d = m.register.records.find((x) => x.id === decodeURIComponent(id));
   if (!d) notFound();
   return (
     <div className="mx-auto max-w-3xl">
@@ -25,7 +26,7 @@ export default async function DecisionPage({ params }: { params: Promise<{ id: s
         Decision Register
       </Link>
       <Card className="p-7">
-        <DecisionDetail d={d} lookup={buildLookup(m)} titleAs="h1" />
+        <DecisionDetail d={d} lookup={buildLookup(m)} duplicates={duplicatesFor(d.id, m.register.duplicates)} suggestions={m.register.suggestions} titleAs="h1" />
       </Card>
     </div>
   );

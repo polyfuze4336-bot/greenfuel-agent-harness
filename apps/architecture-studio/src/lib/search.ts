@@ -21,7 +21,7 @@ const entry = (h: SearchHit, text: string): Entry => ({ ...h, haystack: `${h.id}
 
 export function buildIndex(m: StudioModel): Entry[] {
   const out: Entry[] = [];
-  for (const d of m.decisions) out.push(entry({ kind: 'decision', id: d.id, title: d.title, subtitle: `${d.type === 'adr' ? 'ADR' : 'Open decision'} · ${d.statusRaw.split(/[ (]/)[0]}`, href: `/decisions?id=${encodeURIComponent(d.id)}` }, `${d.summary} ${d.owner ?? ''} ${d.milestone ?? ''}`));
+  for (const d of m.register.records) out.push(entry({ kind: 'decision', id: d.id, title: d.title, subtitle: `${d.kind === 'adr' ? 'ADR' : 'Open decision'} · ${d.status}`, href: `/decisions?id=${encodeURIComponent(d.id)}` }, `${d.description ?? ''} ${d.businessJustification ?? ''} ${d.decisionOwner ?? ''} ${d.milestone ?? ''} ${d.options.map((o) => o.name).join(' ')}`));
   for (const t of m.tasks) out.push(entry({ kind: 'task', id: t.id, title: t.title, subtitle: `${t.family === 'roadmap' ? 'Roadmap' : 'Owner task'} · ${t.status}${t.blocked ? ' · blocked' : ''}`, href: `/queue?id=${encodeURIComponent(t.id)}` }, `${t.detail} ${t.blocks}`));
   for (const r of m.requirements) out.push(entry({ kind: 'requirement', id: r.id, title: r.title, subtitle: `Requirement · ${r.priority}`, href: `/architecture?rq=${encodeURIComponent(r.id)}#requirements` }, `${r.acceptance} ${r.justification}`));
   for (const r of m.risks) out.push(entry({ kind: 'risk', id: r.id, title: r.title, subtitle: `Risk · ${r.status}`, href: `/architecture?rk=${encodeURIComponent(r.id)}#risks` }, `${r.cause} ${r.mitigation}`));

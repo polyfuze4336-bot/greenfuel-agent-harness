@@ -40,6 +40,8 @@ export interface OptionInfo {
   unknown: Claim[];
   /** How the comparison-table column was tied to this option, when one was. */
   mapping: 'letter' | 'position' | null;
+  /** The comparison-table column this option was tied to (a letter such as "C"), when one was. */
+  matrixColumn: string | null;
   src: Src;
 }
 

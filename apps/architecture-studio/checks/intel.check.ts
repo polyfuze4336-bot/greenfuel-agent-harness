@@ -279,8 +279,8 @@ describe('schema validation', () => {
     assert.match(bad((r) => (r.source.commit = 'abc')), /40-character/);
     assert.match(bad((r) => r.missing.push('decisionOwner')), /populated but listed as missing/);
     assert.match(bad((r) => (r.missing = r.missing.filter((m) => m !== 'priority'))), /empty but not listed/);
-    assert.match(bad((r) => (r.implications.cost = { text: 'x', src: { path: '', line: 0, rule: '' } })), /needs a path/);
-    assert.match(bad((r) => r.options.push({ key: 'Z', name: 'z', summary: null, disposition: null, recommended: false, tradeoffs: null, pros: [{ text: 'free pro', src: { path: '', line: 0 }, basis: 'recorded' }], cons: [], conditional: [], unknown: [], mapping: null, src: { path: 'p', line: 1 } })), /recorded text with a source/);
+    assert.match(bad((r) => (r.implications.cost = { text: 'x', src: { path: '', line: 0, rule: '' } })), /recorded source|needs a path/);
+    assert.match(bad((r) => r.options.push({ key: 'Z', name: 'z', summary: null, disposition: null, recommended: false, tradeoffs: null, pros: [{ text: 'free pro', src: { path: '', line: 0 }, basis: 'recorded' }], cons: [], conditional: [], unknown: [], mapping: null, matrixColumn: null, src: { path: 'p', line: 1 } })), /recorded text with a source/);
   });
 });
 

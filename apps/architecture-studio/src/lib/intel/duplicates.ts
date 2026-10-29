@@ -9,7 +9,7 @@ export function tokens(s: string): Set<string> {
   return new Set(
     s
       .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, ' ')
+      .replace(/[^a-z0-9\s]/g, ' ')
       .split(/\s+/)
       .map((w) => w.replace(/(ies)$/, 'y').replace(/(es|s|ing|ed)$/, ''))
       .filter((w) => w.length >= 4 && !STOP.has(w)),
