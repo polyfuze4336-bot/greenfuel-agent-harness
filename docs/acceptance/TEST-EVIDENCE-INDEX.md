@@ -5,7 +5,7 @@ Generated from the evidence records, the committed evaluation runs, the test fol
 
 **What an evidence record is.** The recorder runs a command and stores what happened: arguments, exit code, duration, an output hash and the output tail, the Git commit and the runtime. It records facts about a run; it does not judge whether the command proves the claim. A claim is only as good as the command that backs it. A record with no exit code is a timeout or a kill, and is kept (append-only).
 
-## A. Evidence records (76)
+## A. Evidence records (77)
 
 | ID | Recorded | Commit | Command | Outcome | Claim |
 |---|---|---|---|---|---|
@@ -85,6 +85,7 @@ Generated from the evidence records, the committed evaluation runs, the test fol
 | EV-0074 | 2026-10-29 | `b18daf7` | `npm test` | exit 1 | Full npm test suite passes after the hardening stage (candidate oracles, remediation of the independent review, and the existing harness tests); recor |
 | EV-0075 | 2026-10-29 | `8ef6887` | `npm test` | exit 0 | Full npm test suite on a clean committed tree after the hardening stage and its remediation; includes the candidate-oracle security tests; supersedes  |
 | EV-0076 | 2026-10-29 | `dffe85a` | `node harness/scripts/spec-validators.mjs deployment-readiness` | exit 2 | Deployment-readiness gate evaluated before the Azure deployment request: result NOT-READY (phase 0, no approver, open decisions, unresolved parameters |
+| EV-0077 | 2026-10-29 | `88b824a` | `npm test` | exit 0 | Full npm test suite on a clean committed tree after the synthetic agent evaluation framework and its remediation of the independent critique; includes |
 
 ## B. Committed evaluation runs (1)
 
