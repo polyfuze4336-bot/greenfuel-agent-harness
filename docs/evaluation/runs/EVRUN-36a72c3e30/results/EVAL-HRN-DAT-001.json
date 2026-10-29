@@ -1,0 +1,29 @@
+{
+  "schema": "greenfuel.eval-evidence/v1",
+  "testId": "EVAL-HRN-DAT-001",
+  "ran": true,
+  "argv": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "tests/record-evidence.test.mjs"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-29T01:15:49.180Z",
+  "durationMs": 3104,
+  "outputSha256": "614b5f45d0e43c467a9605ee736220f52a3e7820c53e0af205da2254efeefda8",
+  "outputBytes": 1453,
+  "outputTail": "TAP version 13\n# Subtest: records exit code, hash and tail of a passing command\nok 1 - records exit code, hash and tail of a passing command\n  ---\n  duration_ms: 144.0213\n  type: 'test'\n  ...\n# Subtest: records a failing command as failure, not as success\nok 2 - records a failing command as failure, not as success\n  ---\n  duration_ms: 119.5129\n  type: 'test'\n  ...\n# Subtest: redacts secret-shaped output\nok 3 - redacts secret-shaped output\n  ---\n  duration_ms: 128.1871\n  type: 'test'\n  ...\n# Subtest: refuses to overwrite an existing record\nok 4 - refuses to overwrite an existing record\n  ---\n  duration_ms: 141.641\n  type: 'test'\n  ...\n# Subtest: can launch npm on every platform and records its exit code\nok 5 - can launch npm on every platform and records its exit code\n  ---\n  duration_ms: 2303.2578\n  type: 'test'\n  ...\n# Subtest: the command line cannot redirect where records are written\nok 6 - the command line cannot redirect where records are written\n  ---\n  duration_ms: 67.8393\n  type: 'test'\n  ...\n# Subtest: refuses commands the policy denies, and writes nothing\nok 7 - refuses commands the policy denies, and writes nothing\n  ---\n  duration_ms: 4.5442\n  type: 'test'\n  ...\n# Subtest: policy allows the recorder invocation itself\nok 8 - policy allows the recorder invocation itself\n  ---\n  duration_ms: 4.0132\n  type: 'test'\n  ...\n1..8\n# tests 8\n# suites 0\n# pass 8\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 3028.5074\n",
+  "parsed": {
+    "tests": 8,
+    "pass": 8,
+    "fail": 0,
+    "skipped": 0,
+    "todo": 0,
+    "cancelled": 0
+  },
+  "status": "PASS",
+  "actual": "ran and passed: 8 tests, 0 failed, 0 skipped"
+}

@@ -1,7 +1,7 @@
 <!-- generated: node harness/scripts/acceptance-reports.mjs --write -->
 # Requirements coverage
 
-Generated from the requirements baseline, the design trace tables, the ADRs, the evaluation catalogue and the committed evaluation run `EVRUN-bdce820495` (commit `22ada85`). Do not edit: `validate-harness` regenerates this file and fails on any difference.
+Generated from the requirements baseline, the design trace tables, the ADRs, the evaluation catalogue and the committed evaluation run `EVRUN-36a72c3e30` (commit `e4a2f82`). Do not edit: `validate-harness` regenerates this file and fails on any difference.
 
 **What a class means.** It says what a test that actually ran has shown. It never says a requirement is satisfied. A passing test of a candidate contract or of the harness shows that contract or harness behaves as the test states; it does not show that a production system meets the requirement, and no production system exists. TESTED AND PASSING is therefore the strongest class that can exist today.
 
@@ -18,9 +18,9 @@ Generated from the requirements baseline, the design trace tables, the ADRs, the
 
 | Class | All | Must |
 |---|---|---|
-| TESTED AND PASSING | 25 | 24 |
+| TESTED AND PASSING | 29 | 28 |
 | TESTED, A TEST FAILS | 9 | 9 |
-| TESTED, A TEST BLOCKED | 6 | 6 |
+| TESTED, A TEST BLOCKED | 2 | 2 |
 | PENDING TEST ONLY | 12 | 8 |
 | DESIGNED ONLY | 12 | 9 |
 | SPECIFIED ONLY | 35 | 24 |
@@ -43,7 +43,7 @@ Generated from the requirements baseline, the design trace tables, the ADRs, the
 | FR-003 | Must | DEA | - | - | - | - | - | **SPECIFIED ONLY** |
 | FR-004 | Must | DEA | - | - | - | - | - | **SPECIFIED ONLY** |
 | FR-005 | Must | DEA | HC-08 | - | - | - | - | **SPECIFIED ONLY** |
-| FR-006 | Must | DEA,EDG | HC-07 | DES-0001 Addressed; DES-0002 Partial | ADR-0004, ADR-0015 | PRC-DAT-007 NOT-RUN | PRD-REL-001 | **TESTED, A TEST BLOCKED** |
+| FR-006 | Must | DEA,EDG | HC-07 | DES-0001 Addressed; DES-0002 Partial | ADR-0004, ADR-0015 | PRC-DAT-007 PASS | PRD-REL-001 | **TESTED AND PASSING** |
 | FR-032 | Must | DEA | - | - | - | - | - | **SPECIFIED ONLY** |
 | FR-007 | Must | EAA | HC-10 | - | - | - | - | **SPECIFIED ONLY** |
 | FR-008 | Must | EAA | HC-05 | - | - | PRC-DAT-004 PASS | PRD-FUN-002 | **TESTED AND PASSING** |
@@ -71,8 +71,8 @@ Generated from the requirements baseline, the design trace tables, the ADRs, the
 | FR-029 | Must | XC | HC-08 | - | - | - | PRD-OBS-001 | **PENDING TEST ONLY** |
 | FR-030 | Must | XC | - | - | - | - | - | **SPECIFIED ONLY** |
 | FR-031 | Should | XC | - | - | - | - | - | **SPECIFIED ONLY** |
-| SEC-001 | Must | SOV | HC-01 | DES-0001 Partial; DES-0002 Partial | ADR-0004, ADR-0015 | HRN-SOV-002 PASS; HRN-AZR-004 PASS; HRN-AZR-005 PASS; PRC-ARC-001 FAIL; PRC-SOV-004 NOT-RUN; PRC-SOV-001 PASS; PRC-SOV-003 PASS; PRC-SEC-003 PASS | PRD-SOV-002 | **TESTED, A TEST FAILS** |
-| SEC-002 | Must | SOV | HC-01 | DES-0001 Partial; DES-0002 Unresolved | ADR-0004, ADR-0015 | HRN-SOV-002 PASS; PRC-ARC-001 FAIL; PRC-SOV-004 NOT-RUN; PRC-SOV-001 PASS; PRC-SOV-003 PASS | PRD-SOV-002 | **TESTED, A TEST FAILS** |
+| SEC-001 | Must | SOV | HC-01 | DES-0001 Partial; DES-0002 Partial | ADR-0004, ADR-0015 | HRN-SOV-002 PASS; HRN-AZR-004 PASS; HRN-AZR-005 PASS; PRC-ARC-001 FAIL; PRC-SOV-004 PASS; PRC-SOV-001 PASS; PRC-SOV-003 PASS; PRC-SEC-003 PASS | PRD-SOV-002 | **TESTED, A TEST FAILS** |
+| SEC-002 | Must | SOV | HC-01 | DES-0001 Partial; DES-0002 Unresolved | ADR-0004, ADR-0015 | HRN-SOV-002 PASS; PRC-ARC-001 FAIL; PRC-SOV-004 PASS; PRC-SOV-001 PASS; PRC-SOV-003 PASS | PRD-SOV-002 | **TESTED, A TEST FAILS** |
 | SEC-003 | Must | SOV,XC | HC-01 | DES-0001 Partial | ADR-0004 | PRC-ARC-001 FAIL | PRD-SOV-002 | **TESTED, A TEST FAILS** |
 | SEC-004 | Must | SOV | HC-01 | DES-0001 Partial | ADR-0004 | PRC-ARC-001 FAIL | PRD-SOV-002 | **TESTED, A TEST FAILS** |
 | SEC-005 | Must | CCA,XC | HC-02 | - | - | HRN-SOV-001 PASS | PRD-SOV-001 | **TESTED AND PASSING** |
@@ -87,7 +87,7 @@ Generated from the requirements baseline, the design trace tables, the ADRs, the
 | SEC-014 | Should | XC | - | DES-0001 Partial | - | - | - | **DESIGNED ONLY** |
 | SEC-015 | Should | XC | - | - | - | - | - | **SPECIFIED ONLY** |
 | DATA-001 | Must | XC,SOV | - | DES-0001 Addressed; DES-0002 Partial | ADR-0015 | HRN-SOV-004 PASS | - | **TESTED AND PASSING** |
-| DATA-002 | Must | DEA,EDG | - | DES-0001 Partial; DES-0002 Partial | ADR-0015 | PRC-DAT-001 PASS; PRC-DAT-006 FAIL; PRC-DAT-007 NOT-RUN; PRC-DAT-008 NOT-RUN | - | **TESTED, A TEST FAILS** |
+| DATA-002 | Must | DEA,EDG | - | DES-0001 Partial; DES-0002 Partial | ADR-0015 | PRC-DAT-001 PASS; PRC-DAT-006 FAIL; PRC-DAT-007 PASS; PRC-DAT-008 PASS | - | **TESTED, A TEST FAILS** |
 | DATA-003 | Must | XC | HC-08 | - | - | PRC-DAT-002 PASS | PRD-OBS-001 | **TESTED AND PASSING** |
 | DATA-004 | Must | XC | - | - | - | - | - | **SPECIFIED ONLY** |
 | DATA-005 | Must | EAA | - | - | - | PRC-DAT-005 FAIL | - | **TESTED, A TEST FAILS** |
@@ -98,7 +98,7 @@ Generated from the requirements baseline, the design trace tables, the ADRs, the
 | DATA-010 | Should | XC | - | - | - | - | - | **SPECIFIED ONLY** |
 | AGT-001 | Must | XC | - | - | - | - | - | **SPECIFIED ONLY** |
 | AGT-002 | Must | XC | HC-09 | - | - | HRN-SEC-006 PASS; HRN-SEC-009 PASS | - | **TESTED AND PASSING** |
-| AGT-003 | Must | XC | HC-06 | DES-0002 Partial | ADR-0015 | HRN-SEC-005 PASS; PRC-SOV-004 NOT-RUN; PRC-SOV-002 PASS | PRD-SEC-001 | **TESTED, A TEST BLOCKED** |
+| AGT-003 | Must | XC | HC-06 | DES-0002 Partial | ADR-0015 | HRN-SEC-005 PASS; PRC-SOV-004 PASS; PRC-SOV-002 PASS | PRD-SEC-001 | **TESTED AND PASSING** |
 | AGT-004 | Must | XC | HC-06 | - | - | PRC-SOV-002 PASS | PRD-DAT-007 | **TESTED AND PASSING** |
 | AGT-005 | Must | XC | HC-04 | - | - | HRN-SEC-003 PASS; PRC-SEC-001 PASS | PRD-SEC-002 | **TESTED AND PASSING** |
 | AGT-006 | Must | XC | HC-09, HC-11 | - | - | HRN-SEC-001 PASS; HRN-SEC-002 PASS; HRN-SEC-007 PASS; PRC-AZR-001 BLOCKED | PRD-SEC-003 | **TESTED, A TEST BLOCKED** |
@@ -112,16 +112,16 @@ Generated from the requirements baseline, the design trace tables, the ADRs, the
 | NFR-003 | Must | XC | HC-12 | - | - | - | PRD-AZR-002; PRD-REL-002 | **PENDING TEST ONLY** |
 | NFR-011 | Must | XC | HC-03 | - | - | PRC-DAT-003 PASS; PRC-SEC-002 PASS | - | **TESTED AND PASSING** |
 | NFR-012 | Should | XC | - | - | - | - | - | **SPECIFIED ONLY** |
-| NFR-017 | Must | EDG | - | DES-0001 Unresolved; DES-0002 Partial | ADR-0015 | PRC-DAT-006 FAIL; PRC-DAT-008 NOT-RUN | - | **TESTED, A TEST FAILS** |
-| NFR-004 | Must | EDG | HC-07 | DES-0001 Unresolved; DES-0002 Unresolved | ADR-0015 | PRC-DAT-007 NOT-RUN | PRD-REL-001; PRD-REL-002 | **TESTED, A TEST BLOCKED** |
-| NFR-005 | Must | EDG | HC-07 | DES-0001 Addressed; DES-0002 Partial | ADR-0004, ADR-0015 | HRN-REL-001 PASS; PRC-DAT-002 PASS; PRC-DAT-007 NOT-RUN | PRD-REL-001 | **TESTED, A TEST BLOCKED** |
+| NFR-017 | Must | EDG | - | DES-0001 Unresolved; DES-0002 Partial | ADR-0015 | PRC-DAT-006 FAIL; PRC-DAT-008 PASS | - | **TESTED, A TEST FAILS** |
+| NFR-004 | Must | EDG | HC-07 | DES-0001 Unresolved; DES-0002 Unresolved | ADR-0015 | PRC-DAT-007 PASS | PRD-REL-001; PRD-REL-002 | **TESTED AND PASSING** |
+| NFR-005 | Must | EDG | HC-07 | DES-0001 Addressed; DES-0002 Partial | ADR-0004, ADR-0015 | HRN-REL-001 PASS; PRC-DAT-002 PASS; PRC-DAT-007 PASS | PRD-REL-001 | **TESTED AND PASSING** |
 | NFR-006 | Must | EDG,DEA | HC-07 | DES-0001 Partial; DES-0002 Partial | ADR-0015 | - | PRD-REL-001 | **PENDING TEST ONLY** |
 | NFR-007 | Should | XC | - | DES-0001 Unresolved | - | - | PRD-OPS-001 | **PENDING TEST ONLY** |
 | NFR-008 | Must | XC | - | DES-0001 Unresolved | - | - | PRD-OPS-001 | **PENDING TEST ONLY** |
 | NFR-016 | Should | XC,SOV | - | DES-0001 Addressed | ADR-0004 | - | - | **DESIGNED ONLY** |
 | NFR-014 | Should | CCA,DRA | - | - | - | - | HRN-PRF-001; PRD-PRF-001 | **PENDING TEST ONLY** |
 | NFR-015 | Should | XC | - | - | - | - | PRD-PRF-001 | **PENDING TEST ONLY** |
-| NFR-009 | Must | SOV | HC-01 | DES-0001 Partial; DES-0002 Unresolved | ADR-0015 | PRC-ARC-001 FAIL; PRC-SOV-004 NOT-RUN; PRC-SOV-001 PASS; PRC-SOV-003 PASS | - | **TESTED, A TEST FAILS** |
+| NFR-009 | Must | SOV | HC-01 | DES-0001 Partial; DES-0002 Unresolved | ADR-0015 | PRC-ARC-001 FAIL; PRC-SOV-004 PASS; PRC-SOV-001 PASS; PRC-SOV-003 PASS | - | **TESTED, A TEST FAILS** |
 | NFR-010 | Must | CCA,XC | HC-02 | - | - | - | PRD-SOV-001 | **PENDING TEST ONLY** |
 | NFR-013 | Should | XC | - | DES-0001 Partial | - | - | - | **DESIGNED ONLY** |
 | NFR-018 | Should | DRA,XC | - | - | - | - | - | **SPECIFIED ONLY** |

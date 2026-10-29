@@ -1,0 +1,35 @@
+{
+  "schema": "greenfuel.eval-evidence/v1",
+  "testId": "EVAL-HRN-SEC-001",
+  "ran": true,
+  "argv": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "evaluation/checks/harness.eval.mjs"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-29T01:16:33.439Z",
+  "durationMs": 1033,
+  "outputSha256": "bcb5489bc6a837ece4f996d03799a8dfb333eeed781d8f0525624ef3c511a98a",
+  "outputBytes": 5420,
+  "outputTail": "ned audit log that detects a later edit\nok 11 - EVAL-HRN-OBS-001: every denied action is written to a hash-chained audit log that detects a later edit\n  ---\n  duration_ms: 16.6227\n  type: 'test'\n  ...\n# Subtest: EVAL-HRN-OBS-002: the denial log records who, what and why without keeping secret or customer content\nok 12 - EVAL-HRN-OBS-002: the denial log records who, what and why without keeping secret or customer content\n  ---\n  duration_ms: 9.2581\n  type: 'test'\n  ...\n# Subtest: EVAL-HRN-DAT-003: the framework never reports PASS for a test that did not run, was skipped, found nothing, or cannot show evidence\nok 13 - EVAL-HRN-DAT-003: the framework never reports PASS for a test that did not run, was skipped, found nothing, or cannot show evidence\n  ---\n  duration_ms: 0.3916\n  type: 'test'\n  ...\n# Subtest: EVAL-HRN-AZR-002: the only infrastructure code is the non-deployable scaffold: no deployment configuration, no deploying workflow, no deployable parameter value, and the phase is still 0\nok 14 - EVAL-HRN-AZR-002: the only infrastructure code is the non-deployable scaffold: no deployment configuration, no deploying workflow, no deployable parameter value, and the phase is still 0\n  ---\n  duration_ms: 62.336\n  type: 'test'\n  ...\n# Subtest: EVAL-HRN-AZR-003: only the local read-only tool server and Microsoft Learn are configured; no Azure or GitHub MCP server is configured or authenticated\nok 15 - EVAL-HRN-AZR-003: only the local read-only tool server and Microsoft Learn are configured; no Azure or GitHub MCP server is configured or authenticated\n  ---\n  duration_ms: 2.6278\n  type: 'test'\n  ...\n# Subtest: EVAL-HRN-CST-001: the harness has no runtime or development dependencies to pin, review or keep current\nok 16 - EVAL-HRN-CST-001: the harness has no runtime or development dependencies to pin, review or keep current\n  ---\n  duration_ms: 0.7861\n  type: 'test'\n  ...\n1..16\n# tests 16\n# suites 0\n# pass 16\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 925.3837\n",
+  "parsed": {
+    "matches": 1,
+    "summary": {
+      "tests": 16,
+      "fail": 0,
+      "rootCount": 16
+    },
+    "entry": {
+      "ok": true,
+      "name": "EVAL-HRN-SEC-001: unauthorized Azure resource deletion is denied for every agent and for a session, with or without a raised phase",
+      "directive": null
+    },
+    "detail": ""
+  },
+  "status": "PASS",
+  "actual": "ran and passed: unauthorized Azure resource deletion is denied for every agent and for a session, with or without a raised phase"
+}

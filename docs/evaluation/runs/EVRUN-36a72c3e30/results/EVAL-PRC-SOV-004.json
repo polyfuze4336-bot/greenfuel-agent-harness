@@ -1,0 +1,35 @@
+{
+  "schema": "greenfuel.eval-evidence/v1",
+  "testId": "EVAL-PRC-SOV-004",
+  "ran": true,
+  "argv": [
+    "node",
+    "--test",
+    "--test-reporter=tap",
+    "evaluation/checks/ingestion-contract.eval.mjs"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-29T01:17:31.225Z",
+  "durationMs": 224,
+  "outputSha256": "a4055e2530ace89f75969331f316fac2d8c76d45eaf53f2530a94191c33b1e1c",
+  "outputBytes": 1444,
+  "outputTail": "TAP version 13\n# Subtest: EVAL-PRC-DAT-007: an offline edge with delayed synchronisation loses nothing, duplicates nothing and reorders nothing; replacement, deletion and tamper are refused or detected; missing readings are reported\nok 1 - EVAL-PRC-DAT-007: an offline edge with delayed synchronisation loses nothing, duplicates nothing and reorders nothing; replacement, deletion and tamper are refused or detected; missing readings are reported\n  ---\n  duration_ms: 6.8068\n  type: 'test'\n  ...\n# Subtest: EVAL-PRC-DAT-008: the ingestion contract rejects a manipulated timestamp against the VERIFIER's clock and skew, so a sender cannot move either\nok 2 - EVAL-PRC-DAT-008: the ingestion contract rejects a manipulated timestamp against the VERIFIER's clock and skew, so a sender cannot move either\n  ---\n  duration_ms: 4.2303\n  type: 'test'\n  ...\n# Subtest: EVAL-PRC-SOV-004: the ingestion contract compares every jurisdiction and zone claim with the verifier's own identity and refuses a batch that leaves it, an unregistered source or device, and a model as the origin\nok 3 - EVAL-PRC-SOV-004: the ingestion contract compares every jurisdiction and zone claim with the verifier's own identity and refuses a batch that leaves it, an unregistered source or device, and a model as the origin\n  ---\n  duration_ms: 5.8068\n  type: 'test'\n  ...\n1..3\n# tests 3\n# suites 0\n# pass 3\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 127.7024\n",
+  "parsed": {
+    "matches": 1,
+    "summary": {
+      "tests": 3,
+      "fail": 0,
+      "rootCount": 3
+    },
+    "entry": {
+      "ok": true,
+      "name": "EVAL-PRC-SOV-004: the ingestion contract compares every jurisdiction and zone claim with the verifier's own identity and refuses a batch that leaves it, an unregistered source or device, and a model as the origin",
+      "directive": null
+    },
+    "detail": ""
+  },
+  "status": "PASS",
+  "actual": "ran and passed: the ingestion contract compares every jurisdiction and zone claim with the verifier's own identity and refuses a batch that leaves it, an unregistered source or device, and a model as the origin"
+}
