@@ -16,6 +16,7 @@ const READ_TOOL = /^(view|read|readfile|read_file|grep|glob|rg|search)$/i;
 const MCP_TOOL = /azure|mcp/i;
 const { matchMcp } = require('./mcp-names.cjs');
 const engine = require('./permission-engine.cjs');
+const enforcement = require('../lib/enforcement.cjs');
 let registryCache;
 // Any session, not just a specialist agent: a tool that looks like one of this repository's enabled MCP servers but is not
 // an exact tool in the registry is refused. This is the guard for clients that have no native tool allow-filter (VS Code).
@@ -136,6 +137,7 @@ function evaluate(event, policy, opts = {}) {
   try {
     decision = engine.decide({ agent: null, tool: toolName, args: event.toolArgs ?? event.tool_input ?? {}, cwd, phase: policy.phase ?? 0, registry: registryCache ?? undefined, consume: Boolean(opts.consume), logDir: opts.logDir, scope: opts.scope, approvals: opts.approvals, now: opts.now, headCommit: opts.headCommit });
     if (decision.decision === 'deny') verdicts.push({ decision: 'deny', id: decision.rules[0] ?? 'PERMISSION', reason: `${decision.reasons[0]} [${decision.rules.join(', ')}]` });
+    if (opts.onDecision) opts.onDecision(decision);
   } catch (e) {
     verdicts.push({ decision: 'deny', id: 'PERMISSION-ERROR', reason: `permission engine error (${e.message}); denying` });
   }
@@ -157,7 +159,21 @@ function main() {
     process.stderr.write(`policy-guard: unparseable hook event (${err.message}); denying.\n`);
     process.exit(2);
   }
-  const verdict = evaluate(event, loadPolicy(), { audit: true, consume: true });
+  let verdict; let engineDecision = null; let policy;
+  try {
+    policy = loadPolicy();
+    verdict = evaluate(event, policy, { audit: true, consume: true, onDecision: (d) => { engineDecision = d; } });
+  } catch (err) {
+    // Fail closed: a policy file that is missing or corrupt, or any unexpected error, blocks the call. A crash that exits with another code could be read as "no objection".
+    process.stderr.write(`policy-guard: ${err.message}; denying.\n`);
+    process.stdout.write(JSON.stringify({ permissionDecision: 'deny', permissionDecisionReason: `[HARNESS-POLICY FAIL-CLOSED] the policy could not be evaluated (${String(err.message).slice(0, 120)})` }));
+    process.exit(2);
+  }
+  // Evidence that enforcement ran, and a record of every decision. Neither may change the decision.
+  try {
+    enforcement.writeHeartbeat({ hook: 'policy-guard', sessionId: event.sessionId, phase: policy.phase ?? 0 });
+    engine.decisionEvent(engine.loadModel(), event, verdict, { agent: null, hook: 'policy-guard', decision: engineDecision });
+  } catch { /* ignore */ }
   process.stdout.write(verdict
     ? JSON.stringify({ permissionDecision: verdict.decision, permissionDecisionReason: `[HARNESS-POLICY ${verdict.id}] ${verdict.reason}` })
     : '{}');

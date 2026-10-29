@@ -11,6 +11,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { matchMcp } = require('./mcp-names.cjs');
 const engine = require('./permission-engine.cjs');
+const enforcement = require('../lib/enforcement.cjs');
 
 const ROOT = path.join(__dirname, '..', '..');
 const PATH_KEYS = new Set(['path', 'filepath', 'file_path', 'file', 'filename', 'uri']);
@@ -115,6 +116,7 @@ function evaluate(event, agentName, policy, phase, registry = null, opts = {}) {
   } catch (e) {
     return finish(deny(`permission engine error (${e.message}); denying`), null);
   }
+  if (opts.onDecision) opts.onDecision(decision);
   if (core) return finish(core, decision);
   if (decision.decision === 'deny') return finish({ decision: 'deny', reason: `${decision.reasons[0]} [${decision.rules.join(', ')}]`, rules: decision.rules }, decision);
   return null;
@@ -193,10 +195,17 @@ function main() {
   try { event = JSON.parse(fs.readFileSync(0, 'utf8')); if (!event || typeof event !== 'object') throw new Error('not an object'); } catch (e) {
     process.stderr.write(`agent-guard: unparseable event (${e.message}); denying.\n`); process.exit(2);
   }
-  let verdict;
-  try { verdict = evaluate(event, agentName, load('harness/policy/agent-policy.json'), load('harness/policy/command-policy.json').phase ?? 0, null, { audit: true, consume: true }); } catch (e) {
-    process.stderr.write(`agent-guard: ${e.message}; denying.\n`); process.exit(2);
+  let verdict; let engineDecision = null;
+  try { verdict = evaluate(event, agentName, load('harness/policy/agent-policy.json'), load('harness/policy/command-policy.json').phase ?? 0, null, { audit: true, consume: true, onDecision: (d) => { engineDecision = d; } }); } catch (e) {
+    process.stderr.write(`agent-guard: ${e.message}; denying.\n`);
+    process.stdout.write(JSON.stringify({ permissionDecision: 'deny', permissionDecisionReason: `[AGENT-GUARD FAIL-CLOSED] the policy could not be evaluated (${String(e.message).slice(0, 120)})` }));
+    process.exit(2);
   }
+  // Evidence that enforcement ran, and a record of every decision. Neither may change the decision.
+  try {
+    enforcement.writeHeartbeat({ hook: 'agent-guard', agent: agentName, sessionId: event.sessionId });
+    engine.decisionEvent(engine.loadModel(), event, verdict, { agent: agentName, hook: 'agent-guard', decision: engineDecision });
+  } catch { /* ignore */ }
   process.stdout.write(verdict ? JSON.stringify({ permissionDecision: 'deny', permissionDecisionReason: `[AGENT-GUARD ${agentName}] ${verdict.reason}` }) : '{}');
 }
 

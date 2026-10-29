@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "schema": "greenfuel.control-plane-owners/v1",
+  "description": "GitHub logins that may make commits to the control plane (harness, workflows, policy, ADRs, approvals, evidence). The CI control-plane guard reads this file from the BASE commit and requires every control-plane commit to be GitHub-verified and made by one of these logins. EMPTY on purpose: the repository owner adds their own login in a signed commit after setting up commit signing (docs/security/APPROVER-ENROLLMENT.md). With no owner listed, an enforcing guard blocks every control-plane commit, which is the safe default.",
+  "enforce": false,
+  "owners": []
+}

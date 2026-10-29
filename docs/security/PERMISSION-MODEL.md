@@ -109,6 +109,7 @@ No agent has any standing permission in an Azure environment. An operation above
 | control-plane.write | P4 | local-fs | never grantable to an agent | Change hooks, policy, approvals, approver keys, audit logs, workflows or scripts |
 | fs.write.executable | P4 | local-fs | separate P4 authorization | Write an executable or script file outside a phase-enabled code scope. Closes the write-then-run route |
 | shell.indirection | P4 | local-exec | never grantable to an agent | A shell command built or hidden at run time (variables joined into a command name, Invoke-Expression, encoded commands, nested shells, inline interpreters, npx). Its real target cannot be classified, so it is refused |
+| credential.extract | P4 | local-fs | never grantable to an agent | Extract a token or credential through a command: the GitHub CLI token, a git credential helper, the Windows credential manager, a container registry login. Credentials are never available to an agent |
 
 ### Default policy and its enforcement
 

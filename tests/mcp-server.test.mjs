@@ -6,6 +6,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { handle, resetForTests, TOOLS, cleanText, capOutput, callTool, MAX_OUTPUT_BYTES } from '../harness/mcp/greenfuel-tools-server.mjs';
 
+// These tests exercise the tools themselves. Attestation (the fail-closed gate that needs a recent hook heartbeat) is tested in enforcement-attestation.test.mjs.
+process.env.HARNESS_ENFORCEMENT_ATTESTATION = 'off';
+
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SERVER = path.join(repo, 'harness', 'mcp', 'greenfuel-tools-server.mjs');
 const init = () => handle({ jsonrpc: '2.0', id: 1, method: 'initialize', params: { protocolVersion: '2025-06-18' } });

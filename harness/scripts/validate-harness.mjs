@@ -17,6 +17,7 @@ import { validateLoop } from './validate-loop.mjs';
 import { validateEvaluation } from './validate-evaluation.mjs';
 import { validateAzure } from './validate-azure.mjs';
 import { validateAcceptance } from './acceptance-reports.mjs';
+import { validateApprovals } from './validate-approvals.mjs';
 
 const { distinctiveUser } = createRequire(import.meta.url)('../lib/local-paths.cjs');
 
@@ -193,7 +194,7 @@ export function validate(root) {
     for (const p of PILLARS) if (!text.includes(p)) fail('pillars', `${doc}: pillar '${p}' not represented`);
   }
 
-  return [...errors, ...validateContext(root), ...validateArchitecture(root), ...validateAgents(root), ...validateTools(root), ...validatePermissions(root), ...validateOrchestration(root), ...validateMemory(root), ...validateLoop(root), ...validateEvaluation(root), ...validateAzure(root), ...validateAcceptance(root)];
+  return [...errors, ...validateContext(root), ...validateArchitecture(root), ...validateAgents(root), ...validateTools(root), ...validatePermissions(root), ...validateOrchestration(root), ...validateMemory(root), ...validateLoop(root), ...validateEvaluation(root), ...validateAzure(root), ...validateAcceptance(root), ...validateApprovals(root)];
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

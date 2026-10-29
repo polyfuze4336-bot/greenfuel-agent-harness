@@ -24,10 +24,16 @@
     "^src/", "^infra/", "^\\.azure/", "^azure\\.yaml$", "^Dockerfile$", "\\.bicep$", "\\.bicepparam$", "\\.tf$", "\\.tfvars$"
   ],
   "controlPlanePaths": [
-    "^\\.github/hooks/", "^\\.github/workflows/", "^harness/policy/", "^harness/hooks/", "^harness/scripts/"
+    "^\\.github/hooks/", "^\\.github/workflows/", "^\\.github/agents/", "^\\.github/instructions/", "^\\.github/skills/", "^\\.github/CODEOWNERS$",
+    "^harness/", "^evaluation/", "^\\.vscode/", "^\\.devcontainer/", "^\\.mcp\\.json$", "^package\\.json$", "^\\.gitignore$", "^\\.gitattributes$",
+    "^memory/", "^docs/approvals/", "^docs/state/runs/", "^docs/state/loops/", "^\\.git/(hooks|config)"
   ],
-  "evidenceRecordPaths": ["^docs/evidence/records/"],
+  "evidenceRecordPaths": ["^docs/evidence/records/", "^docs/evidence/logs/", "^docs/evidence/MANIFEST\\.json$"],
   "secretFilePaths": [
-    "(^|/)\\.env($|\\.(?!example$|sample$|template$))", "\\.(pfx|pem|key|p12)$", "(^|/)id_(rsa|ed25519)$", "(^|/)local\\.settings\\.json$", "(^|/)\\.azure/.*\\.env$"
+    "(^|/)\\.env($|\\.(?!example$|sample$|template$))", "\\.(pfx|pem|key|p12)$", "(^|/)id_(rsa|ed25519)$", "(^|/)local\\.settings\\.json$", "(^|/)\\.azure/.*\\.env$",
+    "(^|/)\\.azure/(msal_token_cache[^/]*|accessTokens\\.json|azureProfile\\.json|service_principal_entries\\.json|msal_http_cache\\.bin|clouds\\.config|az\\.json|az\\.sess)$",
+    "(^|/)\\.config/gh/(hosts|config)\\.yml$", "(^|/)\\.config/gcloud/", "(^|/)\\.config/azd/", "(^|/)\\.azd/", "(^|/)\\.kube/config$", "(^|/)\\.docker/config\\.json$",
+    "(^|/)\\.aws/(credentials|config)$", "(^|/)\\.ssh/", "(^|/)\\.gnupg/", "(^|/)\\.git/config$", "(^|/)\\.git/hooks/", "(^|/)\\.git-credentials$", "(^|/)\\.netrc$",
+    "(^|/)AppData/(Local|Roaming)/Microsoft/(Credentials|Protect|Vault)/"
   ]
 }

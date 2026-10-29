@@ -41,4 +41,24 @@ jobs:
       - run: node harness/scripts/validate-loop.mjs
       - run: node harness/scripts/validate-evaluation.mjs
       - run: node harness/scripts/validate-azure.mjs
+      - run: node harness/scripts/validate-approvals.mjs
       - run: node --test
+  # Independent of every hook and agent: control-plane commits must be GitHub-verified and made by an enrolled owner.
+  # Report-only until the owner enables enforcement (repository variable GF_CONTROL_PLANE_ENFORCE=true); see docs/security/APPROVER-ENROLLMENT.md.
+  control-plane-guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+      - run: node harness/scripts/ci-control-plane-guard.mjs --base "$BASE_SHA" --head "$HEAD_SHA" --repo "$GITHUB_REPOSITORY"
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GF_CONTROL_PLANE_ENFORCE: ${{ vars.GF_CONTROL_PLANE_ENFORCE }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}

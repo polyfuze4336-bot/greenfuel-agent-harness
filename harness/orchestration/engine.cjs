@@ -919,6 +919,7 @@ function verifyTaskApproval(ctx, run, taskId, rec) {
   for (const s of Array.isArray(rec.signatures) ? rec.signatures : []) {
     const key = ctx.model.approvers.find((k) => k.keyId === s.keyId);
     if (!key || key.revoked || !key.tiers?.includes(rec.tier)) continue;
+    if (!Array.isArray(key.classes) || !key.classes.includes(rec.tier === 'P2' ? 'repository' : 'deployment')) continue; // approval classes are separate
     try { if (crypto.verify(null, payload, crypto.createPublicKey(key.publicKeyPem), Buffer.from(String(s.sig), 'base64'))) good.add(s.keyId); } catch { /* an invalid signature counts as absent */ }
   }
   if (good.size < lim.minApprovers) return no(`needs ${lim.minApprovers} valid signature(s) from distinct registered approvers with the ${rec.tier} capability; found ${good.size}`);

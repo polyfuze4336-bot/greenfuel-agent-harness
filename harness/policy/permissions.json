@@ -35,7 +35,7 @@
   "agentCeilingNote": "An environment that is absent means no access at all. No agent has a ceiling for azure-nonprod or azure-prod, so every Azure operation is denied. The validator derives each ceiling from agent-policy.json (tools, commands, MCP grants) and fails if the two disagree.",
   "unscopedSession": {
     "description": "A Copilot session that is not a named specialist agent (for example the default agent used by a human). It has no agent identity, so tier ceilings and deny-unknown cannot be applied. The repository-wide guard still enforces the non-negotiable denials below. Use a specialist agent for any task that matters.",
-    "enforced": ["secret.read", "secret.write", "data.cross-shipowner", "data.cross-jurisdiction", "azure.delete", "azure.secret.read", "azure.rbac.write", "azure.policy.write", "azure.nonprod.deploy", "azure.nonprod.write", "regulatory.file", "commercial.settle", "shell.indirection"]
+    "enforced": ["secret.read", "secret.write", "data.cross-shipowner", "data.cross-jurisdiction", "azure.delete", "azure.secret.read", "azure.rbac.write", "azure.policy.write", "azure.nonprod.deploy", "azure.nonprod.write", "regulatory.file", "commercial.settle", "shell.indirection", "credential.extract"]
   },
   "operations": {
     "fs.read": { "tier": 0, "env": "local-fs", "description": "Read a file or list a folder" },
@@ -67,12 +67,14 @@
     "git.protected.modify": { "tier": 4, "env": "github-remote", "description": "Push or merge to a protected branch, force-push, delete a branch or rewrite history" },
     "control-plane.write": { "tier": 4, "env": "local-fs", "description": "Change hooks, policy, approvals, approver keys, audit logs, workflows or scripts" },
     "fs.write.executable": { "tier": 4, "env": "local-fs", "description": "Write an executable or script file outside a phase-enabled code scope. Closes the write-then-run route" },
-    "shell.indirection": { "tier": 4, "env": "local-exec", "description": "A shell command built or hidden at run time (variables joined into a command name, Invoke-Expression, encoded commands, nested shells, inline interpreters, npx). Its real target cannot be classified, so it is refused" }
+    "shell.indirection": { "tier": 4, "env": "local-exec", "description": "A shell command built or hidden at run time (variables joined into a command name, Invoke-Expression, encoded commands, nested shells, inline interpreters, npx). Its real target cannot be classified, so it is refused" },
+    "credential.extract": { "tier": 4, "env": "local-fs", "description": "Extract a token or credential through a command: the GitHub CLI token, a git credential helper, the Windows credential manager, a container registry login. Credentials are never available to an agent" }
   },
-  "neverGrantable": ["secret.read", "secret.write", "azure.secret.read", "data.cross-shipowner", "data.cross-jurisdiction", "regulatory.file", "commercial.settle", "git.protected.modify", "control-plane.write", "azure.prod.any", "shell.indirection"],
+  "neverGrantable": ["secret.read", "secret.write", "azure.secret.read", "data.cross-shipowner", "data.cross-jurisdiction", "regulatory.file", "commercial.settle", "git.protected.modify", "control-plane.write", "azure.prod.any", "shell.indirection", "credential.extract"],
   "neverGrantableNote": "No approval of any tier can authorise these for an agent. A human performs them directly, outside the agent, under the break-glass or release procedure. A P4 approval can authorise only the P4 operations that are not listed here: azure.delete, azure.rbac.write, azure.policy.write, fs.write.executable.",
   "classifiers": [
-    { "op": "shell.indirection", "kind": "shell", "pattern": "\\b(invoke-expression|iex)\\b|(^|[\\s;(|])&\\s*[$(@\"']|-(enc|encodedcommand|ec)\\s+\\S{8,}|\\bfrombase64string\\b|\\bcmd(\\.exe)?\\s+/[ck]\\b|\\b(powershell|pwsh)(\\.exe)?\\s[^|;\\n]*-(c|command|enc|encodedcommand|e|ec)\\b|\\[char\\]\\s*\\d|\\[string\\]::join|\\bnode(\\.exe)?\\s+(-e|--eval|-p|--print)\\b|\\bpython3?(\\.exe)?\\s+-c\\b|\\b(npx|pnpx)\\b|\\bnpm\\s+exec\\b|\\b(ba)?sh\\s+-c\\b" },
+    { "op": "shell.indirection", "kind": "shell", "pattern": "\\b(invoke-expression|iex)\\b|(^|[\\s;(|])&\\s*[$(@\"']|-(enc|encodedcommand|ec)\\s+\\S{8,}|\\bfrombase64string\\b|\\bcmd(\\.exe)?\\s+/[ck]\\b|\\b(powershell|pwsh)(\\.exe)?\\s[^|;\\n]*-(c|command|enc|encodedcommand|e|ec)\\b|\\[char\\]\\s*\\d|\\[string\\]::join|\\bnode(\\.exe)?\\s+(-e|--eval|-p|--print)\\b|\\bpython3?(\\.exe)?\\s+-c\\b|\\b(npx|pnpx)\\b|\\bnpm\\s+exec\\b|\\b(ba)?sh\\s+-c\\b|\\bbase64\\b[^\\n]*\\s(-d|-D|--decode)\\b|\\bcertutil(\\.exe)?\\b[^\\n]*-decode\\b|[|;&]\\s*(sh|bash|zsh|dash|ksh)\\s*($|[|;&])|\\|\\s*(iex|invoke-expression)\\b" },
+    { "op": "credential.extract", "kind": "shell", "pattern": "\\bgh(\\.exe)?\\s+auth\\s+(token|login|refresh|setup-git|status\\s+[^|;\\n]*(-t\\b|--show-token))|\\bgit\\s+credential(-manager(-core)?)?\\s+(fill|approve|get|store|list)\\b|\\bcmdkey(\\.exe)?\\s+/(list|generic|add)\\b|\\bget-storedcredential\\b|\\bsecurity\\s+find-(generic|internet)-password\\b|\\bdocker\\s+login\\b|\\bvaultcmd(\\.exe)?\\b|\\bnpm\\s+(token|login|adduser)\\b|\\bnpm\\s+config\\s+get\\s+[^\\n]*(token|auth)" },
     { "op": "azure.secret.read", "kind": "shell", "pattern": "\\b(curl|wget|iwr|irm|invoke-webrequest|invoke-restmethod)(\\.exe)?\\b[^\\n]*(\\.vault\\.azure\\.net|login\\.microsoftonline\\.com|169\\.254\\.169\\.254|/oauth2/(v2\\.0/)?token|/list(keys|connectionstrings|secrets)\\b)|\\b(get-azaccesstoken|get-azkeyvault(secret|key|certificate)|get-azstorageaccountkey|get-azmanagedhsm\\w*key|connect-azaccount|save-azcontext)\\b" },
     { "op": "azure.delete", "kind": "shell", "pattern": "^(?=.*\\b(curl|wget|iwr|irm|invoke-webrequest|invoke-restmethod)(\\.exe)?\\b)(?=.*(management\\.azure\\.com|management\\.core\\.windows\\.net))(?=.*(-X\\s*DELETE|--request\\s+DELETE|-Method\\s+DELETE)).*$|\\b(remove|stop|clear|revoke|unregister|disable)-az\\w+" },
     { "op": "azure.nonprod.deploy", "kind": "shell", "pattern": "\\b(new-azresourcegroupdeployment|new-azsubscriptiondeployment|new-azdeployment|start-azdeployment|new-azmanagementgroupdeployment)\\b" },
@@ -96,7 +98,7 @@
     { "op": "commercial.settle", "kind": "any", "pattern": "settle[-_ .]?(invoice|claim|dispute|payment|account)|(pay|issue|approve)[-_ .]?(invoice|refund|credit[-_ ]?note|payment)|commercial[-_ .]?settlement" }
   ],
   "pathClasses": [
-    { "id": "secret", "pattern": "(^|/)\\.env($|\\.(?!example$|sample$|template$))|\\.(pfx|pem|key|p12|jks|keystore)$|(^|/)id_(rsa|ed25519|ecdsa)$|(^|/)local\\.settings\\.json$|(^|/)\\.azure/.*\\.env$|(^|/)\\.git-credentials$|(^|/)\\.npmrc$|(^|/)\\.netrc$|(^|/)simulated-secrets/" },
+    { "id": "secret", "pattern": "(^|/)\\.env($|\\.(?!example$|sample$|template$))|\\.(pfx|pem|key|p12|jks|keystore)$|(^|/)id_(rsa|ed25519|ecdsa)$|(^|/)local\\.settings\\.json$|(^|/)\\.azure/.*\\.env$|(^|/)\\.git-credentials$|(^|/)\\.npmrc$|(^|/)\\.netrc$|(^|/)simulated-secrets/|(^|/)\\.azure/(msal_token_cache[^/]*|accessTokens\\.json|azureProfile\\.json|service_principal_entries\\.json|msal_http_cache\\.bin|clouds\\.config|az\\.json|az\\.sess)$|(^|/)\\.config/gh/(hosts|config)\\.yml$|(^|/)\\.config/gcloud/|(^|/)\\.config/azd/|(^|/)\\.azd/|(^|/)\\.kube/config$|(^|/)\\.docker/config\\.json$|(^|/)\\.aws/(credentials|config)$|(^|/)\\.ssh/|(^|/)\\.gnupg/|(^|/)\\.git/config$|(^|/)\\.git/hooks/|(^|/)AppData/(Local|Roaming)/Microsoft/(Credentials|Protect|Vault)/" },
     { "id": "control-plane", "pattern": "^(harness/|\\.github/|\\.vscode/|\\.mcp\\.json$|docs/approvals/|docs/state/runs/|docs/state/loops/|evaluation/|docs/evaluation/|docs/azure/data/|memory/|package\\.json$|\\.gitignore$)" },
     { "id": "audit", "pattern": "(^|/)\\.harness-logs/" },
     { "id": "shipowner", "pattern": "(^|/)tests/fixtures/shipowners/(?<owner>[^/]+)(/|$)" },
@@ -188,6 +190,7 @@
   "audit": {
     "schema": "greenfuel.denied-action/v1",
     "file": ".harness-logs/denied-actions.jsonl",
+    "eventsFile": ".harness-logs/audit-events.jsonl",
     "directoryOverride": "HARNESS_LOG_DIR",
     "chained": true,
     "fields": ["seq", "ts", "session", "agent", "mode", "tool", "operations", "tier", "environment", "decision", "rules", "reason", "paths", "scope", "argsSha256", "argsPreview", "approvals", "prevHash", "hash"],

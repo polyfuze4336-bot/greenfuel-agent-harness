@@ -13,6 +13,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const { matchMcp } = require('./mcp-names.cjs');
+const approverRegistry = require('../approvals/registry.cjs');
 
 const ROOT = path.join(__dirname, '..', '..');
 const norm = (t) => String(t).toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -35,6 +36,8 @@ function loadModel(root = ROOT) {
   const perm = readJson(root, 'harness/policy/permissions.json');
   let approvers = [];
   try { approvers = readJson(root, 'harness/policy/approvers.json').approvers ?? []; } catch { approvers = []; }
+  // Only well-formed entries with a verified proof of possession are trusted. A half-formed or self-asserted entry approves nothing.
+  approvers = approverRegistry.trustedApprovers(approvers);
   return {
     root, perm, approvers,
     classifiers: perm.classifiers.map((c) => ({ ...c, re: new RegExp(c.pattern, 'i') })),
@@ -94,15 +97,32 @@ function shellTargets(command, model, cwd) {
 }
 
 // ---------- classification ----------
+// Spellings a shell treats as the same command: PowerShell backtick escapes (a`z), cmd carets (a^z) and empty quote pairs (a''z).
+// Every variant is classified, and an operation found in any of them counts, so a spelling trick cannot hide a command from the screen.
+function shellVariants(command) {
+  const c = String(command);
+  const noTick = c.replace(/`/g, '');
+  const noCaret = c.replace(/\^/g, '');
+  const noEmpty = c.replace(/(['"])\1/g, '');
+  return [...new Set([c, noTick, noCaret, noEmpty, noEmpty.replace(/`/g, '').replace(/\^/g, '')])];
+}
+
 function classifyShell(command, model, cwd) {
-  const segments = String(command).split(/&&|\|\||;|\||\r?\n/).map((s) => s.trim()).filter(Boolean);
-  const ops = [];
-  for (const seg of segments) {
-    const hit = model.classifiers.find((c) => (c.kind === 'shell' || c.kind === 'any') && c.re.test(seg));
-    ops.push({ op: hit ? hit.op : 'unknown', segment: seg });
-  }
+  const ops = []; const seen = new Set();
+  shellVariants(command).forEach((variant, vi) => {
+    const segments = variant.split(/&&|\|\||;|\||\r?\n/).map((s) => s.trim()).filter(Boolean);
+    for (const seg of segments) {
+      const hit = model.classifiers.find((c) => (c.kind === 'shell' || c.kind === 'any') && c.re.test(seg));
+      const op = hit ? hit.op : 'unknown';
+      if (op === 'unknown' && vi > 0) continue; // a variant only adds findings; it never adds "unknown"
+      const key = `${op}\u0000${seg}`;
+      if (!seen.has(key)) { seen.add(key); ops.push({ op, segment: seg }); }
+    }
+  });
   if (!ops.length) ops.push({ op: 'unknown', segment: '' });
-  return { ops, targets: shellTargets(command, model, cwd), egress: model.egress.test(command), command: String(command) };
+  const targets = []; const seenT = new Set();
+  for (const v of shellVariants(command)) for (const t of shellTargets(v, model, cwd)) if (!seenT.has(t.rel)) { seenT.add(t.rel); targets.push(t); }
+  return { ops, targets, egress: model.egress.test(command), command: String(command) };
 }
 
 function classify(tool, args, model, cwd, registry) {
@@ -164,6 +184,8 @@ function verifyApproval(rec, ctx) {
   for (const s of Array.isArray(rec.signatures) ? rec.signatures : []) {
     const key = model.approvers.find((k) => k.keyId === s.keyId);
     if (!key || key.revoked || !Array.isArray(key.tiers) || !key.tiers.includes(rec.tier)) continue;
+    // Separation of approval classes: a repository key approves P2 only, a deployment key P3 and P4; an architecture or filing key approves no operation.
+    if (!Array.isArray(key.classes) || !key.classes.includes(rec.tier === 'P2' ? 'repository' : 'deployment')) continue;
     try {
       if (crypto.verify(null, payload, crypto.createPublicKey(key.publicKeyPem), Buffer.from(String(s.sig), 'base64'))) good.add(s.keyId);
     } catch { /* an unreadable key or signature counts as invalid */ }
@@ -304,7 +326,7 @@ function decide(ctx) {
 }
 
 function defaultFor(op) {
-  return ({ 'azure.delete': 'DEF-06', 'azure.rbac.write': 'DEF-06', 'azure.policy.write': 'DEF-06', 'azure.secret.read': 'DEF-05', 'azure.prod.any': 'DEF-06', 'azure.nonprod.deploy': 'DEF-08', 'azure.nonprod.write': 'DEF-08', 'regulatory.file': 'DEF-09', 'commercial.settle': 'DEF-09', 'git.protected.modify': 'DEF-07', 'git.write': 'DEF-07', 'git.push.branch': 'DEF-07', 'pr.write': 'DEF-07', 'data.cross-shipowner': 'DEF-04', 'data.cross-jurisdiction': 'DEF-03', 'control-plane.write': 'CTL-01', 'fs.write.executable': 'EXEC-01', 'shell.indirection': 'DEF-02' })[op] ?? 'DEF-01';
+  return ({ 'azure.delete': 'DEF-06', 'azure.rbac.write': 'DEF-06', 'azure.policy.write': 'DEF-06', 'azure.secret.read': 'DEF-05', 'azure.prod.any': 'DEF-06', 'credential.extract': 'DEF-05', 'azure.nonprod.deploy': 'DEF-08', 'azure.nonprod.write': 'DEF-08', 'regulatory.file': 'DEF-09', 'commercial.settle': 'DEF-09', 'git.protected.modify': 'DEF-07', 'git.write': 'DEF-07', 'git.push.branch': 'DEF-07', 'pr.write': 'DEF-07', 'data.cross-shipowner': 'DEF-04', 'data.cross-jurisdiction': 'DEF-03', 'control-plane.write': 'CTL-01', 'fs.write.executable': 'EXEC-01', 'shell.indirection': 'DEF-02' })[op] ?? 'DEF-01';
 }
 
 // ---------- output filter: isolated and secret data in search results ----------
@@ -360,6 +382,47 @@ function writeAudit(model, event, decision, extra = {}) {
   } catch { return null; } finally { if (locked) { try { fs.rmdirSync(lock); } catch { /* ignore */ } } }
 }
 
+// ---------- decision and outcome events (hash chained, metadata only) ----------
+// Denials alone cannot answer "what did the agents do". This chain records every hook decision (allow, ask, deny), every approval
+// outcome and every tool result summary. It holds names, classes and hashes: never arguments, contents, tool output or secrets.
+const EVENT_KINDS = new Set(['decision', 'outcome', 'approval', 'approval-admin', 'attestation']);
+function writeEvent(model, kind, fields = {}, extra = {}) {
+  if (!EVENT_KINDS.has(kind)) return null;
+  const dir = logDir(model, extra.logDir);
+  const file = path.join(dir, path.basename(model.perm.audit.eventsFile ?? 'audit-events.jsonl'));
+  const lock = `${file}.lock`;
+  let locked = false;
+  try {
+    fs.mkdirSync(dir, { recursive: true });
+    for (let i = 0; i < 40 && !locked; i++) { try { fs.mkdirSync(lock); locked = true; } catch { const end = Date.now() + 25; while (Date.now() < end) { /* wait */ } } }
+    let prev = null; let seq = 1;
+    try {
+      const last = fs.readFileSync(file, 'utf8').trimEnd().split('\n').pop();
+      if (last) { const l = JSON.parse(last); prev = l.hash; seq = (l.seq ?? 0) + 1; }
+    } catch { /* first record */ }
+    const safe = {};
+    for (const [k, v] of Object.entries(fields)) {
+      if (['argsPreview', 'args', 'toolArgs', 'output', 'content', 'text'].includes(k)) continue;
+      safe[k] = typeof v === 'string' ? v.slice(0, 300) : v;
+    }
+    const rec = { schema: 'greenfuel.audit-event/v1', seq, ts: (extra.now ?? new Date()).toISOString(), kind, ...safe, unchained: locked ? undefined : true, prevHash: locked ? prev : null };
+    rec.hash = sha256(canonical({ ...rec, hash: undefined }));
+    fs.appendFileSync(file, `${JSON.stringify(rec)}\n`);
+    return rec;
+  } catch { return null; } finally { if (locked) { try { fs.rmdirSync(lock); } catch { /* ignore */ } } }
+}
+
+// One decision event from a hook: what was asked, what was decided and under which rules. The arguments are represented by a hash only.
+function decisionEvent(model, event, verdict, extra = {}) {
+  const args = typeof event.toolArgs === 'string' ? event.toolArgs : JSON.stringify(event.toolArgs ?? event.tool_input ?? {});
+  const cls = extra.decision ?? null;
+  return writeEvent(model, 'decision', {
+    session: event.sessionId ? String(event.sessionId).slice(0, 64) : null, agent: extra.agent ?? null, hook: extra.hook ?? null, tool: String(event.toolName ?? event.tool_name ?? ''),
+    decision: verdict?.decision ?? 'allow', rule: verdict?.id ?? null, operations: cls?.operations?.map((o) => o.op) ?? [], tier: cls?.tier ?? null,
+    pathClasses: [...new Set((cls?.targets ?? []).flatMap((t) => t.classes ?? []))], approvals: cls?.approvals ?? [], argsSha256: sha256(args),
+  }, extra);
+}
+
 function verifyAuditChain(file) {
   const problems = [];
   let prev = null; let n = 0;
@@ -388,4 +451,4 @@ function signApproval(rec, privateKeyPem, keyId, passphrase) {
   return { ...rec, signatures: [...(rec.signatures ?? []), { keyId, sig }] };
 }
 
-module.exports = { loadModel, classify, classifyPath, decide, verifyApproval, filterIsolated, writeAudit, verifyAuditChain, generateApproverKey, signApproval, canonical, sha256, toRel, loadApprovals, findApproval };
+module.exports = { loadModel, classify, classifyPath, decide, verifyApproval, filterIsolated, writeAudit, writeEvent, decisionEvent, shellVariants, verifyAuditChain, generateApproverKey, signApproval, canonical, sha256, toRel, loadApprovals, findApproval };

@@ -128,7 +128,7 @@ function check(root, errors) {
     if (ids.has(k.keyId)) fail(`duplicate approver key ${k.keyId}`);
     ids.add(k.keyId);
     if (!/^-----BEGIN PUBLIC KEY-----/.test(k.publicKeyPem ?? '')) fail(`approver ${k.keyId}: publicKeyPem must be a PUBLIC key`);
-    if (!Array.isArray(k.tiers) || !k.tiers.length || k.tiers.some((t) => !['P2', 'P3', 'P4'].includes(t))) fail(`approver ${k.keyId}: tiers must be a subset of P2, P3, P4`);
+    if (!Array.isArray(k.tiers) || k.tiers.some((t) => !['P2', 'P3', 'P4'].includes(t))) fail(`approver ${k.keyId}: tiers must be a subset of P2, P3, P4 (empty for an architecture or filing key)`);
   }
   const raw = readFileSync(path.join(root, 'harness/policy/approvers.json'), 'utf8');
   if (/PRIVATE KEY/.test(raw)) fail('approvers.json contains private key material; remove it and treat the key as compromised');

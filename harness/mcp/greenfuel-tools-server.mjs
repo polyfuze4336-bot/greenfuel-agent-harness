@@ -20,6 +20,16 @@ import { loadContext, rowsOf, hasContext } from '../scripts/validate-context.mjs
 
 const { makeContext, checkPlanView, runStatusView } = createRequire(import.meta.url)('../orchestration/engine.cjs');
 const memory = createRequire(import.meta.url)('../memory/store.cjs');
+const enforcement = createRequire(import.meta.url)('../lib/enforcement.cjs');
+
+// Fail closed: tools that read the harness state answer only when a hook has recently run in this workspace. If hooks are not loaded
+// (untrusted folder, hooks disabled, wrong working folder) the call is refused and says why. HARNESS_ENFORCEMENT_ATTESTATION=off is a
+// human decision made in the launch environment; the result then says so. Discovery (tools/list) is not gated.
+export function attest(now = new Date()) {
+  if (enforcement.attestationMode() === 'off') return { ok: true, mode: 'off' };
+  const hb = enforcement.readHeartbeat({ now });
+  return { ok: hb.ok, mode: 'required', reason: hb.reason };
+}
 
 export const SERVER = { name: 'greenfuel-tools', title: 'Green-fuel harness tools (read-only)', version: '0.1.0' };
 export const MAX_OUTPUT_BYTES = 32768;
@@ -215,6 +225,11 @@ export function handle(msg) {
     const started = Date.now();
     try {
       if (!params || typeof params.name !== 'string') return fail(msg.id, -32602, 'tools/call needs a tool name');
+      const att = attest();
+      if (!att.ok) {
+        process.stderr.write(`${JSON.stringify({ ts: new Date().toISOString(), tool: params.name, ok: false, refused: 'enforcement-not-attested' })}\n`);
+        return ok(msg.id, { content: [{ type: 'text', text: `[HARNESS FAIL-CLOSED] This tool is refused because enforcement is not attested: ${att.reason}. Open the repository root in a trusted workspace with hooks enabled, then try again. Do not work around this.` }], isError: true });
+      }
       const { text, truncated } = capOutput(JSON.stringify(cleanDeep(callTool(params.name, params.arguments)), null, 1));
       process.stderr.write(`${JSON.stringify({ ts: new Date().toISOString(), tool: params.name, ms: Date.now() - started, ok: true, bytes: Buffer.byteLength(text), truncated })}\n`);
       return ok(msg.id, { content: [{ type: 'text', text }], isError: false });

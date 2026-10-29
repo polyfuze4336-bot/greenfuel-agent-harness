@@ -133,9 +133,13 @@ function main() {
     const patterns = loadJson('harness/policy/secret-patterns.json').redaction.map((p) => new RegExp(p, 'gi'));
     const { modified, meta } = process_(event, registry, patterns);
     audit(event, meta);
+    try { engine.writeEvent(engine.loadModel(), 'outcome', { session: event.sessionId ? String(event.sessionId).slice(0, 64) : null, hook: 'tool-output-guard', tool: meta.tool, resultType: meta.resultType, bytesIn: meta.bytesIn, bytesOut: meta.bytesOut, redactions: meta.redactions, isolationRemoved: meta.isolationRemoved, injectionFlags: meta.injectionFlags, truncated: meta.truncated, untrusted: meta.untrusted }); } catch { /* the outcome record must never change the result */ }
     process.stdout.write(modified ? JSON.stringify({ modifiedResult: modified }) : '{}');
   } catch (e) {
-    process.stderr.write(`tool-output-guard: ${e.message}; result passed through unchanged.\n`);
+    // Fail closed: if the sanitiser itself failed, the raw result is not passed on. The model is told the result was withheld and why.
+    process.stderr.write(`tool-output-guard: ${e.message}; result withheld.\n`);
+    const res = event && typeof event.toolResult === 'object' && event.toolResult ? event.toolResult : null;
+    if (res) process.stdout.write(JSON.stringify({ modifiedResult: { ...res, textResultForLlm: '[HARNESS FAIL-CLOSED] This tool result was withheld because the output sanitiser could not process it. Do not retry with a workaround; tell the user.' } }));
     process.exit(0);
   }
 }

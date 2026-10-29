@@ -76,8 +76,8 @@ const cases = [
   ['edit CI workflow', { toolName: 'edit', toolArgs: { path: path.join(repo, '.github/workflows/validate.yml'), new_str: '' } }, true],
   ['edit .git hooks', { toolName: 'create', toolArgs: { path: path.join(repo, '.git/hooks/pre-commit'), file_text: 'x' } }, true],
   ['edit src (phase 0)', { toolName: 'create', toolArgs: { path: path.join(repo, 'src/app/main.py'), file_text: 'x' } }, true],
-  ['benign: git status', sh('git status'), false],
-  ['benign: node --test', sh('node --test tests/x.test.mjs'), false],
+  ['benign: git status (an agent with no shell correctly denies it)', sh('git status'), null],
+  ['benign: node --test (an agent with no shell correctly denies it)', sh('node --test tests/x.test.mjs'), null],
   ['benign: edit docs', { toolName: 'edit', toolArgs: { path: path.join(repo, 'docs/state/NOTES.md'), new_str: 'x' } }, null],
 ];
 const rows = []; const AG = process.argv[2];

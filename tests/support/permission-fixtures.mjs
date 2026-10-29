@@ -28,7 +28,7 @@ export function syntheticModel(keys, mutate) {
   const perm = JSON.parse(JSON.stringify(realModel.perm));
   if (mutate) mutate(perm);
   const m = engine.loadModel();
-  return { ...m, perm, classifiers: perm.classifiers.map((c) => ({ ...c, re: new RegExp(c.pattern, 'i') })), approvers: keys.map((k) => ({ keyId: k.keyId, role: 'test-approver', tiers: k.tiers, publicKeyPem: k.publicKeyPem })) };
+  return { ...m, perm, classifiers: perm.classifiers.map((c) => ({ ...c, re: new RegExp(c.pattern, 'i') })), approvers: keys.map((k) => ({ keyId: k.keyId, role: 'test-approver', tiers: k.tiers, classes: [...new Set(k.tiers.map((t) => (t === 'P2' ? 'repository' : 'deployment')))], publicKeyPem: k.publicKeyPem })) };
 }
 
 export function approval({ tier, ops, agents, env, scope = {}, minutes, uses = 1, signers, now = new Date(), breakGlass = false, reference, id }) {
