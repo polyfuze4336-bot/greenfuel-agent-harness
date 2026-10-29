@@ -2,7 +2,7 @@
   "kind": "decision",
   "title": "Azure readiness stage: non-deployable IaC scaffold and provisional service selection",
   "statement": "Azure readiness stage: non-deployable IaC scaffold and provisional service selection",
-  "body": "Proposed. Adopt: - The scaffold in [infra/](../../infra): `main.bicep` for one jurisdiction cell and eight modules, three parameter files whose values are all `REQUIRES-APPROVAL` except the environment name, and four read-only discovery queries. It is marked `SCAFFOLD, NOT DEPLOYABLE`. `deploymentApproved` accepts only `true`. No parameter has a default. - The provisional selection in [AZURE-REFERENCE-ARCHITECTURE](../azure/AZURE-REFERENCE-ARCHITECTURE.md): a lean for each candidate service (lean in, reserve, defer, evaluate) with the questions to verify. **It is not a decision.** It needs a design record and review (roadmap R17) before it is relied on. - [validate-azure.mjs](../../harness/scripts/validate-azure.mjs): static infrastructure policy (no public access, no shared keys or local authentication, no geo-redundant storage or backup, no key reads or secrets, no broad roles, pinned role list, no defaults), the port assessment register contract (a port is never Established by region alone), document checks, and the twelve-gate readiness computation, which the existing `deployment-readiness` utility now includes. - [infra-validate.yml](../../.github/workflows/infra-validate.yml): compile and check only, read-only token, no Azure sign-in, no secret. A workflow that signs in or deploys is refused by the validator until the phase is raised. - The default hosting for every port until residency is established is a jurisdiction-local evidence store with a controlled shore integration (option C). A region is never proof of residency. - The agents' phase gate is unchanged: agents still cannot write `infra/` in Phase 0. This scaffold was written by a human-run session on the owner's instruction. The phase stays 0. - `EVAL-HRN-AZR-002` is changed from \"no infrastructure code exists\" to the stronger property that the only infrastructure is the non-deployable scaffold: no deployment configuration, no deploying workflow, no deployable parameter value, and the phase is 0. New evaluation tests cover the validator's rejection of an insecure template and of a residency claim by region.",
+  "body": "Accepted. The owner accepted and approved the decisions of this stage with one exception: **actual Azure deployment is not approved** and is deferred (TODO T36). The phase stays 0. Adopt: - The scaffold in [infra/](../../infra): `main.bicep` for one jurisdiction cell and eight modules, three parameter files whose values are all `REQUIRES-APPROVAL` except the environment name, and four read-only discovery queries. It is marked `SCAFFOLD, NOT DEPLOYABLE`. `deploymentApproved` accepts only `true`. No parameter has a default. - The provisional selection in [AZURE-REFERENCE-ARCHITECTURE](../azure/AZURE-REFERENCE-ARCHITECTURE.md): a lean for each candidate service (lean in, reserve, defer, evaluate) with the questions to verify. **It is not a decision.** It needs a design record and review (roadmap R17) before it is relied on. - [validate-azure.mjs](../../harness/scripts/validate-azure.mjs): static infrastructure policy (no public access, no shared keys or local authentication, no geo-redundant storage or backup, no key reads or secrets, no broad roles, pinned role list, no defaults), the port assessment register contract (a port is never Established by region alone), document checks, and the twelve-gate readiness computation, which the existing `deployment-readiness` utility now includes. - [infra-validate.yml](../../.github/workflows/infra-validate.yml): compile and check only, read-only token, no Azure sign-in, no secret. A workflow that signs in or deploys is refused by the validator until the phase is raised. - The default hosting for every port until residency is established is a jurisdiction-local evidence store with a controlled shore integration (option C). A region is never proof of residency. - The agents' phase gate is unchanged: agents still cannot write `infra/` in Phase 0. This scaffold was written by a human-run session on the owner's instruction. The phase stays 0. - `EVAL-HRN-AZR-002` is changed from \"no infrastructure code exists\" to the stronger property that the only infrastructure is the non-deployable scaffold: no deployment configuration, no deploying workflow, no deployable parameter value, and the phase is 0. New evaluation tests cover the validator's rejection of an insecure template and of a residency claim by region.",
   "refs": [
     "ADR-0014",
     "D-003",
@@ -18,7 +18,7 @@
     "file:docs/adr/0014-azure-readiness-scaffold-and-provisional-selection.md"
   ],
   "subject": "adr.0014",
-  "position": "proposed",
+  "position": "accepted",
   "tags": [
     "adr"
   ],
@@ -28,26 +28,30 @@
     "evidence": [],
     "source": "adr",
     "ref": "file:docs/adr/0014-azure-readiness-scaffold-and-provisional-selection.md",
-    "sourceSha256": "ba04741c930e3cc3f4add20154f6c3a5f91d42669b98e88a64ade64534570b97",
-    "trust": "unreviewed",
+    "sourceSha256": "ee1778447b874b3ed90a9c32b9df3ebf7b6575283d77bbe81fb96ef57008b696",
+    "trust": "authoritative",
     "recordedBy": {
       "type": "importer",
       "name": "import-adr"
     }
   },
-  "approval": null,
+  "approval": {
+    "by": "programme-owner",
+    "at": "2026-10-29T00:32:00.562Z",
+    "ref": "ADR-0014"
+  },
   "validity": {
     "supersedes": [],
     "supersededBy": null,
-    "validUntil": "2026-12-27T15:05:50.297Z",
+    "validUntil": null,
     "reviewBy": null,
-    "status": "proposed",
+    "status": "approved",
     "validFrom": "2026-10-28T15:05:50.299Z"
   },
   "schema": "greenfuel.memory/v1",
   "category": "semantic",
   "createdAt": "2026-10-28T15:05:50.299Z",
-  "updatedAt": "2026-10-28T15:05:50.299Z",
+  "updatedAt": "2026-10-29T00:32:00.562Z",
   "classification": "internal",
   "review": null,
   "id": "DEC-0014"

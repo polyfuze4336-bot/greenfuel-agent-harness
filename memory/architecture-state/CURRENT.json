@@ -241,10 +241,20 @@
       "critical": false,
       "approvalRef": "ADR-0013",
       "coreHash": "afe615cc168db0a3e3e4ab34c04b2b6ad6cc5f0dd6ba607d0b97ef9eefdd5ceb"
+    },
+    {
+      "id": "DEC-0014",
+      "kind": "decision",
+      "subject": "adr.0014",
+      "position": "accepted",
+      "statement": "Azure readiness stage: non-deployable IaC scaffold and provisional service selection",
+      "critical": false,
+      "approvalRef": "ADR-0014",
+      "coreHash": "075f6474918af70304b165c0442005aa392add1e10d9e4bb8916b6f99f1f6b20"
     }
   ],
   "counts": {
-    "approved": 24,
+    "approved": 25,
     "superseded": 0,
     "invalidated": 0
   }

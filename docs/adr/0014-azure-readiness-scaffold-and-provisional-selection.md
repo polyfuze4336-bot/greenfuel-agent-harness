@@ -1,6 +1,6 @@
 # ADR 0014: Azure readiness stage: non-deployable IaC scaffold and provisional service selection
 
-- **Status:** Proposed (awaiting the programme owner's decision)
+- **Status:** Accepted (2026-10-29, programme owner, by instruction in chat: "accept and approve all decision with the exception of actual azure deployment"). Actual Azure deployment is not approved: it is deferred (TODO T36)
 - **Type:** Governance
 - **Date:** 2026-10-28
 - **Deciders:** Programme owner
@@ -19,7 +19,7 @@
 3. **A non-deployable scaffold where every unresolved decision is a required parameter with no default, committed parameter files that carry placeholders only, security defaults in the modules, a static policy validator, a CI workflow that compiles and checks without signing in, and a computed twelve-gate readiness check (chosen).**
 
 ## Decision
-Proposed. Adopt:
+Accepted. The owner accepted and approved the decisions of this stage with one exception: **actual Azure deployment is not approved** and is deferred (TODO T36). The phase stays 0. Adopt:
 - The scaffold in [infra/](../../infra): `main.bicep` for one jurisdiction cell and eight modules, three parameter files whose values are all `REQUIRES-APPROVAL` except the environment name, and four read-only discovery queries. It is marked `SCAFFOLD, NOT DEPLOYABLE`. `deploymentApproved` accepts only `true`. No parameter has a default.
 - The provisional selection in [AZURE-REFERENCE-ARCHITECTURE](../azure/AZURE-REFERENCE-ARCHITECTURE.md): a lean for each candidate service (lean in, reserve, defer, evaluate) with the questions to verify. **It is not a decision.** It needs a design record and review (roadmap R17) before it is relied on.
 - [validate-azure.mjs](../../harness/scripts/validate-azure.mjs): static infrastructure policy (no public access, no shared keys or local authentication, no geo-redundant storage or backup, no key reads or secrets, no broad roles, pinned role list, no defaults), the port assessment register contract (a port is never Established by region alone), document checks, and the twelve-gate readiness computation, which the existing `deployment-readiness` utility now includes.
