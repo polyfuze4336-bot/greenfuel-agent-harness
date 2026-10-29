@@ -96,7 +96,7 @@ export function record({ id, claim, cmd, outDir }) {
   if (kind) rec.failureKind = kind;
   if (tap.failures.length) rec.failures = tap.failures;
   if (kind) {
-    const logsDir = path.join(path.dirname(outDir), 'logs');
+    const logsDir = path.basename(outDir) === 'records' ? path.join(path.dirname(outDir), 'logs') : path.join(outDir, 'logs');
     mkdirSync(logsDir, { recursive: true });
     const body = redact(output);
     writeFileSync(path.join(logsDir, `${id}.log`), body, { flag: 'wx' });
