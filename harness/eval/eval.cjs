@@ -17,7 +17,7 @@ const crypto = require('node:crypto');
 const os = require('node:os');
 const { spawnSync } = require('node:child_process');
 const perm = require('../hooks/permission-engine.cjs');
-
+const { scrub: scrubPaths } = require('../lib/local-paths.cjs');
 const ROOT = path.resolve(__dirname, '..', '..');
 const { canonical, sha256 } = perm;
 const readJson = (p) => JSON.parse(fs.readFileSync(p, 'utf8'));
@@ -142,7 +142,7 @@ const SCRUB = ['NODE_TEST_CONTEXT', 'NODE_OPTIONS', 'NODE_PATH', 'NODE_REPL_EXTE
 function redact(root, s) {
   let o = String(s);
   try { for (const p of readJson(path.join(root, 'harness/policy/secret-patterns.json')).redaction) o = o.replace(new RegExp(p, 'gi'), '[REDACTED]'); } catch { /* keep going */ }
-  return o;
+  return scrubPaths(o, [root]);
 }
 function parseTap(out) {
   const lines = String(out).replace(/\r/g, '').split('\n'); const top = [];

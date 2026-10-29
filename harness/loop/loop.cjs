@@ -25,6 +25,7 @@ const crypto = require('node:crypto');
 const { spawnSync } = require('node:child_process');
 const perm = require('../hooks/permission-engine.cjs');
 const agentGuard = require('../hooks/agent-guard.cjs');
+const { scrub: scrubPaths } = require('../lib/local-paths.cjs');
 const policyGuard = require('../hooks/policy-guard.cjs');
 
 const ROOT = path.resolve(__dirname, '..', '..');
@@ -120,7 +121,7 @@ function mutate(ctx, id, fn) {
 function redact(text) {
   let o = String(text);
   try { for (const p of readJson(path.join(ROOT, 'harness/policy/secret-patterns.json')).redaction) o = o.replace(new RegExp(p, 'gi'), '[REDACTED]'); } catch { /* keep going */ }
-  return o;
+  return scrubPaths(o);
 }
 // Removes what changes between identical runs (times, line numbers, paths, hashes) so the same failure has the same fingerprint.
 function normalise(text, ws, root) {

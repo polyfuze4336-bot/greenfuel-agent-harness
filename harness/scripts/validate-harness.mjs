@@ -2,6 +2,8 @@
 // Structural and policy validation for this repository. Zero dependencies.
 // Usage: node harness/scripts/validate-harness.mjs [--root <dir>] [--json]
 import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { validateContext, contextStats } from './validate-context.mjs';
@@ -153,6 +155,20 @@ export function validate(root) {
     const text = readFileSync(f, 'utf8');
     for (const re of secretRes) if (re.test(text)) fail('secrets', `${rel(f)}: matches secret pattern ${re}`);
   }
+
+  // Publication hygiene: this machine's account name must not be committed. Output captured by the recorders is scrubbed (harness/lib/local-paths.cjs).
+  // docs/state/loops is excluded: its check evidence is covered by a hash chain and cannot be edited without invalidating the loop record.
+  try {
+    const user = os.userInfo().username;
+    if (user.length >= 4 && existsSync(path.join(root, '.git'))) {
+      const tracked = execFileSync('git', ['ls-files', '-z'], { cwd: root, maxBuffer: 64 * 1024 * 1024 }).toString().split('\0').filter(Boolean);
+      const re = new RegExp(user.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+      for (const f of tracked) {
+        if (f.startsWith('docs/state/loops/') || !existsSync(path.join(root, f)) || statSync(path.join(root, f)).size > 5_000_000) continue;
+        if (re.test(readFileSync(path.join(root, f), 'utf8'))) fail('privacy', `${f}: contains the local account name; scrub it before the repository is shared`);
+      }
+    }
+  } catch { /* no git or no account name: the check does not apply */ }
 
   if (existsSync(path.join(root, 'harness/policy/command-policy.json'))) {
     const policy = JSON.parse(read('harness/policy/command-policy.json'));

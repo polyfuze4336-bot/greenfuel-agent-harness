@@ -2,7 +2,9 @@
 
 A GitHub Copilot harness for VS Code, built to help design, implement, test, deploy and operate an Azure-native agentic solution for **Agentic Green-Fuel Bunkering Certification for an Asian Marine Fuels Group**.
 
-**Status: Phase 0, harness foundation only.** This repository contains no bunkering application code, no infrastructure code, and has created no Azure resources. Raising the phase is a human decision recorded in an ADR.
+**Status: Phase 0, harness foundation only.** This repository contains no bunkering application code, no infrastructure code that can be deployed, and has created no Azure resources. Raising the phase is a human decision recorded in an ADR. The harness has passed a final acceptance review as a Phase 0 design-and-governance harness; it is **not ready** for application development or Azure deployment. See the [acceptance report](docs/acceptance/HARNESS-ACCEPTANCE-REPORT.md) for what is verified, what is not and the critical blockers. Licensed under the [MIT licence](LICENSE).
+
+Every standard, scheme and Azure capability named in the documents is a candidate to verify, not a confirmed fact, and no figure in the designs is sourced unless it says so.
 
 ## What is here
 
@@ -20,6 +22,77 @@ A GitHub Copilot harness for VS Code, built to help design, implement, test, dep
 | Product context baseline | [PROBLEMSTATEMENT.md](PROBLEMSTATEMENT.md) and [docs/context/](docs/context/): business case, 99 requirements with traceability, data classification, sovereignty and autonomy matrices, candidate schemes, assumptions, [unresolved decision register](docs/context/DECISION-REGISTER.md), [context-loading strategy](docs/context/CONTEXT-LOADING-STRATEGY.md) |
 
 Read in this order: [REFERENCE-ASSESSMENT](docs/harness/REFERENCE-ASSESSMENT.md), [HARNESS-ARCHITECTURE](docs/harness/HARNESS-ARCHITECTURE.md), [CAPABILITY-MATRIX](docs/harness/CAPABILITY-MATRIX.md), [IMPLEMENTATION-ROADMAP](docs/harness/IMPLEMENTATION-ROADMAP.md), [OPEN-QUESTIONS](docs/harness/OPEN-QUESTIONS.md).
+
+## How the agents connect
+
+Hub-and-spoke: one read-only orchestrator delegates, specialists have narrow scopes, review lanes cannot write. Dotted arrows are prerequisites, not delegation. Full detail, tool reach and the control plane: [AGENT-CONNECTIVITY](docs/harness/AGENT-CONNECTIVITY.md).
+
+```mermaid
+flowchart TB
+  H(["Human owner<br/>approves P2+ actions, ADRs, phase changes"])
+  ORC["orchestrator<br/>planner, read-only"]
+
+  subgraph PLAN["Planners: read, search, no file writes, no commands"]
+    MD["maritime-domain"]
+    SR["security-reviewer"]
+    AC["architecture-critic"]
+  end
+
+  subgraph AUTH["Authors: edit only inside their own write scope, no commands"]
+    PA["principal-architect"]
+    AZ["azure-platform"]
+    DE["data-engineer"]
+    APP["application-engineer"]
+    AI["ai-engineer"]
+    SRE["sre-engineer"]
+  end
+
+  subgraph EXEC["Executors: short command allow-list, narrow write scope"]
+    QA["qa-engineer"]
+    DR["design-reviewer"]
+  end
+
+  H --> ORC
+  ORC ==>|delegates| PA
+  ORC ==>|delegates| MD
+  ORC ==>|delegates| AZ
+  ORC ==>|delegates| APP
+  ORC ==>|delegates| AI
+  ORC ==>|delegates| DE
+  ORC ==>|delegates| SR
+  ORC ==>|delegates| SRE
+  ORC ==>|delegates| QA
+  ORC ==>|delegates| AC
+  ORC ==>|delegates| DR
+
+  MD -.-> PA
+  MD -.-> DE
+  PA -.-> AZ
+  PA -.-> APP
+  PA -.-> AI
+  PA -.-> DE
+  PA -.-> SR
+  PA -.-> AC
+  PA -.-> DR
+  DE -.-> APP
+  DE -.-> AI
+  DE -.-> QA
+  AZ -.-> SRE
+  APP -.-> SRE
+  APP -.-> QA
+  AI -.-> QA
+  AC -.-> DR
+  SR -.-> DR
+
+  classDef planner fill:#e8f1fb,stroke:#2b6cb0,color:#1a365d
+  classDef author fill:#e6f6ec,stroke:#2f855a,color:#1c4532
+  classDef executor fill:#fff4e0,stroke:#c05621,color:#7b341e
+  classDef human fill:#fde8e8,stroke:#c53030,color:#742a2a
+  class ORC,MD,SR,AC planner
+  class PA,AZ,DE,APP,AI,SRE author
+  class QA,DR executor
+  class H human
+```
 
 ## The six pillars
 

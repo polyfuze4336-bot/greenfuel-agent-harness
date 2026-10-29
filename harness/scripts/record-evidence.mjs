@@ -12,6 +12,7 @@ import { fileURLToPath } from 'node:url';
 
 const require = createRequire(import.meta.url);
 const { evaluate, loadPolicy } = require('../hooks/policy-guard.cjs');
+const { scrub: scrubPaths } = require('../lib/local-paths.cjs');
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const TAIL_BYTES = 2000;
 // Default limit 300 seconds. A human may raise it with HARNESS_EVIDENCE_TIMEOUT_SECONDS for a long suite; the value is capped, and a bad value falls back to the default.
@@ -70,7 +71,7 @@ export function record({ id, claim, cmd, outDir }) {
     durationMs: Date.now() - started,
     outputSha256: createHash('sha256').update(output).digest('hex'),
     outputBytes: Buffer.byteLength(output),
-    outputTail: output.slice(-TAIL_BYTES).replace(SECRET, '[REDACTED]'),
+    outputTail: scrubPaths(output.slice(-TAIL_BYTES).replace(SECRET, '[REDACTED]')),
     gitHead: gitHead(),
     environment: { node: process.version, platform: process.platform, release: os.release() },
   };

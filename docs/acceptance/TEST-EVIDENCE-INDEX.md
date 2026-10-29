@@ -75,19 +75,21 @@ Only the latest full run is kept in the tree; earlier runs remain in Git history
 |---|---|---|---|---|---|---|---|
 | EVRUN-36a72c3e30 | `e4a2f82` | no | 53 | 3 | 1 | 16 | G1 PASS, G2 FAIL, G3 FAIL, G4 BLOCKED, G5 BLOCKED, G6 BLOCKED, G7 BLOCKED |
 
-## C. Test files (31) run by `npm test`
+## C. Test files (33) run by `npm test`
 
 The count is the number of top-level `test(` declarations in the file. Generated cases (mutation tables) run several tests per declaration, so the executed total is larger; the executed total is in the evidence record for `npm test`.
 
 | File | Declarations |
 |---|---|
 | tests/acceptance-reports.test.mjs | 3 |
+| tests/agent-connectivity.test.mjs | 5 |
 | tests/agent-guard.test.mjs | 26 |
 | tests/approvals.test.mjs | 12 |
 | tests/audit-denials.test.mjs | 4 |
 | tests/design-gate.test.mjs | 22 |
 | tests/evaluation-engine.test.mjs | 28 |
 | tests/ingestion-contract.test.mjs | 20 |
+| tests/local-paths.test.mjs | 3 |
 | tests/loop-engine.test.mjs | 31 |
 | tests/mcp-names.test.mjs | 5 |
 | tests/mcp-server.test.mjs | 15 |
