@@ -1,0 +1,33 @@
+{
+  "id": "EV-0069",
+  "claim": "validate-harness on the architecture branch (all validators incl. architecture lint, approvals, evidence, business model)",
+  "argv": [
+    "node",
+    "harness/scripts/validate-harness.mjs"
+  ],
+  "exitCode": 1,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-29T11:26:55.053Z",
+  "durationMs": 4216,
+  "outputSha256": "1aa01636f5054825f5010cf1eec08b3ef9cb6b8c39630b555192f89f46a78f72",
+  "outputBytes": 200,
+  "outputTail": "FAIL [acceptance] docs/acceptance/TEST-EVIDENCE-INDEX.md does not match what the generator produces from the repository; regenerate it with acceptance-reports.mjs --write, never edit it\n1 problem(s).\n",
+  "gitHead": "e7e1e56d829a047e9d3ee6a0974aedbb9395b715",
+  "treeClean": false,
+  "dirtyFileCount": 1,
+  "treeCleanAfter": false,
+  "dirtyFileCountAfter": 1,
+  "headUnchanged": true,
+  "headAfter": "e7e1e56d829a047e9d3ee6a0974aedbb9395b715",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  },
+  "failureKind": "nonzero-exit",
+  "logFile": "docs/evidence/logs/EV-0069.log",
+  "logSha256": "1aa01636f5054825f5010cf1eec08b3ef9cb6b8c39630b555192f89f46a78f72",
+  "prevRecordSha256": "126f9675642d2ed7c0131ba252ccce296d6bb10d81a762b5c98412fd2eab5805",
+  "recordSha256": "2e7db3b9ab2a9725aef66ed8d81f1741641348e7f92291d8f0b1ef66546e8006"
+}

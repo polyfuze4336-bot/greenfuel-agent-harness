@@ -1,0 +1,31 @@
+{
+  "id": "EV-0070",
+  "claim": "business-model check: inputs classed, price file valid, report current",
+  "argv": [
+    "node",
+    "harness/scripts/business-model.mjs",
+    "check"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-29T11:26:59.562Z",
+  "durationMs": 299,
+  "outputSha256": "d3e23f4adca4659c9c5244d320c6dc495b70773deec2a9690d8b570df26761c6",
+  "outputBytes": 19,
+  "outputTail": "business-model: OK\n",
+  "gitHead": "e7e1e56d829a047e9d3ee6a0974aedbb9395b715",
+  "treeClean": false,
+  "dirtyFileCount": 3,
+  "treeCleanAfter": false,
+  "dirtyFileCountAfter": 3,
+  "headUnchanged": true,
+  "headAfter": "e7e1e56d829a047e9d3ee6a0974aedbb9395b715",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  },
+  "prevRecordSha256": "2b1ea2d1554230bf73e1399a1c2c2477ed1c32e6224a2fe27b93d02e10423f8b",
+  "recordSha256": "8fac6aff983605c898071890b2686ed2f671dfaa2974695f26f486a24bc39067"
+}

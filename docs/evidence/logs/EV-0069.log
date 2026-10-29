@@ -1,0 +1,2 @@
+FAIL [acceptance] docs/acceptance/TEST-EVIDENCE-INDEX.md does not match what the generator produces from the repository; regenerate it with acceptance-reports.mjs --write, never edit it
+1 problem(s).

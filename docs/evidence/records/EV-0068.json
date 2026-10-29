@@ -1,0 +1,31 @@
+{
+  "id": "EV-0068",
+  "claim": "Design-review gate on RV-0003 (DES-0003): computes Blocked, declared Blocked, 0 rejection reasons, 0 errors",
+  "argv": [
+    "node",
+    "harness/scripts/design-gate.mjs",
+    "docs/architecture/reviews/RV-0003-target-system-architecture.md"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-29T11:26:54.458Z",
+  "durationMs": 309,
+  "outputSha256": "23798e70c146cc918f83b1f2adb25720028b86790c77a5d747525a93bb937918",
+  "outputBytes": 3759,
+  "outputTail": " AGT-005 (Must) is Partial\nBLOCK   AGT-006 (Must) is Partial\nBLOCK   AGT-007 (Must) is Partial\nBLOCK   AGT-008 (Must) is Unresolved\nBLOCK   AGT-009 (Must) is Partial\nBLOCK   AGT-010 (Must) is Partial\nBLOCK   AGT-011 (Must) is Partial\nBLOCK   NFR-001 (Must) is Partial\nBLOCK   NFR-003 (Must) is Partial\nBLOCK   NFR-004 (Must) is Partial\nBLOCK   NFR-005 (Must) is Partial\nBLOCK   NFR-006 (Must) is Partial\nBLOCK   NFR-008 (Must) is Partial\nBLOCK   NFR-009 (Must) is Partial\nBLOCK   NFR-010 (Must) is Partial\nBLOCK   NFR-011 (Must) is Partial\nBLOCK   NFR-017 (Must) is Partial\nBLOCK   D-006 (M1) is Open and affects BR-002, FR-026, FR-027, FR-028\nBLOCK   D-025 (M2) is Open and affects BR-002, FR-029, NFR-003\nBLOCK   D-003 (M1) is Open and affects BR-006, SEC-001, DATA-009\nBLOCK   D-009 (M1) is Open and affects BR-006, SEC-001, SEC-002, SEC-003, DATA-001, NFR-009\nBLOCK   D-020 (M1) is Open and affects BR-007, FR-006, NFR-004\nBLOCK   D-019 (M1) is Open and affects FR-001, SEC-013, DATA-002, DATA-004, AGT-003, NFR-006\nBLOCK   D-012 (M1) is Open and affects FR-026, SEC-007\nBLOCK   D-007 (M1) is Open and affects FR-027, SEC-009, SEC-010, AGT-005\nBLOCK   D-033 (M2) is Open and affects SEC-002\nBLOCK   D-011 (M2) is Open and affects SEC-004\nBLOCK   D-015 (M1) is Open and affects SEC-005, SEC-006, DATA-001, DATA-004, NFR-010\nBLOCK   D-035 (M2) is Open and affects DATA-004\nBLOCK   D-016 (M2) is Open and affects DATA-006, NFR-011\nBLOCK   D-008 (M1) is Open and affects AGT-001, AGT-002\nBLOCK   D-037 (M2) is Open and affects AGT-011\nBLOCK   D-031 (M2) is Open and affects NFR-003, NFR-008\nBLOCK   critical question DQ-03-01 is unanswered\nBLOCK   critical question DQ-03-02 is unanswered\nBLOCK   critical question DQ-04-01 is unanswered\nBLOCK   critical question DQ-05-02 is unanswered\nBLOCK   critical question DQ-06-01 is unanswered\nBLOCK   critical question DQ-06-02 is unanswered\nBLOCK   critical question DQ-07-01 is unanswered\nSummary: 0 rejection reason(s), 85 blocking reason(s), 0 error(s)\n",
+  "gitHead": "e7e1e56d829a047e9d3ee6a0974aedbb9395b715",
+  "treeClean": true,
+  "dirtyFileCount": 0,
+  "treeCleanAfter": true,
+  "dirtyFileCountAfter": 0,
+  "headUnchanged": true,
+  "headAfter": "e7e1e56d829a047e9d3ee6a0974aedbb9395b715",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  },
+  "prevRecordSha256": "d4f0556b5c4560bd570a25f52583bbe1040fba2df9e2994d196b49e9dd331dc1",
+  "recordSha256": "488f129229427eb64bee333e353d9ecc889069f80a6a1b47520304d95e05d67e"
+}

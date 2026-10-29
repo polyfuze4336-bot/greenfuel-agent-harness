@@ -5,7 +5,7 @@ Generated from the evidence records, the committed evaluation runs, the test fol
 
 **What an evidence record is.** The recorder runs a command and stores what happened: arguments, exit code, duration, an output hash and the output tail, the Git commit and the runtime. It records facts about a run; it does not judge whether the command proves the claim. A claim is only as good as the command that backs it. A record with no exit code is a timeout or a kill, and is kept (append-only).
 
-## A. Evidence records (67)
+## A. Evidence records (70)
 
 | ID | Recorded | Commit | Command | Outcome | Claim |
 |---|---|---|---|---|---|
@@ -76,6 +76,9 @@ Generated from the evidence records, the committed evaluation runs, the test fol
 | EV-0065 | 2026-10-29 | `726d8e5` | `node harness/scripts/evaluate.mjs verify --run EVRUN-9b6110b026` | exit 0 | evaluate.mjs verify of the current committed run EVRUN-9b6110b026 re-derives every status, gate and hard-constraint verdict (capstone audit) |
 | EV-0066 | 2026-10-29 | `45c0f13` | `npm test` | exit 0 | npm test on branch capstone/rubric-enhancement with the audit documents: all tests pass, none skipped (capstone audit) |
 | EV-0067 | 2026-10-29 | `9a23b10` | `npm test` | exit 0 | npm test on the hardening branch (full suite, recorder-run, clean tree at start) |
+| EV-0068 | 2026-10-29 | `e7e1e56` | `node harness/scripts/design-gate.mjs docs/architecture/reviews/RV-0003` | exit 0 | Design-review gate on RV-0003 (DES-0003): computes Blocked, declared Blocked, 0 rejection reasons, 0 errors |
+| EV-0069 | 2026-10-29 | `e7e1e56` | `node harness/scripts/validate-harness.mjs` | exit 1 | validate-harness on the architecture branch (all validators incl. architecture lint, approvals, evidence, business model) |
+| EV-0070 | 2026-10-29 | `e7e1e56` | `node harness/scripts/business-model.mjs check` | exit 0 | business-model check: inputs classed, price file valid, report current |
 
 ## B. Committed evaluation runs (1)
 
