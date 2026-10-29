@@ -1,0 +1,23 @@
+{
+  "id": "EV-0061",
+  "claim": "npm run validate on branch capstone/rubric-enhancement before the audit documents (clean tree)",
+  "argv": [
+    "npm",
+    "run",
+    "validate"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-29T09:20:30.639Z",
+  "durationMs": 7156,
+  "outputSha256": "6dc479b23a0c28892b0d18f8aaeb98def94227d1240df05881b24dfe57322894",
+  "outputBytes": 108,
+  "outputTail": "\n> greenfuel-agent-harness@0.1.0 validate\n> node harness/scripts/validate-harness.mjs\n\nvalidate-harness: OK\n",
+  "gitHead": "1a500f7622bda0596a6fec8bff94dda20608d015",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}
