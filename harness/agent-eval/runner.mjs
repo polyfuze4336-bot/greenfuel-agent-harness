@@ -2,6 +2,7 @@
 // Commands: run --arm <id> [--write] | list | verify | compare [--write]. Reproducible: the content hash excludes wall-clock latency and creation time only.
 // This is SYNTHETIC EVALUATION. A run here is never production evidence.
 import fs from 'node:fs';
+import crypto from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { performance } from 'node:perf_hooks';
@@ -18,7 +19,7 @@ const root = path.resolve(here, '..', '..');
 export const runsDir = path.join(root, 'docs', 'evaluation', 'agent-runs');
 export const GATES = JSON.parse(fs.readFileSync(path.join(here, 'gates.json'), 'utf8'));
 const norm = (p) => fs.readFileSync(p, 'utf8').replace(/\r\n/g, '\n');
-export const codeSha = () => sha256(['env.mjs', 'score.mjs', 'gates.json', 'lib/decimal.mjs', 'arms/deterministic.mjs', 'arms/controls.mjs'].map((f) => norm(path.join(here, f))).join('\u0000'));
+export const codeSha = () => sha256(['env.mjs', 'score.mjs', 'gates.json', 'registry.json', 'runner.mjs', 'build-dataset.mjs', 'lib/decimal.mjs', 'lib/exact.mjs', 'arms/deterministic.mjs', 'arms/controls.mjs', 'arms/llm.mjs', '../contracts/tenant-boundary-contract.mjs', '../contracts/audit-chain.mjs'].map((f) => norm(path.join(here, f))).join('\u0000'));
 
 export const ARMS = { [deterministic.arm.id]: { ...deterministic.arm, run: deterministic.run }, ...Object.fromEntries(controls.map((a) => [a.id, a])), [single.id]: single, [multi.id]: multi };
 
@@ -35,7 +36,8 @@ export function datasetProblems({ cases, manifest }) {
   return out;
 }
 
-const view = (c) => ({ id: c.id, task: c.task, tenant: c.tenant, request: JSON.parse(JSON.stringify(c.request)) }); // the arm never sees facts or expected outcomes
+// The arm gets the task and request only, and an opaque per-run case reference (not the stable id), so it cannot key behaviour on a known case id.
+const view = (c, salt) => ({ id: `T${sha256(`${salt}|${c.id}`).slice(0, 8)}`, task: c.task, tenant: c.tenant, request: JSON.parse(JSON.stringify(c.request)) });
 
 export const getMetric = (agg, p) => p.split('.').reduce((o, k) => (o == null ? undefined : o[k]), agg);
 export function evaluateGates(agg, status = 'RUN') {
@@ -84,15 +86,20 @@ export async function runArm(armId, dataset = loadDataset(), { repeats = 1 } = {
     const rec = { ...base, runId: null, arm: { id: arm.id, kind: arm.kind, status: 'NOT_RUN', orchestration: arm.orchestration, model: null, promptSha256: null, notRunReasons: arm.notRunReasons }, perCase: [], aggregates: agg, gates: g, failure: 'F-NOT-RUN' };
     rec.runId = `AR-${arm.id}-NOT-RUN`; rec.contentSha256 = contentHash(rec); return rec;
   }
-  const perCase = []; const timings = {};
+  const perCase = []; const timings = {}; const salt = crypto.randomBytes(8).toString('hex'); const flips = new Set();
   for (const c of dataset.cases) {
-    const env = createEnv(c); const t0 = performance.now(); let result;
-    try { result = await arm.run(view(c), env); } catch (e) { result = null; env.log.push({ tool: 'ARM-ERROR', result: String(e.message).slice(0, 80) }); }
-    timings[c.id] = performance.now() - t0;
-    const s = scoreCase(c, result, env); s.latencyMs = timings[c.id]; perCase.push(s);
+    let first = null;
+    for (let rep = 0; rep < repeats; rep++) {
+      const env = createEnv(c); const t0 = performance.now(); let result;
+      try { result = await arm.run(view(c, `${salt}|${rep}`), env); } catch (e) { result = null; env.log.push({ tool: 'ARM-ERROR', result: String(e.message).slice(0, 80) }); }
+      const ms = performance.now() - t0; const s = scoreCase(c, result, env); s.latencyMs = ms;
+      if (rep === 0) { first = s; timings[c.id] = ms; perCase.push(s); } else if (s.success !== first.success || s.outcome !== first.outcome) flips.add(c.id);
+    }
   }
-  const aggregates = aggregate(perCase, timings);
-  const rec = { ...base, runId: null, arm: { id: arm.id, kind: arm.kind, status: 'RUN', orchestration: arm.orchestration, model: arm.model, promptSha256: arm.promptSha256 ?? null, version: arm.version }, perCase, aggregates, gates: evaluateGates(aggregates) };
+  const aggregates = aggregate(perCase, timings); aggregates.stability = { repeats, unstableCases: flips.size, note: repeats === 1 ? 'a single run per case: stability not measured' : 'share of cases whose outcome or success changed between repeats of the same input' };
+  const splitOf = (s) => { const a = aggregate(perCase.filter((r) => r.split === s)); return { aggregates: { cases: a.cases, taskCompletionRate: a.taskCompletionRate, outcomeAccuracy: a.outcomeAccuracy, calculationCorrectness: a.calculationCorrectness, numericAssertions: a.numericAssertions, escalation: a.escalation, security: a.security, unsupportedClaims: a.unsupportedClaims }, gate: evaluateGates(a).overall }; };
+  const bySplit = { dev: splitOf('dev'), holdout: splitOf('holdout') };
+  const rec = { ...base, runId: null, arm: { id: arm.id, kind: arm.kind, status: 'RUN', orchestration: arm.orchestration, model: arm.model, promptSha256: arm.promptSha256 ?? null, version: arm.version }, perCase, aggregates, bySplit, gates: evaluateGates(aggregates) };
   rec.contentSha256 = contentHash(rec); rec.runId = `AR-${arm.id}-${rec.contentSha256.slice(0, 8)}`; rec.contentSha256 = contentHash(rec);
   rec.createdAt = undefined; return rec;
 }
@@ -102,7 +109,7 @@ export function regressions(candidate, baseline) {
   const out = []; if (!baseline) return ['no baseline to compare'];
   if (candidate.dataset.casesSha256 !== baseline.dataset.casesSha256) return ['the dataset differs from the baseline: not comparable'];
   const A = candidate.aggregates; const B = baseline.aggregates;
-  const worseHigh = ['taskCompletionRate', 'calculationCorrectness.rate', 'escalation.recall', 'toolSelectionPrecision', 'evidenceCitationAccuracy'];
+  const worseHigh = ['taskCompletionRate', 'outcomeAccuracy', 'calculationCorrectness.rate', 'numericAssertions.rate', 'escalation.recall', 'escalation.reasonCorrectRate', 'toolSelectionPrecision', 'evidenceCitationAccuracy'];
   const worseLow = ['security.disclosureCases', 'security.neverActionAttempts', 'security.qcBypassAttempts', 'unsupportedClaims.statements', 'unsupportedClaims.numbers'];
   for (const m of worseHigh) { const a = getMetric(A, m); const b = getMetric(B, m); if (a !== null && b !== null && a < b) out.push(`${m} fell from ${b} to ${a}`); }
   for (const m of worseLow) { const a = getMetric(A, m); const b = getMetric(B, m); if (a > b) out.push(`${m} rose from ${b} to ${a}`); }
@@ -140,12 +147,15 @@ export function comparisonMarkdown(recs) {
     `Dataset v${recs[0].dataset.version} (${recs[0].dataset.casesSha256.slice(0, 12)}), expected outcomes **${recs[0].dataset.reviewStatus}**. SYNTHETIC evaluation: not production evidence. Control arms exist only to prove the scorer detects failures and are not candidates.`, '',
     `| Metric | ${cols.join(' | ')} |`, `|---|${cols.map(() => '---').join('|')}|`,
     `| Kind | ${recs.map((r) => r.arm.kind).join(' | ')} |`,
-    row('Cases', (a) => f2(a.cases)), row('Task completion rate', (a) => f2(a.taskCompletionRate)), row('Tool selection precision', (a) => f2(a.toolSelectionPrecision)), row('Required-tool recall', (a) => f2(a.requiredToolRecall)),
+    row('Cases', (a) => f2(a.cases)), row('Outcome accuracy (outcome only)', (a) => f2(a.outcomeAccuracy)), row('Task completion rate (verified: outcome, evidence, grounding, no violation)', (a) => f2(a.taskCompletionRate)),
+    `| Task completion, dev / holdout | ${recs.map((r) => (r.arm.status === 'NOT_RUN' ? 'NOT RUN' : `${f2(r.bySplit.dev.aggregates.taskCompletionRate)} / ${f2(r.bySplit.holdout.aggregates.taskCompletionRate)}`)).join(' | ')} |`,
+    row('Tool selection precision', (a) => f2(a.toolSelectionPrecision)), row('Required-tool recall', (a) => f2(a.requiredToolRecall)),
     row('Evidence citation accuracy', (a) => f2(a.evidenceCitationAccuracy)), row('Citation recall', (a) => f2(a.citationRecall)),
     row('Unsupported statements / numbers', (a) => `${a.unsupportedClaims.statements} / ${a.unsupportedClaims.numbers}`),
     row('Never-action attempts', (a) => f2(a.security.neverActionAttempts)), row('QC-bypass attempts', (a) => f2(a.security.qcBypassAttempts)), row('Disclosure cases (of opportunities)', (a) => `${a.security.disclosureCases} of ${a.security.disclosureOpportunities}`),
     row('Escalation precision', (a) => f2(a.escalation.precision)), row('Escalation recall', (a) => f2(a.escalation.recall)), row('Escalation reason correct (of true escalations)', (a) => f2(a.escalation.reasonCorrectRate)),
-    row('Calculation correctness', (a) => `${a.calculationCorrectness.correct} of ${a.calculationCorrectness.cases}`), row('Recovery after transient failure', (a) => `${a.recovery.recovered} of ${a.recovery.cases}`),
+    row('Emissions calculation correctness', (a) => `${a.calculationCorrectness.correct} of ${a.calculationCorrectness.cases}`), row('All numeric assertions correct', (a) => `${a.numericAssertions.correct} of ${a.numericAssertions.cases}`), row('Recovery after transient failure', (a) => `${a.recovery.recovered} of ${a.recovery.cases}`),
+    row('Stability across repeats', (a) => (a.stability.repeats === 1 ? 'not measured (1 run)' : `${a.stability.unstableCases} unstable of ${a.cases}`)),
     row('Model tokens', (a) => `${a.tokens.input} in / ${a.tokens.output} out`), row('Overall gate result', () => ''),
   ];
   lines[lines.length - 1] = `| Overall gate result | ${recs.map((r) => r.gates.overall).join(' | ')} |`;

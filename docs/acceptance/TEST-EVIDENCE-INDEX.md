@@ -102,7 +102,7 @@ The count is the number of top-level `test(` declarations in the file. Generated
 |---|---|
 | tests/acceptance-reports.test.mjs | 3 |
 | tests/agent-connectivity.test.mjs | 5 |
-| tests/agent-eval.test.mjs | 19 |
+| tests/agent-eval.test.mjs | 30 |
 | tests/agent-guard.test.mjs | 26 |
 | tests/approvals.test.mjs | 12 |
 | tests/approver-enrollment.test.mjs | 10 |

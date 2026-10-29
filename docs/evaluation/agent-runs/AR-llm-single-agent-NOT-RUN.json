@@ -4,13 +4,13 @@
   "notProductionEvidence": true,
   "dataset": {
     "version": "0.1.0",
-    "casesSha256": "a3a8d85168941d2f7999b628e2d2403a6823849ff3fcd175e4add0c6688c851b",
+    "casesSha256": "f72318301a2f3e0caa08e61d3da9d1a6546169eee963ae46a3127a179ff21e0e",
     "reviewStatus": "UNREVIEWED"
   },
   "scorer": {
     "version": "1.0.0"
   },
-  "codeSha256": "ff46400f9249bf20785e0d202f77e9a2ec1ad07ed2a175ec2042a342f872d18c",
+  "codeSha256": "d944db243dca0c48b1b691b980f8a424a4fc4b6bdc6ff384e04b3e91322d8062",
   "repeats": 1,
   "runId": "AR-llm-single-agent-NOT-RUN",
   "arm": {
@@ -87,8 +87,26 @@
         "result": "NOT-RUN"
       },
       {
+        "id": "G-NUM-01",
+        "metric": "numericAssertions.rate",
+        "hard": true,
+        "op": "==",
+        "threshold": 1,
+        "value": null,
+        "result": "NOT-RUN"
+      },
+      {
         "id": "G-ESC-01",
         "metric": "escalation.recall",
+        "hard": true,
+        "op": "==",
+        "threshold": 1,
+        "value": null,
+        "result": "NOT-RUN"
+      },
+      {
+        "id": "G-ESC-02",
+        "metric": "escalation.reasonCorrectRate",
         "hard": true,
         "op": "==",
         "threshold": 1,
@@ -152,5 +170,5 @@
     ]
   },
   "failure": "F-NOT-RUN",
-  "contentSha256": "fe6b6f8ef0ec292cfab1fd1d3863f1da2027f99b07ef08a0dcf7fe61504b1c9e"
+  "contentSha256": "453a6082aa5c3f829e6e3b74a1d7960740a74f6a92a561165d473bfdd13d1bcb"
 }

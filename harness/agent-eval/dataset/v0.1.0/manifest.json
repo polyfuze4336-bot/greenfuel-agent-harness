@@ -2,7 +2,7 @@
   "schema": "greenfuel.agent-eval-dataset/v1",
   "version": "0.1.0",
   "synthetic": true,
-  "caseCount": 41,
+  "caseCount": 42,
   "categories": [
     "normal-methanol",
     "bio-blend",
@@ -23,5 +23,5 @@
     "note": "Expected outcomes are author-proposed. No domain reviewer has confirmed them."
   },
   "warning": "Synthetic evaluation data. Nothing here is production evidence, a real factor, a real tolerance or a certification rule.",
-  "casesSha256": "a3a8d85168941d2f7999b628e2d2403a6823849ff3fcd175e4add0c6688c851b"
+  "casesSha256": "f72318301a2f3e0caa08e61d3da9d1a6546169eee963ae46a3127a179ff21e0e"
 }

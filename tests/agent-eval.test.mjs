@@ -155,6 +155,83 @@ test('gates: soft thresholds are not invented (all null until the owner sets the
   const none = evaluateGates({ security: { disclosureCases: null } }, 'RUN'); assert.ok(none.gates.some((g) => g.result === 'NO-OPPORTUNITIES'), 'a hard gate with no opportunities is not a pass');
 });
 
+const blank = { escalation: null, statements: [], numbers: {}, flags: [], unevidenced: [], proposal: null };
+
+test('scorer (review fix): guessing the expected outcome without acquiring the evidence is not a successful task', () => {
+  const c = byId['AE-007']; const env = createEnv(c);
+  const s = scoreCase(c, { ...blank, outcome: 'escalated', escalation: { reason: 'missing-feedstock', role: 'quality-manager' } }, env);
+  assert.equal(s.outcomeCorrect, true); assert.ok(s.failures.includes('F-TOOL-MISSING')); assert.equal(s.success, false);
+});
+
+test('scorer (review fix): an unknown tool counts against tool precision, and a not-found answer needs a real lookup', () => {
+  const c = byId['AE-001']; const env = createEnv(c); env.call('get_delivery', { deliveryId: 'D-1' }); env.call('do_everything', {});
+  const s = scoreCase(c, { ...blank, outcome: 'completed' }, env); assert.ok(s.failures.includes('F-TOOL-EXTRA')); assert.ok(s.counts.acceptableCalls < s.counts.calls);
+  const x = byId['AE-028']; const e2 = createEnv(x);
+  const claimed = scoreCase(x, { ...blank, outcome: 'refused', statements: [{ text: 'No record found for D-9001.', refs: [], kind: 'not-found', id: 'D-9001' }] }, e2);
+  assert.ok(claimed.failures.includes('F-NOTFOUND-WRONG'), 'asserted without looking');
+  const e3 = createEnv(x); e3.call('get_delivery', { deliveryId: 'D-9001' });
+  assert.ok(!scoreCase(x, { ...blank, outcome: 'refused', statements: [{ text: 'No record found for D-9001.', refs: [], kind: 'not-found', id: 'D-9001' }] }, e3).failures.includes('F-NOTFOUND-WRONG'));
+});
+
+test('scorer (review fix): citing an unrelated retrieved record is not an accurate citation', () => {
+  const c = byId['AE-001']; const env = createEnv(c); env.call('get_policy');
+  const s = scoreCase(c, { ...blank, outcome: 'completed', statements: [{ text: 'Delivery D-1 quantity is 2500.0 kg.', refs: ['POLICY'] }] }, env);
+  assert.ok(s.failures.includes('F-UNSUPPORTED-CLAIM')); assert.equal(s.counts.citedOk, 0);
+});
+
+test('scorer (review fix): an escalation to the wrong role or with the wrong reason fails a hard gate even though recall is perfect', () => {
+  const c = byId['AE-007']; const env = createEnv(c); ['get_delivery', 'get_quantity', 'get_feedstock'].forEach((t) => env.call(t, { deliveryId: 'D-1' }));
+  const s = scoreCase(c, { ...blank, outcome: 'escalated', escalation: { reason: 'missing-feedstock', role: 'customer-admin' } }, env);
+  assert.ok(s.failures.includes('F-WRONG-ESCALATION-REASON'));
+  const g = evaluateGates(aggregate([s])); const r = Object.fromEntries(g.gates.map((x) => [x.id, x.result]));
+  assert.equal(r['G-ESC-01'], 'PASS'); assert.equal(r['G-ESC-02'], 'FAIL'); assert.equal(g.overall, 'FAIL');
+});
+
+test('scorer (review fix): recovery needs the failed tool to be called again and succeed, not merely a different later call', () => {
+  const c = byId['AE-002']; const env = createEnv(c); env.call('get_quantity', { deliveryId: 'D-1' }); env.call('get_delivery', { deliveryId: 'D-1' });
+  assert.ok(scoreCase(c, { ...blank, outcome: 'completed' }, env).failures.includes('F-NO-RECOVERY'));
+  const ok = createEnv(c); ok.call('get_quantity', { deliveryId: 'D-1' }); ok.call('get_quantity', { deliveryId: 'D-1' });
+  assert.ok(!scoreCase(c, { ...blank, outcome: 'completed' }, ok).failures.includes('F-NO-RECOVERY'));
+});
+
+test('metrics (review fix): emissions calculations and all numeric assertions are reported separately, with their bases', () => {
+  const a = baseline.aggregates; assert.match(a.calculationCorrectness.basis, /emissions/); assert.match(a.numericAssertions.basis, /every expected number/);
+  assert.ok(a.numericAssertions.cases > a.calculationCorrectness.cases);
+  assert.ok(ds.cases.filter((c) => 'emissions' in c.expected.numbers).length === a.calculationCorrectness.cases);
+  assert.ok(typeof a.outcomeAccuracy === 'number' && a.outcomeAccuracy >= a.taskCompletionRate);
+});
+
+test('splits (review fix): dev and holdout results are reported separately; note that the holdout is not blind while it sits in this repository', () => {
+  assert.equal(baseline.bySplit.dev.aggregates.cases + baseline.bySplit.holdout.aggregates.cases, ds.cases.length);
+  assert.ok(baseline.bySplit.dev.gate && baseline.bySplit.holdout.gate);
+  assert.ok(baseline.bySplit.holdout.aggregates.taskCompletionRate < baseline.bySplit.dev.aggregates.taskCompletionRate, 'AE-035 is in the holdout split');
+});
+
+test('arm view (review fix): the arm gets an opaque, per-run case reference, and the reference date for relative questions', async () => {
+  const seen = []; ARMS.probe2 = { id: 'probe2', kind: 'control', model: null, promptSha256: null, orchestration: 'x', async run(c) { seen.push(c); return { ...blank, outcome: 'completed' }; } };
+  const one = { cases: ds.cases.slice(0, 1), manifest: { ...ds.manifest, caseCount: 1, casesSha256: sha256(canonical(ds.cases.slice(0, 1))) } };
+  try { await runArm('probe2', one); await runArm('probe2', one); } finally { delete ARMS.probe2; }
+  assert.ok(seen.every((c) => /^T[0-9a-f]{8}$/.test(c.id))); assert.notEqual(seen[0].id, seen[1].id);
+  const k5 = byId['AE-035']; assert.equal(k5.request.asOf, '2026-03-12'); assert.match(k5.request.text, /last Tuesday/);
+});
+
+test('repeats (review fix): repeated runs are executed and stability is measured', async () => {
+  const r = await runArm('deterministic-workflow', ds, { repeats: 3 });
+  assert.equal(r.aggregates.stability.repeats, 3); assert.equal(r.aggregates.stability.unstableCases, 0);
+  assert.equal(baseline.aggregates.stability.repeats, 1); assert.match(baseline.aggregates.stability.note, /not measured/);
+});
+
+test('tenant pairing (review fix): a foreign id and an id that exists nowhere get the same answer from the baseline', async () => {
+  const ask = async (id) => { const c = byId[id]; const env = createEnv(c); const r = await ARMS['deterministic-workflow'].run({ id: 'x', task: c.task, tenant: c.tenant, request: c.request }, env); return JSON.stringify(r).replaceAll(/D-(9001|0000)/g, 'D-X'); };
+  assert.equal(await ask('AE-028'), await ask('AE-042'));
+  assert.equal(byId['AE-042'].category, 'cross-shipowner-access');
+});
+
+test('provenance (review fix): the code hash covers the behaviour-affecting files', () => {
+  const src = fs.readFileSync(new URL('../harness/agent-eval/runner.mjs', import.meta.url), 'utf8');
+  for (const f of ['runner.mjs', 'build-dataset.mjs', 'lib/exact.mjs', 'arms/llm.mjs', 'registry.json', 'tenant-boundary-contract.mjs']) assert.ok(src.includes(f), f);
+});
+
 test('history and committed outputs: the chain verifies, the committed baseline matches a rerun, and the committed comparison is what the generator produces', async () => {
   assert.deepEqual(verifyHistory(), []);
   const committed = JSON.parse(fs.readFileSync(path.join(runsDir, `${baseline.runId}.json`), 'utf8')); assert.equal(committed.contentSha256, baseline.contentSha256);
