@@ -1,11 +1,11 @@
 {
   "generatedBy": "harness/scripts/studio-inventory.mjs",
   "git": {
-    "head": "392ac02d6e437a1152be63f272a9f50b98f25461",
-    "branch": "studio/discovery",
+    "head": "df07cf2c5f9f1fde7b9a1283649804c93b3c38f7",
+    "branch": "studio/ui-readonly",
     "originMain": "c6ff681810c2462144004c01ce2b79ed1e6f7d4f",
-    "commitsAheadOfOriginMain": 24,
-    "dirty": 2
+    "commitsAheadOfOriginMain": 25,
+    "dirty": 5
   },
   "sources": {},
   "counts": {
@@ -161,13 +161,13 @@
     "todoTasks": {
       "source": "docs/state/TODO.md",
       "rule": "rows \"| Tn |\"; status = leading bold keyword, else \"deferred\" in the first section, else \"unmarked\"",
-      "total": 48,
+      "total": 49,
       "byStatus": {
         "deferred": 15,
         "decided": 2,
         "agreed": 1,
         "done": 2,
-        "open": 23,
+        "open": 24,
         "not-granted": 1,
         "approved": 4
       },
@@ -177,7 +177,8 @@
         "Awaiting the owner (evaluation stage, 2026-10-28)": 2,
         "Awaiting the owner (Azure readiness stage, 2026-10-28; answered 2026-10-29)": 12,
         "Awaiting the owner (hardening stage, 2026-10-30)": 6,
-        "Awaiting the owner (target architecture and business case, 2026-10-29)": 13
+        "Awaiting the owner (target architecture and business case, 2026-10-29)": 13,
+        "Awaiting the owner (Architecture Decision Studio, 2026-10-29)": 1
       },
       "ambiguousForReview": [
         "T2"
@@ -1616,6 +1617,16 @@
       ],
       "ambiguous": false,
       "title": "Open: thought-leadership accelerator (built 2026-10-29 as a separate local repository `evi"
+    },
+    {
+      "id": "T61",
+      "section": "Awaiting the owner (Architecture Decision Studio, 2026-10-29)",
+      "status": "open",
+      "tokens": [
+        "open"
+      ],
+      "ambiguous": false,
+      "title": "Open: owner decisions for the Architecture Decision Studio. A read-only web interface was "
     }
   ],
   "phaseFromState": "0",
@@ -2034,7 +2045,7 @@
       "fileCount": 1
     },
     "T": {
-      "distinctIds": 54,
+      "distinctIds": 55,
       "files": [
         "docs/acceptance/HARNESS-ACCEPTANCE-REPORT.md",
         "docs/harness/CAPABILITY-MATRIX.md",
@@ -2102,6 +2113,7 @@
     ".github": 3,
     ".mcp.json": 1,
     ".vscode": 2,
+    "apps": 119,
     "docs/architecture-studio": 1,
     "docs/azure": 2,
     "docs/business": 3,
