@@ -1,0 +1,23 @@
+{
+  "id": "EV-0050",
+  "claim": "Deployment-readiness utility reports NOT-READY (exit 2): the end-to-end scenario pauses before any Azure provisioning",
+  "argv": [
+    "node",
+    "harness/scripts/spec-validators.mjs",
+    "deployment-readiness"
+  ],
+  "exitCode": 2,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-29T01:18:19.176Z",
+  "durationMs": 268,
+  "outputSha256": "cdc7abc323247a0f7a3d2c152894836449f7afac012f7ef99f85b40703e75377",
+  "outputBytes": 2912,
+  "outputTail": "ent exists and no hosting option can be chosen\n  - [DG-11] D-037 is open: the Azure tenant, subscription and landing zone\n  - [DG-02] D-003 is open: the ports and jurisdictions\n  - [DG-02] D-009 is open: the residency interpretation per port\n  - [DG-02] D-010 is open: the hosting model per port\n  - [DG-04] D-013 is open: tamper evidence and key custody\n  - [DG-02] D-028 is open: where AI inference runs\n  - [DG-09] D-031 is open: availability, recovery and latency targets\n  - [DG-09] D-033 is open: the operating model and support access\n  - [DG-02] D-018 is open: the edge platform\n  - [DG-04] No approver is registered (T13), so no signed approval can exist for a billable or Azure change\n  - [DG-03] No live verification of region and service availability exists: it needs read-only Azure access that has not been approved (T11, D-037)\n  - [DG-04] The scoped deployment identities, custom role, locks and policy have not been created (T17); nothing exists in Azure\n  - [DG-05] infra/params/dev.parameters.json still has unresolved REQUIRES-APPROVAL values\n  - [DG-05] infra/params/test.parameters.json still has unresolved REQUIRES-APPROVAL values\n  - [DG-05] infra/params/prod.parameters.json still has unresolved REQUIRES-APPROVAL values\n  - [DG-06] No what-if result is recorded for any environment, so no infrastructure change has been reviewed\n  - [DG-07] No sourced cost estimate and no agreed budget exist; any figure now would be invented (HC-12)\n  - [DG-08] No signed approval record exists for creating resources or for any billable change\n  - [DG-09] No runbook, rollback or recovery procedure has been exercised in a non-production environment\n  - [DG-10] No post-deployment smoke or integration test has run: nothing is deployed\n  note: Checks the preconditions recorded in the specifications. It tests no application and cannot show that anything is ready.\n  note: Deployment is a human-run action (HC-11). No result here authorises it, and NO-BLOCKERS-FOUND is not an approval.\n",
+  "gitHead": "c37b3f1388ddd7d672c2e4a915c4f78ccba81481",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}

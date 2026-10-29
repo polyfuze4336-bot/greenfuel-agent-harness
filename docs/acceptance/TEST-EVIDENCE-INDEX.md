@@ -5,7 +5,7 @@ Generated from the evidence records, the committed evaluation runs, the test fol
 
 **What an evidence record is.** The recorder runs a command and stores what happened: arguments, exit code, duration, an output hash and the output tail, the Git commit and the runtime. It records facts about a run; it does not judge whether the command proves the claim. A claim is only as good as the command that backs it. A record with no exit code is a timeout or a kill, and is kept (append-only).
 
-## A. Evidence records (47)
+## A. Evidence records (53)
 
 | ID | Recorded | Commit | Command | Outcome | Claim |
 |---|---|---|---|---|---|
@@ -56,6 +56,12 @@ Generated from the evidence records, the committed evaluation runs, the test fol
 | EV-0045 | 2026-10-28 | `dbe2f23` | `node harness/scripts/validate-azure.mjs --bicep` | exit 0 | validate-azure --bicep at dbe2f23: static policy passes and every Bicep file compiles with no diagnostics (local compiler, no Azure call) |
 | EV-0046 | 2026-10-28 | `dbe2f23` | `node harness/scripts/evaluate.mjs verify --run EVRUN-bdce820495` | exit 0 | evaluate.mjs verify of EVRUN-bdce820495 re-derives every status, gate and hard-constraint verdict |
 | EV-0047 | 2026-10-28 | `dbe2f23` | `npm test` | exit 0 | npm test at dbe2f23: all tests pass, none skipped (includes Azure validator, evaluation re-run and record tests). Supersedes EV-0043, which timed out  |
+| EV-0048 | 2026-10-29 | `c37b3f1` | `node --test tests/ingestion-contract.test.mjs evaluation/checks/ingest` | exit 0 | Ingestion candidate contract tests and its three evaluation checks pass (synthetic fixtures; a specification harness, not the application) |
+| EV-0049 | 2026-10-29 | `c37b3f1` | `node harness/scripts/design-gate.mjs docs/architecture/reviews/RV-0002` | exit 0 | Design gate: declared status of RV-0002 (Blocked) is consistent with the computed result |
+| EV-0050 | 2026-10-29 | `c37b3f1` | `node harness/scripts/spec-validators.mjs deployment-readiness` | exit 2 | Deployment-readiness utility reports NOT-READY (exit 2): the end-to-end scenario pauses before any Azure provisioning |
+| EV-0051 | 2026-10-29 | `c37b3f1` | `node harness/scripts/evaluate.mjs verify --run EVRUN-36a72c3e30` | exit 0 | evaluate.mjs verify of EVRUN-36a72c3e30 re-derives every status, gate and hard-constraint verdict |
+| EV-0052 | 2026-10-29 | `c37b3f1` | `npm run validate` | exit 1 | npm run validate is clean at c37b3f1 (stage 12), including the acceptance-document generator check and validate-evaluation |
+| EV-0053 | 2026-10-29 | `c37b3f1` | `npm test` | exit 1 | npm test at c37b3f1: all tests pass, none skipped (includes the ingestion contract, acceptance-document generator and evaluation re-run tests) |
 
 ## B. Committed evaluation runs (1)
 

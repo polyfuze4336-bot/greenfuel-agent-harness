@@ -1,0 +1,23 @@
+{
+  "id": "EV-0049",
+  "claim": "Design gate: declared status of RV-0002 (Blocked) is consistent with the computed result",
+  "argv": [
+    "node",
+    "harness/scripts/design-gate.mjs",
+    "docs/architecture/reviews/RV-0002-evidence-ingestion-subsystem.md"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-29T01:18:18.892Z",
+  "durationMs": 112,
+  "outputSha256": "4bb192b019d12279bcafc1fae5d095f1c9f2d5e569e517c9a587a56d92043ce7",
+  "outputBytes": 1949,
+  "outputTail": "Review: RV-0002  Design: DES-0002  Option evaluated: B\nComputed: Blocked   Declared: Blocked\nBLOCK   HC-01 is conditional on open D-003, D-009, D-010, D-011\nBLOCK   HC-02 unresolved for option B\nBLOCK   HC-06 is conditional on open D-013, D-019\nBLOCK   HC-07 is conditional on open D-018, D-020, D-031\nBLOCK   HC-08 is conditional on open D-013, D-018, D-021\nBLOCK   PV-04 not assessed\nBLOCK   PV-07 not assessed\nBLOCK   PV-08 not assessed\nBLOCK   BR-007 (Must) is Partial\nBLOCK   FR-001 (Must) is Partial\nBLOCK   FR-006 (Must) is Partial\nBLOCK   SEC-013 (Must) is Unresolved\nBLOCK   DATA-002 (Must) is Partial\nBLOCK   AGT-010 (Must) is Partial\nBLOCK   NFR-004 (Must) is Unresolved\nBLOCK   NFR-005 (Must) is Partial\nBLOCK   NFR-006 (Must) is Partial\nBLOCK   NFR-017 (Must) is Partial\nBLOCK   BR-002 (Must) is Partial\nBLOCK   BR-006 (Must) is Partial\nBLOCK   FR-002 (Must) is Partial\nBLOCK   SEC-001 (Must) is Partial\nBLOCK   SEC-002 (Must) is Unresolved\nBLOCK   SEC-008 (Must) is Partial\nBLOCK   SEC-012 (Must) is Partial\nBLOCK   DATA-001 (Must) is Partial\nBLOCK   NFR-001 (Must) is Partial\nBLOCK   NFR-009 (Must) is Unresolved\nBLOCK   AGT-003 (Must) is Partial\nBLOCK   D-020 (M1) is Open and affects BR-007, FR-006, NFR-004\nBLOCK   D-019 (M1) is Open and affects FR-001, SEC-013, DATA-002, NFR-006, FR-002, AGT-003\nBLOCK   D-006 (M1) is Open and affects BR-002\nBLOCK   D-025 (M2) is Open and affects BR-002\nBLOCK   D-003 (M1) is Open and affects BR-006, SEC-001\nBLOCK   D-009 (M1) is Open and affects BR-006, SEC-001, SEC-002, DATA-001, NFR-009\nBLOCK   D-007 (M1) is Open and affects FR-002\nBLOCK   D-033 (M2) is Open and affects SEC-002\nBLOCK   D-015 (M1) is Open and affects DATA-001\nBLOCK   critical question DQ-03-02 is unanswered\nBLOCK   critical question DQ-04-01 is unanswered\nBLOCK   critical question DQ-06-01 is unanswered\nBLOCK   critical question DQ-07-02 is unanswered\nSummary: 0 rejection reason(s), 42 blocking reason(s), 0 error(s)\n",
+  "gitHead": "c37b3f1388ddd7d672c2e4a915c4f78ccba81481",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}

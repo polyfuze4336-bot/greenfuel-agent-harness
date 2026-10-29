@@ -1,0 +1,23 @@
+{
+  "id": "EV-0052",
+  "claim": "npm run validate is clean at c37b3f1 (stage 12), including the acceptance-document generator check and validate-evaluation",
+  "argv": [
+    "npm",
+    "run",
+    "validate"
+  ],
+  "exitCode": 1,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-29T01:18:27.181Z",
+  "durationMs": 6682,
+  "outputSha256": "3fad442a9dd36c85c6f6da32b52b5e134340d9b7a8df84b6f25ee6f76c56742f",
+  "outputBytes": 287,
+  "outputTail": "\n> greenfuel-agent-harness@0.1.0 validate\n> node harness/scripts/validate-harness.mjs\n\nFAIL [acceptance] docs/acceptance/TEST-EVIDENCE-INDEX.md does not match what the generator produces from the repository; regenerate it with acceptance-reports.mjs --write, never edit it\n1 problem(s).\n",
+  "gitHead": "c37b3f1388ddd7d672c2e4a915c4f78ccba81481",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}

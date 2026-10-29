@@ -1,0 +1,64 @@
+{
+  "kind": "decision",
+  "title": "Jurisdiction-local, tamper-evident evidence ingestion by an edge hash-chained log with store-and-forward",
+  "statement": "Jurisdiction-local, tamper-evident evidence ingestion by an edge hash-chained log with store-and-forward",
+  "body": "Select option 2 as the design direction. It is **Proposed**, not Accepted: the review computes Blocked, and a Design ADR cannot be Accepted unless its review is Approved. The chain format and the reference behaviour are captured as a candidate contract (`greenfuel.ingestion-batch/v0-candidate`) in [ingestion-contract.mjs](../../harness/contracts/ingestion-contract.mjs), used as an acceptance oracle and not as a decision on the signing mechanism.",
+  "refs": [
+    "ADR-0015",
+    "BR-007",
+    "BR-002",
+    "BR-006",
+    "FR-001",
+    "FR-002",
+    "FR-006",
+    "SEC-001",
+    "SEC-002",
+    "SEC-008",
+    "SEC-012",
+    "SEC-013",
+    "DATA-001",
+    "DATA-002",
+    "AGT-003",
+    "AGT-010",
+    "NFR-001",
+    "NFR-004",
+    "NFR-005",
+    "NFR-006",
+    "NFR-009",
+    "file:docs/adr/0015-evidence-ingestion-subsystem.md"
+  ],
+  "subject": "adr.0015",
+  "position": "proposed",
+  "tags": [
+    "adr"
+  ],
+  "owner": "programme-owner",
+  "critical": false,
+  "provenance": {
+    "evidence": [],
+    "source": "adr",
+    "ref": "file:docs/adr/0015-evidence-ingestion-subsystem.md",
+    "sourceSha256": "c634b2805298a90cae3b5003f5b4d60f2329e7cd8793b386ba92a7fdc60c9678",
+    "trust": "unreviewed",
+    "recordedBy": {
+      "type": "importer",
+      "name": "import-adr"
+    }
+  },
+  "approval": null,
+  "validity": {
+    "supersedes": [],
+    "supersededBy": null,
+    "validUntil": "2026-12-28T01:30:47.375Z",
+    "reviewBy": null,
+    "status": "proposed",
+    "validFrom": "2026-10-29T01:30:47.377Z"
+  },
+  "schema": "greenfuel.memory/v1",
+  "category": "semantic",
+  "createdAt": "2026-10-29T01:30:47.377Z",
+  "updatedAt": "2026-10-29T01:30:47.377Z",
+  "classification": "internal",
+  "review": null,
+  "id": "DEC-0015"
+}
