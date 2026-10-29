@@ -1,4 +1,6 @@
-// Read model for the Architecture Decision Studio. Pure data: no Node imports, safe for client components.
+import type { RegisterSnapshot } from '../intel/schema.ts';
+
+// Shared read-model types for the Architecture Decision Studio.
 
 export type DecisionStatus = 'open' | 'proposed' | 'accepted' | 'rejected' | 'deferred' | 'superseded';
 
@@ -272,6 +274,8 @@ export interface StudioModel {
   presentation: { slides: Slide[]; qa: QaItem[]; rehearsal: RehearsalCriterion[]; recordings: Recording[]; recordingsSrc: string };
   recentCommits: CommitInfo[];
   warnings: string[];
+  /** Normalized decision register: the same decisions, enriched, checked and traced to source. */
+  register: RegisterSnapshot;
 }
 
 export const STATUS_LABEL: Record<DecisionStatus, string> = {

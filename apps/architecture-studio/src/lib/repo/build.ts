@@ -1,4 +1,5 @@
 import { GitRepositoryAdapter } from './git.ts';
+import { buildRegister, type FragmentCache } from '../intel/engine.ts';
 import { adrRefs, assumptionRefs, dRefs, field, lineOf, parseAdr, parseAssumptions, parseRegister, parseRequirements, parseRisks, parseRoadmap, parseTodo, plain, tableRows } from './parse.ts';
 import type { Approvals, Attention, Blocker, Decision, Doc, DesignReview, EvidenceRun, Metrics, PendingApproval, QaItem, RehearsalCriterion, Recording, RepoMeta, Slide, StudioModel, Task } from './types.ts';
 
@@ -44,7 +45,7 @@ function classify(p: string): Doc['authority'] {
   return 'reference';
 }
 
-export function buildModel(git: GitRepositoryAdapter): StudioModel {
+export function buildModel(git: GitRepositoryAdapter, fragmentCache: FragmentCache = new Map()): StudioModel {
   const warnings: string[] = [];
   const docPaths = git.list('docs/').filter((p) => !/^docs\/state\/(runs|loops)\//.test(p));
   git.preload([...docPaths, P.approvers, ...git.list('docs/state/')]);
@@ -304,8 +305,12 @@ export function buildModel(git: GitRepositoryAdapter): StudioModel {
     .filter((x) => x.j)
     .map((x) => ({ path: x.p, scenario: x.j!.scenario ?? '', title: x.j!.title ?? '', recordedAt: x.j!.recordedAt ?? '', gitHead: (x.j!.gitHead ?? '').slice(0, 7), notLive: x.j!.notLive === true }));
 
+  // ---- decision intelligence register (normalized records, checks, suggestions)
+  const { snapshot: regSnap } = buildRegister(git, fragmentCache);
+
   // ---- GitHub traceability
-  const used = new Set<string>([...decisions.map((d) => d.src.path), ...tasks.map((t) => t.src.path), ...requirements.map((r) => r.src.path), ...risks.map((r) => r.src.path), ...assumptions.map((a) => a.src.path), ...reviews.flatMap((r) => [r.src.path, r.designSrc.path]), ...docs.map((d) => d.path), ...runs.map((r) => r.src.path), ...recordings.map((r) => r.path), P.qa, P.rehearsal, P.deck, P.trace, P.approvers, P.snapshot, P.state, P.todo, P.register, 'harness/scripts/approval.mjs']);
+  const regPaths = regSnap.records.flatMap((r) => [r.source.path, ...r.citedBy, ...r.evidence.flatMap((e) => (e.src ? [e.src.path] : [])), ...r.rubric.map((x) => x.src.path), ...r.approvalHistory.map((e) => e.src.path), ...r.options.flatMap((o) => [...o.pros, ...o.cons, ...o.conditional, ...o.unknown].map((c) => c.src.path)), ...Object.values(r.implications).flatMap((i) => (i ? [i.src.path] : []))]).concat(regSnap.suggestions.map((s) => s.src.path), regSnap.suggestions.flatMap((s) => s.basedOn.filter((b) => b.includes('/'))));
+  const used = new Set<string>([...regPaths, ...decisions.map((d) => d.src.path), ...tasks.map((t) => t.src.path), ...requirements.map((r) => r.src.path), ...risks.map((r) => r.src.path), ...assumptions.map((a) => a.src.path), ...reviews.flatMap((r) => [r.src.path, r.designSrc.path]), ...docs.map((d) => d.path), ...runs.map((r) => r.src.path), ...recordings.map((r) => r.path), P.qa, P.rehearsal, P.deck, P.trace, P.approvers, P.snapshot, P.state, P.todo, P.register, 'harness/scripts/approval.mjs']);
   const links = git.githubCommitsFor([...used].filter((p) => git.has(p)));
 
   return {
@@ -325,6 +330,7 @@ export function buildModel(git: GitRepositoryAdapter): StudioModel {
     evidence,
     presentation: { slides, qa, rehearsal, recordings, recordingsSrc: 'docs/capstone/presentation/recordings/' },
     recentCommits: ((localOnly) => git.log(10).map((c) => ({ sha: c.sha, short: c.sha.slice(0, 7), date: c.date, subject: c.subject, author: c.author, localOnly: localOnly.has(c.sha) })))(git.localOnlyCommits(50)),
-    warnings,
+    register: regSnap,
+    warnings: [...warnings, ...regSnap.warnings],
   };
 }

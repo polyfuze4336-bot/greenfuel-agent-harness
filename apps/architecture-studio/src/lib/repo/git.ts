@@ -113,6 +113,11 @@ export class GitRepositoryAdapter {
     return [...this.tree.keys()].filter((k) => k.startsWith(prefix)).sort();
   }
 
+  /** Every tracked file path at the commit being read. */
+  listAll(): string[] {
+    return [...this.tree.keys()].sort();
+  }
+
   oid(p: string): string | undefined {
     return this.tree.get(p);
   }
