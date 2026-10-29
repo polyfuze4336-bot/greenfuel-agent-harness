@@ -75,6 +75,9 @@ Run on 2026-10-29, Windows, Node 22.23.4, Microsoft Edge (Chromium), commands fr
 | `npm run build` | compiled; 16 routes |
 | `npm run test:e2e` | **67 of 67 pass** (3.3 minutes) |
 | `node harness/scripts/validate-harness.mjs` | OK |
+| `npm test` at the repository root | 1085 of 1085 pass (the Studio's own tests are kept out of this run) |
+
+Screenshots were captured with the sidebar reading commit `0aede2c`, the commit that added the Studio.
 
 Browser tests by file: `studio.spec.ts` 18 (navigation, figures, register, queue, approvals, architecture, presentation), `shell.spec.ts` 10 (search, notifications, sync, identity), `states.spec.ts` 11 (errors, empty, loading, hardening), `a11y-responsive.spec.ts` 18, `readonly.spec.ts` 6, `screenshots.spec.ts` 4.
 
