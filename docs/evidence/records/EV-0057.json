@@ -1,0 +1,24 @@
+{
+  "id": "EV-0057",
+  "claim": "Fresh clone of the committed HEAD (no install step): the repository validator is clean and the ingestion contract and acceptance-generator tests pass",
+  "argv": [
+    "node",
+    "harness/scripts/fresh-clone-check.mjs",
+    "tests/ingestion-contract.test.mjs",
+    "tests/acceptance-reports.test.mjs"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-29T02:17:11.696Z",
+  "durationMs": 14121,
+  "outputSha256": "faa6f3d68c1bd668e11f57ea470c4ce4566b4d333164a1975dd6feacdd6b903f",
+  "outputBytes": 14542,
+  "outputTail": " duration_ms: 0.4571\n  type: 'test'\n  ...\n# Subtest: a batch that does not continue the accepted chain is rejected; an event after the end of its delivery is kept and flagged\nok 56 - a batch that does not continue the accepted chain is rejected; an event after the end of its delivery is kept and flagged\n  ---\n  duration_ms: 0.9551\n  type: 'test'\n  ...\n# Subtest: stored history is checkable on its own: deleting or editing an accepted record, or its batch commitment, is detected\nok 57 - stored history is checkable on its own: deleting or editing an accepted record, or its batch commitment, is detected\n  ---\n  duration_ms: 1.3135\n  type: 'test'\n  ...\n# Subtest: missing meter readings are reported as an incomplete delivery and are never estimated\nok 58 - missing meter readings are reported as an incomplete delivery and are never estimated\n  ---\n  duration_ms: 0.44\n  type: 'test'\n  ...\n# Subtest: ingest never mutates the store it is given, and the same inputs give the same result\nok 59 - ingest never mutates the store it is given, and the same inputs give the same result\n  ---\n  duration_ms: 0.6682\n  type: 'test'\n  ...\n# Subtest: a delivery that never started, started twice or received events after its end is kept as evidence and flagged, never silently normal\nok 60 - a delivery that never started, started twice or received events after its end is kept as evidence and flagged, never silently normal\n  ---\n  duration_ms: 2.9751\n  type: 'test'\n  ...\n# Subtest: the stand-alone store check cannot be evaded by removing a source head, an orphan record or a batch commitment, and a malformed store is reported instead of crashing it\nok 61 - the stand-alone store check cannot be evaded by removing a source head, an orphan record or a batch commitment, and a malformed store is reported instead of crashing it\n  ---\n  duration_ms: 1.9187\n  type: 'test'\n  ...\n1..61\n# tests 61\n# suites 0\n# pass 61\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 2399.2839\nfresh-clone-check: OK\n",
+  "gitHead": "490df78fa00e067f20e59e0b1aa46bbcb673fab2",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}
