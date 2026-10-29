@@ -227,7 +227,7 @@ function executeTest(ctx, t, cache) {
     if (r.type === 'eval-test') {
       const named = p.top.filter((e) => e.name === t.id || e.name.startsWith(`${t.id}:`) || e.name.startsWith(`${t.id} `));
       const entry = named.find((e) => !e.ok) ?? named[0];
-      ev.parsed = { matches: named.length, summary: { tests: p.tests, fail: p.fail, rootCount: p.top.length }, entry: entry ? { ok: entry.ok, name: entry.name, directive: entry.directive } : null, detail: entry && !entry.ok ? failureDetail(p, entry, ctx.policy.limits.actualMax) : '' };
+      ev.parsed = { matches: named.length, summary: { tests: p.tests, fail: p.fail, rootCount: p.top.length }, entry: entry ? { ok: entry.ok, name: entry.name, directive: entry.directive } : null, detail: entry && !entry.ok ? redact(ctx.root, failureDetail(p, entry, ctx.policy.limits.actualMax)) : '' };
     } else {
       ev.parsed = { tests: p.tests, pass: p.pass, fail: p.fail, skipped: p.skipped, todo: p.todo, cancelled: p.cancelled };
       const f = p.top.find((e) => !e.ok); if (f) ev.firstFailure = f.name.slice(0, 120);

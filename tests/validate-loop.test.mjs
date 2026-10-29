@@ -8,7 +8,7 @@ import { cpSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { repo } from './support/permission-fixtures.mjs';
 import { validateLoop } from '../harness/scripts/validate-loop.mjs';
 
-const FILES = ['harness/policy', 'harness/loop', 'harness/hooks', 'harness/scripts/loop.mjs', 'harness/tools/tool-registry.json', 'docs/loop', 'docs/state/loops', 'tests/fixtures/loop/emissions', '.gitignore'];
+const FILES = ['harness/policy', 'harness/loop', 'harness/lib', 'harness/hooks', 'harness/scripts/loop.mjs', 'harness/tools/tool-registry.json', 'docs/loop', 'docs/state/loops', 'tests/fixtures/loop/emissions', '.gitignore'];
 function sandbox() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'gf-vl-'));
   for (const f of FILES) { if (!fs.existsSync(path.join(repo, f))) continue; mkdirSync(path.dirname(path.join(root, f)), { recursive: true }); cpSync(path.join(repo, f), path.join(root, f), { recursive: true, filter: (s) => !s.includes('.lock') }); }
