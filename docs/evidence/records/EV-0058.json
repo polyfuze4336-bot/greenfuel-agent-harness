@@ -1,0 +1,22 @@
+{
+  "id": "EV-0058",
+  "claim": "npm test at the publication-hygiene commit: all tests pass, none skipped (adds agent-connectivity, local-path scrubbing and acceptance tests)",
+  "argv": [
+    "npm",
+    "test"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-29T08:28:48.098Z",
+  "durationMs": 359385,
+  "outputSha256": "86f5af383b9c725ce2919c809cc214a883b653c6460bc681d0453c5ddd56912d",
+  "outputBytes": 165696,
+  "outputTail": "l the registry, no loader variables, no undeclared properties\nok 763 - candidates: env must equal the registry, no loader variables, no undeclared properties\n  ---\n  duration_ms: 899.014\n  type: 'test'\n  ...\n# Subtest: servers whose names collide after normalisation are rejected\nok 764 - servers whose names collide after normalisation are rejected\n  ---\n  duration_ms: 369.3554\n  type: 'test'\n  ...\n# Subtest: candidates: exactly the pending servers, matching the registry, never carrying credentials\nok 765 - candidates: exactly the pending servers, matching the registry, never carrying credentials\n  ---\n  duration_ms: 1016.8276\n  type: 'test'\n  ...\n# Subtest: agent grants: exact server/tool names, enabled tools only, privilege by class, external only with web access\nok 766 - agent grants: exact server/tool names, enabled tools only, privilege by class, external only with web access\n  ---\n  duration_ms: 1446.9605\n  type: 'test'\n  ...\n# Subtest: agent grants: web hosts in the registry and policy must agree and be plain hosts\nok 767 - agent grants: web hosts in the registry and policy must agree and be plain hosts\n  ---\n  duration_ms: 1516.0356\n  type: 'test'\n  ...\n# Subtest: hook, log ignore and generated documents are enforced\nok 768 - hook, log ignore and generated documents are enforced\n  ---\n  duration_ms: 2681.0405\n  type: 'test'\n  ...\n# Subtest: generated tables: complete, free of pipes inside cells, and idempotent under --write\nok 769 - generated tables: complete, free of pipes inside cells, and idempotent under --write\n  ---\n  duration_ms: 339.5633\n  type: 'test'\n  ...\n# Subtest: helpers: grants resolve by alias, command substring and MCP name; server tool lists derive from enabled tools\nok 770 - helpers: grants resolve by alias, command substring and MCP name; server tool lists derive from enabled tools\n  ---\n  duration_ms: 3.8368\n  type: 'test'\n  ...\n1..770\n# tests 770\n# suites 0\n# pass 770\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 358143.2407\n",
+  "gitHead": "53855dbc34c29865a845b8eec13d28b1f31a5cc0",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}
