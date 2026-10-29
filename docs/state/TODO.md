@@ -51,6 +51,7 @@ The owner accepted and approved this stage's decisions on 2026-10-29 except actu
 | T38 | **Open (acceptance review).** Re-run the end-to-end scenario with the harness's own specialist agents from a session whose working folder is the repository root (so `.github/agents` loads), in VS Code chat, and compare with the trace. This session could not invoke them | [E2E-ACCEPTANCE-TRACE](../acceptance/E2E-ACCEPTANCE-TRACE.md) | Pillar 3, row E-3 |
 | T39 | **Open (acceptance review).** Decide the ingestion design-level residuals: signing and quarantine of unauthenticated batches, an external anchor for chain heads, source rate and store quotas. They depend on D-013, D-020 and D-031 | [DES-0002](../architecture/designs/DES-0002-evidence-ingestion-subsystem.md) section 9 | HR-06, HR-13 |
 | T40 | **Open (acceptance review).** Decide whether to remediate the three evaluation findings now (roadmap R16: effective periods and timestamp rules in the methodology and lineage contracts) so G2 and G3 can be re-run. The ingestion contract already implements the timestamp rule of ADR 0013; the lineage contract does not | [EVALUATION-REPORT](../evaluation/EVALUATION-REPORT.md) | G2, G3 |
+| T41 | **Open (acceptance review).** Make the evidence recorder keep the names of failing tests (it keeps only the output tail), then re-run the full suite when convenient to see whether the single unexplained failure in EV-0054 recurs | [HARNESS-ACCEPTANCE-REPORT](../acceptance/HARNESS-ACCEPTANCE-REPORT.md) finding F-9 | Deterministic test execution (A-6) |
 
 ## Decisions made
 

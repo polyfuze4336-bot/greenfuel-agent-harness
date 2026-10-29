@@ -1,0 +1,22 @@
+{
+  "id": "EV-0055",
+  "claim": "npm test at e4c9139 (stage 12): all 762 tests pass, none skipped. Supersedes EV-0053 and EV-0054, which each recorded failures (EV-0054: one test failed once and did not recur in two later full runs; cause not identified)",
+  "argv": [
+    "npm",
+    "test"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-29T02:05:45.137Z",
+  "durationMs": 586001,
+  "outputSha256": "36ac4d15a228437591757640b3463f3dd1595ba77c492c10c0939ba7159c3ef9",
+  "outputBytes": 164044,
+  "outputTail": " registry, no loader variables, no undeclared properties\nok 755 - candidates: env must equal the registry, no loader variables, no undeclared properties\n  ---\n  duration_ms: 2603.5581\n  type: 'test'\n  ...\n# Subtest: servers whose names collide after normalisation are rejected\nok 756 - servers whose names collide after normalisation are rejected\n  ---\n  duration_ms: 1444.8671\n  type: 'test'\n  ...\n# Subtest: candidates: exactly the pending servers, matching the registry, never carrying credentials\nok 757 - candidates: exactly the pending servers, matching the registry, never carrying credentials\n  ---\n  duration_ms: 4980.5638\n  type: 'test'\n  ...\n# Subtest: agent grants: exact server/tool names, enabled tools only, privilege by class, external only with web access\nok 758 - agent grants: exact server/tool names, enabled tools only, privilege by class, external only with web access\n  ---\n  duration_ms: 3710.7409\n  type: 'test'\n  ...\n# Subtest: agent grants: web hosts in the registry and policy must agree and be plain hosts\nok 759 - agent grants: web hosts in the registry and policy must agree and be plain hosts\n  ---\n  duration_ms: 1490.2317\n  type: 'test'\n  ...\n# Subtest: hook, log ignore and generated documents are enforced\nok 760 - hook, log ignore and generated documents are enforced\n  ---\n  duration_ms: 3793.6259\n  type: 'test'\n  ...\n# Subtest: generated tables: complete, free of pipes inside cells, and idempotent under --write\nok 761 - generated tables: complete, free of pipes inside cells, and idempotent under --write\n  ---\n  duration_ms: 1101.4729\n  type: 'test'\n  ...\n# Subtest: helpers: grants resolve by alias, command substring and MCP name; server tool lists derive from enabled tools\nok 762 - helpers: grants resolve by alias, command substring and MCP name; server tool lists derive from enabled tools\n  ---\n  duration_ms: 17.4191\n  type: 'test'\n  ...\n1..762\n# tests 762\n# suites 0\n# pass 762\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 583902.5361\n",
+  "gitHead": "e4c91393d2ed4f1b8c57cec49a85fdd3325da6bc",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}

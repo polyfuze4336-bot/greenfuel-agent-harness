@@ -25,7 +25,7 @@ Non-critical but material: no branch protection on this plan (T14), human memory
 
 ## 2. What was independently shown and what was not
 
-- **Observed by me in this review:** a fresh `git clone` of the previous pushed commit passed the repository validator and every specialist validator, and the full test suite ran there (701 tests, all passing, none skipped) without installing any dependency, because the package has none. That observation was **not recorded** at the time. The recorded evidence is a fresh clone of the Stage 12 content commit that ran the repository validator and the new contract and generator tests (EV-0056). The end-to-end scenario was designed, prototyped and tested here, and its tests ran (EV-0048).
+- **Observed by me in this review:** a fresh `git clone` of the previous pushed commit passed the repository validator and every specialist validator, and the full test suite ran there (701 tests, all passing, none skipped) without installing any dependency, because the package has none. That observation was **not recorded** at the time. The recorded evidence is a fresh clone of the Stage 12 content commit that ran the repository validator and the new contract and generator tests (EV-0057). The end-to-end scenario was designed, prototyped and tested here, and its tests ran (EV-0048).
 - **Independent model reviewers:** the contract and the design were challenged in two rounds by two separate read-only model agents (a design critic and a security reviewer). They found real defects, all recorded in RV-0002 section 7. They are models, not people, and they are not evidence records.
 - **Not independent:** the author, the harness agents and the reviewers are all language models. No human has reviewed any design, ADR or this report. This is the largest governance limit and is recorded as RK-012.
 - **Not done in this session:** the harness's own twelve specialist agents were not invoked, because this session's working folder does not load them. The scenario was executed by one session following the harness's documents and gates, with the independent review supplied by built-in model agents. Native delegation through the harness hook was shown earlier in the CLI (run `RUN-afb2a0466e`) and was reported by the owner in VS Code. VS Code itself was not observed and was not restarted.
@@ -40,7 +40,7 @@ Classes: **IMPLEMENTED AND VERIFIED** (built, and a recorded run or test shows i
 | ID | Capability | Class | Evidence | Limit |
 |---|---|---|---|---|
 | **Pillar 1: Tools** | | | | |
-| T-1 | Tool registry, validators, local MCP server and per-agent grants | IMPLEMENTED AND VERIFIED | EV-0017, EV-0019 and the tool tests in EV-0054 | Enabled tools are read-only by rule. Local zero-dependency server only |
+| T-1 | Tool registry, validators, local MCP server and per-agent grants | IMPLEMENTED AND VERIFIED | EV-0017, EV-0019 and the tool tests in EV-0055 | Enabled tools are read-only by rule. Local zero-dependency server only |
 | T-2 | Output sanitising (secret redaction, hidden characters, size cap, untrusted boundary) | IMPLEMENTED AND VERIFIED | Tool-guard tests and the Copilot CLI transcript in TOOL-DEMO | The transcript is an observation, not an evidence record. VS Code was not observed (T12) |
 | T-3 | Remote documentation server (Microsoft Learn) for one agent | IMPLEMENTED BUT NOT VERIFIED | Configuration checked by validator; one CLI call observed | No recorded run of a call; VS Code trust prompt unverified |
 | T-4 | Azure MCP and GitHub MCP | BLOCKED | Pinned and reviewed candidates, not configured | Needs a named read-only identity and subscription (T11, T33). Not approved |
@@ -77,9 +77,9 @@ Classes: **IMPLEMENTED AND VERIFIED** (built, and a recorded run or test shows i
 | A-3 | Azure deployment controls (static): non-deployable scaffold, twelve computed gates, approval requirement | IMPLEMENTED AND VERIFIED | EV-0020, EV-0044, EV-0045, EV-0050 | Static checks only; nothing ran against Azure |
 | A-4 | Actual Azure deployment | BLOCKED | Deferred by the owner (T36) | Also needs T32, T33 and signed approvals |
 | A-5 | Prompt-injection resistance | PARTIALLY IMPLEMENTED | Hook, output guard and memory tests; contract tests for hostile payloads | No model-level test and no production agent exists |
-| A-6 | Deterministic test execution | IMPLEMENTED AND VERIFIED | EV-0054; a fresh clone of the Stage 12 content commit (EV-0056); CI green on the pushed commits | One scenario is skipped in CI; the suite takes several minutes. EV-0052 and EV-0053 are recorded failures from running before the generated evidence index was regenerated: they are kept, and EV-0054 supersedes EV-0053 |
+| A-6 | Deterministic test execution | PARTIALLY IMPLEMENTED | EV-0055 (762 tests, all pass); two further unrecorded full runs also passed; CI green on the pushed commits | **One unexplained intermittent failure:** EV-0054 recorded 1 failed test of 762 on a clean tree and it did not recur in three later full runs, so determinism is not shown. The recorder keeps only the output tail, so the test was not identified (finding F-9, TODO T41). EV-0052 and EV-0053 are explained failures from running before the generated evidence index was regenerated. One scenario is skipped in CI |
 | A-7 | Audit-log completeness | PARTIALLY IMPLEMENTED | The denial log chain verifies | It is local, git-ignored, denial-only and not anchored outside the machine (T16) |
-| A-8 | Reproducible setup | IMPLEMENTED AND VERIFIED | Fresh clone (EV-0056) and CI | One local operating system; the toolchain for TypeScript and Bicep is optional |
+| A-8 | Reproducible setup | IMPLEMENTED AND VERIFIED | Fresh clone (EV-0057) and CI | One local operating system; the toolchain for TypeScript and Bicep is optional |
 | A-9 | Documentation quality | IMPLEMENTED BUT NOT VERIFIED | Link, figure and compliance-claim lints | No human reader. This review found stale status labels, now fixed |
 | A-10 | Production-agent security and evaluation tests | NOT IMPLEMENTED | Tests are catalogued as pending | No production agent exists |
 | A-11 | Evaluation gates G2 to G7 | BLOCKED | The committed run | G2 and G3 fail on real findings; G4 to G7 are blocked behind them |
@@ -110,6 +110,7 @@ The three tests added by this stage (EVAL-PRC-DAT-007, EVAL-PRC-DAT-008, EVAL-PR
 | F-6 | Stale ADR status labels in four documents (ADR 0010, 0011, 0012, 0014 shown as Proposed after acceptance) | Low | Fixed in this stage |
 | F-7 | The committed evaluation run became stale when three tests were added to the catalogue | Process | Fixed: a new full run was recorded |
 | F-8 | The audit log is denial-only and local, so the question "what did agents do" is answered only by evidence records and run stores | Medium | Open (T16) |
+| F-9 | One full test run (EV-0054) recorded 1 failed test of 762 on a clean tree. It did not recur in three later full runs. The recorder keeps only the last part of the output, so the failing test was not identified | Medium | **Open:** cause unknown. The recorder should keep failing-test names (TODO T41) |
 
 ## 6. What needs the owner
 
@@ -123,11 +124,11 @@ The three tests added by this stage (EVAL-PRC-DAT-007, EVAL-PRC-DAT-008, EVAL-PR
 
 | Class | Count |
 |---|---|
-| IMPLEMENTED AND VERIFIED | 13 |
+| IMPLEMENTED AND VERIFIED | 12 |
 | IMPLEMENTED BUT NOT VERIFIED | 4 |
-| PARTIALLY IMPLEMENTED | 7 |
+| PARTIALLY IMPLEMENTED | 8 |
 | NOT IMPLEMENTED | 4 |
 | BLOCKED | 5 |
 | **Total capabilities assessed** | **33** |
 
-No capability is classified higher than its recorded evidence supports. The thirteen verified rows are verified for what the evidence covers and each states its limit.
+No capability is classified higher than its recorded evidence supports. The twelve verified rows are verified for what the evidence covers and each states its limit.
