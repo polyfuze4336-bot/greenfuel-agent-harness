@@ -25,7 +25,9 @@ function scrub(text, extraRoots = []) {
   for (const [from, to] of swaps) if (from.length > 3) out = out.replace(new RegExp(esc(from), 'gi'), to);
   let user = '';
   try { user = os.userInfo().username; } catch { /* no account name available */ }
-  if (user.length >= 4) out = out.replace(new RegExp(esc(user), 'gi'), '<user>');
+  // generic service-account names (CI runners, containers) are ordinary words and would change unrelated text
+  const generic = new Set(['runner', 'root', 'admin', 'user', 'ubuntu', 'vscode', 'node', 'docker', 'default', 'system']);
+  if (user.length >= 4 && !generic.has(user.toLowerCase())) out = out.replace(new RegExp(esc(user), 'gi'), '<user>');
   return out;
 }
 

@@ -160,7 +160,9 @@ export function validate(root) {
   // docs/state/loops is excluded: its check evidence is covered by a hash chain and cannot be edited without invalidating the loop record.
   try {
     const user = os.userInfo().username;
-    if (user.length >= 4 && existsSync(path.join(root, '.git'))) {
+    // Generic service-account names (CI runners, containers) are ordinary words and would match unrelated text.
+    const generic = new Set(['runner', 'root', 'admin', 'user', 'ubuntu', 'vscode', 'node', 'docker', 'default', 'system']);
+    if (user.length >= 4 && !generic.has(user.toLowerCase()) && existsSync(path.join(root, '.git'))) {
       const tracked = execFileSync('git', ['ls-files', '-z'], { cwd: root, maxBuffer: 64 * 1024 * 1024 }).toString().split('\0').filter(Boolean);
       const re = new RegExp(user.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
       for (const f of tracked) {
