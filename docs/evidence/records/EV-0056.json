@@ -1,0 +1,23 @@
+{
+  "id": "EV-0056",
+  "claim": "npm run validate is clean at the stage 12 content commit, including the acceptance-document generator check and validate-evaluation",
+  "argv": [
+    "npm",
+    "run",
+    "validate"
+  ],
+  "exitCode": 0,
+  "signal": null,
+  "spawnError": null,
+  "startedAt": "2026-10-29T02:16:28.392Z",
+  "durationMs": 5295,
+  "outputSha256": "6dc479b23a0c28892b0d18f8aaeb98def94227d1240df05881b24dfe57322894",
+  "outputBytes": 108,
+  "outputTail": "\n> greenfuel-agent-harness@0.1.0 validate\n> node harness/scripts/validate-harness.mjs\n\nvalidate-harness: OK\n",
+  "gitHead": "e0f88cbcbe1bbbf03026cad0e247aec4d3fca0e6",
+  "environment": {
+    "node": "v22.23.4",
+    "platform": "win32",
+    "release": "10.0.26300"
+  }
+}

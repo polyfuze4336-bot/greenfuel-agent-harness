@@ -5,7 +5,7 @@ Generated from the evidence records, the committed evaluation runs, the test fol
 
 **What an evidence record is.** The recorder runs a command and stores what happened: arguments, exit code, duration, an output hash and the output tail, the Git commit and the runtime. It records facts about a run; it does not judge whether the command proves the claim. A claim is only as good as the command that backs it. A record with no exit code is a timeout or a kill, and is kept (append-only).
 
-## A. Evidence records (55)
+## A. Evidence records (56)
 
 | ID | Recorded | Commit | Command | Outcome | Claim |
 |---|---|---|---|---|---|
@@ -64,6 +64,7 @@ Generated from the evidence records, the committed evaluation runs, the test fol
 | EV-0053 | 2026-10-29 | `c37b3f1` | `npm test` | exit 1 | npm test at c37b3f1: all tests pass, none skipped (includes the ingestion contract, acceptance-document generator and evaluation re-run tests) |
 | EV-0054 | 2026-10-29 | `2c35ce3` | `npm test` | exit 1 | npm test at 2c35ce3 (stage 12): all tests pass, none skipped (includes the ingestion contract, acceptance-document generator and evaluation re-run tes |
 | EV-0055 | 2026-10-29 | `e4c9139` | `npm test` | exit 0 | npm test at e4c9139 (stage 12): all 762 tests pass, none skipped. Supersedes EV-0053 and EV-0054, which each recorded failures (EV-0054: one test fail |
+| EV-0056 | 2026-10-29 | `e0f88cb` | `npm run validate` | exit 0 | npm run validate is clean at the stage 12 content commit, including the acceptance-document generator check and validate-evaluation |
 
 ## B. Committed evaluation runs (1)
 
