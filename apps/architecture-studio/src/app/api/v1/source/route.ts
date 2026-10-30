@@ -17,11 +17,23 @@ export function GET(req: NextRequest) {
     if (!p || p.length > 300 || p.includes('..') || p.startsWith('/') || p.includes('\\') || !ALLOWED_PREFIX.some((x) => p.startsWith(x)) || !ALLOWED_EXT.test(p)) return problem(400, 'Path not allowed', 'Only documentation and policy files can be previewed.');
     const git = openAdapter();
     if (!git.has(p)) return problem(404, 'Path not found', `No file at that path at commit ${git.commit.slice(0, 7)}.`);
-    const text = git.read(p) ?? '';
+    // An earlier version is served only for a commit that is in this file's own history.
+    const at = req.nextUrl.searchParams.get('at');
+    let commit = git.commit;
+    let blob = git.oid(p);
+    let text = git.read(p) ?? '';
+    if (at) {
+      if (!/^[0-9a-f]{40}$/.test(at) || !git.log(50, [p]).some((c) => c.sha === at)) return problem(404, 'Version not found', 'That commit is not in the history of this file.');
+      const old = git.readAt(at, p);
+      if (old === undefined) return problem(404, 'Version not found', 'The file does not exist at that commit.');
+      commit = at;
+      blob = undefined;
+      text = old;
+    }
     if (text.length > MAX_BYTES) return problem(413, 'File too large', 'The file is too large to preview.');
     const all = text.split('\n');
     const start = Math.max(1, line - context);
     const end = Math.min(all.length, line + context);
-    return ok({ path: p, commit: git.commit, blob: git.oid(p), totalLines: all.length, start, end, highlight: line, lines: all.slice(start - 1, end).map((t, i) => ({ n: start + i, text: t.slice(0, 600) })) });
+    return ok({ path: p, commit, blob: blob ?? '', totalLines: all.length, start, end, highlight: line, lines: all.slice(start - 1, end).map((t, i) => ({ n: start + i, text: t.slice(0, 600) })) });
   });
 }

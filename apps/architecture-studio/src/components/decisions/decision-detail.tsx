@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-import { ArrowRightLeft, Info, TriangleAlert } from 'lucide-react';
+import { ArrowRightLeft, Gavel, Info, TriangleAlert } from 'lucide-react';
 import { FIELD_LABEL, type Claim, type DuplicateCandidate, type NormalizedDecision, type OptionInfo, type Suggestion } from '@/lib/intel/schema.ts';
 import type { Lookup } from '@/lib/lookup.ts';
 import { RefChips, SourceBlock } from '../record-bits.tsx';
@@ -14,6 +14,7 @@ const APPROVAL_TEXT: Record<NormalizedDecision['approvalBasis'], string> = {
   signed: 'A signed approval record names this decision. The Studio does not verify the signature; run approval.mjs verify.',
   'owner-instruction-unsigned': "Approved on the owner's instruction in chat. No signed approval record exists.",
   'delegated-unsigned': "Decided by the architect on the owner's instruction. No signed approval record exists.",
+  'review-record': 'Approved by a Studio review record that was merged to the canonical branch. It is a recorded decision, not a signed approval under ADR 0008.',
   none: 'No approval is recorded for this decision.',
 };
 
@@ -135,27 +136,35 @@ export function SuggestionList({ items, lookup, empty }: { items: Suggestion[]; 
   );
 }
 
-export function DecisionDetail({ d, lookup, duplicates = [], suggestions = [], titleAs = 'h2' }: { d: NormalizedDecision; lookup: Lookup; duplicates?: DuplicateCandidate[]; suggestions?: Suggestion[]; titleAs?: 'h1' | 'h2' }) {
+export function DecisionDetail({ d, lookup, duplicates = [], suggestions = [], titleAs = 'h2', bare = false }: { d: NormalizedDecision; lookup: Lookup; duplicates?: DuplicateCandidate[]; suggestions?: Suggestion[]; titleAs?: 'h1' | 'h2'; bare?: boolean }) {
   const Title = titleAs;
   const mine = suggestions.filter((s) => s.decisionId === d.id);
   const prov = Object.entries(d.fieldSources);
   return (
     <article data-testid="decision-detail" aria-label={`${d.id} ${d.title}`}>
-      <div className="mb-3 flex flex-wrap items-center gap-2">
-        <Tag>{d.id}</Tag>
-        <NormStatusPill status={d.status} />
-        {d.status === 'Approved' && d.approvalBasis !== 'signed' ? <NeutralPill title={APPROVAL_TEXT[d.approvalBasis]}>Unsigned</NeutralPill> : null}
-        <span className="text-[12.5px] text-ink-3">{d.kind === 'adr' ? `Architecture decision record${d.category ? ` · ${adrTypeLabel(d.category)}` : ''}` : 'Open register entry'}</span>
-      </div>
-      <Title className="text-[22px] leading-[1.25] font-semibold">{d.title}</Title>
+      {bare ? null : (
+        <>
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <Tag>{d.id}</Tag>
+            <NormStatusPill status={d.status} />
+            {d.status === 'Approved' && d.approvalBasis !== 'signed' ? <NeutralPill title={APPROVAL_TEXT[d.approvalBasis]}>Unsigned</NeutralPill> : null}
+            <span className="text-[12.5px] text-ink-3">{d.kind === 'adr' ? `Architecture decision record${d.category ? ` · ${adrTypeLabel(d.category)}` : ''}` : 'Open register entry'}</span>
+          </div>
+          <Title className="text-[22px] leading-[1.25] font-semibold">{d.title}</Title>
 
-      <div className="mt-4 flex flex-wrap items-center gap-2">
-        <Link href={`/decisions/${d.id}/compare`} className="inline-flex items-center gap-1.5 rounded-lg bg-accent px-3 py-1.5 text-[13px] font-medium text-accent-ink hover:opacity-90">
-          <ArrowRightLeft aria-hidden className="size-3.5" />
-          Compare alternatives
-        </Link>
-        <SourcePreviewButton src={{ path: d.source.path, line: d.source.line }} />
-      </div>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <Link href={`/decisions/${d.id}/review`} className="inline-flex items-center gap-1.5 rounded-lg bg-navy px-3 py-1.5 text-[13px] font-medium text-white hover:opacity-90">
+              <Gavel aria-hidden className="size-3.5" />
+              Review and decide
+            </Link>
+            <Link href={`/decisions/${d.id}/compare`} className="inline-flex items-center gap-1.5 rounded-lg border border-hairline-strong bg-surface px-3 py-1.5 text-[13px] font-medium text-ink hover:bg-surface-2">
+              <ArrowRightLeft aria-hidden className="size-3.5" />
+              Compare alternatives
+            </Link>
+            <SourcePreviewButton src={{ path: d.source.path, line: d.source.line }} />
+          </div>
+        </>
+      )}
 
       <Block title="Status, verbatim from the source">
         <blockquote className="rounded-xl border-l-[3px] border-hairline-strong bg-surface-2 px-4 py-3 text-[13.5px] leading-6 text-ink-2">{d.statusRaw || 'No status recorded'}</blockquote>

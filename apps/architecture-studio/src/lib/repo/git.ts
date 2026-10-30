@@ -145,6 +145,16 @@ export class GitRepositoryAdapter {
     return this.cache.get(p);
   }
 
+  /** A file as it was at an earlier commit. The caller must already have checked the commit is in the file's own history. */
+  readAt(commit: string, p: string): string | undefined {
+    if (!/^[0-9a-f]{40,64}$/.test(commit)) throw new GitError('BAD_REF', 'Not a commit id.');
+    try {
+      return this.run(['cat-file', 'blob', `${commit}:${p}`]).toString('utf8').replace(/\r\n/g, '\n');
+    } catch {
+      return undefined;
+    }
+  }
+
   // ---- repository facts
 
   remoteUrl(): string | null {

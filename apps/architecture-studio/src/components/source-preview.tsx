@@ -18,7 +18,7 @@ interface Preview {
 }
 
 /** Read-only view of a repository file at the commit being read, centred on the cited line. */
-export function SourcePreviewButton({ src, label = 'Preview source' }: { src: Src; label?: string }) {
+export function SourcePreviewButton({ src, label = 'Preview source', at }: { src: Src; label?: string; at?: string }) {
   const [open, setOpen] = useState(false);
   const [context, setContext] = useState(20);
   const [state, setState] = useState<{ s: 'loading' } | { s: 'error'; message: string } | { s: 'ok'; data: Preview }>({ s: 'loading' });
@@ -29,7 +29,7 @@ export function SourcePreviewButton({ src, label = 'Preview source' }: { src: Sr
     if (!open) return;
     const ctl = new AbortController();
     setState((s) => (s.s === 'ok' ? s : { s: 'loading' }));
-    fetch(`/api/v1/source?path=${encodeURIComponent(src.path)}&line=${src.line}&context=${context}`, { signal: ctl.signal })
+    fetch(`/api/v1/source?path=${encodeURIComponent(src.path)}&line=${src.line}&context=${context}${at ? `&at=${at}` : ''}`, { signal: ctl.signal })
       .then(async (r) => {
         const body = (await r.json().catch(() => null)) as (Preview & { detail?: string }) | null;
         if (!r.ok || !body?.lines) throw new Error(body?.detail ?? `HTTP ${r.status}`);
@@ -39,7 +39,7 @@ export function SourcePreviewButton({ src, label = 'Preview source' }: { src: Sr
         if ((e as { name?: string }).name !== 'AbortError') setState({ s: 'error', message: e instanceof Error ? e.message : 'Could not load the file.' });
       });
     return () => ctl.abort();
-  }, [open, src.path, src.line, context, n]);
+  }, [open, src.path, src.line, context, n, at]);
 
   useEffect(() => {
     if (state.s === 'ok') mark.current?.scrollIntoView({ block: 'center' });

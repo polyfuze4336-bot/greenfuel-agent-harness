@@ -68,7 +68,7 @@ export interface Implication {
 }
 
 export interface ApprovalEvent {
-  type: 'status-line' | 'signed-approval' | 'owner-log';
+  type: 'status-line' | 'signed-approval' | 'owner-log' | 'review-event';
   date: string | null;
   actor: string | null;
   text: string;
@@ -120,7 +120,7 @@ export interface NormalizedDecision {
   statusRaw: string;
   statusRule: string;
   /** How the approval stands: signed record, owner instruction without a signature, or none. */
-  approvalBasis: 'signed' | 'owner-instruction-unsigned' | 'delegated-unsigned' | 'none';
+  approvalBasis: 'signed' | 'owner-instruction-unsigned' | 'delegated-unsigned' | 'review-record' | 'none';
   recommendedOption: OptionInfo | null;
   options: OptionInfo[];
   comparison: Comparison | null;
@@ -160,6 +160,8 @@ export interface NormalizedDecision {
   /** Where each populated field came from. */
   fieldSources: Record<string, FieldSource>;
   contentHash: string;
+  /** Set only when a merged review record changes the status shown. The source's own status is kept here. */
+  review?: { phase: string; sourceStatus: NormStatus; sourceStatusRule: string; decidingEventId: string | null };
 }
 
 export interface DuplicateCandidate {

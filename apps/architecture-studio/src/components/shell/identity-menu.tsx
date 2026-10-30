@@ -28,6 +28,8 @@ const SHORTCUTS: [string, string][] = [
   ['Enter', 'Open the selected result or row'],
   ['Esc', 'Close search, a panel or a menu'],
   ['Tab', 'Move between controls'],
+  ['N  /  P', 'Review page: next or previous pending decision'],
+  ['A  R  D  V  C  O', 'Review page: approve, reject, defer, request revision, comment, reopen (each opens a dialog; nothing is submitted by a key)'],
 ];
 
 export function IdentityMenu({ repo, approvers }: { repo: RepoMeta; approvers: number }) {

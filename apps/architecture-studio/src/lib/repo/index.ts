@@ -2,6 +2,9 @@ import path from 'node:path';
 import { GitRepositoryAdapter, GitError, validateRef } from './git.ts';
 import { buildModel } from './build.ts';
 import { FileStateStore, type FragmentCache } from '../intel/engine.ts';
+import { applyReviewOverlay } from '../workflow/overlay.ts';
+import { canonicalRefName } from '../workflow/runtime.ts';
+import { loadReviewStates } from '../workflow/review.ts';
 import type { StudioModel } from './types.ts';
 
 export { GitError };
@@ -29,13 +32,27 @@ export function stateStore(): FileStateStore {
   return new FileStateStore(process.env.STUDIO_CACHE_DIR?.trim() || path.resolve(process.cwd(), '.studio-cache'));
 }
 
+/**
+ * Shows merged review records on top of the register. The reviews are read from the canonical ref (origin/main by default),
+ * not from the branch being browsed, so a decision is canonical only once its review event is on the canonical branch.
+ */
+function withReviews(model: StudioModel): StudioModel {
+  const ref = canonicalRefName();
+  try {
+    const canon = new GitRepositoryAdapter(repoRoot(), validateRef(ref)).open();
+    return { ...model, register: applyReviewOverlay(model.register, loadReviewStates(canon), ref) };
+  } catch {
+    return model;
+  }
+}
+
 /** Build (or reuse, for a few seconds) the read model. `fresh` forces a re-read of the repository. */
 export async function getModel(opts: { fresh?: boolean } = {}): Promise<StudioModel> {
   const delay = Number(process.env.STUDIO_E2E_DELAY_MS ?? 0);
   if (delay > 0) await new Promise((r) => setTimeout(r, delay));
   const key = `${repoRoot()}::${configuredRef()}`;
   if (!opts.fresh && cached && cached.key === key && Date.now() - cached.at < TTL_MS) return cached.model;
-  const model = buildModel(openAdapter(), fragmentCache);
+  const model = withReviews(buildModel(openAdapter(), fragmentCache));
   cached = { key, at: Date.now(), model };
   return model;
 }
