@@ -57,6 +57,10 @@ export function invalidateModel() {
 
 /** Build (or reuse, for a few seconds) the read model. `fresh` forces a re-read of the repository. */
 export async function getModel(opts: { fresh?: boolean } = {}): Promise<StudioModel> {
+  // In Entra mode the repository content is not produced for anyone who may not read it. Layouts and pages are rendered
+  // independently of one another, so withholding it here is what stops it reaching the page payload.
+  const { authConfig } = await import('../auth/config.ts');
+  if (authConfig().mode === 'entra') await (await import('../auth/server.ts')).assertMayRead();
   const delay = Number(process.env.STUDIO_E2E_DELAY_MS ?? 0);
   if (delay > 0) await new Promise((r) => setTimeout(r, delay));
   const key = `${repoRoot()}::${configuredRef()}`;

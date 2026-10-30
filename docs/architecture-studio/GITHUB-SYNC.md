@@ -10,7 +10,7 @@ GitHub stays authoritative. The Studio never writes to the canonical branch, nev
 
 | # | Step | Where it happens |
 |---|---|---|
-| 1 | Validate the action and the person's authority | `ReviewService.submit` / `WorkService.submit`: the identity is re-verified with GitHub at the moment of acting; the role rules in `harness/policy/decision-workflow.json` are applied; AI agent sessions are refused |
+| 1 | Validate the action and the person's authority | `ReviewService.submit` / `WorkService.submit`: the identity is re-verified with GitHub at the moment of acting; the role, domain, designation, sign-in freshness and segregation rules in `harness/policy/access-policy.json` are applied and the record is signed ([ACCESS-CONTROL](ACCESS-CONTROL.md)); AI agent sessions are refused |
 | 2 | Verify the source commit | The decision's source file is compared, by git blob id, with the same file on the canonical branch. The commit the person was looking at is recorded in the event (`basis.sourceCommit`) and in the proposal |
 | 3 | Detect concurrent modification | The canonical branch is fetched at submit. Three checks: the source file changed (`source-changed`), the decision's record chain or phase changed (`stale-revision`), another change is in flight (`proposal-open`). At send time the chain is checked again (`CANONICAL_MOVED`, `SEQUENCE_TAKEN`) |
 | 4 | Generate the structured record | One hash-chained JSON event, `docs/decision-reviews/<id>/NNNN-<action>.json` or `docs/work-items/<id>/NNNN-<action>.json` |

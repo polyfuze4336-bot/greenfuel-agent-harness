@@ -159,11 +159,11 @@ export function QueueExplorer() {
             title="Sign in to see your tasks"
             action={
               <button type="button" className={btn} data-testid="mine-sign-in" onClick={() => void signIn()}>
-                Sign in with GitHub
+                {session?.mode === 'entra' ? 'Sign in with Microsoft' : 'Sign in with GitHub'}
               </button>
             }
           >
-            My tasks are items assigned to you and unassigned items whose owner text names a role you hold. The Studio learns who you are from GitHub, never from what you type.
+            My tasks are items assigned to you and unassigned items whose owner text names a role you hold. The Studio learns who you are from your sign-in, never from what you type.
           </EmptyState>
         ) : inScope.length === 0 ? (
           <EmptyState icon={Inbox} title={`Nothing in ${VIEW_SHORT[view]}`}>

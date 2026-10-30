@@ -1,36 +1,8 @@
 // Who may act on a work item, when each action is offered, and what a request must contain. Pure functions.
-import type { Actor, RoleCheck } from './events.ts';
-import { isListed, rolesHeld, type Policy } from './rules.ts';
 import { PRIORITIES, type WorkItem } from '../queue/types.ts';
 import { WORK_ACTIONS, WORK_ID, workPermittedIn, type WorkAction, type WorkState } from './work-events.ts';
 
-export interface WorkAuthorisation {
-  ok: boolean;
-  code?: 'no-policy' | 'not-listed' | 'missing-role' | 'self-approval';
-  reason?: string;
-  roleCheck: RoleCheck;
-}
-
 const MIN_REASON = 10;
-
-export function authoriseWork(actor: Pick<Actor, 'login' | 'githubId'>, action: WorkAction, state: WorkState, policy: Policy): WorkAuthorisation {
-  const policySource = policy.source === 'canonical' ? 'canonical' : 'local-head-not-canonical';
-  const held = rolesHeld(actor, policy);
-  const completion = action === 'approve-completion' || action === 'reject-completion';
-  const base: RoleCheck = { critical: false, required: completion ? policy.work.completionRoles : [], held, namedRoles: [], outstanding: [], policySource };
-  // Anyone verified may comment; it still reaches the repository only through a reviewed pull request.
-  if (action === 'comment') return { ok: true, roleCheck: base };
-  if (!policy.people.length) return { ok: false, code: 'no-policy', reason: 'No approver is configured in the decision workflow policy, so nobody can act on work items.', roleCheck: base };
-  if (!isListed(actor, policy)) return { ok: false, code: 'not-listed', reason: `${actor.login} is not a registered person in the policy.`, roleCheck: base };
-  if (completion) {
-    if (!policy.work.completionRoles.length) return { ok: false, code: 'no-policy', reason: 'The policy names no role that may approve or reject completion, so it is denied.', roleCheck: base };
-    if (!policy.work.completionRoles.some((r) => held.includes(r))) return { ok: false, code: 'missing-role', reason: `${actor.login} does not hold a role that may ${action === 'approve-completion' ? 'approve' : 'reject'} completion (${policy.work.completionRoles.join(' or ')}).`, roleCheck: base };
-    if (policy.work.requireIndependentApproval && state.submittedBy && state.submittedBy.toLowerCase() === actor.login.toLowerCase()) {
-      return { ok: false, code: 'self-approval', reason: `${actor.login} submitted this work for review and the policy requires a different person to approve or reject it.`, roleCheck: base };
-    }
-  }
-  return { ok: true, roleCheck: base };
-}
 
 export interface WorkAvailability {
   action: WorkAction;

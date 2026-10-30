@@ -32,6 +32,7 @@ export interface LogEntry {
   date: string;
   author: string;
   subject: string;
+  email: string;
 }
 
 export function validateRef(ref: string): string {
@@ -229,7 +230,7 @@ export class GitRepositoryAdapter {
   }
 
   log(n: number, paths: string[] = [], from = this.commit): LogEntry[] {
-    const args = ['log', `-n${Math.min(Math.max(n, 1), 50)}`, '--format=%H%x1f%cI%x1f%an%x1f%s', from, '--'];
+    const args = ['log', `-n${Math.min(Math.max(n, 1), 50)}`, '--format=%H%x1f%cI%x1f%an%x1f%s%x1f%ae', from, '--'];
     for (const p of paths) {
       if (!this.tree.has(p) && !this.list(p).length) throw new GitError('BAD_PATH', `Unknown path: ${p.slice(0, 80)}`);
       args.push(p);
@@ -239,8 +240,8 @@ export class GitRepositoryAdapter {
       .split('\n')
       .filter(Boolean)
       .map((l) => {
-        const [sha, date, author, subject] = l.split('\x1f');
-        return { sha: sha ?? '', date: date ?? '', author: author ?? '', subject: subject ?? '' };
+        const [sha, date, author, subject, email] = l.split('\x1f');
+        return { sha: sha ?? '', date: date ?? '', author: author ?? '', subject: subject ?? '', email: email ?? '' };
       });
   }
 

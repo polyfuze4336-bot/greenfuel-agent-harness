@@ -1,11 +1,11 @@
 {
   "generatedBy": "harness/scripts/studio-inventory.mjs",
   "git": {
-    "head": "140c39866d64a2246de0a4a2fb4aa8cc9c5ba75a",
+    "head": "1436188ace07f5828d0f453eb07653a60f50820e",
     "branch": "studio/ui-readonly",
     "originMain": "140c39866d64a2246de0a4a2fb4aa8cc9c5ba75a",
-    "commitsAheadOfOriginMain": 0,
-    "dirty": 86
+    "commitsAheadOfOriginMain": 1,
+    "dirty": 114
   },
   "sources": {},
   "counts": {
@@ -161,13 +161,13 @@
     "todoTasks": {
       "source": "docs/state/TODO.md",
       "rule": "rows \"| Tn |\"; status = leading bold keyword, else \"deferred\" in the first section, else \"unmarked\"",
-      "total": 52,
+      "total": 53,
       "byStatus": {
         "deferred": 15,
         "decided": 2,
         "agreed": 1,
         "done": 2,
-        "open": 27,
+        "open": 28,
         "not-granted": 1,
         "approved": 4
       },
@@ -178,7 +178,7 @@
         "Awaiting the owner (Azure readiness stage, 2026-10-28; answered 2026-10-29)": 12,
         "Awaiting the owner (hardening stage, 2026-10-30)": 6,
         "Awaiting the owner (target architecture and business case, 2026-10-29)": 13,
-        "Awaiting the owner (Architecture Decision Studio, 2026-10-29)": 4
+        "Awaiting the owner (Architecture Decision Studio, 2026-10-29)": 5
       },
       "ambiguousForReview": [
         "T2"
@@ -1657,6 +1657,16 @@
       ],
       "ambiguous": false,
       "title": "Open: owner decisions for the Architecture Work Queue. The queue (323 items from 11 reposi"
+    },
+    {
+      "id": "T65",
+      "section": "Awaiting the owner (Architecture Decision Studio, 2026-10-29)",
+      "status": "open",
+      "tokens": [
+        "open"
+      ],
+      "ambiguous": false,
+      "title": "Open: owner actions for Entra authentication and access control. Roles, enrollment, approv"
     }
   ],
   "phaseFromState": "0",
@@ -1670,6 +1680,13 @@
         "docs/context/AGENT-AUTONOMY-MATRIX.md"
       ],
       "fileCount": 6
+    },
+    "AC": {
+      "distinctIds": 29,
+      "files": [
+        "docs/architecture-studio/ACCESS-CONTROL.md"
+      ],
+      "fileCount": 1
     },
     "AGT": {
       "distinctIds": 11,
@@ -1918,13 +1935,14 @@
       "fileCount": 1
     },
     "L": {
-      "distinctIds": 9,
+      "distinctIds": 26,
       "files": [
         "docs/acceptance/HARNESS-ACCEPTANCE-REPORT.md",
+        "docs/architecture-studio/ACCESS-CONTROL.md",
         "docs/context/AGENT-AUTONOMY-MATRIX.md",
         "docs/design/ai/AGENTIC-AUTONOMY-DESIGN-RECORD.md"
       ],
-      "fileCount": 3
+      "fileCount": 4
     },
     "LV": {
       "distinctIds": 8,
@@ -2075,7 +2093,7 @@
       "fileCount": 1
     },
     "T": {
-      "distinctIds": 58,
+      "distinctIds": 59,
       "files": [
         "docs/acceptance/HARNESS-ACCEPTANCE-REPORT.md",
         "docs/harness/CAPABILITY-MATRIX.md",
@@ -2143,7 +2161,7 @@
     ".github": 3,
     ".mcp.json": 1,
     ".vscode": 2,
-    "apps": 210,
+    "apps": 241,
     "docs/architecture-studio": 2,
     "docs/azure": 2,
     "docs/business": 3,

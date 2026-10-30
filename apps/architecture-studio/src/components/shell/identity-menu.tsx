@@ -3,7 +3,7 @@
 import * as Dialog from '@radix-ui/react-dialog';
 import * as Menu from '@radix-ui/react-dropdown-menu';
 import { useEffect, useState } from 'react';
-import { Check, ExternalLink, Keyboard, Monitor, Moon, Sun, X } from 'lucide-react';
+import { Check, ExternalLink, Keyboard, LogOut, Monitor, Moon, ShieldCheck, Sun, X } from 'lucide-react';
 import type { RepoMeta } from '@/lib/repo/types.ts';
 
 type Theme = 'system' | 'light' | 'dark';
@@ -29,13 +29,28 @@ const SHORTCUTS: [string, string][] = [
   ['Esc', 'Close search, a panel or a menu'],
   ['Tab', 'Move between controls'],
   ['N  /  P', 'Review page: next or previous pending decision'],
-  ['A  R  D  V  C  O', 'Review page: approve, reject, defer, request revision, comment, reopen (each opens a dialog; nothing is submitted by a key)'],
+  ['A  R  D  V  C  O  M', 'Review page: approve, reject, defer, request revision, comment, reopen, recommend (each opens a dialog; nothing is submitted by a key)'],
 ];
 
 export function IdentityMenu({ repo, approvers }: { repo: RepoMeta; approvers: number }) {
   const [theme, setTheme] = useState<Theme>('system');
   const [keys, setKeys] = useState(false);
+  const [who, setWho] = useState<{ login: string; provider: string; roles: string[]; mode: string } | null>(null);
+  const loadWho = async () => {
+    try {
+      const r = await fetch('/api/v1/auth/session', { cache: 'no-store', credentials: 'same-origin' });
+      const b = (await r.json()) as { authenticated?: boolean; mode?: string; user?: { login: string; provider: string; roles: string[] } };
+      setWho(b.authenticated && b.user ? { ...b.user, mode: b.mode ?? '' } : null);
+    } catch {
+      setWho(null);
+    }
+  };
+  const signOut = async () => {
+    await fetch('/api/v1/auth/signout', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: '{}' });
+    window.location.assign('/');
+  };
   useEffect(() => {
+    void loadWho();
     const t = (localStorage.getItem(THEME_KEY) as Theme | null) ?? 'system';
     setTheme(t);
     const mq = window.matchMedia('(prefers-color-scheme: dark)');
@@ -58,7 +73,7 @@ export function IdentityMenu({ repo, approvers }: { repo: RepoMeta; approvers: n
 
   return (
     <>
-      <Menu.Root modal={false}>
+      <Menu.Root modal={false} onOpenChange={(o) => o && void loadWho()}>
         <Menu.Trigger asChild>
           <button type="button" aria-label={`${initials(user?.name)} account menu${user?.name ? ` for ${user.name}` : ''}`} className="grid size-9 place-items-center rounded-full bg-navy text-[12.5px] font-semibold text-white ring-1 ring-white/20 transition-opacity hover:opacity-90">
             {initials(user?.name)}
@@ -67,10 +82,25 @@ export function IdentityMenu({ repo, approvers }: { repo: RepoMeta; approvers: n
         <Menu.Portal>
           <Menu.Content align="end" sideOffset={8} className="anim-pop z-50 w-72 rounded-2xl bg-surface p-1.5" style={{ boxShadow: 'var(--shadow-pop)' }}>
             <div className="px-2.5 pt-2 pb-2.5">
-              <p className="text-[11.5px] font-medium tracking-wide text-ink-3 uppercase">Local git identity</p>
-              <p className="mt-1 text-[14px] font-semibold">{user?.name || 'Not configured'}</p>
-              <p className="truncate text-[13px] text-ink-2">{user?.email || 'git config user.email is empty'}</p>
-              <p className="mt-2 text-[12px] leading-[18px] text-ink-3">Read from git configuration on this machine. The Studio has no sign-in, so this is not an authenticated user. {approvers === 0 ? 'No approver is enrolled in the registry.' : `${approvers} approver(s) are enrolled in the registry.`}</p>
+              {who ? (
+                <div data-testid="menu-identity">
+                  <p className="text-[11.5px] font-medium tracking-wide text-ink-3 uppercase">Signed in{who.provider === 'entra' ? ' with Microsoft' : ' (development)'}</p>
+                  <p className="mt-1 flex items-center gap-1.5 text-[14px] font-semibold">
+                    <ShieldCheck aria-hidden className="size-4 text-[var(--s-accepted-fg)]" />
+                    {who.login}
+                  </p>
+                  <p className="text-[13px] text-ink-2">{who.roles.length ? who.roles.join(', ') : 'No role (read only)'}</p>
+                  <p className="mt-2 text-[12px] leading-[18px] text-ink-3">Roles come from the access policy and, with Entra, your Entra assignment. They are checked on the server for every action.</p>
+                </div>
+              ) : (
+                <>
+                  <p className="text-[11.5px] font-medium tracking-wide text-ink-3 uppercase">Not signed in</p>
+                  <p className="mt-1 text-[14px] font-semibold">{user?.name || 'No git identity'}</p>
+                  <p className="mt-2 text-[12px] leading-[18px] text-ink-3">
+                    Acting needs a sign-in. The local git name is shown for context only; it is not an authenticated user. {approvers === 0 ? 'No approver is enrolled.' : `${approvers} approver(s) are enrolled.`}
+                  </p>
+                </>
+              )}
             </div>
             <Menu.Separator className="my-1 h-px bg-hairline" />
             <Menu.Label className="px-2.5 pt-1.5 pb-1 text-[11.5px] font-medium tracking-wide text-ink-3 uppercase">Appearance</Menu.Label>
@@ -91,6 +121,20 @@ export function IdentityMenu({ repo, approvers }: { repo: RepoMeta; approvers: n
                 </Menu.RadioItem>
               ))}
             </Menu.RadioGroup>
+            {who?.roles.includes('administrator') ? (
+              <Menu.Item asChild className={item}>
+                <a href="/access" data-testid="access-link">
+                  <ShieldCheck aria-hidden className="size-4 text-ink-3" />
+                  Access review
+                </a>
+              </Menu.Item>
+            ) : null}
+            {who ? (
+              <Menu.Item className={item} onSelect={() => void signOut()}>
+                <LogOut aria-hidden className="size-4 text-ink-3" />
+                Sign out
+              </Menu.Item>
+            ) : null}
             <Menu.Separator className="my-1 h-px bg-hairline" />
             <Menu.Item className={item} onSelect={() => setKeys(true)}>
               <Keyboard aria-hidden className="size-4 text-ink-3" />

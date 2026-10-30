@@ -15,8 +15,9 @@ export interface SessionInfo {
   authenticated: boolean;
   csrf?: string;
   testMode: boolean;
+  mode?: 'entra' | 'github-dev';
   canonicalRef: string;
-  user?: { login: string; name: string | null; roles: string[]; listed: boolean; verifiedBy: string };
+  user?: { login: string; name: string | null; provider?: string; roles: string[]; listed: boolean; verifiedBy: string };
 }
 
 export type Problem = { detail?: string; code?: string; title?: string };
@@ -55,7 +56,13 @@ export function useQueue() {
     void load();
   }, [load]);
 
+  const sessionRef = useRef<SessionInfo | null>(null);
+  sessionRef.current = session;
   const signIn = useCallback(async () => {
+    if (sessionRef.current?.mode === 'entra') {
+      window.location.assign(`/api/v1/auth/entra/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+      return null;
+    }
     const r = await api<SessionInfo>('/api/v1/auth/signin', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' });
     await load();
     return r.ok ? null : (r.body?.detail ?? `Sign-in failed (HTTP ${r.status}).`);

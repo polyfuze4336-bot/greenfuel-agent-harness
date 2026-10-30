@@ -103,7 +103,7 @@ test.describe('identity menu', () => {
     await ready(page, '/');
     await page.getByRole('button', { name: / account menu/ }).click();
     const menu = page.getByRole('menu');
-    await expect(menu).toContainText('Local git identity');
+    await expect(menu).toContainText('Not signed in');
     await expect(menu).toContainText('not an authenticated user');
     await menu.getByRole('menuitemradio', { name: 'Dark' }).click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');

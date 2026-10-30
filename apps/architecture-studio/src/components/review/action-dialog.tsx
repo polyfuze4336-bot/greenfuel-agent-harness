@@ -26,7 +26,7 @@ export interface SubmitResult {
 }
 
 const MIN_REASON = 10;
-const needsReason: ActionKind[] = ['reject', 'defer', 'request-revision', 'reopen', 'approve-alternative'];
+const needsReason: ActionKind[] = ['reject', 'defer', 'request-revision', 'reopen', 'approve-alternative', 'recommend'];
 
 const COPY: Record<ActionKind, { title: string; lead: string; reasonLabel: string; submit: string }> = {
   approve: { title: 'Approve the recommended option', lead: 'You are approving the option the source recommends.', reasonLabel: 'Why (optional)', submit: 'Submit approval' },
@@ -36,6 +36,7 @@ const COPY: Record<ActionKind, { title: string; lead: string; reasonLabel: strin
   'request-revision': { title: 'Request revision', lead: 'Say what must change before this can be decided.', reasonLabel: 'What needs to change', submit: 'Request revision' },
   defer: { title: 'Defer this decision', lead: 'Deferring leaves the decision open for later. Say why, and until when if you know.', reasonLabel: 'Reason for deferring', submit: 'Submit deferral' },
   comment: { title: 'Add a comment', lead: 'A comment changes no status. It joins the decision’s history through a pull request.', reasonLabel: 'Comment', submit: 'Submit comment' },
+  recommend: { title: 'Record a recommendation', lead: 'A recommendation does not decide anything. It tells the approver what you advise, and it is recorded with your name.', reasonLabel: 'Why you advise this', submit: 'Submit recommendation' },
   reopen: { title: 'Reopen this decision', lead: 'Reopening is the controlled way to revisit an approved or rejected decision. The earlier decision stays on record.', reasonLabel: 'Why it is being reopened', submit: 'Submit reopening' },
 };
 
@@ -58,6 +59,7 @@ export function ActionDialog({ action, onClose, decisionId, options, revision, o
   const [text, setText] = useState('');
   const [optionKey, setOptionKey] = useState('');
   const [conditions, setConditions] = useState<string[]>(['']);
+  const [recommendation, setRecommendation] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<SubmitResult | null>(null);
   // After a conflict the person reads the current state and confirms; only then is the newer revision used.
@@ -76,6 +78,7 @@ export function ActionDialog({ action, onClose, decisionId, options, revision, o
     setError(null);
     setBusy(false);
     setConditions(['']);
+    setRecommendation('');
     setOverride(null);
     const o = optionsRef.current;
     setOptionKey(action === 'approve-with-conditions' ? (o.find((x) => x.recommended)?.key ?? o[0]?.key ?? '') : '');
@@ -86,7 +89,7 @@ export function ActionDialog({ action, onClose, decisionId, options, revision, o
   const reasonRequired = needsReason.includes(action) || action === 'comment';
   const reasonOk = !reasonRequired || text.trim().length >= (action === 'comment' ? 1 : MIN_REASON);
   const condList = conditions.map((x) => x.trim()).filter(Boolean);
-  const valid = reasonOk && (action !== 'approve-alternative' || !!optionKey) && (action !== 'approve-with-conditions' || (condList.length > 0 && !!optionKey));
+  const valid = reasonOk && (action !== 'recommend' || !!recommendation) && (action !== 'approve-alternative' || !!optionKey) && (action !== 'approve-with-conditions' || (condList.length > 0 && !!optionKey));
   const hint = !reasonOk ? (action === 'comment' ? 'Write a comment.' : `At least ${MIN_REASON} characters are needed (${text.trim().length} so far).`) : null;
 
   const submit = async (reconciledRevision?: string) => {
@@ -101,6 +104,7 @@ export function ActionDialog({ action, onClose, decisionId, options, revision, o
     if (action === 'comment') body.comment = text;
     else if (text.trim()) body.rationale = text;
     if (optionKey) body.optionKey = optionKey;
+    if (action === 'recommend') body.recommendation = recommendation;
     if (action === 'approve-with-conditions') body.conditions = condList;
     const r = await onSubmit(body);
     setBusy(false);
@@ -142,6 +146,20 @@ export function ActionDialog({ action, onClose, decisionId, options, revision, o
                       <span className="font-mono font-semibold">{o.key}</span> · {o.name}
                       {o.recommended ? <span className="ml-2 rounded-full bg-accent-soft px-2 py-0.5 text-[11.5px] font-semibold text-accent">Recommended</span> : null}
                     </span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          ) : null}
+
+          {action === 'recommend' ? (
+            <fieldset className="mt-4">
+              <legend className="mb-1.5 text-[13px] font-medium">What do you advise the approver to do?</legend>
+              <div className="space-y-1.5">
+                {(['approve', 'reject', 'revise'] as const).map((r) => (
+                  <label key={r} className="flex cursor-pointer items-start gap-2.5 rounded-xl border border-hairline px-3.5 py-2.5 text-[13.5px] has-[:checked]:border-accent has-[:checked]:bg-accent-soft">
+                    <input type="radio" name="recommendation" value={r} checked={recommendation === r} onChange={() => setRecommendation(r)} className="mt-1" />
+                    <span>{r === 'approve' ? 'Approve' : r === 'reject' ? 'Reject' : 'Revise before deciding'}</span>
                   </label>
                 ))}
               </div>
@@ -199,7 +217,7 @@ export function ActionDialog({ action, onClose, decisionId, options, revision, o
           </div>
 
           <p className="mt-4 rounded-xl bg-surface-2 px-3.5 py-2.5 text-[12.5px] leading-5 text-ink-2">
-            You are acting as <strong>@{login}</strong>. This saves a proposal and opens a pull request on GitHub. The decision keeps its current status until a person merges that pull request.
+            You are acting as <strong>@{login}</strong>. This saves a proposal and opens a pull request on GitHub. The decision keeps its current status until a person merges that pull request. Your role is checked again on the server; nothing on this page grants authority.
           </p>
 
           {error?.conflict ? (
@@ -212,6 +230,11 @@ export function ActionDialog({ action, onClose, decisionId, options, revision, o
               <AlertCircle aria-hidden className="mt-0.5 size-4 shrink-0" />
               <div className="min-w-0">
                 <p>{error.detail ?? `The request failed (HTTP ${error.status}).`}</p>
+                {error.code === 'reauth-required' ? (
+                  <a className="mt-1.5 inline-block font-medium underline" href={`/api/v1/auth/entra/login?reauth=1&next=${encodeURIComponent(window.location.pathname)}`}>
+                    Sign in again to continue
+                  </a>
+                ) : null}
                 {stale ? (
                   <button type="button" className="mt-1.5 font-medium underline" onClick={onReload}>
                     Reload this decision

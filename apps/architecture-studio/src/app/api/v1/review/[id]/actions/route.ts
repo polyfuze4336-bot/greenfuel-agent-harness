@@ -16,6 +16,8 @@ export function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> })
     const { service } = runtime();
     const s = requireSession(req);
     if (s instanceof Response) {
+      // Read the (small) body we are not going to use: answering and closing while a client is still sending can reset its connection.
+      if (Number(req.headers.get('content-length') ?? 0) <= 40_000) await req.arrayBuffer().catch(() => undefined);
       service.deps.store.audit({ at: new Date().toISOString(), actor: null, decisionId: id.slice(0, 20), action: 'submit', outcome: 'denied', code: s.status === 401 ? 'unauthenticated' : 'bad-request', detail: `HTTP ${s.status}`, proposalId: null });
       return s;
     }

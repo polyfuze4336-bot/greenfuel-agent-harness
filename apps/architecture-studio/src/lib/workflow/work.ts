@@ -14,12 +14,16 @@ import {
   WORK_ACTION_LABEL, WORK_DIR, applyWorkEvent, emptyWorkState, foldWorkEvents, hashWorkEvent, parseWorkEvent, serializeWorkEvent, workEventId, workEventPath,
   type WorkAction, type WorkEvent, type WorkState,
 } from './work-events.ts';
-import { authoriseWork, validateWorkRequest, workAvailability, type WorkAvailability, type WorkRequest } from './work-rules.ts';
+import { validateWorkRequest, workAvailability, type WorkAvailability, type WorkRequest } from './work-rules.ts';
+import { authenticityAt, checkRecord, type Authenticity } from '../auth/authenticity.ts';
+import { authorizeWork, effectiveRoles, keyOf, roleCheckOf } from '../auth/authorize.ts';
+import { authContextFor, getTrust } from '../auth/config.ts';
+import { actorOf, authFacts, authzPublic } from './review.ts';
 
 const FILE = new RegExp(`^${WORK_DIR}/([A-Za-z0-9-]{1,16})/(\\d{4})-([a-z-]+)\\.json$`);
 
 /** Every work-item event on a ref, folded per item. A file that does not parse or match its own path is reported, never trusted. */
-export function loadWorkStates(adapter: GitRepositoryAdapter): Map<string, WorkState> {
+export function loadWorkStates(adapter: GitRepositoryAdapter, authenticity: Authenticity = authenticityAt((x) => adapter.read(x))): Map<string, WorkState> {
   const paths = adapter.list(`${WORK_DIR}/`).filter((p) => p.endsWith('.json'));
   adapter.preload(paths);
   const byItem = new Map<string, WorkEvent[]>();
@@ -36,6 +40,11 @@ export function loadWorkStates(adapter: GitRepositoryAdapter): Map<string, WorkS
     const e = parsed.event;
     if (e.itemId !== m[1] || e.seq !== Number(m[2]) || e.action !== m[3]) {
       problem(m[1]!, `${p}: the file name does not match its content`);
+      continue;
+    }
+    const fake = checkRecord(authenticity, { actor: e.actor, createdAt: e.createdAt, eventHash: e.eventHash, signature: e.signature, roleCheck: e.roleCheck, approvalClass: e.action === 'approve-completion' || e.action === 'reject-completion' || e.action === 'reopen' });
+    if (fake) {
+      problem(m[1]!, `${p}: not accepted as a record, because ${fake}`);
       continue;
     }
     byItem.set(e.itemId, [...(byItem.get(e.itemId) ?? []), e]);
@@ -174,13 +183,14 @@ export class WorkService {
   view(item: WorkItem, user: VerifiedUser | null, canonical: CanonicalWorkRead = this.canonical(), policy: Policy = this.review.policy()): WorkView {
     const state = canonical.states.get(item.id) ?? emptyWorkState(item.id);
     const open = this.deps.store.openFor(item.id, 'work');
+    const ctx = authContextFor(policy, this.now().getTime());
     const actions = workAvailability(item, state).map((a) => {
       if (!user) return { ...a, authorised: null, authReason: 'Sign in to act.' };
       if (!a.allowed) return { ...a, authorised: null, authReason: null };
-      const auth = authoriseWork({ login: user.login, githubId: user.id }, a.action, state, policy);
+      const auth = authorizeWork({ principal: user, action: a.action, itemId: item.id, submitter: state.submittedBySubject }, ctx);
       return { ...a, authorised: auth.ok, authReason: auth.ok ? null : (auth.reason ?? null) };
     });
-    const mine = user ? policy.people.find((p) => p.githubLogin.toLowerCase() === user.login.toLowerCase() && p.githubId === user.id) : undefined;
+    const mine = user ? policy.people.find((p) => p.subject === keyOf(user)) : undefined;
     return {
       itemId: item.id,
       revision: this.revisionOf(item, state, open),
@@ -189,8 +199,8 @@ export class WorkService {
       recent: this.deps.store.forDecision(item.id, 'work').filter((p) => !isOpen(p.state)).slice(-5).reverse(),
       actions,
       policy: { source: policy.source, configured: policy.people.length > 0 },
-      people: policy.people.map((p) => ({ login: p.githubLogin, holder: p.holder, roles: p.roles })),
-      user: user ? { login: user.login, roles: mine?.roles ?? [], listed: !!mine } : null,
+      people: policy.people.filter((p) => p.revokedAt === null).map((p) => ({ login: p.login, holder: p.holder, roles: p.roles })),
+      user: user ? { login: user.login, roles: effectiveRoles(user, ctx).roles, listed: !!mine } : null,
     };
   }
 
@@ -198,22 +208,25 @@ export class WorkService {
     this.deps.store.audit({ at: this.now().toISOString(), actor: user?.login ?? null, decisionId: `work:${id}`, action, outcome, code, detail: detail?.slice(0, 300) ?? null, proposalId, ...(facts ? { facts } : {}) });
   }
 
-  private refuse(user: VerifiedUser | null, id: string, action: string, outcome: 'denied' | 'stale' | 'invalid', e: ServiceError): never {
-    this.audit(user, id, action, outcome, e.code, e.message);
+  private refuse(user: VerifiedUser | null, id: string, action: string, outcome: 'denied' | 'stale' | 'invalid', e: ServiceError, facts?: AuditFacts): never {
+    this.audit(user, id, action, outcome, e.code, e.message, null, facts);
     throw e;
   }
 
   async submit(user: VerifiedUser | null, item: WorkItem, req: Partial<WorkRequest>, ctx: WorkContext): Promise<{ proposal: Proposal; duplicate: boolean }> {
     const action = String(req.action ?? '');
-    if (!user) this.refuse(null, item.id, action, 'denied', new ServiceError(401, 'unauthenticated', 'Sign in first. Every action needs a verified GitHub identity.'));
-    let current: VerifiedUser;
-    try {
-      current = await this.deps.identity.verify();
-    } catch (e) {
-      return this.refuse(user, item.id, action, 'denied', new ServiceError(401, 'identity-unverified', e instanceof Error ? e.message : 'GitHub could not confirm your identity.'));
-    }
-    if (current.id !== user!.id || current.login.toLowerCase() !== user!.login.toLowerCase()) {
-      this.refuse(user, item.id, action, 'denied', new ServiceError(401, 'identity-changed', `The GitHub account on this computer is now ${current.login}, not ${user!.login}. Sign in again.`));
+    if (!user) this.refuse(null, item.id, action, 'denied', new ServiceError(401, 'unauthenticated', 'Sign in first. Every action needs a verified identity.'));
+    let current: VerifiedUser = user!;
+    if (user!.provider === 'github') {
+      try {
+        current = await this.deps.identity.verify();
+      } catch (e) {
+        return this.refuse(user, item.id, action, 'denied', new ServiceError(401, 'identity-unverified', e instanceof Error ? e.message : 'GitHub could not confirm your identity.'));
+      }
+      if (keyOf(current) !== keyOf(user!)) {
+        this.refuse(user, item.id, action, 'denied', new ServiceError(401, 'identity-changed', `The GitHub account on this computer is now ${current.login}, not ${user!.login}. Sign in again.`));
+      }
+      current = { ...current, authAt: user!.authAt };
     }
     return withLock(`work:${item.id}`, async () => {
       const v = validateWorkRequest(req);
@@ -228,8 +241,9 @@ export class WorkService {
       if (!canonical.available) return this.refuse(current, item.id, a, 'invalid', new ServiceError(503, 'canonical-unavailable', canonical.error ?? 'The canonical branch cannot be read.'));
       const policy = this.review.policy();
       const state = canonical.states.get(item.id) ?? emptyWorkState(item.id);
-      const auth = authoriseWork({ login: current.login, githubId: current.id }, a, state, policy);
-      if (!auth.ok) return this.refuse(current, item.id, a, 'denied', new ServiceError(403, auth.code ?? 'forbidden', auth.reason ?? 'Not permitted.'));
+      const actx = authContextFor(policy, this.now().getTime());
+      const auth = authorizeWork({ principal: current, action: a, itemId: item.id, submitter: state.submittedBySubject }, actx);
+      if (!auth.ok) return this.refuse(current, item.id, a, 'denied', new ServiceError(auth.status, auth.code ?? 'forbidden', auth.reason ?? 'Not permitted.', { authz: authzPublic(auth) }), authFacts(auth));
 
       const prior = this.deps.store.byKey(item.id, req.idempotencyKey!, 'work');
       if (prior) {
@@ -254,7 +268,7 @@ export class WorkService {
       if (!av?.allowed) return this.refuse(current, item.id, a, 'denied', new ServiceError(409, 'not-allowed', av?.reason ?? 'This action is not allowed now.'));
 
       const c = v.value;
-      if (a === 'assign' && !policy.people.some((p) => p.githubLogin.toLowerCase() === c.assignee!.toLowerCase())) {
+      if (a === 'assign' && !policy.people.some((p) => p.revokedAt === null && p.login.toLowerCase() === c.assignee!.toLowerCase())) {
         return this.refuse(current, item.id, a, 'invalid', new ServiceError(400, 'invalid', `${c.assignee} is not a registered person in the policy. Assign to one of the registered people.`));
       }
       if (a === 'mark-blocked') {
@@ -276,12 +290,12 @@ export class WorkService {
 
       const seq = state.events.length + 1;
       const base = {
-        schema: 'greenfuel.work-item-event/v1' as const,
+        schema: 'greenfuel.work-item-event/v2' as const,
         id: workEventId(item.id, seq),
         itemId: item.id,
         seq,
         action: a,
-        actor: { login: current.login, githubId: current.id, name: current.name, verifiedBy: current.verifiedBy },
+        actor: actorOf(current),
         createdAt: this.now().toISOString(),
         basis: { itemHash: item.contentHash, sourceStatus: item.sourceStatus ?? item.status, sourcePath: item.source.path },
         prevHash: state.headHash,
@@ -292,9 +306,12 @@ export class WorkService {
         comment: c.comment,
         evidence: c.evidence,
         blockedBy: c.blockedBy,
-        roleCheck: auth.roleCheck,
+        roleCheck: roleCheckOf(auth, current, actx, null),
       };
-      const event: WorkEvent = { ...base, eventHash: hashWorkEvent(base) };
+      const signer = getTrust().signer;
+      if (!signer) return this.refuse(current, item.id, a, 'invalid', new ServiceError(503, 'signing-unavailable', getTrust().signerProblem ?? 'This server has no signing key, so it cannot record an action.'));
+      const hash = hashWorkEvent(base);
+      const event: WorkEvent = { ...base, eventHash: hash, signature: signer.sign(hash) };
       const legal = applyWorkEvent(state, event);
       if ('error' in legal) return this.refuse(current, item.id, a, 'denied', new ServiceError(409, 'not-allowed', legal.error));
 

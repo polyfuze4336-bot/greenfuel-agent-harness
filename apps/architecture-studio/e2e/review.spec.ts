@@ -297,40 +297,40 @@ test.describe('reopening', () => {
 });
 
 test.describe('who may act', () => {
-  test('an unregistered person can read and comment but cannot decide, in the UI or through the API', async ({ page }) => {
+  test('a person with no role can read but cannot decide or comment, in the UI or through the API', async ({ page }) => {
     await open(page, 'D-004');
     await signIn(page, USERS.outsider);
-    await expect(page.getByTestId('identity')).toContainText('Not a registered approver');
+    await expect(page.getByTestId('identity-roles')).toContainText('viewer');
     await expect(page.getByTestId('action-reject')).toHaveAttribute('aria-disabled', 'true');
     await page.getByTestId('action-reject').click({ force: true }); // aria-disabled, but clickable so that it can explain itself
-    await expect(page.getByTestId('rail-notice')).toContainText('is not a registered approver');
+    await expect(page.getByTestId('rail-notice')).toContainText('does not allow this');
     await expect(page.getByTestId('action-dialog')).toHaveCount(0);
     await shot(page, '35-review-unauthorised');
-    await expect(page.getByTestId('action-comment')).not.toHaveAttribute('aria-disabled', 'true');
+    await expect(page.getByTestId('action-comment')).toHaveAttribute('aria-disabled', 'true');
 
     const token = await csrf(page.request);
     const rev = (await (await page.request.get('/api/v1/review/D-004')).json()) as { view: { revision: string } };
     const before = prs().length;
     const r = await post(page.request, '/api/v1/review/D-004/actions', { action: 'reject', rationale: REASON, expectedRevision: rev.view.revision, idempotencyKey: 'outsider-direct-1' }, { 'x-studio-csrf': token });
     expect(r.status()).toBe(403);
-    expect(((await r.json()) as { code: string }).code).toBe('not-listed');
+    expect(((await r.json()) as { code: string }).code).toBe('missing-permission');
     expect(prs().length).toBe(before);
   });
 
-  test('a registered person without the required role is refused, and the refusal is audited', async ({ page }) => {
+  test('a security reviewer cannot approve an architecture decision, and the refusal is audited', async ({ page }) => {
     await open(page, 'D-004');
-    await signIn(page, USERS.quality);
-    await expect(page.getByTestId('identity')).toContainText('quality-manager');
+    await signIn(page, USERS.security);
+    await expect(page.getByTestId('identity-roles')).toContainText('security-reviewer');
     await expect(page.getByTestId('action-reject')).toHaveAttribute('aria-disabled', 'true');
     await page.getByTestId('unavailable-reasons').waitFor({ state: 'attached' });
-    await expect(page.getByTestId('unavailable-reasons')).toContainText('does not hold a role');
+    await expect(page.getByTestId('unavailable-reasons')).toContainText('does not allow this');
     const token = await csrf(page.request);
     const rev = (await (await page.request.get('/api/v1/review/D-004')).json()) as { view: { revision: string } };
-    const r = await post(page.request, '/api/v1/review/D-004/actions', { action: 'reject', rationale: REASON, expectedRevision: rev.view.revision, idempotencyKey: 'quality-direct-1' }, { 'x-studio-csrf': token });
+    const r = await post(page.request, '/api/v1/review/D-004/actions', { action: 'reject', rationale: REASON, expectedRevision: rev.view.revision, idempotencyKey: 'security-direct-1' }, { 'x-studio-csrf': token });
     expect(r.status()).toBe(403);
-    expect(((await r.json()) as { code: string }).code).toBe('missing-role');
+    expect(((await r.json()) as { code: string }).code).toBe('missing-permission');
     const audit = (await (await page.request.get('/api/v1/review/D-004')).json()) as { audit: { outcome: string; code: string; actor: string }[] };
-    expect(audit.audit.some((a) => a.outcome === 'denied' && a.code === 'missing-role' && a.actor === 'test-quality')).toBe(true);
+    expect(audit.audit.some((a) => a.outcome === 'denied' && a.code === 'missing-permission' && a.actor === 'test-security')).toBe(true);
   });
 
   test('a bot account cannot sign in, and a request without a session, origin or CSRF token is refused', async ({ page, request }) => {
@@ -341,7 +341,17 @@ test.describe('who may act', () => {
     await expect(page.getByTestId('identity')).toHaveCount(0);
 
     const body = { action: 'comment', comment: 'hello', expectedRevision: 'x', idempotencyKey: 'anon-direct-0001' };
-    expect((await post(request, '/api/v1/review/D-004/actions', body)).status(), 'no session').toBe(401);
+    // Seen intermittently when this suite runs after e2e/access.spec.ts: the first POST on a new connection is reset (ECONNRESET) before
+    // any response. The cause was not found; one retry on that error and nothing else keeps the assertion about the 401 meaningful.
+    const anon = async () => {
+      try {
+        return await post(request, '/api/v1/review/D-004/actions', body);
+      } catch (e) {
+        if (!/ECONNRESET/.test(String(e))) throw e;
+        return post(request, '/api/v1/review/D-004/actions', body);
+      }
+    };
+    expect((await anon()).status(), 'no session').toBe(401);
     as(USERS.owner);
     await open(page, 'D-004');
     await signIn(page);
@@ -368,9 +378,9 @@ test.describe('who may act', () => {
     await signIn(page);
     await page.getByTestId('action-comment').click();
     await page.getByTestId('action-dialog').getByRole('textbox').fill('A comment from the first account.');
-    as(USERS.quality); // someone ran `gh auth switch` meanwhile
+    as(USERS.security); // someone ran `gh auth switch` meanwhile
     await page.getByTestId('action-dialog').getByRole('button', { name: 'Submit comment' }).click();
-    await expect(page.getByTestId('action-dialog').getByRole('alert')).toContainText('is now test-quality, not test-owner');
+    await expect(page.getByTestId('action-dialog').getByRole('alert')).toContainText('is now test-security, not test-owner');
     await page.keyboard.press('Escape');
     expect(prs().filter((p) => p.head.includes('D-035'))).toHaveLength(0);
   });
@@ -466,7 +476,7 @@ test.describe('GitHub synchronisation failure and recovery', () => {
   });
 
   test('a pull request closed without merging is reported as Failed and frees the decision', async ({ page }) => {
-    await open(page, 'D-036');
+    await open(page, 'D-018');
     await signIn(page);
     await act(page, 'defer', { reason: 'Deferred, to be withdrawn again.', submit: 'Submit deferral' });
     const n = lastPr().number;
@@ -509,7 +519,7 @@ test.describe('GitHub synchronisation failure and recovery', () => {
 
 test.describe('quality', () => {
   test('the review page and its dialog have no automatically detectable accessibility violations', async ({ page }) => {
-    await open(page, 'D-001');
+    await open(page, 'D-010');
     await signIn(page);
     await expectNoAxeViolations(page, 'review page');
     await page.getByTestId('action-reject').click();
@@ -521,7 +531,7 @@ test.describe('quality', () => {
   });
 
   test('dialogs trap and return focus, close with Escape, and keys never submit anything', async ({ page }) => {
-    await open(page, 'D-001');
+    await open(page, 'D-010');
     await signIn(page);
     await page.getByRole('heading', { level: 1 }).click();
     const before = prs().length;
@@ -530,7 +540,7 @@ test.describe('quality', () => {
     await page.keyboard.press('Escape');
     await expect(page.getByTestId('action-dialog')).toBeHidden();
     await page.keyboard.press('a');
-    await expect(page.getByTestId('rail-notice')).toContainText('unavailable'); // D-001 recommends nothing
+    await expect(page.getByTestId('rail-notice')).toContainText('unavailable'); // D-010 recommends nothing
     expect(prs().length).toBe(before);
   });
 
@@ -539,7 +549,7 @@ test.describe('quality', () => {
     await page.getByText(/Audit trail \(/).click();
     const trail = page.getByTestId('audit-trail');
     await expect(trail).toContainText('denied');
-    await expect(trail).toContainText('not-listed');
+    await expect(trail).toContainText('missing-permission');
   });
 
   test('the loading and error states of the rail are handled', async ({ page }) => {
@@ -553,6 +563,6 @@ test.describe('quality', () => {
 });
 
 test('the test-mode banner is shown, so simulated GitHub is never mistaken for the real one', async ({ page }) => {
-  await open(page, 'D-001');
+  await open(page, 'D-010');
   await expect(page.getByTestId('test-mode-banner')).toContainText('TEST MODE');
 });

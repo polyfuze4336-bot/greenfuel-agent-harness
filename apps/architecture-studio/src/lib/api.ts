@@ -9,8 +9,17 @@ export function ok(body: unknown) {
   return NextResponse.json(body, { headers: { 'Cache-Control': 'no-store' } });
 }
 
-export async function guard(fn: () => Promise<Response>): Promise<Response> {
+/**
+ * Wraps every route. Unless it is marked public, the caller must be allowed to read: in Entra mode that means a live session whose
+ * roles include one that can read. Routes that change something then apply their own, stricter, authorization in the service.
+ */
+export async function guard(fn: () => Promise<Response>, opts: { public?: boolean } = {}): Promise<Response> {
   try {
+    if (!opts.public) {
+      const { readGate } = await import('./auth/server.ts');
+      const denied = await readGate();
+      if (denied) return denied;
+    }
     return await fn();
   } catch (e) {
     if (e instanceof GitError) {

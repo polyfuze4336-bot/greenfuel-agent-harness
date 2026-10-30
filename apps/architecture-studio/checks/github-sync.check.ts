@@ -15,8 +15,10 @@ import { PublishError } from '../src/lib/workflow/publish.ts';
 import { ReviewService, ServiceError } from '../src/lib/workflow/review.ts';
 import { ReviewStore, type Proposal } from '../src/lib/workflow/store.ts';
 import { WorkService } from '../src/lib/workflow/work.ts';
-import { USERS, git, makeDecision, makeFixture, type Fixture } from './fixtures/review-fixture.ts';
+import { USERS, git, installTestAuth, makeDecision, makeFixture, type Fixture } from './fixtures/review-fixture.ts';
 import { FakeGitHub, makeAppKeys } from './fixtures/fake-github.ts';
+
+installTestAuth();
 import type { NormalizedDecision } from '../src/lib/intel/schema.ts';
 import type { ActionKind } from '../src/lib/workflow/events.ts';
 
@@ -471,7 +473,7 @@ describe('what the app is allowed to do', () => {
     const w = await appWorld();
     const base = git(w.fx.remote, 'rev-parse', 'refs/heads/main');
     const mk = (p: string) => w.publisher.buildCommit({ baseSha: base, files: [{ path: p, content: 'x' }], author: { name: 'a', email: 'a@x.invalid' }, message: 'm', now: new Date() });
-    for (const p of ['docs/adr/0001.md', '.github/workflows/x.yml', 'harness/policy/decision-workflow.json', 'docs/decision-reviews/../adr/x.json']) await assert.rejects(mk(p), (e: unknown) => e instanceof PublishError && e.code === 'BAD_INPUT');
+    for (const p of ['docs/adr/0001.md', '.github/workflows/x.yml', 'harness/policy/access-policy.json', 'docs/decision-reviews/../adr/x.json']) await assert.rejects(mk(p), (e: unknown) => e instanceof PublishError && e.code === 'BAD_INPUT');
     const d = makeDecision({ id: 'ADR-0342' });
     const { proposal } = await w.submit(w.a, d, 'approve');
     const sent = await w.a.svc.sync(proposal.id);

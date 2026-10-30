@@ -183,7 +183,7 @@ export function ItemSheet({ id, data, session, onChanged, onSignIn, onOpen }: { 
               <p data-testid="identity" className="mb-2 flex items-center gap-2 text-[13px] text-ink-2">
                 <ShieldCheck aria-hidden className="size-4 text-[var(--s-accepted-fg)]" />
                 Acting as <strong>@{session.user.login}</strong>
-                {session.user.listed ? ` · ${session.user.roles.join(', ')}` : ' · not a registered person (comments only)'}
+                {session.user.roles.length ? ` · ${session.user.roles.join(', ')}` : ' · no role (read only)'}
               </p>
             ) : (
               <div className="mb-2">
@@ -199,9 +199,9 @@ export function ItemSheet({ id, data, session, onChanged, onSignIn, onOpen }: { 
                   }}
                 >
                   <LogIn aria-hidden className="size-3.5" />
-                  Sign in with GitHub
+                  {session?.mode === 'entra' ? 'Sign in with Microsoft' : 'Sign in with GitHub'}
                 </button>
-                <p className="mt-1.5 text-[12.5px] text-ink-3">Every action needs a verified GitHub identity.</p>
+                <p className="mt-1.5 text-[12.5px] text-ink-3">Every action needs a verified identity. Your role is checked on the server.</p>
                 {signInError ? (
                   <p role="alert" className="mt-1.5 text-[12.5px] text-[var(--s-rejected-fg)]">
                     {signInError}

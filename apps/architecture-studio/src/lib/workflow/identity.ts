@@ -3,16 +3,11 @@
 // Limit, stated plainly: this proves which GitHub account is configured on this computer. It cannot prove that a human is at
 // the keyboard. The real gate against an unattended approval is that nothing becomes canonical until a person merges a pull request.
 import { execFile } from 'node:child_process';
-import crypto from 'node:crypto';
 import fs from 'node:fs';
+import type { Principal } from '../auth/authorize.ts';
 
-export interface VerifiedUser {
-  login: string;
-  id: number;
-  name: string | null;
-  type: string;
-  verifiedBy: 'github-api' | 'test-fixture';
-}
+/** A verified person. See auth/authorize.ts: the same type serves GitHub and Entra sign-ins. */
+export type VerifiedUser = Principal;
 
 export class IdentityError extends Error {
   readonly code: 'NOT_SIGNED_IN' | 'GH_UNAVAILABLE' | 'NOT_A_PERSON' | 'AGENT_SESSION';
@@ -27,12 +22,13 @@ export interface IdentityProvider {
   verify(): Promise<VerifiedUser>;
 }
 
-function parseUser(raw: unknown, verifiedBy: VerifiedUser['verifiedBy']): VerifiedUser {
+function parseUser(raw: unknown, verifiedBy: 'github-api' | 'test-fixture'): VerifiedUser {
   const o = (raw ?? {}) as Record<string, unknown>;
   if (typeof o.login !== 'string' || !o.login || !Number.isInteger(o.id)) throw new IdentityError('NOT_SIGNED_IN', 'GitHub did not return an account. Run `gh auth login`.');
   // Accounts of type Bot or Organization cannot decide. A person's account is type "User".
   if (o.type !== 'User') throw new IdentityError('NOT_A_PERSON', `${o.login} is a ${String(o.type)} account. Only a person's GitHub account can decide.`);
-  return { login: o.login, id: o.id as number, name: typeof o.name === 'string' && o.name ? o.name : null, type: 'User', verifiedBy };
+  // GitHub signs a person in with no second-factor claim the Studio can see, so mfa is false and authAt is the moment GitHub confirmed them.
+  return { provider: 'github', subject: String(o.id), tenantId: null, login: o.login, id: o.id as number, name: typeof o.name === 'string' && o.name ? o.name : null, type: 'User', verifiedBy, entraRoles: [], entraGroups: [], mfa: false, authAt: Date.now() };
 }
 
 /** Asks GitHub who the signed-in GitHub CLI account is. No token is read, stored or logged by the Studio. */
@@ -72,42 +68,4 @@ export class FixtureIdentity implements IdentityProvider {
   }
 }
 
-// ---- sessions
-
-export interface Session {
-  token: string;
-  csrf: string;
-  user: VerifiedUser;
-  expiresAt: number;
-}
-
-const TTL_MS = 8 * 60 * 60 * 1000;
-
-export class SessionStore {
-  private readonly map = new Map<string, Session>();
-  private readonly now: () => number;
-  constructor(now: () => number = Date.now) {
-    this.now = now;
-  }
-
-  create(user: VerifiedUser): Session {
-    const s: Session = { token: crypto.randomBytes(32).toString('hex'), csrf: crypto.randomBytes(24).toString('hex'), user, expiresAt: this.now() + TTL_MS };
-    this.map.set(s.token, s);
-    return s;
-  }
-
-  get(token: string | undefined): Session | null {
-    if (!token) return null;
-    const s = this.map.get(token);
-    if (!s) return null;
-    if (s.expiresAt <= this.now()) {
-      this.map.delete(token);
-      return null;
-    }
-    return s;
-  }
-
-  destroy(token: string | undefined) {
-    if (token) this.map.delete(token);
-  }
-}
+export { SessionStore, type Session } from '../auth/sessions.ts';

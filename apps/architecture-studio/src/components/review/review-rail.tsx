@@ -18,8 +18,12 @@ interface SessionInfo {
   authenticated: boolean;
   csrf?: string;
   testMode: boolean;
+  mode: 'entra' | 'github-dev';
+  devApprovals: boolean;
+  entraConfigured: boolean;
   canonicalRef: string;
-  user?: { login: string; name: string | null; roles: string[]; listed: boolean; verifiedBy: string };
+  user?: { login: string; name: string | null; provider: string; roles: string[]; listed: boolean; verifiedBy: string; mfa: boolean; notes: string[] };
+  session?: { idleExpiresAt: number; absoluteExpiresAt: number; approvalWindowEndsAt: number };
   policy: { source: string; configured: boolean; problems: string[] };
 }
 
@@ -41,10 +45,10 @@ async function api<T>(url: string, init?: RequestInit): Promise<{ ok: boolean; s
   return { ok: r.ok, status: r.status, body };
 }
 
-const KEYS: Record<string, ActionKind> = { a: 'approve', r: 'reject', d: 'defer', v: 'request-revision', c: 'comment', o: 'reopen' };
+const KEYS: Record<string, ActionKind> = { a: 'approve', r: 'reject', d: 'defer', v: 'request-revision', c: 'comment', o: 'reopen', m: 'recommend' };
 const PRIMARY: ActionKind[] = ['approve', 'approve-alternative', 'approve-with-conditions'];
-const SECONDARY: ActionKind[] = ['request-revision', 'defer', 'reject', 'comment', 'reopen'];
-const HOTKEY: Partial<Record<ActionKind, string>> = { approve: 'A', reject: 'R', defer: 'D', 'request-revision': 'V', comment: 'C', reopen: 'O' };
+const SECONDARY: ActionKind[] = ['recommend', 'request-revision', 'defer', 'reject', 'comment', 'reopen'];
+const HOTKEY: Partial<Record<ActionKind, string>> = { approve: 'A', reject: 'R', defer: 'D', 'request-revision': 'V', comment: 'C', reopen: 'O', recommend: 'M' };
 
 export function Tracker({ p, onCheck, busy, subject = 'decision' }: { p: Proposal; onCheck: () => void; busy: boolean; subject?: string }) {
   const failed = p.state === 'failed' || p.state === 'conflicted';
@@ -163,7 +167,7 @@ export function ReviewRail({ id, options }: { id: string; options: OptionChoice[
       headers: { 'content-type': 'application/json', 'x-studio-csrf': session?.csrf ?? '' },
       body: JSON.stringify(body),
     });
-    if (r.status === 401) await loadBoth();
+    if (r.status === 401 && r.body?.code !== 'reauth-required') await loadBoth();
     if (r.ok && r.body) {
       setNotice(r.body.duplicate ? 'That submission was already recorded. Nothing new was created.' : `Submitted. ${PROPOSAL_LABEL[r.body.proposal.state as ProposalState]}.`);
       // Refresh in the background so the dialog can close at once.
@@ -299,10 +303,14 @@ export function ReviewRail({ id, options }: { id: string; options: OptionChoice[
             <p className="flex items-center gap-2 text-[14px] font-semibold">
               <ShieldCheck aria-hidden className="size-4 text-[var(--s-accepted-fg)]" />@{session.user.login}
             </p>
-            <p className="mt-0.5 text-[12.5px] leading-5 text-ink-2">
-              {session.user.listed ? `Registered approver: ${session.user.roles.join(', ') || 'no roles'}` : 'Not a registered approver. You can comment, not decide.'}
+            <p data-testid="identity-roles" className="mt-0.5 text-[12.5px] leading-5 text-ink-2">
+              {session.user.roles.length ? `Role${session.user.roles.length > 1 ? 's' : ''}: ${session.user.roles.join(', ')}` : 'No role. You can read, not act.'}
             </p>
-            <p className="text-[12px] text-ink-3">Confirmed by {session.user.verifiedBy === 'github-api' ? 'GitHub' : 'the test fixture'}, not typed in.</p>
+            <p className="text-[12px] text-ink-3">
+              Confirmed by {session.user.verifiedBy === 'entra-oidc' ? 'Microsoft Entra ID' : session.user.verifiedBy === 'github-api' ? 'GitHub (development sign-in)' : 'the test fixture'}, not typed in.
+              {session.user.provider === 'entra' ? (session.user.mfa ? ' Multi-factor sign-in.' : ' No multi-factor claim on this sign-in.') : ''}
+            </p>
+            {session.user.notes.length ? <p className="mt-1 text-[12px] leading-5 text-ink-3">{session.user.notes[0]}</p> : null}
             <button type="button" className={`${btn} mt-2.5`} onClick={() => void signOut()}>
               <LogOut aria-hidden className="size-3.5" />
               Sign out
@@ -310,11 +318,23 @@ export function ReviewRail({ id, options }: { id: string; options: OptionChoice[
           </div>
         ) : (
           <div className="mt-2">
-            <p className="text-[13px] leading-5 text-ink-2">Every action needs a verified GitHub identity. The Studio asks GitHub which account is signed in on this computer.</p>
-            <button type="button" data-testid="sign-in" className={`${btn} mt-2.5`} onClick={() => void signIn()} disabled={busy}>
-              <LogIn aria-hidden className="size-3.5" />
-              Sign in with GitHub
-            </button>
+            {session.mode === 'entra' ? (
+              <>
+                <p className="text-[13px] leading-5 text-ink-2">Every action needs a Microsoft Entra ID sign-in. Your role comes from your Entra assignment and the access policy, never from this page.</p>
+                <a data-testid="sign-in" className={`${btn} mt-2.5`} href={`/api/v1/auth/entra/login?next=${encodeURIComponent(typeof window === 'undefined' ? '/' : window.location.pathname)}`}>
+                  <LogIn aria-hidden className="size-3.5" />
+                  Sign in with Microsoft
+                </a>
+              </>
+            ) : (
+              <>
+                <p className="text-[13px] leading-5 text-ink-2">Development sign-in: the Studio asks GitHub which account is signed in on this computer. This is not a production identity.</p>
+                <button type="button" data-testid="sign-in" className={`${btn} mt-2.5`} onClick={() => void signIn()} disabled={busy}>
+                  <LogIn aria-hidden className="size-3.5" />
+                  Sign in with GitHub
+                </button>
+              </>
+            )}
             {signInError ? (
               <p role="alert" className="mt-2 text-[12.5px] leading-5 text-[var(--s-rejected-fg)]">
                 {signInError}
@@ -324,7 +344,7 @@ export function ReviewRail({ id, options }: { id: string; options: OptionChoice[
         )}
         {!v.policy.configured ? (
           <p role="note" data-testid="no-approvers" className="mt-3 rounded-lg px-3 py-2 text-[12.5px] leading-5" style={{ background: 'var(--s-open-bg)', color: 'var(--s-open-fg)' }}>
-            No approver is configured, so nobody can decide yet. Register approvers in <span className="font-mono">harness/policy/decision-workflow.json</span> through a reviewed change.
+            No approver is enrolled, so nobody can decide yet. Enroll approvers in <span className="font-mono">harness/policy/access-policy.json</span> through a reviewed change.
           </p>
         ) : v.policy.source !== 'canonical' ? (
           <p role="note" className="mt-3 rounded-lg px-3 py-2 text-[12.5px] leading-5" style={{ background: 'var(--s-open-bg)', color: 'var(--s-open-fg)' }}>
@@ -376,6 +396,26 @@ export function ReviewRail({ id, options }: { id: string; options: OptionChoice[
       <Card className="p-4">
         <h2 className="text-[13px] font-semibold text-ink-2">Decide</h2>
         <p className="mt-0.5 mb-2.5 text-[12.5px] text-ink-3">One decision, one action at a time. Nothing here changes the repository directly.</p>
+        <p data-testid="governance" data-domain={v.governance.domain} className="mb-2.5 rounded-lg bg-surface-2 px-3 py-2 text-[12.5px] leading-5 text-ink-2">
+          <span className="font-medium text-ink">Approval domain: {v.governance.domain}.</span>{' '}
+          {v.governance.domain === 'regulatory' || v.governance.domain === 'unclassified'
+            ? 'The Studio does not approve this kind of record. A regulatory filing or an unclassified record is approved outside it.'
+            : v.governance.designated === false
+              ? 'You are not designated to approve this decision. Designation is set in the access policy.'
+              : v.governance.designated === true
+                ? 'You are the designated approver for this decision.'
+                : 'Only the designated approver can decide it.'}{' '}
+          Architecture approval never authorises a regulatory filing or a deployment.
+        </p>
+        {v.actions.some((a) => a.authCode === 'reauth-required') ? (
+          <p data-testid="reauth-notice" className="mb-2.5 rounded-lg px-3 py-2 text-[12.5px] leading-5" style={{ background: 'var(--s-open-bg)', color: 'var(--s-open-fg)' }}>
+            Approving needs a recent sign-in.{' '}
+            <a data-testid="reauth-link" className="font-medium underline" href={`/api/v1/auth/entra/login?reauth=1&next=${encodeURIComponent(`/decisions/${id}/review`)}`}>
+              Sign in again to approve
+            </a>
+            .
+          </p>
+        ) : null}
         <ul className="space-y-1.5" aria-label="Actions">
           {PRIMARY.map((a) => button(a, true))}
         </ul>
@@ -418,7 +458,7 @@ export function ReviewRail({ id, options }: { id: string; options: OptionChoice[
         </div>
         {data.next ? <p className="mt-2 truncate text-[12.5px] text-ink-3">Next: {data.next.id}, {data.next.title}</p> : <p className="mt-2 text-[12.5px] text-ink-3">No more pending decisions after this one.</p>}
         <p className="mt-1.5 text-[12px] text-ink-3">
-          Keys: <kbd className="font-mono">N</kbd> next, <kbd className="font-mono">P</kbd> previous, <kbd className="font-mono">A R D V C O</kbd> actions.
+          Keys: <kbd className="font-mono">N</kbd> next, <kbd className="font-mono">P</kbd> previous, <kbd className="font-mono">A R D V C O M</kbd> actions.
         </p>
       </Card>
 

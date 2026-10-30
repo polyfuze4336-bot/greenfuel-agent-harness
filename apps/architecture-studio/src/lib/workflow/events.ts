@@ -3,8 +3,9 @@
 // decision, so a missing, reordered or edited event is detected. This module is pure: no file, network or clock access.
 import crypto from 'node:crypto';
 import type { NormStatus } from '../intel/schema.ts';
+import type { RecordSignature } from '../auth/signing.ts';
 
-export const EVENT_SCHEMA = 'greenfuel.decision-review-event/v1';
+export const EVENT_SCHEMA = 'greenfuel.decision-review-event/v2';
 export const REVIEW_DIR = 'docs/decision-reviews';
 
 import { ACTIONS, ACTION_LABEL, type ActionKind } from './labels.ts';
@@ -12,11 +13,15 @@ export { ACTIONS, ACTION_LABEL, type ActionKind };
 
 export const DECISION_ID = /^(ADR-\d{4}|D-\d{3})$/;
 
+/** Who did it. The subject is the stable identity (a GitHub id, or an Entra tenant and object id); the login is only a display handle. */
 export interface Actor {
   login: string;
-  githubId: number;
+  githubId: number | null;
   name: string | null;
-  verifiedBy: 'github-api' | 'test-fixture';
+  verifiedBy: 'github-api' | 'test-fixture' | 'entra-oidc';
+  provider: 'entra' | 'github';
+  subject: string;
+  tenantId: string | null;
 }
 
 export interface RoleCheck {
@@ -29,6 +34,13 @@ export interface RoleCheck {
   /** Named roles the actor does not hold: a reviewer of the pull request should expect their input. */
   outstanding: string[];
   policySource: 'canonical' | 'local-head-not-canonical';
+  /** The approval domain the record was classified into, and the hash of the access policy it was decided under. */
+  domain: string;
+  policyHash: string;
+  /** The authorization checks that passed, by name. */
+  checks: string[];
+  authAgeSeconds: number;
+  mfa: boolean;
 }
 
 export interface OptionRef {
@@ -51,8 +63,12 @@ export interface ReviewEvent {
   conditions: string[];
   rationale: string | null;
   comment: string | null;
+  /** For a recommend action: approve, reject or revise. Null otherwise. */
+  recommendation: string | null;
   roleCheck: RoleCheck;
   eventHash: string;
+  /** The server's signature over the hash. Without a valid one the record is not an approval. */
+  signature: RecordSignature | null;
 }
 
 export type ReviewPhase = 'none' | 'approved' | 'approved-with-conditions' | 'rejected' | 'revision-requested' | 'deferred' | 'reopened';
@@ -87,9 +103,11 @@ export function canonicalJson(v: unknown): string {
 
 export const sha256 = (s: string) => crypto.createHash('sha256').update(s).digest('hex');
 
-export function hashEvent(e: Omit<ReviewEvent, 'eventHash'> | ReviewEvent): string {
-  const { eventHash: _omit, ...rest } = e as ReviewEvent;
-  void _omit;
+/** The hash covers everything except itself and the signature, which is made over the hash. */
+export function hashEvent(e: Omit<ReviewEvent, 'eventHash' | 'signature'> | ReviewEvent): string {
+  const { eventHash: _h, signature: _s, ...rest } = e as ReviewEvent;
+  void _h;
+  void _s;
   return sha256(canonicalJson(rest));
 }
 
@@ -99,7 +117,7 @@ export const serializeEvent = (e: ReviewEvent) => `${JSON.stringify(e, null, 2)}
 
 // ---- parsing
 
-const KEYS = ['schema', 'id', 'decisionId', 'seq', 'action', 'actor', 'createdAt', 'basis', 'prevHash', 'option', 'conditions', 'rationale', 'comment', 'roleCheck', 'eventHash'];
+const KEYS = ['schema', 'id', 'decisionId', 'seq', 'action', 'actor', 'createdAt', 'basis', 'prevHash', 'option', 'conditions', 'rationale', 'comment', 'recommendation', 'roleCheck', 'eventHash', 'signature'];
 
 /** Strict parse: unknown keys, wrong types or a hash that does not match are refused. */
 export function parseEvent(text: string): { event: ReviewEvent } | { error: string } {
@@ -120,7 +138,9 @@ export function parseEvent(text: string): { event: ReviewEvent } | { error: stri
   if (!Number.isInteger(r.seq) || (r.seq as number) < 1) return { error: 'bad seq' };
   if (!ACTIONS.includes(r.action as ActionKind)) return { error: 'unknown action' };
   const a = r.actor as Record<string, unknown> | null;
-  if (!a || typeof a.login !== 'string' || !a.login || !Number.isInteger(a.githubId)) return { error: 'bad actor' };
+  if (!a || typeof a.login !== 'string' || !a.login || (a.githubId !== null && !Number.isInteger(a.githubId))) return { error: 'bad actor' };
+  if ((a.provider !== 'entra' && a.provider !== 'github') || typeof a.subject !== 'string' || !a.subject || (a.tenantId !== null && typeof a.tenantId !== 'string')) return { error: 'bad actor identity' };
+  if (r.signature !== null && (typeof r.signature !== 'object' || Array.isArray(r.signature))) return { error: 'bad signature field' };
   if (typeof r.createdAt !== 'string' || Number.isNaN(Date.parse(r.createdAt))) return { error: 'bad createdAt' };
   if (typeof r.eventHash !== 'string' || !/^[0-9a-f]{64}$/.test(r.eventHash)) return { error: 'bad eventHash' };
   if (r.prevHash !== null && !(typeof r.prevHash === 'string' && /^[0-9a-f]{64}$/.test(r.prevHash))) return { error: 'bad prevHash' };
@@ -145,9 +165,9 @@ export function permittedIn(phase: ReviewPhase): ActionKind[] {
     case 'none':
       // Reopen from "no review yet" is how a source-approved or source-rejected decision is revisited. Whether the
       // source status allows it is checked when the action is requested.
-      return [...DECIDING, 'reopen', 'comment'];
+      return [...DECIDING, 'reopen', 'comment', 'recommend'];
     default:
-      return [...DECIDING, 'comment'];
+      return [...DECIDING, 'comment', 'recommend'];
   }
 }
 
@@ -167,6 +187,7 @@ export function nextPhase(phase: ReviewPhase, a: ActionKind): ReviewPhase {
     case 'reopen':
       return 'reopened';
     case 'comment':
+    case 'recommend':
       return phase;
   }
 }
@@ -192,7 +213,7 @@ export function applyEvent(s: ReviewState, e: ReviewEvent): ReviewState | { erro
   if (e.prevHash !== s.headHash) return { error: 'prevHash does not match the previous event: an event is missing, reordered or replaced' };
   if (!permittedIn(s.phase).includes(e.action)) return { error: `"${e.action}" is not allowed while the decision is ${s.phase}` };
   const phase = nextPhase(s.phase, e.action);
-  const decides = e.action !== 'comment';
+  const decides = e.action !== 'comment' && e.action !== 'recommend';
   const approves = phase === 'approved' || phase === 'approved-with-conditions';
   return {
     ...s,

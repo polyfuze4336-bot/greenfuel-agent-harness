@@ -2,6 +2,8 @@ import { guard, ok } from '@/lib/api.ts';
 import { getQueue } from '@/lib/queue/server.ts';
 import { VIEWS, VIEW_LABEL, VIEW_RULE } from '@/lib/queue/views.ts';
 import { currentSession, runtime } from '@/lib/workflow/http.ts';
+import { effectiveRoles, keyOf } from '@/lib/auth/authorize.ts';
+import { authContextFor } from '@/lib/auth/config.ts';
 import type { NextRequest } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -13,13 +15,14 @@ export function GET(req: NextRequest) {
     const rt = runtime();
     const policy = rt.service.policy();
     const session = currentSession(req);
-    const mine = session ? policy.people.find((p) => p.githubLogin.toLowerCase() === session.user.login.toLowerCase() && p.githubId === session.user.id) : undefined;
+    const ctx = authContextFor(policy);
+    const roles = session ? effectiveRoles(session.user, ctx).roles : [];
     return ok({
       ...q.snapshot,
       views: VIEWS.map((v) => ({ id: v, label: VIEW_LABEL[v], rule: VIEW_RULE[v] })),
       canonical: { ref: q.snapshot.canonicalRef, commit: q.canonicalCommit, available: q.canonicalAvailable },
-      policy: { source: policy.source, completionRoles: policy.work.completionRoles, independent: policy.work.requireIndependentApproval, people: policy.people.map((p) => ({ login: p.githubLogin, holder: p.holder, roles: p.roles })) },
-      me: session ? { login: session.user.login, roles: mine?.roles ?? [], listed: !!mine } : null,
+      policy: { source: policy.source, completionRoles: ['architecture-owner'], independent: policy.segregation.enforce, people: policy.people.filter((p) => p.revokedAt === null).map((p) => ({ login: p.login, holder: p.holder, roles: p.roles })) },
+      me: session ? { login: session.user.login, roles, listed: policy.people.some((p) => p.subject === keyOf(session.user)) } : null,
     });
   });
 }

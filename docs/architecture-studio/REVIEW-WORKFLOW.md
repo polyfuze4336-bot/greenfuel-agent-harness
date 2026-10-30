@@ -53,7 +53,7 @@ Keys on the review page: `N` and `P` for the next and previous pending decision;
 ## 4. Identity and roles
 
 - **Identity** comes from GitHub, not from a typed name. The Studio runs `gh api user` and requires an account of type `User`. It reads no token. It refuses to sign in inside an agent session (`HARNESS_AGENT_SESSION`).
-- **Roles** come from `harness/policy/decision-workflow.json` on the canonical branch. A person is recognised only if **both** the login and the numeric GitHub id match, so a renamed or recycled login gets nothing. The file ships with one registered approver; any other account is denied every decision action.
+- **Roles and approval authority** come from `harness/policy/access-policy.json` on the canonical branch, evaluated by the server for every action: roles, approval domains, designated approvers, sign-in freshness and segregation of duties. People are identified by a stable subject (`github:<numeric id>` or `entra:<tenant>:<object id>`), never by a name, so a renamed or recycled login gets nothing. The old `decision-workflow.json` is gone. See [ACCESS-CONTROL](ACCESS-CONTROL.md).
 - If the policy is not yet on the canonical branch, the local copy is used and **every event records that**, so the pull request reviewer sees it.
 - The policy is a control-plane file (`harness/`). Changing who may approve is a reviewed repository change, never a Studio action.
 - A role that a record names but the approver does not hold is listed in the pull request ("roles named by the record but not held").
@@ -147,7 +147,7 @@ Run 2026-10-30: 38 workflow unit tests (85 unit tests in the Studio), 26 review-
 
 Recorded as owner TODO T62.
 
-1. **Approvers.** On the owner's chat instruction (2026-10-30) `polyfuze4336-bot`, GitHub id 225331490, is registered as programme owner in `harness/policy/decision-workflow.json`, committed locally and not pushed. Add anyone else, with their roles, through a reviewed change. A programme owner can decide every decision, including critical ones.
+1. **Approvers.** On the owner's chat instruction (2026-10-30) `polyfuze4336-bot`, GitHub id 225331490, is enrolled as Architecture Owner (bootstrap) in `harness/policy/access-policy.json`, committed locally and not pushed. Add anyone else through a reviewed change. This account can decide architecture-domain decisions only when the operator sets `STUDIO_ALLOW_DEV_APPROVALS=1` (development) or after real Entra enrollment; it cannot decide security, regulatory or unclassified decisions, and cannot decide what it proposed. See [ACCESS-CONTROL](ACCESS-CONTROL.md).
 2. **Push the policy and the Studio branches** so the policy is on `origin/main` and decisions record `canonical`.
 3. **Whether a merged review record counts as approval** for this programme, or only as a recommendation until a signed approval exists. The Studio labels it "review record" either way.
 4. **Authorising ADR** for the Studio and this write path (T61 item 3).

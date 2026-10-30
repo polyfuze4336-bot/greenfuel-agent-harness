@@ -64,5 +64,5 @@ export function POST(req: NextRequest) {
     rt.deliveries.record(delivery);
     audit('webhook-handled', `${event}${target.action ? `/${target.action}` : ''} re-checked ${report.checked} proposal(s); ${report.advanced.length} advanced`);
     return ok({ handled: true, checked: report.checked, advanced: report.advanced });
-  });
+  }, { public: true });
 }

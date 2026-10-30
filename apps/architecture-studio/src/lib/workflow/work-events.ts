@@ -3,13 +3,15 @@
 // one JSON file per action under docs/work-items/<item id>/, hash-chained to the one before, sent as a pull request.
 // Pure: no file, network or clock access.
 import { canonicalJson, sha256, type Actor, type RoleCheck } from './events.ts';
+import type { RecordSignature } from '../auth/signing.ts';
+import { subjectKeyOf } from '../auth/access-policy.ts';
 import type { Priority } from '../queue/types.ts';
 import { PRIORITIES } from '../queue/types.ts';
 
 import { WORK_ACTIONS, WORK_ACTION_LABEL, type WorkAction } from './labels.ts';
 export { WORK_ACTIONS, WORK_ACTION_LABEL, type WorkAction };
 
-export const WORK_EVENT_SCHEMA = 'greenfuel.work-item-event/v1';
+export const WORK_EVENT_SCHEMA = 'greenfuel.work-item-event/v2';
 export const WORK_DIR = 'docs/work-items';
 
 /** Item ids are safe path segments: T14, R1b, B-01, G-12, RK-001, RV-0001, SF-N4, RC-A1, D-010, ADR-0004. */
@@ -34,6 +36,8 @@ export interface WorkEvent {
   blockedBy: string[];
   roleCheck: RoleCheck;
   eventHash: string;
+  /** The server's signature over the hash. Without a valid one the record is not an approval. */
+  signature: RecordSignature | null;
 }
 
 export type WorkPhase = 'none' | 'active' | 'blocked' | 'clarification' | 'in-review' | 'completed';
@@ -48,6 +52,8 @@ export interface WorkState {
   headHash: string | null;
   /** Who last submitted the item for review, and with which evidence. */
   submittedBy: string | null;
+  /** The stable identity of who submitted it, for segregation of duties. */
+  submittedBySubject: string | null;
   evidence: string[];
   blockedBy: string[];
   completedBy: WorkEvent | null;
@@ -58,13 +64,14 @@ export const workEventPath = (id: string, seq: number, action: WorkAction) => `$
 export const workEventId = (id: string, seq: number) => `WI-${id}-${String(seq).padStart(4, '0')}`;
 export const serializeWorkEvent = (e: WorkEvent) => `${JSON.stringify(e, null, 2)}\n`;
 
-export function hashWorkEvent(e: Omit<WorkEvent, 'eventHash'> | WorkEvent): string {
-  const { eventHash: _omit, ...rest } = e as WorkEvent;
-  void _omit;
+export function hashWorkEvent(e: Omit<WorkEvent, 'eventHash' | 'signature'> | WorkEvent): string {
+  const { eventHash: _h, signature: _s, ...rest } = e as WorkEvent;
+  void _h;
+  void _s;
   return sha256(canonicalJson(rest));
 }
 
-const KEYS = ['schema', 'id', 'itemId', 'seq', 'action', 'actor', 'createdAt', 'basis', 'prevHash', 'assignee', 'priority', 'dueDate', 'rationale', 'comment', 'evidence', 'blockedBy', 'roleCheck', 'eventHash'];
+const KEYS = ['schema', 'id', 'itemId', 'seq', 'action', 'actor', 'createdAt', 'basis', 'prevHash', 'assignee', 'priority', 'dueDate', 'rationale', 'comment', 'evidence', 'blockedBy', 'roleCheck', 'eventHash', 'signature'];
 
 export function parseWorkEvent(text: string): { event: WorkEvent } | { error: string } {
   let o: unknown;
@@ -84,7 +91,9 @@ export function parseWorkEvent(text: string): { event: WorkEvent } | { error: st
   if (!Number.isInteger(r.seq) || (r.seq as number) < 1) return { error: 'bad seq' };
   if (!WORK_ACTIONS.includes(r.action as WorkAction)) return { error: 'unknown action' };
   const a = r.actor as Record<string, unknown> | null;
-  if (!a || typeof a.login !== 'string' || !a.login || !Number.isInteger(a.githubId)) return { error: 'bad actor' };
+  if (!a || typeof a.login !== 'string' || !a.login || (a.githubId !== null && !Number.isInteger(a.githubId))) return { error: 'bad actor' };
+  if ((a.provider !== 'entra' && a.provider !== 'github') || typeof a.subject !== 'string' || !a.subject || (a.tenantId !== null && typeof a.tenantId !== 'string')) return { error: 'bad actor identity' };
+  if (r.signature !== null && (typeof r.signature !== 'object' || Array.isArray(r.signature))) return { error: 'bad signature field' };
   if (typeof r.createdAt !== 'string' || Number.isNaN(Date.parse(r.createdAt))) return { error: 'bad createdAt' };
   if (typeof r.eventHash !== 'string' || !/^[0-9a-f]{64}$/.test(r.eventHash)) return { error: 'bad eventHash' };
   if (r.prevHash !== null && !(typeof r.prevHash === 'string' && /^[0-9a-f]{64}$/.test(r.prevHash))) return { error: 'bad prevHash' };
@@ -138,7 +147,7 @@ export function nextWorkPhase(phase: WorkPhase, a: WorkAction): WorkPhase {
 }
 
 export function emptyWorkState(itemId: string): WorkState {
-  return { itemId, events: [], phase: 'none', assignee: null, priority: null, dueDate: null, headHash: null, submittedBy: null, evidence: [], blockedBy: [], completedBy: null, problems: [] };
+  return { itemId, events: [], phase: 'none', assignee: null, priority: null, dueDate: null, headHash: null, submittedBy: null, submittedBySubject: null, evidence: [], blockedBy: [], completedBy: null, problems: [] };
 }
 
 export function applyWorkEvent(s: WorkState, e: WorkEvent): WorkState | { error: string } {
@@ -157,6 +166,7 @@ export function applyWorkEvent(s: WorkState, e: WorkEvent): WorkState | { error:
   if (e.action === 'unblock') next.blockedBy = [];
   if (e.action === 'submit-for-review') {
     next.submittedBy = e.actor.login;
+    next.submittedBySubject = subjectKeyOf(e.actor);
     next.evidence = e.evidence;
   }
   if (e.action === 'approve-completion') next.completedBy = e;

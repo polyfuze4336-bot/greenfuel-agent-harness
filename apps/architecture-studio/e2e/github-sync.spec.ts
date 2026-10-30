@@ -251,14 +251,14 @@ test.describe('validation, rejected pull requests and failures', () => {
 
 test.describe('concurrent changes', () => {
   test('GitHub changed after the decision was opened: a conflict view shows original, current and proposed, and sends nothing until the person reconciles', async ({ page, request }) => {
-    await open(page, 'D-036');
+    await open(page, 'D-037');
     await signIn(page);
     await expect(status(page)).toContainText('Pending Review');
 
     // Meanwhile another person comments on the same decision, and it is merged on GitHub.
     const csrf = await apiSession(request);
-    const made = (await (await apiAct(request, csrf, 'D-036', { action: 'comment', comment: 'A colleague added context first.', expectedRevision: await revisionOf(request, 'D-036'), idempotencyKey: 'colleague-key-1234' })).json()) as { proposal: { id: string } };
-    const pr = await prFor(request, 'D-036');
+    const made = (await (await apiAct(request, csrf, 'D-037', { action: 'comment', comment: 'A colleague added context first.', expectedRevision: await revisionOf(request, 'D-037'), idempotencyKey: 'colleague-key-1234' })).json()) as { proposal: { id: string } };
+    const pr = await prFor(request, 'D-037');
     await ctl(request, 'merge', pr.number);
     expect((await (await apiSync(request, csrf, made.proposal.id)).json()).proposal.state).toBe('applied');
     const writes = (await fake(request)).refWrites.length;
@@ -287,7 +287,7 @@ test.describe('concurrent changes', () => {
     await expect(d).toBeHidden({ timeout: 40_000 });
     await expect(tracker(page)).toHaveAttribute('data-state', 'pull-request-created');
     expect((await fake(request)).refWrites.length).toBe(writes + 1);
-    const audit = (await (await request.get('/api/v1/review/D-036')).json()) as { audit: { outcome: string; action: string }[] };
+    const audit = (await (await request.get('/api/v1/review/D-037')).json()) as { audit: { outcome: string; action: string }[] };
     expect(audit.audit.some((a) => a.outcome === 'stale' && a.action === 'defer'), 'the refusal is in the audit log').toBe(true);
   });
 

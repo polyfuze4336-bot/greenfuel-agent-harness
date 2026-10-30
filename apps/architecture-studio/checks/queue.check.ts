@@ -20,8 +20,10 @@ import { parsePolicy } from '../src/lib/workflow/rules.ts';
 import { ReviewStore } from '../src/lib/workflow/store.ts';
 import { WorkService, loadWorkStates, type WorkContext } from '../src/lib/workflow/work.ts';
 import { WORK_ACTIONS, applyWorkEvent, emptyWorkState, foldWorkEvents, hashWorkEvent, parseWorkEvent, serializeWorkEvent, workEventId, workPermittedIn, type WorkAction, type WorkEvent, type WorkState } from '../src/lib/workflow/work-events.ts';
-import { authoriseWork, validateWorkRequest, workAvailability } from '../src/lib/workflow/work-rules.ts';
-import { PEOPLE, USERS, git, makeFixture, policyJson, type Fixture } from './fixtures/review-fixture.ts';
+import { validateWorkRequest, workAvailability } from '../src/lib/workflow/work-rules.ts';
+import { parseAccessPolicy } from '../src/lib/auth/access-policy.ts';
+import { authorizeWork, type Principal } from '../src/lib/auth/authorize.ts';
+import { USERS, git, installTestAuth, makeFixture, policyJson, subjectOf, type Fixture } from './fixtures/review-fixture.ts';
 
 const fixtures: Fixture[] = [];
 after(() => {
@@ -403,14 +405,16 @@ describe('the whole snapshot', () => {
 
 // ---------------------------------------------------------------- work-item events and rules
 
-const owner = { login: 'test-owner', githubId: 1001, name: 'Test Owner', verifiedBy: 'test-fixture' as const };
+const auth = installTestAuth();
+const owner = { login: 'test-owner', githubId: 1001, name: 'Test Owner', verifiedBy: 'test-fixture' as const, provider: 'github' as const, subject: '1001', tenantId: null };
 function ev(itemId: string, seq: number, action: WorkAction, prev: string | null, over: Partial<WorkEvent> = {}): WorkEvent {
   const body = {
-    schema: 'greenfuel.work-item-event/v1' as const, id: workEventId(itemId, seq), itemId, seq, action, actor: owner, createdAt: new Date(Date.UTC(2026, 9, 30, 1, seq)).toISOString(),
+    schema: 'greenfuel.work-item-event/v2' as const, id: workEventId(itemId, seq), itemId, seq, action, actor: owner, createdAt: new Date(Date.UTC(2026, 9, 30, 1, seq)).toISOString(),
     basis: { itemHash: 'h', sourceStatus: 'x', sourcePath: 'docs/state/TODO.md' }, prevHash: prev, assignee: null, priority: null, dueDate: null, rationale: null, comment: null, evidence: [], blockedBy: [],
-    roleCheck: { critical: false, required: [], held: ['programme-owner'], namedRoles: [], outstanding: [], policySource: 'canonical' as const }, ...over,
+    roleCheck: { critical: false, required: [], held: ['architecture-owner'], namedRoles: [], outstanding: [], policySource: 'canonical' as const, domain: 'architecture', policyHash: '', checks: [], authAgeSeconds: 0, mfa: false }, ...over,
   };
-  return { ...body, eventHash: hashWorkEvent(body) };
+  const eventHash = hashWorkEvent(body);
+  return { ...body, eventHash, signature: auth.signer.sign(eventHash) } as WorkEvent;
 }
 function chain(itemId: string, steps: [WorkAction, Partial<WorkEvent>?][]): WorkState {
   let s = emptyWorkState(itemId);
@@ -479,26 +483,31 @@ describe('work-item state machine', () => {
 });
 
 describe('work-item rules', () => {
-  const policy = parsePolicy(policyJson([...PEOPLE, { githubLogin: 'test-owner2', githubId: 1005, holder: 'Owner Two', roles: ['programme-owner'] }]), 'canonical');
+  const policy = parseAccessPolicy(policyJson(), 'canonical');
   const inReview = chain('T5', [['submit-for-review', { evidence: ['EV-0001'] }]]);
+  const principal = (u: { login: string; id: number }): Principal => ({ provider: 'github', subject: String(u.id), tenantId: null, login: u.login, name: null, id: u.id, type: 'User', verifiedBy: 'test-fixture', entraRoles: [], entraGroups: [], mfa: false, authAt: Date.parse('2026-10-30T00:00:00Z') });
+  const ctx = { policy, now: Date.parse('2026-10-30T00:05:00Z'), devApprovals: true } as const;
+  const can = (u: { login: string; id: number }, action: Parameters<typeof authorizeWork>[0]['action'], submitter: string | null = null) => authorizeWork({ principal: principal(u), action, itemId: 'T5', submitter }, ctx);
 
-  it('lets a registered owner act, anyone comment, and no one else decide', () => {
-    assert.equal(authoriseWork({ login: 'test-owner', githubId: 1001 }, 'assign', emptyWorkState('T5'), policy).ok, true);
-    assert.equal(authoriseWork({ login: 'test-outsider', githubId: 1003 }, 'comment', emptyWorkState('T5'), policy).ok, true);
-    assert.equal(authoriseWork({ login: 'test-outsider', githubId: 1003 }, 'assign', emptyWorkState('T5'), policy).code, 'not-listed');
-    assert.equal(authoriseWork({ login: 'test-owner', githubId: 9999 }, 'assign', emptyWorkState('T5'), policy).code, 'not-listed', 'right login, wrong id');
-    assert.equal(authoriseWork({ login: 'test-owner', githubId: 1001 }, 'assign', emptyWorkState('T5'), parsePolicy(policyJson([]), 'canonical')).code, 'no-policy');
+  it('lets an architecture owner act, a viewer only read, and nobody decide who holds no approval permission', () => {
+    assert.equal(can(USERS.owner, 'assign').ok, true);
+    assert.equal(can(USERS.contrib, 'comment').ok, true);
+    assert.equal(can(USERS.outsider, 'comment').code, 'missing-permission', 'a viewer cannot comment');
+    assert.equal(can(USERS.outsider, 'assign').code, 'missing-permission');
+    assert.equal(can({ login: 'test-owner', id: 9999 }, 'assign').code, 'missing-permission', 'right login, wrong id: only a viewer');
+    const none = authorizeWork({ principal: principal(USERS.owner), action: 'assign', itemId: 'T5', submitter: null }, { ...ctx, policy: parseAccessPolicy(policyJson({ people: [] }), 'canonical') });
+    assert.equal(none.code, 'missing-permission');
   });
 
-  it('keeps completion approval to the configured role, and from the submitter when required', () => {
-    assert.equal(authoriseWork({ login: 'test-quality', githubId: 1002 }, 'approve-completion', inReview, policy).code, 'missing-role');
-    assert.equal(authoriseWork({ login: 'test-owner', githubId: 1001 }, 'approve-completion', inReview, policy).code, 'self-approval');
-    assert.equal(authoriseWork({ login: 'test-owner', githubId: 1001 }, 'reject-completion', inReview, policy).code, 'self-approval');
-    assert.equal(authoriseWork({ login: 'test-owner2', githubId: 1005 }, 'approve-completion', inReview, policy).ok, true);
-    const lax = parsePolicy(policyJson(PEOPLE, { requireIndependentCompletionApproval: false }), 'canonical');
-    assert.equal(authoriseWork({ login: 'test-owner', githubId: 1001 }, 'approve-completion', inReview, lax).ok, true, 'a one-person programme can be configured to approve its own work');
+  it('keeps completion approval to an architecture owner, and from the submitter', () => {
+    const submitter = subjectOf(USERS.owner);
+    assert.equal(can(USERS.security, 'approve-completion', submitter).code, 'missing-permission');
+    assert.equal(can(USERS.admin, 'approve-completion', submitter).code, 'missing-permission', 'an administrator does not approve');
+    assert.equal(can(USERS.owner, 'approve-completion', submitter).code, 'sod-submitter');
+    assert.equal(can(USERS.owner, 'reject-completion', submitter).code, 'sod-submitter');
+    assert.equal(can(USERS.owner2, 'approve-completion', submitter).ok, true);
+    void inReview;
   });
-
   it('offers each action only where it makes sense for the kind and source status', () => {
     const allowed = (i: WorkItem, s = emptyWorkState(i.id)) => workAvailability(i, s).filter((a) => a.allowed).map((a) => a.action);
     assert.ok(allowed(item({ id: 'T6' })).includes('submit-for-review'));
@@ -605,7 +614,7 @@ function world(policy?: string, github?: (real: LocalGitHub) => LocalGitHub) {
   return { fx, store, real, review, work, ctx, as, act, land, key };
 }
 const code = (c: string) => (e: unknown) => e instanceof ServiceError && e.code === c;
-const OWNERS = policyJson([...PEOPLE, { githubLogin: 'test-owner2', githubId: 1005, holder: 'Owner Two', roles: ['programme-owner'] }]);
+const OWNERS = policyJson();
 
 describe('work-item service', () => {
   it('assigns through a pull request: nothing is assigned until the merge is verified', async () => {
@@ -615,7 +624,7 @@ describe('work-item service', () => {
     await assert.rejects(w.act(it, u, 'assign', { assignee: 'nobody' }), code('invalid'), 'an unregistered person cannot be assigned');
     await assert.rejects(w.act(it, u, 'assign', { assignee: 'test-owner', dueDate: '2026-99-99' }), code('invalid'));
     const before = git(w.fx.work, 'status', '--porcelain');
-    const { proposal } = await w.act(it, u, 'assign', { assignee: 'test-quality', dueDate: '2026-11-05' });
+    const { proposal } = await w.act(it, u, 'assign', { assignee: 'test-contrib', dueDate: '2026-11-05' });
     assert.equal(proposal.family, 'work');
     assert.ok(proposal.branch.startsWith('work-item/T1/0001-assign-'));
     const sent = await w.work.sync(proposal.id);
@@ -625,7 +634,7 @@ describe('work-item service', () => {
     w.fx.merge(sent.prNumber!);
     assert.equal((await w.work.sync(proposal.id)).state, 'applied');
     const s = w.work.canonical().states.get('T1')!;
-    assert.equal(s.assignee, 'test-quality');
+    assert.equal(s.assignee, 'test-contrib');
     assert.equal(s.dueDate, '2026-11-05');
     assert.equal(git(w.fx.work, 'status', '--porcelain'), before, 'the working tree was not touched');
     const file = git(w.fx.remote, 'diff-tree', '--no-commit-id', '--name-only', '-r', 'refs/heads/main');
@@ -646,9 +655,9 @@ describe('work-item service', () => {
     await w.land(it, u, 'submit-for-review', { evidence: ['EV-0001', 'docs/proof/result.md'] });
     assert.equal(w.work.canonical().states.get('T2')!.phase, 'in-review');
 
-    await assert.rejects(w.act(it, u, 'approve-completion'), code('self-approval'), 'the submitter may not approve their own work');
-    const q = await w.as(USERS.quality);
-    await assert.rejects(w.act(it, q, 'approve-completion'), code('missing-role'));
+    await assert.rejects(w.act(it, u, 'approve-completion'), code('sod-submitter'), 'the submitter may not approve their own work');
+    const q = await w.as(USERS.security);
+    await assert.rejects(w.act(it, q, 'approve-completion'), code('missing-permission'));
     const o2 = await w.as(USERS.owner2);
     await w.land(it, o2, 'approve-completion', { rationale: 'Evidence covers the acceptance criteria.' });
     const s = w.work.canonical().states.get('T2')!;
@@ -699,8 +708,10 @@ describe('work-item service', () => {
     const it = item({ id: 'T1' });
     await assert.rejects(w.act(it, null, 'comment', { comment: 'hello' }), code('unauthenticated'));
     const out = await w.as(USERS.outsider);
-    await assert.rejects(w.act(it, out, 'assign', { assignee: 'test-owner' }), code('not-listed'));
-    const { proposal } = await w.act(it, out, 'comment', { comment: 'A question from outside the team.' });
+    await assert.rejects(w.act(it, out, 'assign', { assignee: 'test-owner' }), code('missing-permission'));
+    await assert.rejects(w.act(it, out, 'comment', { comment: 'A question from outside the team.' }), code('missing-permission'), 'a viewer cannot comment');
+    const contrib = await w.as(USERS.contrib);
+    const { proposal } = await w.act(it, contrib, 'comment', { comment: 'A question from the team.' });
     assert.equal(proposal.state, 'locally-submitted');
     await w.work.sync(proposal.id);
 
@@ -715,7 +726,7 @@ describe('work-item service', () => {
     const v2 = w2.work.view(it, u);
     await assert.rejects(w2.work.submit(u, it, { ...req, comment: 'two', idempotencyKey: 'dup-work-key-3', expectedRevision: v2.revision }, w2.ctx), code('proposal-open'));
     assert.equal(w2.store.list().length, 1);
-    w2.fx.setIdentity(USERS.quality);
+    w2.fx.setIdentity(USERS.security);
     await assert.rejects(w2.work.submit(u, it, { ...req, idempotencyKey: 'dup-work-key-4' }, w2.ctx), code('identity-changed'));
   });
 

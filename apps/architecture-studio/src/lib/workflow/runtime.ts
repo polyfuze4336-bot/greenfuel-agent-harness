@@ -14,6 +14,8 @@ import { GitHubApi } from '../github/api.ts';
 import { AppAuth, appConfigFromEnv, type AppConfig } from '../github/app-auth.ts';
 import { AppGitHub, AppPublisher } from '../github/app-github.ts';
 import { DeliveryLog } from '../github/webhook.ts';
+import { EntraClient } from '../auth/entra.ts';
+import { authConfig } from '../auth/config.ts';
 import type { GitHubPort } from './github.ts';
 import type { Publisher } from './publish.ts';
 import type { NormalizedDecision } from '../intel/schema.ts';
@@ -33,6 +35,8 @@ interface Runtime {
   github: GitHubPort;
   app: { config: AppConfig; auth: AppAuth; api: GitHubApi } | null;
   deliveries: DeliveryLog;
+  /** Microsoft Entra ID sign-in. Present only in entra mode, and only when it is fully configured. */
+  entra: EntraClient | null;
 }
 
 const g = globalThis as unknown as { __studioReview?: Runtime };
@@ -40,7 +44,8 @@ const g = globalThis as unknown as { __studioReview?: Runtime };
 export function reviewRuntime(root: string, readRef: string): Runtime {
   const cache = process.env.STUDIO_CACHE_DIR?.trim() || path.resolve(process.cwd(), '.studio-cache');
   const appCfg = appConfigFromEnv();
-  const key = [root, readRef, canonicalRefName(), cache, isTestMode(), process.env.STUDIO_TEST_FIXTURE_DIR ?? '', appCfg?.repo ?? '', appCfg?.apiUrl ?? ''].join('|');
+  const auth = authConfig();
+  const key = [auth.mode, auth.entra?.clientId ?? '', auth.entra?.authority ?? '', root, readRef, canonicalRefName(), cache, isTestMode(), process.env.STUDIO_TEST_FIXTURE_DIR ?? '', appCfg?.repo ?? '', appCfg?.apiUrl ?? ''].join('|');
   if (g.__studioReview?.key === key) return g.__studioReview;
   const test = isTestMode();
   const fixtures = process.env.STUDIO_TEST_FIXTURE_DIR?.trim() ?? '';
@@ -77,6 +82,7 @@ export function reviewRuntime(root: string, readRef: string): Runtime {
     github,
     app,
     deliveries: new DeliveryLog(path.join(cache, 'webhook-deliveries.json')),
+    entra: auth.entra ? new EntraClient(auth.entra) : null,
   };
   return g.__studioReview;
 }

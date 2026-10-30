@@ -40,7 +40,7 @@ export async function getQueue(): Promise<QueueRead> {
     adapter = null;
   }
   const head = openAdapter().commit;
-  const key = [head, adapter?.commit ?? 'none', policy.source, policy.work.completionRoles.join(','), policy.work.requireIndependentApproval].join('|');
+  const key = [head, adapter?.commit ?? 'none', policy.source, policy.hash].join('|');
   const hit = shared.__studioQueue;
   if (hit?.key === key) return hit.read;
 
@@ -52,7 +52,7 @@ export async function getQueue(): Promise<QueueRead> {
   const snapshot = buildQueue(model, openAdapter(head), {
     work: canonical.states,
     roleAliases: policy.roleAliases,
-    completionRoles: policy.work.completionRoles,
+    completionRoles: ['architecture-owner'],
     canonicalRef: ref,
   });
   const read: QueueRead = {

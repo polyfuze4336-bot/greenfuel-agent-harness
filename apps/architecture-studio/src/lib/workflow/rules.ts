@@ -1,130 +1,25 @@
-// Who may act on a decision, and which actions a decision currently allows. Pure functions.
-// Policy is data in harness/policy/decision-workflow.json. It is a control-plane file: changing who can approve is a
-// reviewed repository change, never a Studio action. An empty or missing policy denies every decision action.
+// Which actions a decision currently offers, and what a request must contain. Pure functions.
+// WHO may take an action is decided in auth/authorize.ts, from the access policy (harness/policy/access-policy.json). This file
+// only says what the decision's own state allows, whatever the person's role: a decision already approved cannot be approved
+// again, a blocked one cannot be approved, and so on.
 import type { NormStatus, NormalizedDecision } from '../intel/schema.ts';
-import { ACTIONS, DECISION_ID, permittedIn, type ActionKind, type Actor, type OptionRef, type ReviewState, type RoleCheck } from './events.ts';
+import { ACCESS_POLICY_PATH, emptyAccessPolicy, parseAccessPolicy, rolesNamed, type AccessPolicy } from '../auth/access-policy.ts';
+import { ACTIONS, DECISION_ID, permittedIn, type ActionKind, type OptionRef, type ReviewState } from './events.ts';
 
-export const POLICY_PATH = 'harness/policy/decision-workflow.json';
-
-export interface PolicyPerson {
-  githubLogin: string;
-  githubId: number;
-  holder: string;
-  roles: string[];
-}
-
-export interface Policy {
-  people: PolicyPerson[];
-  roleAliases: Record<string, string[]>;
-  critical: { priorities: string[]; includeBlocked: boolean; requiredRoles: string[] };
-  reopen: { requiredRoles: string[] };
-  /** Rules for work items: who may approve or reject completion, and whether the submitter may not approve their own work. */
-  work: { completionRoles: string[]; requireIndependentApproval: boolean };
-  source: 'canonical' | 'local-head-not-canonical' | 'missing';
-  problems: string[];
-}
-
-export function emptyPolicy(source: Policy['source'], problem?: string): Policy {
-  return { people: [], roleAliases: {}, critical: { priorities: ['Must'], includeBlocked: true, requiredRoles: [] }, reopen: { requiredRoles: [] }, work: { completionRoles: [], requireIndependentApproval: true }, source, problems: problem ? [problem] : [] };
-}
-
-const strings = (v: unknown): string[] => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string' && x.trim().length > 0) : []);
-
-export function parsePolicy(text: string | undefined, source: Policy['source']): Policy {
-  if (text === undefined) return emptyPolicy('missing', `${POLICY_PATH} does not exist, so nobody can decide.`);
-  let o: Record<string, unknown>;
-  try {
-    o = JSON.parse(text) as Record<string, unknown>;
-  } catch {
-    return emptyPolicy(source, `${POLICY_PATH} is not valid JSON, so nobody can decide.`);
-  }
-  const p = emptyPolicy(source);
-  const aliases = (o.roleAliases && typeof o.roleAliases === 'object' ? o.roleAliases : {}) as Record<string, unknown>;
-  for (const [k, v] of Object.entries(aliases)) p.roleAliases[k] = strings(v).map((s) => s.toLowerCase());
-  const seen = new Set<string>();
-  for (const raw of Array.isArray(o.people) ? o.people : []) {
-    const r = raw as Record<string, unknown>;
-    const login = typeof r.githubLogin === 'string' ? r.githubLogin.trim() : '';
-    const roles = strings(r.roles);
-    if (!login || !Number.isInteger(r.githubId) || (r.githubId as number) <= 0 || typeof r.holder !== 'string' || !r.holder.trim()) {
-      p.problems.push(`A person entry needs githubLogin, a numeric githubId and a holder name: ${login || '(no login)'} was ignored.`);
-      continue;
-    }
-    if (seen.has(login.toLowerCase())) {
-      p.problems.push(`${login} appears twice; the second entry was ignored.`);
-      continue;
-    }
-    const unknown = roles.filter((x) => !(x in p.roleAliases));
-    if (unknown.length) p.problems.push(`${login} has role(s) with no alias entry (${unknown.join(', ')}); they were ignored.`);
-    seen.add(login.toLowerCase());
-    p.people.push({ githubLogin: login, githubId: r.githubId as number, holder: r.holder.trim(), roles: roles.filter((x) => x in p.roleAliases) });
-  }
-  const c = (o.critical ?? {}) as Record<string, unknown>;
-  p.critical = { priorities: strings(c.priorities).length ? strings(c.priorities) : ['Must'], includeBlocked: c.includeBlocked !== false, requiredRoles: strings(c.requiredRoles).filter((r) => r in p.roleAliases) };
-  p.reopen = { requiredRoles: strings((o.reopen as Record<string, unknown> | undefined)?.requiredRoles).filter((r) => r in p.roleAliases) };
-  const w = (o.work ?? {}) as Record<string, unknown>;
-  const completion = strings(w.completionRoles).filter((r) => r in p.roleAliases);
-  p.work = { completionRoles: completion.length ? completion : p.critical.requiredRoles, requireIndependentApproval: w.requireIndependentCompletionApproval !== false };
-  if (!p.people.length) p.problems.push('No approver is configured, so nobody can decide.');
-  return p;
-}
-
-/** Roles held by a verified GitHub account. Both the login and the numeric id must match, so a renamed or recycled login gets nothing. */
-export function rolesHeld(actor: Pick<Actor, 'login' | 'githubId'>, policy: Policy): string[] {
-  const p = policy.people.find((x) => x.githubLogin.toLowerCase() === actor.login.toLowerCase());
-  return p && p.githubId === actor.githubId ? p.roles : [];
-}
-
-export function isListed(actor: Pick<Actor, 'login' | 'githubId'>, policy: Policy): boolean {
-  return policy.people.some((x) => x.githubLogin.toLowerCase() === actor.login.toLowerCase() && x.githubId === actor.githubId);
-}
-
-/** Roles that the decision's own "required approver role" text names, matched through the policy's aliases. */
-export function rolesNamed(text: string | undefined | null, policy: Policy): string[] {
-  const t = (text ?? '').toLowerCase();
-  return Object.entries(policy.roleAliases)
-    .filter(([, al]) => al.some((a) => t.includes(a)))
-    .map(([k]) => k);
-}
+export const POLICY_PATH = ACCESS_POLICY_PATH;
+export type Policy = AccessPolicy;
+export const emptyPolicy = emptyAccessPolicy;
+export const parsePolicy = parseAccessPolicy;
+export { rolesNamed };
 
 /** The status the repository's own source states, ignoring any merged review record. Quality gates read this one. */
 export const sourceStatusOf = (d: NormalizedDecision): NormStatus => d.review?.sourceStatus ?? d.status;
 export const sourceRuleOf = (d: NormalizedDecision): string => d.review?.sourceStatusRule ?? d.statusRule;
 
-export function isCritical(d: NormalizedDecision, policy: Policy): boolean {
+export function isCritical(d: NormalizedDecision, policy: Pick<AccessPolicy, 'critical'>): boolean {
   if (d.priority && policy.critical.priorities.includes(d.priority.value)) return true;
   return policy.critical.includeBlocked && sourceStatusOf(d) === 'Blocked';
 }
-
-export interface Authorisation {
-  ok: boolean;
-  code?: 'no-policy' | 'not-listed' | 'missing-role';
-  reason?: string;
-  roleCheck: RoleCheck;
-}
-
-export function authorise(actor: Pick<Actor, 'login' | 'githubId'>, action: ActionKind, d: NormalizedDecision, policy: Policy): Authorisation {
-  const policySource = policy.source === 'canonical' ? 'canonical' : 'local-head-not-canonical';
-  const held = rolesHeld(actor, policy);
-  const named = rolesNamed(d.requiredApproverRole?.text, policy);
-  const critical = isCritical(d, policy);
-  const base: RoleCheck = { critical, required: [], held, namedRoles: named, outstanding: named.filter((r) => !held.includes(r)), policySource };
-  if (action === 'comment') {
-    // Anyone verified may comment; the comment still reaches the repository only through a reviewed pull request.
-    return { ok: true, roleCheck: base };
-  }
-  if (!policy.people.length) return { ok: false, code: 'no-policy', reason: 'No approver is configured in the decision workflow policy, so nobody can decide.', roleCheck: base };
-  if (!isListed(actor, policy)) return { ok: false, code: 'not-listed', reason: `${actor.login} is not a registered approver in ${POLICY_PATH}.`, roleCheck: base };
-  const override = policy.critical.requiredRoles;
-  const required = action === 'reopen' ? [...new Set([...policy.reopen.requiredRoles, ...override])] : critical ? override : [...new Set([...named, ...override])];
-  const roleCheck = { ...base, required };
-  if (!required.length) return { ok: false, code: 'no-policy', reason: 'The policy names no role that may take this action, so it is denied.', roleCheck };
-  if (!required.some((r) => held.includes(r))) {
-    return { ok: false, code: 'missing-role', reason: `${actor.login} does not hold a role this action needs (${required.join(' or ')}).`, roleCheck };
-  }
-  return { ok: true, roleCheck };
-}
-
 // ---- which actions a decision offers
 
 export interface ActionAvailability {
@@ -145,7 +40,7 @@ export function availability(d: NormalizedDecision, s: ReviewState): ActionAvail
     if (!phaseOk.includes(action)) {
       return no(action === 'reopen' || action === 'comment' ? 'Not allowed in this state.' : `Already ${s.phase === 'rejected' ? 'rejected' : 'approved'} in the review record. It cannot be overwritten; reopen it first.`);
     }
-    if (action === 'comment') return { action, allowed: true, reason: null };
+    if (action === 'comment' || action === 'recommend') return { action, allowed: true, reason: null };
     if (srcStatus === 'Superseded' && s.phase === 'none') return no('This decision is Superseded. Review the decision that supersedes it.');
     if (action === 'reopen') {
       return effective === 'Approved' || effective === 'Rejected' ? { action, allowed: true, reason: null } : no('Only an Approved or Rejected decision can be reopened.');
@@ -172,6 +67,8 @@ export interface ActionRequest {
   rationale?: string | null;
   conditions?: string[] | null;
   comment?: string | null;
+  /** For a recommendation: approve, reject or revise. */
+  recommendation?: string | null;
 }
 
 export interface Cleaned {
@@ -179,6 +76,7 @@ export interface Cleaned {
   rationale: string | null;
   comment: string | null;
   conditions: string[];
+  recommendation: string | null;
 }
 
 // eslint-disable-next-line no-control-regex
@@ -199,6 +97,12 @@ export function validateRequest(req: Partial<ActionRequest>, d: NormalizedDecisi
     return { ok: false, message: `${what} needs a written rationale of at least ${MIN_REASON} characters.` };
   }
   if (a === 'comment' && !comment) return { ok: false, message: 'A comment cannot be empty.' };
+  let recommendation: string | null = null;
+  if (a === 'recommend') {
+    recommendation = typeof req.recommendation === 'string' ? req.recommendation : '';
+    if (!['approve', 'reject', 'revise'].includes(recommendation)) return { ok: false, message: 'A recommendation must be approve, reject or revise.' };
+    if (rationale.length < MIN_REASON) return { ok: false, message: `A recommendation needs a written rationale of at least ${MIN_REASON} characters.` };
+  }
   let conditions: string[] = [];
   if (a === 'approve-with-conditions') {
     conditions = (Array.isArray(req.conditions) ? req.conditions : []).map((c) => clean(c, 500)).filter(Boolean);
@@ -214,7 +118,7 @@ export function validateRequest(req: Partial<ActionRequest>, d: NormalizedDecisi
     if (a === 'approve-alternative' && d.recommendedOption && chosen.key === d.recommendedOption.key) return { ok: false, message: 'That is the recommended option. Use "Approve the recommended option".' };
     option = { key: chosen.key, name: chosen.name, recommended: !!d.recommendedOption && chosen.key === d.recommendedOption.key };
   }
-  return { ok: true, value: { option, rationale: rationale || null, comment: comment || null, conditions } };
+  return { ok: true, value: { option, rationale: rationale || null, comment: comment || null, conditions, recommendation } };
 }
 
 export const isDecisionId = (s: string) => DECISION_ID.test(s);

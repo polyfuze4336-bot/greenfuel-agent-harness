@@ -2,7 +2,12 @@ import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 import { RepoUnavailable } from '@/components/repo-unavailable.tsx';
 import { AppShell, type ShellData } from '@/components/shell/app-shell.tsx';
+import { LoginScreen } from '@/components/login-screen.tsx';
+import { authorizeAccess } from '@/lib/auth/authorize.ts';
+import { authConfig, authContextFor } from '@/lib/auth/config.ts';
+import { serverSession } from '@/lib/auth/server.ts';
 import { GitError, getModel } from '@/lib/repo/index.ts';
+import { runtime } from '@/lib/workflow/http.ts';
 import { repoCtx } from '@/lib/links.ts';
 import './globals.css';
 
@@ -19,6 +24,21 @@ export const dynamic = 'force-dynamic';
 const THEME_SCRIPT = `try{var t=localStorage.getItem('studio:theme')||'system';var d=t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.dataset.theme=d?'dark':'light'}catch(e){}`;
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
+  // In Entra mode nothing is rendered, and the repository is not even read, for someone who may not read.
+  if (authConfig().mode === 'entra') {
+    const rt = runtime();
+    const s = await serverSession();
+    const allowed = authorizeAccess(s?.user ?? null, 'read', authContextFor(rt.service.policy()));
+    if (!allowed.ok) {
+      return (
+        <html lang="en" suppressHydrationWarning>
+          <body>
+            <LoginScreen reason={s ? (allowed.reason ?? 'You have no role in the Architecture Studio.') : 'Sign in to continue.'} entraConfigured={!!rt.entra} />
+          </body>
+        </html>
+      );
+    }
+  }
   let shell: ShellData | null = null;
   let failure: { message: string; code?: string } | null = null;
   try {

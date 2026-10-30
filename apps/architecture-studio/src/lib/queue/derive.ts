@@ -20,7 +20,7 @@ export interface DeriveInput {
   model: StudioModel;
   read(path: string): string | undefined;
   exists(path: string): boolean;
-  /** Role aliases from the decision-workflow policy, used to say which roles an owner text names. */
+  /** Role aliases from the access policy, used to say which roles an owner text names. */
   roleAliases?: Record<string, string[]>;
 }
 

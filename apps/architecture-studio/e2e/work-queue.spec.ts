@@ -110,9 +110,9 @@ test.describe('work item actions', () => {
     await expect(page.getByTestId('work-assign')).toHaveAttribute('title', /Sign in/);
     await signIn(page, USERS.outsider);
     await expect(page.getByTestId('work-assign')).toHaveAttribute('aria-disabled', 'true');
-    await expect(page.getByTestId('work-assign')).toHaveAttribute('title', /registered/i);
-    // A comment is open to any verified account.
-    await expect(page.getByTestId('work-comment')).not.toHaveAttribute('aria-disabled', 'true');
+    await expect(page.getByTestId('work-assign')).toHaveAttribute('title', /does not allow this/i);
+    // A viewer reads; commenting needs the contributor role.
+    await expect(page.getByTestId('work-comment')).toHaveAttribute('aria-disabled', 'true');
     await shot(page, '40-queue-item-unregistered');
   });
 
@@ -298,8 +298,9 @@ test.describe('decisions change what is blocked, and only what is linked', () =>
     const q = (await (await request.get('/api/v1/queue')).json()) as Q;
     const cands = [...new Set(q.edges.filter((e) => e.type === 'requires' && /^D-\d+$/.test(e.to)).map((e) => e.to))].filter((id) => !USED.has(id) && q.items.find((i) => i.id === id)?.status === 'Open');
     for (const id of cands) {
-      const review = (await (await request.get('/api/v1/review/' + id)).json()) as { view: { open: unknown } };
+      const review = (await (await request.get('/api/v1/review/' + id)).json()) as { view: { open: unknown; governance: { domain: string } } };
       if (review.view.open) continue; // another test left a request in flight on this decision
+      if (review.view.governance.domain !== 'architecture') continue; // only the architecture owner decides these; security and regulatory records need other approval
       const d = (await (await request.get('/api/v1/queue/' + id)).json()) as never;
       if (test(d)) return { id, q };
     }
@@ -328,7 +329,9 @@ test.describe('decisions change what is blocked, and only what is linked', () =>
   test('a rejected decision lists the work that requires it and flags it for review, without changing any status', async ({ page, request }) => {
     const { id, q } = await pick(request, (d) => d.scenarios.ifRejected.requiring.length > 0);
     const before = (await (await request.get('/api/v1/queue/' + id)).json()) as { scenarios: { ifRejected: { requiring: { id: string }[]; mentioning: { id: string }[] } } };
-    const requiring = before.scenarios.ifRejected.requiring.map((r) => r.id);
+    // Build-blockers such as BLK-5 ("N decisions are needed by milestone M1") are derived from the decisions still open, so a decision that
+    // has just been decided leaves them by design (src/lib/repo/build.ts). Every other kind of dependent must stay exactly as previewed.
+    const requiring = before.scenarios.ifRejected.requiring.map((r) => r.id).filter((r) => !/^BLK-/.test(r));
     const unrelated = q.items.filter((i) => !requiring.includes(i.id) && !before.scenarios.ifRejected.mentioning.some((m) => m.id === i.id) && i.id !== id && i.kind !== 'decision');
     const statusBefore = new Map(q.items.map((i) => [i.id, i.status]));
 
@@ -341,7 +344,7 @@ test.describe('decisions change what is blocked, and only what is linked', () =>
     expect(after.items.find((i) => i.id === id)?.status).toBe('Rejected');
     const impact = after.impacts.find((i) => i.decisionId === id)!;
     expect(impact.rule).toBe('rejected');
-    expect(impact.requiring.map((r) => r.id).sort()).toEqual([...requiring].sort());
+    expect(impact.requiring.map((r) => r.id).filter((r) => !/^BLK-/.test(r)).sort()).toEqual([...requiring].sort());
     for (const r of requiring) {
       const it = after.items.find((i) => i.id === r)!;
       if (it.status !== 'Done') expect(it.reviewNeeded.length, `${r} is flagged`).toBeGreaterThan(0);

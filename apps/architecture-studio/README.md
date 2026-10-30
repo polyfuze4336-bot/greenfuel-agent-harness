@@ -1,6 +1,6 @@
 # Architecture Decision Studio
 
-A local web application over the decisions, tasks, approvals, assumptions and evidence recorded in this repository. It reads committed git content and shows it. **Reading never changes anything.** The one thing that writes is the [decision review workflow](../../docs/architecture-studio/REVIEW-WORKFLOW.md): it proposes a decision as a pull request, never to your branch or to `main`, and shows a decision as decided only after a person has merged it. Until a person is registered as an approver in `harness/policy/decision-workflow.json`, nobody can decide; one account is registered at present.
+A local web application over the decisions, tasks, approvals, assumptions and evidence recorded in this repository. It reads committed git content and shows it. **Reading never changes anything.** The one thing that writes is the [decision review workflow](../../docs/architecture-studio/REVIEW-WORKFLOW.md): it proposes a decision as a pull request, never to your branch or to `main`, and shows a decision as decided only after a person has merged it. Who may decide is set in `harness/policy/access-policy.json` and enforced on the server ([ACCESS-CONTROL](../../docs/architecture-studio/ACCESS-CONTROL.md)): roles, approval domains, designated approvers, step-up sign-in and segregation of duties. One account is enrolled at present, and it can approve only on a development server (`STUDIO_ALLOW_DEV_APPROVALS=1`).
 
 This is **not** the bunkering platform. It is part of the engineering and governance control plane, and no business logic of the Green-Fuel Bunkering Certification Platform lives here.
 
@@ -97,9 +97,13 @@ With `STUDIO_GITHUB_APP_ID`, `STUDIO_GITHUB_APP_INSTALLATION_ID`, `STUDIO_GITHUB
 
 - Binds to `localhost` and rejects any request whose `Host` header is not loopback (DNS-rebinding defence; `src/proxy.ts`).
 - Strict Content-Security-Policy (`default-src 'self'`, `frame-ancestors 'none'`), `nosniff`, `no-referrer`, no `X-Powered-By`. No third-party request is made by any page: no web fonts, analytics or CDN.
-- There is no sign-in. **Do not expose the port.** The identity menu shows the local git identity and says it is not authenticated.
+- Two authentication modes. **Development** (default): reading needs no sign-in, so **do not expose the port**; acting uses the GitHub CLI account and approving also needs `STUDIO_ALLOW_DEV_APPROVALS=1`. **Entra** (`STUDIO_AUTH_MODE=entra`): Microsoft Entra ID sign-in is required to read anything, every action is authorized on the server, and approvals are signed by the server's key. See below and [ACCESS-CONTROL](../../docs/architecture-studio/ACCESS-CONTROL.md).
 - Refs are validated (no leading `-`, no `..`), file paths for history must exist in the commit's tree, and no absolute path is sent to the browser.
 - Dependencies are pinned by the lockfile and were installed with `--ignore-scripts`. `npm audit` reported 0 vulnerabilities (see the report).
+
+## Sign-in and access control
+
+Entra mode needs: `STUDIO_AUTH_MODE=entra`, `STUDIO_ENTRA_TENANT_ID`, `STUDIO_ENTRA_CLIENT_ID`, `STUDIO_ENTRA_CLIENT_SECRET_FILE` (a file, never the secret itself), `STUDIO_ENTRA_REDIRECT_URI` (`https://<host>/api/v1/auth/entra/callback`), `STUDIO_SIGNING_KEY_FILE` (Ed25519 private key, PEM) and, recommended, `STUDIO_ACCESS_POLICY_SHA256`. Without a signing key the server refuses to record any approval. Roles, enrollment, designated approvers and segregation rules are in `harness/policy/access-policy.json`, changed only by a reviewed pull request. Administrators review access at `/access`. None of this has been run against a real Entra tenant; see the limitations in [ACCESS-CONTROL](../../docs/architecture-studio/ACCESS-CONTROL.md).
 
 ## Tests
 
@@ -107,7 +111,7 @@ With `STUDIO_GITHUB_APP_ID`, `STUDIO_GITHUB_APP_INSTALLATION_ID`, `STUDIO_GITHUB
 npm run typecheck     # tsc --noEmit
 npm run test:unit     # adapter, parsers, read-only guarantee, count agreement (node --test)
 npm run build
-npm run test:e2e      # Playwright on Microsoft Edge; starts its own servers on 3100 to 3105 (3103 is test mode with a simulated GitHub; 3104 is a Studio configured as a GitHub App, talking to the stand-in GitHub API on 3105)
+npm run test:e2e      # Playwright on Microsoft Edge; starts its own servers on 3100 to 3107 (3103 is test mode with a simulated GitHub; 3104 is a Studio configured as a GitHub App, talking to the stand-in GitHub API on 3105; 3106 is a Studio in Entra mode against a stand-in Entra ID on 3107)
 ```
 
 The end-to-end run also regenerates the screenshots in `docs/architecture-studio/screenshots/`. The unit checks live in `checks/` and the browser tests in `e2e/` so the repository-wide `node --test` does not collect them.

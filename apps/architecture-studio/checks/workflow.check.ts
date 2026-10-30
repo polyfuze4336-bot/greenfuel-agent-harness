@@ -7,12 +7,14 @@ import { GitHubError, LocalGitHub, type GitHubPort, type PullRequestInfo } from 
 import { FixtureIdentity, GhCliIdentity, IdentityError, SessionStore, type VerifiedUser } from '../src/lib/workflow/identity.ts';
 import { GitPublisher, PublishError } from '../src/lib/workflow/publish.ts';
 import { ReviewService, ServiceError } from '../src/lib/workflow/review.ts';
-import { authorise, availability, parsePolicy, rolesHeld, validateRequest } from '../src/lib/workflow/rules.ts';
+import { availability, validateRequest } from '../src/lib/workflow/rules.ts';
+import { parseAccessPolicy, rolesNamed } from '../src/lib/auth/access-policy.ts';
 import { ReviewStore, type Proposal } from '../src/lib/workflow/store.ts';
 import { pendingOrder } from '../src/lib/workflow/runtime.ts';
-import { PEOPLE, USERS, git, makeDecision, makeFixture, policyJson, type Fixture } from './fixtures/review-fixture.ts';
+import { PEOPLE, USERS, git, installTestAuth, makeDecision, makeFixture, policyJson, subjectOf, type Fixture } from './fixtures/review-fixture.ts';
 import type { NormalizedDecision, RegisterSnapshot } from '../src/lib/intel/schema.ts';
 
+const auth = installTestAuth();
 const fixtures: Fixture[] = [];
 after(() => {
   for (const f of fixtures) f.cleanup();
@@ -206,7 +208,7 @@ describe('reopening and history', () => {
     const d = makeDecision({ id: 'ADR-0107', status: 'Approved', statusRaw: 'Accepted', approvalBasis: 'owner-instruction-unsigned' });
     const owner = await w.as(USERS.owner);
     const v = w.svc.view(d, owner);
-    for (const a of v.actions) assert.equal(a.allowed, ['reopen', 'comment'].includes(a.action), a.action);
+    for (const a of v.actions) assert.equal(a.allowed, ['reopen', 'comment', 'recommend'].includes(a.action), a.action);
     await assert.rejects(w.submit(d, owner, 'approve'), code('not-allowed'));
     await w.decideAndMerge(d, owner, 'reopen', { rationale: 'The owner wants this decision revisited.' });
     assert.equal(w.svc.view(d, owner).actions.find((x) => x.action === 'approve')!.allowed, true);
@@ -223,9 +225,12 @@ describe('reopening and history', () => {
     assert.equal(w.svc.canonical().states.get('ADR-0108')!.effectiveStatus, 'Pending Review');
     await w.decideAndMerge(d, owner, 'comment', { comment: 'Waiting on the sovereignty lead.' });
     assert.equal(w.svc.canonical().states.get('ADR-0108')!.effectiveStatus, 'Pending Review', 'a comment changes no status');
-    await w.decideAndMerge(d, owner, 'defer', { rationale: 'Postponed to milestone M2.' });
+    // The person who asked for the revision proposed it, so a different owner decides.
+    await assert.rejects(w.submit(d, owner, 'defer', { rationale: 'Postponed to milestone M2.' }), code('sod-proposer'));
+    const owner2 = await w.as(USERS.owner2);
+    await w.decideAndMerge(d, owner2, 'defer', { rationale: 'Postponed to milestone M2.' });
     assert.equal(w.svc.canonical().states.get('ADR-0108')!.effectiveStatus, 'Deferred');
-    await w.decideAndMerge(d, owner, 'approve');
+    await w.decideAndMerge(d, owner2, 'approve');
     assert.equal(w.svc.canonical().states.get('ADR-0108')!.effectiveStatus, 'Approved', 'a deferred decision can still be decided');
   });
 });
@@ -255,68 +260,87 @@ describe('quality gates and authority', () => {
     assert.equal(v.actions.find((a) => a.action === 'approve')!.allowed, false);
   });
 
-  it('denies an unauthenticated caller, an unregistered person, a listed person without the required role, and a bot', async () => {
+  it('denies an unauthenticated caller, a person with no role, a role that cannot approve, a bot and a recycled login', async () => {
     const w = world();
     const d = makeDecision({ id: 'ADR-0111' });
     await assert.rejects(w.submit(d, null, 'approve'), code('unauthenticated'));
 
     const outsider = await w.as(USERS.outsider);
-    await assert.rejects(w.submit(d, outsider, 'approve'), code('not-listed'));
+    await assert.rejects(w.submit(d, outsider, 'approve'), code('missing-permission'), 'a viewer cannot approve');
 
-    const quality = await w.as(USERS.quality);
-    await assert.rejects(w.submit(d, quality, 'approve'), code('missing-role'), 'a Must decision needs the programme owner');
-    const qv = w.svc.view(d, quality);
-    assert.equal(qv.actions.find((a) => a.action === 'approve')!.authorised, false);
-    assert.match(qv.actions.find((a) => a.action === 'approve')!.authReason ?? '', /does not hold a role/);
+    const contrib = await w.as(USERS.contrib);
+    await assert.rejects(w.submit(d, contrib, 'approve'), code('missing-permission'), 'a contributor proposes, it does not approve');
+
+    const security = await w.as(USERS.security);
+    await assert.rejects(w.submit(d, security, 'approve'), code('missing-permission'), 'a security reviewer cannot approve an architecture decision');
+    const sv = w.svc.view(d, security);
+    assert.equal(sv.actions.find((a) => a.action === 'approve')!.authorised, false);
+    assert.match(sv.actions.find((a) => a.action === 'approve')!.authReason ?? '', /approve/i);
+
+    const admin = await w.as(USERS.admin);
+    await assert.rejects(w.submit(d, admin, 'approve'), code('missing-permission'), 'an administrator manages access and approves nothing');
 
     w.fx.setIdentity(USERS.bot);
     await assert.rejects(w.identity.verify(), (e: unknown) => e instanceof IdentityError && e.code === 'NOT_A_PERSON');
 
     const impostor = await w.as(USERS.impostor);
-    await assert.rejects(w.submit(d, impostor, 'approve'), code('not-listed'), 'right login, wrong GitHub id');
-    assert.deepEqual(rolesHeld({ login: 'test-owner', githubId: 9999 }, parsePolicy(policyJson(), 'canonical')), []);
+    await assert.rejects(w.submit(d, impostor, 'approve'), code('missing-permission'), 'right login, wrong GitHub id');
 
     assert.equal(w.store.list().length, 0, 'nothing was recorded for any denied attempt');
     const denied = w.store.readAudit({ decisionId: 'ADR-0111' }).filter((a) => a.outcome === 'denied');
-    assert.equal(denied.length, 4, 'every denied submission is in the audit log (the bot was refused earlier, at sign-in)');
+    assert.equal(denied.length, 6, 'every denied submission is in the audit log (the bot was refused earlier, at sign-in)');
   });
 
-  it('lets a non-critical decision be approved by the role the record names', async () => {
+  it('approval domains are separate: a security-gate record needs the security reviewer, and a regulatory record is never approvable', async () => {
     const w = world();
-    const d = makeDecision({ id: 'ADR-0112', priority: { value: 'Should', basis: 'REQ-2' }, requiredApproverRole: { text: 'Quality manager', basis: 'test' } });
-    const quality = await w.as(USERS.quality);
-    const done = await w.decideAndMerge(d, quality, 'approve');
-    assert.deepEqual(done.event.roleCheck.held, ['quality-manager']);
-    assert.equal(done.event.roleCheck.critical, false);
-    const critical = makeDecision({ id: 'ADR-0113', requiredApproverRole: { text: 'Quality manager', basis: 'test' } });
-    await assert.rejects(w.submit(critical, quality, 'approve'), code('missing-role'), 'Must priority makes it critical');
-  });
-
-  it('with no policy, or an empty one, nobody can decide; anyone verified may still comment', async () => {
-    const w = world({ policy: null });
-    const d = makeDecision({ id: 'ADR-0114' });
+    const sec = makeDecision({ id: 'ADR-0112', kind: 'register-entry', requiredApproverRole: { text: 'Security architect', basis: 'test' } });
     const owner = await w.as(USERS.owner);
-    assert.equal(w.svc.policy().source, 'missing');
-    await assert.rejects(w.submit(d, owner, 'approve'), code('no-policy'));
-    const w2 = world({ policy: policyJson([]) });
-    const o2 = await w2.as(USERS.owner);
-    await assert.rejects(w2.submit(d, o2, 'reject', { rationale: REASON }), code('no-policy'));
-    const out = await w2.as(USERS.outsider);
-    const done = await w2.decideAndMerge(d, out, 'comment', { comment: 'A question for the owner.' });
-    assert.deepEqual(done.event.roleCheck.held, []);
+    await assert.rejects(w.submit(sec, owner, 'approve'), code('missing-permission'), 'an architecture owner cannot approve a security gate');
+    const security = await w.as(USERS.security);
+    const done = await w.decideAndMerge(sec, security, 'approve');
+    assert.equal(done.event.roleCheck.domain, 'security');
+    assert.deepEqual(done.event.roleCheck.held.includes('security-reviewer'), true);
+
+    const filing = makeDecision({ id: 'ADR-0113', requiredApproverRole: { text: 'Quality manager', basis: 'test' } });
+    for (const u of [USERS.owner, USERS.owner2, USERS.security, USERS.admin]) {
+      const who = await w.as(u);
+      await assert.rejects(w.submit(filing, who, 'approve'), code('domain-not-approvable'), `${u.login} cannot approve a regulatory record`);
+    }
+    const v = w.svc.view(filing, await w.as(USERS.owner));
+    assert.equal(v.governance.domain, 'regulatory');
+    const unclassified = makeDecision({ id: 'D-900', kind: 'register-entry', requiredApproverRole: { text: 'Somebody unknown', basis: 'test' } });
+    await assert.rejects(w.submit(unclassified, await w.as(USERS.owner), 'approve'), code('domain-not-approvable'), 'an unclassified record is not approvable');
   });
 
-  it('says in the event when the policy was read from the local branch and not yet from the canonical one', async () => {
-    const w = world();
-    // Move the policy off the canonical branch: delete it on origin/main only.
-    const rm = w.fx.commitToMain({ 'harness/policy/decision-workflow.json': policyJson([]) }, 'empty the canonical policy');
-    git(w.fx.work, 'fetch', '-q', 'origin');
-    assert.ok(rm);
+  it('only the designated approver may decide, even with the right role', async () => {
+    const w = world({ policy: policyJson({ ownership: [{ domain: 'architecture', scope: { all: true }, owners: ['github:1001'] }] }) });
+    const d = makeDecision({ id: 'ADR-0114' });
+    await assert.rejects(w.submit(d, await w.as(USERS.owner2), 'approve'), code('not-designated'));
+    await w.decideAndMerge(d, await w.as(USERS.owner), 'approve');
+  });
+
+  it('with no policy, or an empty one, nobody can decide; a person with no role can still read', async () => {
+    const w = world({ policy: null });
     const d = makeDecision({ id: 'ADR-0115' });
     const owner = await w.as(USERS.owner);
-    await assert.rejects(w.submit(d, owner, 'approve'), code('no-policy'), 'the canonical policy wins over the local one');
+    assert.equal(w.svc.policy().source, 'missing');
+    await assert.rejects(w.submit(d, owner, 'approve'), code('policy-invalid'));
+    const w2 = world({ policy: policyJson({ people: [] }) });
+    const o2 = await w2.as(USERS.owner);
+    await assert.rejects(w2.submit(d, o2, 'reject', { rationale: REASON }), code('missing-permission'));
+    const out = await w2.as(USERS.outsider);
+    await assert.rejects(w2.submit(d, out, 'comment', { comment: 'A question for the owner.' }), code('missing-permission'), 'a viewer cannot even comment');
   });
 
+  it('a policy emptied on the canonical branch wins over the local copy', async () => {
+    const w = world();
+    const rm = w.fx.commitToMain({ 'harness/policy/access-policy.json': policyJson({ people: [] }) }, 'empty the canonical policy');
+    git(w.fx.work, 'fetch', '-q', 'origin');
+    assert.ok(rm);
+    const d = makeDecision({ id: 'ADR-0116' });
+    const owner = await w.as(USERS.owner);
+    await assert.rejects(w.submit(d, owner, 'approve'), code('missing-permission'), 'the canonical policy wins over the local one');
+  });
   it('refuses to sign in inside an agent session, and sessions expire', async () => {
     const prev = process.env.HARNESS_AGENT_SESSION;
     process.env.HARNESS_AGENT_SESSION = '1';
@@ -328,7 +352,7 @@ describe('quality gates and authority', () => {
     }
     let now = 1_000;
     const s = new SessionStore(() => now);
-    const sess = s.create({ login: 'a', id: 1, name: null, type: 'User', verifiedBy: 'test-fixture' });
+    const sess = s.create({ provider: 'github', subject: '1', tenantId: null, login: 'a', id: 1, name: null, type: 'User', verifiedBy: 'test-fixture', entraRoles: [], entraGroups: [], mfa: false, authAt: now }, { idleMinutes: 600, absoluteHours: 8 });
     assert.ok(s.get(sess.token));
     now += 9 * 60 * 60 * 1000;
     assert.equal(s.get(sess.token), null);
@@ -340,7 +364,7 @@ describe('quality gates and authority', () => {
     const d = makeDecision({ id: 'ADR-0116' });
     const owner = await w.as(USERS.owner);
     const v = w.svc.view(d, owner);
-    w.fx.setIdentity(USERS.quality); // someone ran `gh auth switch`
+    w.fx.setIdentity(USERS.security); // someone ran `gh auth switch`
     await assert.rejects(w.svc.submit(owner, d, { action: 'approve', expectedRevision: v.revision, idempotencyKey: w.key() }), code('identity-changed'));
     w.fx.setIdentity(null);
     await assert.rejects(w.svc.submit(owner, d, { action: 'approve', expectedRevision: v.revision, idempotencyKey: w.key() }), code('identity-unverified'));
@@ -579,7 +603,7 @@ describe('publishing is narrow and never touches main', () => {
     const pub = new GitPublisher(w.fx.work);
     const base = pub.fetchCanonical('origin/main');
     const author = { name: 'T', email: 't@example.invalid' };
-    for (const bad of ['harness/policy/decision-workflow.json', 'docs/adr/0001-x.md', '../escape.json', 'docs/decision-reviews/ADR-0001/x.txt']) {
+    for (const bad of ['harness/policy/access-policy.json', 'docs/adr/0001-x.md', '../escape.json', 'docs/decision-reviews/ADR-0001/x.txt']) {
       assert.throws(() => pub.buildCommit({ baseSha: base, files: [{ path: bad, content: '{}' }], author, message: 'm', now: new Date() }), (e: unknown) => e instanceof PublishError && e.code === 'BAD_INPUT', bad);
     }
     const sha = pub.buildCommit({ baseSha: base, files: [{ path: 'docs/decision-reviews/ADR-0001/0001-comment.json', content: '{}\n' }], author, message: 'm', now: new Date() });
@@ -613,16 +637,17 @@ describe('audit log', () => {
 });
 
 describe('ordering and availability', () => {
-  it('the policy shipped in this repository parses, and can never list a bot, an organisation or a person without a numeric id', async () => {
+  it('the access policy shipped in this repository parses, enrolls only humans by stable subject, and asks for no github approvals in production', async () => {
     const fs = await import('node:fs');
-    const text = fs.readFileSync(path.resolve(import.meta.dirname, '..', '..', '..', 'harness', 'policy', 'decision-workflow.json'), 'utf8');
-    const p = parsePolicy(text, 'canonical');
-    assert.ok(Object.keys(p.roleAliases).includes('programme-owner'));
-    assert.deepEqual(p.critical.requiredRoles, ['programme-owner']);
-    assert.ok(p.people.every((x) => Number.isInteger(x.githubId) && !/\[bot\]$/i.test(x.githubLogin)));
-    assert.ok(p.problems.every((m) => /No approver is configured/.test(m)), `unexpected policy problems: ${p.problems.join('; ')}`);
+    const text = fs.readFileSync(path.resolve(import.meta.dirname, '..', '..', '..', 'harness', 'policy', 'access-policy.json'), 'utf8');
+    const p = parseAccessPolicy(text, 'canonical');
+    assert.deepEqual(p.problems, [], `unexpected policy problems: ${p.problems.join('; ')}`);
+    assert.ok(p.people.length >= 1 && p.people.every((x) => /^(github:[1-9]\d*|entra:[0-9a-f-]{36}:[0-9a-f-]{36})$/.test(x.subject) && !/\[bot\]$/i.test(x.login)));
+    assert.deepEqual(p.authentication.approvalProviders, ['entra']);
+    assert.equal(p.segregation.enforce, true);
+    assert.ok(p.roleAliases['programme-owner']);
+    assert.ok(!p.people.some((x) => x.roles.includes('administrator') && x.roles.some((r) => ['architecture-owner', 'security-reviewer', 'deployment-approver'].includes(r))), 'no one holds administrator together with an approver role');
   });
-
   it('orders pending decisions: Must first, ADRs before register entries, Blocked last, skipping those with a request in flight', () => {
     const r = [
       makeDecision({ id: 'D-002', kind: 'register-entry', status: 'Pending Review', priority: { value: 'Must', basis: 'x' } }),
@@ -641,32 +666,31 @@ describe('ordering and availability', () => {
     const av = availability(d, { decisionId: d.id, events: [], phase: 'none', effectiveStatus: null, approvedOption: null, conditions: [], headHash: null, decidingEvent: null, problems: [] });
     assert.equal(av.length, ACTIONS.length);
     assert.ok(av.filter((a) => !a.allowed).every((a) => a.reason));
-    const p = parsePolicy(policyJson(), 'canonical');
+    const p = parseAccessPolicy(policyJson(), 'canonical');
     assert.equal(p.people.length, PEOPLE.length);
-    const a = authorise({ login: 'test-owner', githubId: 1001 }, 'approve', makeDecision({ id: 'ADR-0171', requiredApproverRole: { text: 'Security architect, quality manager', basis: 't' }, priority: null }), p);
-    assert.deepEqual(a.roleCheck.namedRoles.sort(), ['quality-manager', 'security-architect']);
-    assert.deepEqual(a.roleCheck.outstanding.sort(), ['quality-manager', 'security-architect'], 'named roles the actor lacks are surfaced to the reviewer');
-    assert.equal(a.ok, true, 'the programme owner may decide a non-critical decision');
+    assert.deepEqual(rolesNamed('Security architect, quality manager', p).sort(), ['quality-manager', 'security-architect']);
   });
 
-  it('a policy entry without a numeric GitHub id, or with a duplicate login, is ignored and reported', () => {
-    const p = parsePolicy(JSON.stringify({ people: [{ githubLogin: 'a', holder: 'A', roles: ['programme-owner'] }, { githubLogin: 'b', githubId: 2, holder: 'B', roles: ['programme-owner'] }, { githubLogin: 'B', githubId: 3, holder: 'B2', roles: [] }], roleAliases: { 'programme-owner': ['programme owner'] } }), 'canonical');
-    assert.equal(p.people.length, 1);
-    assert.equal(p.problems.length, 2);
-    assert.equal(parsePolicy('{not json', 'canonical').people.length, 0);
-    assert.equal(parsePolicy(undefined, 'canonical').source, 'missing');
+  it('a policy entry with no stable subject, not marked human, or listed twice is ignored and reported', () => {
+    const ok = (subject: string, over: Record<string, unknown> = {}) => ({ subject, kind: 'human', login: 'x', holder: 'X', roles: ['contributor'], enrolledAt: '2026-01-01T00:00:00Z', enrollment: { basis: 'bootstrap', reference: 'r' }, ...over });
+    const p = parseAccessPolicy(JSON.stringify({ version: 2, people: [ok('github:2'), ok('alice@example.com'), ok('github:3', { kind: 'agent' }), ok('github:2'), ok('github:4', { enrolledAt: 'not a date' })] }), 'canonical');
+    assert.deepEqual(p.people.map((x) => x.subject), ['github:2']);
+    assert.equal(p.problems.filter((m) => !/Nobody/.test(m)).length, 4);
+    assert.equal(parseAccessPolicy('{not json', 'canonical').people.length, 0);
+    assert.equal(parseAccessPolicy(JSON.stringify({ version: 1, people: [] }), 'canonical').people.length, 0, 'the old format grants nothing');
+    assert.equal(parseAccessPolicy(undefined, 'canonical').source, 'missing');
   });
 });
-
-/** Build a valid event the way the service does, for tests that put events on the canonical branch directly. */
-function event(d: NormalizedDecision, seq: number, action: ActionKind, prevHash: string | null, extra: { rationale?: string; comment?: string } = {}): ReviewEvent {
+/** Build a valid, signed event the way the service does, for tests that put events on the canonical branch directly. */
+function event(d: NormalizedDecision, seq: number, action: ActionKind, prevHash: string | null, extra: { rationale?: string; comment?: string; signed?: boolean; actor?: { login: string; id: number } } = {}): ReviewEvent {
+  const who = extra.actor ?? { login: 'test-owner', id: 1001 };
   const body = {
-    schema: 'greenfuel.decision-review-event/v1' as const,
+    schema: 'greenfuel.decision-review-event/v2' as const,
     id: eventId(d.id, seq),
     decisionId: d.id,
     seq,
     action,
-    actor: { login: 'test-owner', githubId: 1001, name: 'Test Owner', verifiedBy: 'test-fixture' as const },
+    actor: { login: who.login, githubId: who.id, name: who.login, verifiedBy: 'test-fixture' as const, provider: 'github' as const, subject: String(who.id), tenantId: null },
     createdAt: new Date(Date.UTC(2026, 9, 30, 1, seq)).toISOString(),
     basis: { recordHash: d.contentHash, sourceStatus: d.status, sourceCommit: 'c'.repeat(40) },
     prevHash,
@@ -674,7 +698,9 @@ function event(d: NormalizedDecision, seq: number, action: ActionKind, prevHash:
     conditions: [],
     rationale: extra.rationale ?? null,
     comment: extra.comment ?? null,
-    roleCheck: { critical: true, required: ['programme-owner'], held: ['programme-owner'], namedRoles: [], outstanding: [], policySource: 'canonical' as const },
+    recommendation: null,
+    roleCheck: { critical: true, required: ['architecture-owner'], held: ['architecture-owner'], namedRoles: [], outstanding: [], policySource: 'canonical' as const, domain: 'architecture', policyHash: '', checks: [], authAgeSeconds: 0, mfa: false },
   };
-  return { ...body, eventHash: hashEvent(body) };
+  const eventHash = hashEvent(body);
+  return { ...body, eventHash, signature: extra.signed === false ? null : auth.signer.sign(eventHash) } as ReviewEvent;
 }

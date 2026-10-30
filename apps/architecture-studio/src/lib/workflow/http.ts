@@ -36,7 +36,7 @@ export function requireSession(req: NextRequest, opts: { csrf?: boolean } = {}):
   if (!sameOrigin(req)) return problem(403, 'Cross-origin request refused', 'Changes are accepted only from this application, in this browser.', 'bad-origin');
   if (!(req.headers.get('content-type') ?? '').toLowerCase().includes('application/json')) return problem(415, 'JSON required', 'Send application/json.', 'bad-content-type');
   const s = currentSession(req);
-  if (!s) return problem(401, 'Sign in first', 'Every action needs a verified GitHub identity.', 'unauthenticated');
+  if (!s) return problem(401, 'Sign in first', 'Every action needs a verified identity.', 'unauthenticated');
   if (opts.csrf !== false && req.headers.get('x-studio-csrf') !== s.csrf) return problem(403, 'Missing or wrong CSRF token', 'Reload the page and try again.', 'bad-csrf');
   return s;
 }

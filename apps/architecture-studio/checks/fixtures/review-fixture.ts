@@ -1,9 +1,12 @@
 // A throw-away world for the review workflow: a working repository, a bare "GitHub" remote, a fake pull-request service
 // and test identities. Nothing here touches the real repository or GitHub. Used by the unit checks and the browser tests.
 import { spawnSync } from 'node:child_process';
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { __setAuthForTests } from '../../src/lib/auth/config.ts';
+import { trustFrom } from '../../src/lib/auth/signing.ts';
 import type { NormalizedDecision } from '../../src/lib/intel/schema.ts';
 
 export const ROLE_ALIASES = {
@@ -18,25 +21,87 @@ export const ROLE_ALIASES = {
   'data-protection-lead': ['data protection lead'],
 };
 
+const person = (login: string, id: number, holder: string, roles: string[]) => ({
+  subject: `github:${id}`,
+  kind: 'human',
+  login,
+  holder,
+  roles,
+  enrolledAt: '2026-01-01T00:00:00Z',
+  enrollment: { basis: 'bootstrap', requestedBy: null, approvedBy: null, reference: 'test fixture' },
+});
+
+/** Two architecture owners (so one can approve what the other proposed), a security reviewer, an administrator and a contributor. */
 export const PEOPLE = [
-  { githubLogin: 'test-owner', githubId: 1001, holder: 'Test Owner', roles: ['programme-owner'] },
-  { githubLogin: 'test-quality', githubId: 1002, holder: 'Test Quality Manager', roles: ['quality-manager'] },
+  person('test-owner', 1001, 'Test Owner', ['architecture-owner']),
+  person('test-owner2', 1005, 'Test Owner Two', ['architecture-owner']),
+  person('test-security', 1002, 'Test Security Reviewer', ['security-reviewer']),
+  person('test-admin', 1006, 'Test Administrator', ['administrator']),
+  person('test-contrib', 1007, 'Test Contributor', ['contributor']),
 ];
 
 export const USERS = {
   owner: { login: 'test-owner', id: 1001, name: 'Test Owner', type: 'User' },
-  quality: { login: 'test-quality', id: 1002, name: 'Test Quality Manager', type: 'User' },
+  owner2: { login: 'test-owner2', id: 1005, name: 'Test Owner Two', type: 'User' },
+  security: { login: 'test-security', id: 1002, name: 'Test Security Reviewer', type: 'User' },
+  admin: { login: 'test-admin', id: 1006, name: 'Test Administrator', type: 'User' },
+  contrib: { login: 'test-contrib', id: 1007, name: 'Test Contributor', type: 'User' },
   outsider: { login: 'test-outsider', id: 1003, name: 'Test Outsider', type: 'User' },
   bot: { login: 'some-agent[bot]', id: 1004, name: null, type: 'Bot' },
   // Same login as the owner, different GitHub id: a renamed or recycled account must get no roles.
   impostor: { login: 'test-owner', id: 9999, name: 'Not The Owner', type: 'User' },
-  owner2: { login: 'test-owner2', id: 1005, name: 'Test Owner Two', type: 'User' },
 };
 
-export function policyJson(people: unknown[] = PEOPLE, work: { completionRoles?: string[]; requireIndependentCompletionApproval?: boolean } = {}) {
-  return `${JSON.stringify({ version: 1, description: 'Test policy.', people, roleAliases: ROLE_ALIASES, critical: { priorities: ['Must'], includeBlocked: true, requiredRoles: ['programme-owner'] }, reopen: { requiredRoles: ['programme-owner'] }, work: { completionRoles: ['programme-owner'], requireIndependentCompletionApproval: true, ...work } }, null, 2)}\n`;
+export const subjectOf = (u: { id: number }) => `github:${u.id}`;
+
+/** The classification rules the repository ships, so test policies classify real records the way the real policy does. */
+export const DEFAULT_RULES = [
+  { domain: 'regulatory', approverTextMatches: ['quality manager', 'compliance counsel'] },
+  { domain: 'security', approverTextMatches: ['security architect'] },
+  { domain: 'architecture', kinds: ['adr'], approverTextMatches: ['programme owner', 'enterprise architect'] },
+];
+
+export interface PolicyOptions {
+  people?: unknown[];
+  ownership?: unknown[];
+  segregation?: Record<string, unknown>;
+  session?: Record<string, unknown>;
+  classification?: unknown;
+  approvalProviders?: string[];
+  tenantId?: string | null;
 }
 
+export function policyJson(o: PolicyOptions = {}) {
+  const people = o.people ?? PEOPLE;
+  return `${JSON.stringify(
+    {
+      version: 2,
+      description: 'Test access policy.',
+      authentication: { tenantId: o.tenantId ?? null, clientId: null, approvalProviders: o.approvalProviders ?? ['entra'], entraRoleMap: { 'Studio.Architect': 'architect', 'Studio.ArchitectureOwner': 'architecture-owner', 'Studio.Administrator': 'administrator', 'Studio.Viewer': 'viewer', 'Studio.SecurityReviewer': 'security-reviewer', 'Studio.DeploymentApprover': 'deployment-approver', 'Studio.Contributor': 'contributor' }, entraGroupMap: {} },
+      session: { idleMinutes: 30, absoluteHours: 8, approvalMaxAuthAgeMinutes: 15, requireMfaForApproval: true, ...o.session },
+      roleAliases: ROLE_ALIASES,
+      critical: { priorities: ['Must'], includeBlocked: true },
+      classification: o.classification ?? { rules: DEFAULT_RULES, overrides: {} },
+      ownership: o.ownership ?? [
+        { domain: 'architecture', scope: { all: true }, owners: ['github:1001', 'github:1005'] },
+        { domain: 'security', scope: { all: true }, owners: ['github:1002'] },
+      ],
+      segregation: { enforce: true, requireIndependentRecommendation: false, authorBindings: [], ...o.segregation },
+      people,
+    },
+    null,
+    2,
+  )}\n`;
+}
+
+/** The server's signing key for tests, and the auth settings every test world needs. Call once per test file. */
+export function installTestAuth(over: { devApprovals?: boolean } = {}) {
+  const { privateKey } = crypto.generateKeyPairSync('ed25519');
+  const trust = trustFrom({ privateKeyPem: privateKey.export({ type: 'pkcs8', format: 'pem' }).toString() });
+  const cacheDir = fs.mkdtempSync(path.join(os.tmpdir(), 'studio-auth-'));
+  __setAuthForTests({ config: { mode: 'github-dev', devApprovals: over.devApprovals ?? true, policyPin: null, cacheDir, entra: null, secureCookies: false, problems: [] }, trust });
+  return { trust, cacheDir, signer: trust.signer!, setApprovals: (on: boolean) => __setAuthForTests({ config: { mode: 'github-dev', devApprovals: on, policyPin: null, cacheDir, entra: null, secureCookies: false, problems: [] } }) };
+}
 export function git(cwd: string, ...a: string[]) {
   // A bare repository must be addressed with --git-dir (git may be configured with safe.bareRepository=explicit).
   const bare = cwd.endsWith('.git');
@@ -86,7 +151,7 @@ export function makeFixture(opts: FixtureOptions = {}): Fixture {
   if (!opts.cloneFrom) fs.writeFileSync(path.join(work, 'README.md'), '# fixture\n');
   if (opts.policy !== null) {
     fs.mkdirSync(path.join(work, 'harness', 'policy'), { recursive: true });
-    fs.writeFileSync(path.join(work, 'harness', 'policy', 'decision-workflow.json'), opts.policy ?? policyJson());
+    fs.writeFileSync(path.join(work, 'harness', 'policy', 'access-policy.json'), opts.policy ?? policyJson());
   }
   git(work, 'add', '-A');
   git(work, 'commit', '-q', '--allow-empty', '-m', 'fixture base');

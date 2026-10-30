@@ -16,7 +16,13 @@ import {
 import { GitHubError, type GitHubPort } from './github.ts';
 import type { IdentityProvider, VerifiedUser } from './identity.ts';
 import { PublishError, splitCanonicalRef, type Publisher } from './publish.ts';
-import { POLICY_PATH, authorise, availability, parsePolicy, rolesHeld, isListed, validateRequest, emptyPolicy, type ActionAvailability, type ActionRequest, type Policy } from './rules.ts';
+import { POLICY_PATH, availability, parsePolicy, validateRequest, emptyPolicy, type ActionAvailability, type ActionRequest, type Policy } from './rules.ts';
+import { authenticityAt, checkRecord, type Authenticity } from '../auth/authenticity.ts';
+import { authorizeDecision, keyOf, roleCheckOf, type Authz } from '../auth/authorize.ts';
+import { authConfig, authContextFor, getTrust } from '../auth/config.ts';
+import { APPROVAL_CLASS } from '../auth/model.ts';
+import { effectiveRoles } from '../auth/authorize.ts';
+import { designatedOwners, subjectKeyOf, type SubjectKey } from '../auth/access-policy.ts';
 import { ReviewStore, isOpen, withLock, type AuditFacts, type Proposal } from './store.ts';
 import { factsOf, syncProposal, type SyncDeps, type SyncFamily } from './sync-core.ts';
 
@@ -44,6 +50,8 @@ export interface ServiceDeps {
   publisher: Publisher;
   identity: IdentityProvider;
   now?: () => Date;
+  /** How long a read policy is reused. 0 reads it every time. */
+  policyTtlMs?: number;
 }
 
 export interface CanonicalReviews {
@@ -57,7 +65,7 @@ export interface CanonicalReviews {
 const FILE = new RegExp(`^${REVIEW_DIR}/((?:ADR-\\d{4}|D-\\d{3}))/(\\d{4})-([a-z-]+)\\.json$`);
 
 /** Every review event on a ref, folded per decision. Files that do not parse or do not match their own path are reported, never trusted. */
-export function loadReviewStates(adapter: GitRepositoryAdapter): Map<string, ReviewState> {
+export function loadReviewStates(adapter: GitRepositoryAdapter, authenticity: Authenticity = authenticityAt((x) => adapter.read(x))): Map<string, ReviewState> {
   const paths = adapter.list(`${REVIEW_DIR}/`).filter((p) => p.endsWith('.json'));
   adapter.preload(paths);
   const byDecision = new Map<string, ReviewEvent[]>();
@@ -74,6 +82,13 @@ export function loadReviewStates(adapter: GitRepositoryAdapter): Map<string, Rev
     const e = parsed.event;
     if (e.decisionId !== m[1] || e.seq !== Number(m[2]) || e.action !== m[3]) {
       problem(m[1]!, `${p}: the file name does not match its content`);
+      continue;
+    }
+    // A record counts only if the server signed it and, for an approval, the actor was enrolled for it at the time. A file that
+    // someone wrote by hand, with a correct hash, is reported here and changes nothing.
+    const fake = checkRecord(authenticity, { actor: e.actor, createdAt: e.createdAt, eventHash: e.eventHash, signature: e.signature, roleCheck: e.roleCheck, approvalClass: (APPROVAL_CLASS as string[]).includes(e.action) });
+    if (fake) {
+      problem(m[1]!, `${p}: not accepted as a record, because ${fake}`);
       continue;
     }
     byDecision.set(e.decisionId, [...(byDecision.get(e.decisionId) ?? []), e]);
@@ -119,9 +134,11 @@ export interface ReviewView {
   canonical: { ref: string; commit: string | null; available: boolean; error: string | null; state: ReviewState };
   open: Proposal | null;
   recent: Proposal[];
-  actions: (ActionAvailability & { authorised: boolean | null; authReason: string | null })[];
-  policy: { source: Policy['source']; configured: boolean; problems: string[] };
-  user: { login: string; name: string | null; roles: string[]; listed: boolean } | null;
+  actions: (ActionAvailability & { authorised: boolean | null; authReason: string | null; authCode: string | null })[];
+  /** Which kind of approval this decision needs, and why. Decided by the policy, never by the person. */
+  governance: { domain: string; basis: string; designated: boolean | null };
+  policy: { source: Policy['source']; configured: boolean; problems: string[]; hash: string };
+  user: { login: string; name: string | null; roles: string[]; listed: boolean; provider: string } | null;
 }
 
 const short = (s: string | null) => (s ? s.slice(0, 7) : '');
@@ -150,14 +167,31 @@ export class ReviewService {
     return { available: true, ref: this.deps.canonicalRef, commit: a.commit, states: loadReviewStates(a), error: null };
   }
 
-  /** Policy comes from the canonical ref. Until it has been merged there, the local HEAD copy is used and every event says so. */
+  private memo: { at: number; policy: Policy } | null = null;
+
+  /** The policy, read from git at most once per policyTtlMs (default 2 s), so a revocation reaches every request within seconds. */
   policy(): Policy {
+    const ttl = this.deps.policyTtlMs ?? 2000;
+    const t = Date.now();
+    if (ttl > 0 && this.memo && t - this.memo.at < ttl) return this.memo.policy;
+    const p = this.readPolicy();
+    this.memo = { at: t, policy: p };
+    return p;
+  }
+
+  forgetPolicy() {
+    this.memo = null;
+  }
+
+  /** Policy comes from the canonical ref. Until it has been merged there, the local HEAD copy is used and every event says so. */
+  private readPolicy(): Policy {
     const c = this.canonicalAdapter();
     const onCanonical = c?.read(POLICY_PATH);
-    if (onCanonical !== undefined) return parsePolicy(onCanonical, 'canonical');
+    const pin = authConfig().policyPin;
+    if (onCanonical !== undefined) return parsePolicy(onCanonical, 'canonical', pin);
     try {
       const local = new GitRepositoryAdapter(this.deps.root, this.deps.readRef).open().read(POLICY_PATH);
-      if (local !== undefined) return parsePolicy(local, 'local-head-not-canonical');
+      if (local !== undefined) return parsePolicy(local, 'local-head-not-canonical', pin);
     } catch {
       /* falls through to a missing policy */
     }
@@ -172,12 +206,19 @@ export class ReviewService {
     const state = canonical.states.get(d.id) ?? emptyState(d.id);
     const open = this.deps.store.openFor(d.id);
     const avail = availability(d, state);
+    const ctx = authContextFor(policy, this.now().getTime());
+    const sod = this.sodInputs(d, state, policy);
+    const rec = recOf(d);
     const actions = avail.map((a) => {
-      if (!user) return { ...a, authorised: null, authReason: 'Sign in to act.' };
-      if (!a.allowed) return { ...a, authorised: null, authReason: null };
-      const auth = authorise({ login: user.login, githubId: user.id }, a.action, d, policy);
-      return { ...a, authorised: auth.ok, authReason: auth.ok ? null : auth.reason ?? null };
+      if (!user) return { ...a, authorised: null, authReason: 'Sign in to act.', authCode: null };
+      if (!a.allowed) return { ...a, authorised: null, authReason: null, authCode: null };
+      const auth = authorizeDecision({ principal: user, action: a.action, rec, ...sod }, ctx);
+      return { ...a, authorised: auth.ok, authReason: auth.ok ? null : auth.reason ?? null, authCode: auth.ok ? null : (auth.code ?? null) };
     });
+    // The domain is the policy's decision about this record, shown so nobody mistakes one kind of approval for another.
+    const gov = authorizeDecision({ principal: user ?? ANON, action: 'comment', rec, proposers: [], recommenders: [] }, ctx);
+    const me = user ? keyOf(user) : null;
+    const designated = me && gov.domain && gov.domain !== 'regulatory' && gov.domain !== 'unclassified' ? designatedOwners(policy, gov.domain, rec).includes(me) : null;
     return {
       decisionId: d.id,
       revision: this.revisionOf(d, state, open),
@@ -185,9 +226,28 @@ export class ReviewService {
       open,
       recent: this.deps.store.forDecision(d.id).filter((p) => !isOpen(p.state)).slice(-5).reverse(),
       actions,
-      policy: { source: policy.source, configured: policy.people.length > 0, problems: policy.problems },
-      user: user ? { login: user.login, name: user.name, roles: rolesHeld({ login: user.login, githubId: user.id }, policy), listed: isListed({ login: user.login, githubId: user.id }, policy) } : null,
+      governance: { domain: gov.domain ?? 'unclassified', basis: gov.classification?.basis ?? '', designated },
+      policy: { source: policy.source, configured: policy.people.length > 0, problems: policy.problems, hash: policy.hash },
+      user: user ? { login: user.login, name: user.name, roles: effectiveRoles(user, ctx).roles, listed: policy.people.some((p) => p.subject === keyOf(user)), provider: user.provider } : null,
     };
+  }
+
+  /** The people who proposed this revision, and who recommended it: the inputs to segregation of duties. Taken from the record and the policy, never from the request. */
+  private sodInputs(d: NormalizedDecision, state: ReviewState, policy: Policy): { proposers: SubjectKey[]; recommenders: { subject: SubjectKey; recommendation: string | null }[] } {
+    const proposers = new Set<SubjectKey>(state.events.filter((e) => e.action === 'request-revision').map((e) => subjectKeyOf(e.actor)));
+    // The author of the record, when the policy binds that git author's email to a person. No bindings, nothing to look up. A record whose
+    // source is not in the canonical history (new, or generated) has no author on file, so only the events speak.
+    let email: string | undefined;
+    if (policy.segregation.authorBindings.length) {
+      try {
+        email = this.canonicalAdapter()?.log(1, [d.source.path])[0]?.email?.toLowerCase();
+      } catch {
+        email = undefined;
+      }
+    }
+    const bound = email ? policy.segregation.authorBindings.find((b) => b.gitEmail === email) : undefined;
+    if (bound) proposers.add(bound.subject);
+    return { proposers: [...proposers], recommenders: state.events.filter((e) => e.action === 'recommend').map((e) => ({ subject: subjectKeyOf(e.actor), recommendation: e.recommendation })) };
   }
 
   private audit(user: VerifiedUser | null, d: string | null, action: string, outcome: Parameters<ReviewStore['audit']>[0]['outcome'], code: string | null, detail: string | null, proposalId: string | null = null, facts?: AuditFacts) {
@@ -195,23 +255,28 @@ export class ReviewService {
   }
 
   /** Record a refusal in the audit log and throw it. */
-  private refuse(user: VerifiedUser | null, d: NormalizedDecision | null, action: string, outcome: 'denied' | 'stale' | 'invalid', e: ServiceError): never {
-    this.audit(user, d?.id ?? null, action, outcome, e.code, e.message);
+  private refuse(user: VerifiedUser | null, d: NormalizedDecision | null, action: string, outcome: 'denied' | 'stale' | 'invalid', e: ServiceError, facts?: AuditFacts): never {
+    this.audit(user, d?.id ?? null, action, outcome, e.code, e.message, null, facts);
     throw e;
   }
 
   async submit(user: VerifiedUser | null, d: NormalizedDecision, req: Partial<ActionRequest>): Promise<{ proposal: Proposal; duplicate: boolean }> {
     const action = String(req.action ?? '');
-    if (!user) this.refuse(null, d, action, 'denied', new ServiceError(401, 'unauthenticated', 'Sign in first. Every action needs a verified GitHub identity.'));
-    // Re-verify against GitHub at the moment of acting, so a switched account or a revoked login cannot ride on an old session.
-    let current: VerifiedUser;
-    try {
-      current = await this.deps.identity.verify();
-    } catch (e) {
-      return this.refuse(user, d, action, 'denied', new ServiceError(401, 'identity-unverified', e instanceof Error ? e.message : 'GitHub could not confirm your identity.'));
-    }
-    if (current.id !== user!.id || current.login.toLowerCase() !== user!.login.toLowerCase()) {
-      this.refuse(user, d, action, 'denied', new ServiceError(401, 'identity-changed', `The GitHub account on this computer is now ${current.login}, not ${user!.login}. Sign in again.`));
+    if (!user) this.refuse(null, d, action, 'denied', new ServiceError(401, 'unauthenticated', 'Sign in first. Every action needs a verified identity.'));
+    // A development GitHub sign-in is re-verified at the moment of acting, so a switched account cannot ride on an old session.
+    // An Entra session was verified by the identity provider and is kept alive or ended by the session store on every request.
+    let current: VerifiedUser = user!;
+    if (user!.provider === 'github') {
+      try {
+        current = await this.deps.identity.verify();
+      } catch (e) {
+        return this.refuse(user, d, action, 'denied', new ServiceError(401, 'identity-unverified', e instanceof Error ? e.message : 'GitHub could not confirm your identity.'));
+      }
+      if (keyOf(current) !== keyOf(user!)) {
+        this.refuse(user, d, action, 'denied', new ServiceError(401, 'identity-changed', `The GitHub account on this computer is now ${current.login}, not ${user!.login}. Sign in again.`));
+      }
+      // The re-check proves who is here now; the moment the person signed in is what the approval window measures.
+      current = { ...current, authAt: user!.authAt };
     }
     return withLock(`decision:${d.id}`, async () => {
       const v = validateRequest(req, d);
@@ -227,8 +292,10 @@ export class ReviewService {
       const canonical = this.canonical();
       if (!canonical.available) return this.refuse(current, d, a, 'invalid', new ServiceError(503, 'canonical-unavailable', canonical.error ?? 'The canonical branch cannot be read.'));
       const policy = this.policy();
-      const auth = authorise({ login: current.login, githubId: current.id }, a, d, policy);
-      if (!auth.ok) return this.refuse(current, d, a, 'denied', new ServiceError(403, auth.code ?? 'forbidden', auth.reason ?? 'Not permitted.'));
+      const state0 = canonical.states.get(d.id) ?? emptyState(d.id);
+      const ctx = authContextFor(policy, this.now().getTime());
+      const auth = authorizeDecision({ principal: current, action: a, rec: recOf(d), ...this.sodInputs(d, state0, policy) }, ctx);
+      if (!auth.ok) return this.refuse(current, d, a, 'denied', new ServiceError(auth.status, auth.code ?? 'forbidden', auth.reason ?? 'Not permitted.', { authz: authzPublic(auth) }), authFacts(auth));
 
       // A retry of the same submission returns what it already created, however the revision has moved since.
       const prior = this.deps.store.byKey(d.id, req.idempotencyKey!);
@@ -268,12 +335,12 @@ export class ReviewService {
 
       const seq = state.events.length + 1;
       const body = {
-        schema: 'greenfuel.decision-review-event/v1' as const,
+        schema: 'greenfuel.decision-review-event/v2' as const,
         id: eventId(d.id, seq),
         decisionId: d.id,
         seq,
         action: a,
-        actor: { login: current.login, githubId: current.id, name: current.name, verifiedBy: current.verifiedBy },
+        actor: actorOf(current),
         createdAt: this.now().toISOString(),
         basis: { recordHash: d.contentHash, sourceStatus: sourceStatusOf(d), sourceCommit: d.source.commit },
         prevHash: state.headHash,
@@ -281,9 +348,14 @@ export class ReviewService {
         conditions: v.value.conditions,
         rationale: v.value.rationale,
         comment: v.value.comment,
-        roleCheck: auth.roleCheck,
+        recommendation: v.value.recommendation,
+        roleCheck: roleCheckOf(auth, current, ctx, d.requiredApproverRole?.text ?? null),
       };
-      const event: ReviewEvent = { ...body, eventHash: hashEvent(body) };
+      // The server signs only after every check above has passed. Without a trusted signing key nothing can be recorded.
+      const signer = getTrust().signer;
+      if (!signer) return this.refuse(current, d, a, 'invalid', new ServiceError(503, 'signing-unavailable', getTrust().signerProblem ?? 'This server has no signing key, so it cannot record an approval.'));
+      const hash = hashEvent(body);
+      const event: ReviewEvent = { ...body, eventHash: hash, signature: signer.sign(hash) };
       const legal = applyEvent(state, event);
       if ('error' in legal) return this.refuse(current, d, a, 'denied', new ServiceError(409, 'not-allowed', legal.error));
 
@@ -339,6 +411,19 @@ export class ReviewService {
 const STATUS_AFTER: Partial<Record<ActionKind, string>> = { approve: 'Approved', 'approve-alternative': 'Approved', 'approve-with-conditions': 'Approved', reject: 'Rejected', defer: 'Deferred', 'request-revision': 'Pending Review', reopen: 'Pending Review' };
 /** The status the decision will have once the action is merged. A comment changes nothing. */
 const statusAfter = (a: ActionKind, now: string): string => STATUS_AFTER[a] ?? now;
+
+/** What the policy needs to classify a decision: its id, kind, and the approver the record itself names. */
+const recOf = (d: NormalizedDecision) => ({ id: d.id, kind: d.kind, approverText: d.requiredApproverRole?.text ?? null });
+
+/** A person who is not signed in, used only to ask the policy how a decision is classified. */
+const ANON: VerifiedUser = { provider: 'github', subject: '0', tenantId: null, login: 'anonymous', name: null, id: null, type: 'User', verifiedBy: 'github-api', entraRoles: [], entraGroups: [], mfa: false, authAt: 0 };
+
+export const actorOf = (u: VerifiedUser) => ({ login: u.login, githubId: u.id, name: u.name, verifiedBy: u.verifiedBy, provider: u.provider, subject: u.subject, tenantId: u.tenantId });
+
+/** What may be shown to the person about a refusal: which checks failed, never another person's details. */
+export const authzPublic = (a: Authz) => ({ code: a.code, domain: a.domain, classification: a.classification?.basis ?? null, roles: a.roles, permission: a.permission, checks: a.checks });
+
+export const authFacts = (a: Authz): AuditFacts => ({ newValue: `${a.code}: ${a.checks.filter((c) => !c.pass).map((c) => c.name).join(', ') || 'denied'}`, oldValue: `domain ${a.domain ?? 'none'}; roles ${a.roles.join('+') || 'none'}` });
 
 function lastEventOf(s: ReviewState) {
   const e = s.events[s.events.length - 1];
