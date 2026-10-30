@@ -1,0 +1,1148 @@
+{
+  "schema": "greenfuel.deck-generation/v1",
+  "id": "deck-7faeb8c-20261030T171910",
+  "mode": "sample",
+  "generatedAt": "2026-10-30T17:19:10.978Z",
+  "generator": {
+    "name": "greenfuel-architecture-studio/presentation",
+    "version": 1
+  },
+  "git": {
+    "commit": "7faeb8c42df4e2a57adbc3005e6e2d4e386afce2",
+    "branch": "studio/ui-readonly",
+    "uncommittedTrackedFiles": 0
+  },
+  "baseline": {
+    "authorized": [],
+    "policyGates": [
+      {
+        "area": "application",
+        "state": "blocked"
+      },
+      {
+        "area": "infrastructure",
+        "state": "blocked"
+      },
+      {
+        "area": "deployment",
+        "state": "blocked"
+      }
+    ],
+    "signatures": "not-verified"
+  },
+  "rubric": {
+    "source": "docs/capstone/RUBRIC-TRACEABILITY.md (derived from the official guide)",
+    "officialFileInRepository": false,
+    "criteria": 20
+  },
+  "decisions": [
+    {
+      "id": "ADR-0016",
+      "status": "Blocked"
+    },
+    {
+      "id": "ADR-0017",
+      "status": "Blocked"
+    },
+    {
+      "id": "ADR-0018",
+      "status": "Blocked"
+    },
+    {
+      "id": "ADR-0019",
+      "status": "Blocked"
+    },
+    {
+      "id": "ADR-0004",
+      "status": "Blocked"
+    },
+    {
+      "id": "ADR-0015",
+      "status": "Blocked"
+    },
+    {
+      "id": "ADR-0020",
+      "status": "Proposed"
+    }
+  ],
+  "sources": [
+    {
+      "path": "docs/acceptance/REQUIREMENTS-COVERAGE.md",
+      "sha256": "c82099fe85b62c55b7168c59a1c452293208e90ca03749139c0bb9a4211322ca",
+      "blob": "30cf28b36614eb5621e166098a11d859a689463b",
+      "bytes": 13946
+    },
+    {
+      "path": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md",
+      "sha256": "8b05e1264065355843f0be26b34ed941f340e95e4e944f5e11bada8a2aa59b7b",
+      "blob": "d4f9a3b830126f57d80570690dcdc741730898ae",
+      "bytes": 10495
+    },
+    {
+      "path": "docs/azure/COST-AND-CAPACITY.md",
+      "sha256": "6f58d13dc3e2dbbbe0dd789bb585db17bc91e9b0b5b42e70ff01dbc831b050f4",
+      "blob": "1d7da036a4a872d1bc5aafb050bf2c885acc68e2",
+      "bytes": 5036
+    },
+    {
+      "path": "docs/azure/OPERATIONS-AND-DR.md",
+      "sha256": "7f522492ccc26d1e0e40eb4cdb496ca645abe3dbe48150d78ed282e0f46611c0",
+      "blob": "5c26b7449ee7ca532990510d6befe4e58580a7ef",
+      "bytes": 6135
+    },
+    {
+      "path": "docs/business/BUSINESS-VALUE-MODEL.md",
+      "sha256": "66b9688053481828ee53980fe38576dc9e60a47a312a4d724d1cd3b4171f9edc",
+      "blob": "9d086328b4741b31629e279e43cea11299f11b33",
+      "bytes": 37513
+    },
+    {
+      "path": "docs/capstone/CRITICAL-GAPS.md",
+      "sha256": "ba0d6459300a0dc282917623d7bd72092cb9473cc2726fbeda3e6790ac1751d7",
+      "blob": "86ad93e6525a7d7282d39b692fa5064a40dd731c",
+      "bytes": 9241
+    },
+    {
+      "path": "docs/capstone/presentation/BACKUP-DEMO.md",
+      "sha256": "05ece1b5617c8624525a1094b45a2df1554ecaccb9991a7c8df3d1be7d28656a",
+      "blob": "172c4608a582a7d1a1cdd56ef22cc9096dde8212",
+      "bytes": 3345
+    },
+    {
+      "path": "docs/capstone/presentation/DEMO-EXECUTIVE.md",
+      "sha256": "fbc79604dd0a20d5324f638cd71ccd8d1d56e0d8bde6aab4ff5ca6a34aece451",
+      "blob": "ee83e1dff3cad7aa4f2282dade57bde8090a314a",
+      "bytes": 4767
+    },
+    {
+      "path": "docs/capstone/presentation/QA-PANEL-50.md",
+      "sha256": "4edfebb43a4274de6a227cb698d55c64c52c6244c5a524bd3726c2ce79a6f989",
+      "blob": "9cedd3839fbfb970a744ea45f0626b0045f2bc3c",
+      "bytes": 45850
+    },
+    {
+      "path": "docs/capstone/presentation/recordings/agents-20261029T131742-b5e009b2.json",
+      "sha256": "fa6eff92f7d404ccb50d345b6f595bdd724daddd82b165d2f778b91330c9fbd2",
+      "blob": "17617d3627485878f90555a757764b4044a706ec",
+      "bytes": 2000
+    },
+    {
+      "path": "docs/capstone/presentation/recordings/approval-20261029T131741-1341d073.json",
+      "sha256": "42730becbb5070575b6da89406e817c1603d764fe15ff3ccac735f00e324f954",
+      "blob": "4b5fe36f24043db5554e68016b946bae52af613c",
+      "bytes": 2006
+    },
+    {
+      "path": "docs/capstone/presentation/recordings/azure-20261029T131743-b9958dcf.json",
+      "sha256": "4ccc1951f9b0e0e560dca5fcc4d211588a9852fc92d1d946e0222c209100e414",
+      "blob": "844cfecb912d515213d6d7e82f43928082e4ed00",
+      "bytes": 1664
+    },
+    {
+      "path": "docs/capstone/presentation/recordings/exec-20261029T131741-04862602.json",
+      "sha256": "225b6e56993613ecd5f4b628c1dbb8d4577d8b88cac636c1a8ec9a59e798428a",
+      "blob": "236b76e24ecb99cecee25b7174ca9f5cd37ec07e",
+      "bytes": 2082
+    },
+    {
+      "path": "docs/capstone/presentation/recordings/isolation-20261029T131742-c9fa8269.json",
+      "sha256": "2d04a4bd4f58f58e0c45d0116edb4edab04c8bf2445605c26392c91e78c9b661",
+      "blob": "874908976738d8dc3040b118db63f22f48affb5c",
+      "bytes": 1744
+    },
+    {
+      "path": "docs/capstone/presentation/recordings/lineage-20261029T131742-c767005e.json",
+      "sha256": "f180b99798594b9804b14d6e1a67213efc7abb35ff46818151a24e9a34886ea5",
+      "blob": "c9829122b098b93c83882aac1aae8eda1a510544",
+      "bytes": 2170
+    },
+    {
+      "path": "docs/capstone/presentation/recordings/observability-20261029T131742-b48a4268.json",
+      "sha256": "7115b4319d0ff7fe9b57c2a271696f100a916d2eca660a48afa0bf2506dc639d",
+      "blob": "baae33ee7aa3260c8d930011bdb7e4b2ef735cdd",
+      "bytes": 1871
+    },
+    {
+      "path": "docs/capstone/presentation/recordings/outage-20261029T131741-8ca76ae6.json",
+      "sha256": "613326c1f21584b4d20860c65c3e721f5e3430f29f178787fb6dc73a671c838f",
+      "blob": "4571b6b2fac15bf552050c0716fdc0b2c5d78b8c",
+      "bytes": 1867
+    },
+    {
+      "path": "docs/capstone/presentation/recordings/tamper-20261029T131741-5b3008eb.json",
+      "sha256": "a4f483e36d9fd9b119cc334bc72854deeff565a12555a9da75a07ef58af8e252",
+      "blob": "7a32bf4144ef7f77945c586d757bfbdde3730845",
+      "bytes": 1621
+    },
+    {
+      "path": "docs/capstone/presentation/REHEARSAL-PLAN-AND-SCORECARD.md",
+      "sha256": "1ee022c6f082b0c0699b4d3a93c0e3419578ccc52d3b246f34614f88f761e344",
+      "blob": "a2c1802c5af245e9653ebfbb2ff15e4e4da46f63",
+      "bytes": 11411
+    },
+    {
+      "path": "docs/capstone/RUBRIC-TRACEABILITY.md",
+      "sha256": "994bec31e54e647bef2bd14027ffcaf3c0e5f41cbb398d17010b002dcf31f905",
+      "blob": "54f03518abec733e9e7ec226b6cf62448ec380c2",
+      "bytes": 30228
+    },
+    {
+      "path": "docs/context/AGENT-AUTONOMY-MATRIX.md",
+      "sha256": "350b5338782ec82c764993aedc8839040cf3c01b5aa2b66b8a4eeee9e50f01b0",
+      "blob": "5bce0a48269445ed66f755d7d46e8cb445d1fd07",
+      "bytes": 9501
+    },
+    {
+      "path": "docs/context/REQUIREMENTS.md",
+      "sha256": "858b199d66d8a258d3cdd3c16fde540d37f12231615e1d72e4b56160d549b3cd",
+      "blob": "4a20b5225b0a829d454363316ab2e32ea0934aba",
+      "bytes": 27283
+    },
+    {
+      "path": "docs/context/SOVEREIGNTY-MATRIX.md",
+      "sha256": "e6eb600d6be9b2cb9c9f22927899c8bf2f07bbef640f0ab785d98b7e6e35bc55",
+      "blob": "90a51fe2692e357e61f17ff4fb2b770c53ba3eb6",
+      "bytes": 11121
+    },
+    {
+      "path": "docs/evaluation/agent-runs/COMPARISON.md",
+      "sha256": "0c81af09ead5db5ed37960e5913aadf5ed6ee4a6c97ebd5a43a09ca9db9643f6",
+      "blob": "ac645a5ee63504b5e8db6f049a1c9fea2ef06a7a",
+      "bytes": 6763
+    },
+    {
+      "path": "docs/evaluation/agent-runs/history.json",
+      "sha256": "504626b7176598dcdb0b3c88286acffd756ecd674d831dd4c637cd87da206a61",
+      "blob": "5b748ec3bca4352ed99a17c63bdfcf9fec9a7652",
+      "bytes": 1947
+    },
+    {
+      "path": "docs/evidence/records/EV-0077.json",
+      "sha256": "b49a12f424ca095dcd5e1af8a501f873e71b35c622acd9bf32a5773e9aacd336",
+      "blob": "5a24537a958e8658e438b04a8c5f87634b2f431b",
+      "bytes": 3258
+    },
+    {
+      "path": "docs/phase/PHASE-1-BLOCKER-REPORT.md",
+      "sha256": "a9a258a3f90c7129c55a5a381ce54eb0fd3bd4e78f08abf32928b9069431dbe6",
+      "blob": "81d5cb5f75c6a31f003589fe7670cf94d0776aad",
+      "bytes": 16403
+    },
+    {
+      "path": "docs/target-architecture/02-ARCHITECTURE-OPTIONS.md",
+      "sha256": "5c32dcb00daf28d9ed6339fae10d011dc7db6e9150915ed8627ee7525a8366fe",
+      "blob": "d1fe86378e20fc33471dd4a0816619c701ba4f30",
+      "bytes": 11871
+    },
+    {
+      "path": "docs/target-architecture/05-QUALITY-ATTRIBUTES.md",
+      "sha256": "11442c83ddecc5a3deacada321e35b2336f87f244d840239162d7d9e6f0cc0ed",
+      "blob": "3b035ad9baa354ad6f2ba490e66020ee1cc8926b",
+      "bytes": 8800
+    },
+    {
+      "path": "docs/target-architecture/06-THREAT-MODEL.md",
+      "sha256": "868a2bf1c75c6d35a656472157564709831e0d07dde708f58a199bfe15e99fa6",
+      "blob": "277e0947a4fa7f4b70875fc749c84604784b0d22",
+      "bytes": 19732
+    },
+    {
+      "path": "docs/target-architecture/07-AZURE-SERVICE-DECISION-MATRIX.md",
+      "sha256": "295db0724099afe478e649c1508f478ef070c615d57f4fa90d1835752afff3cb",
+      "blob": "67923adac0fac55d37719b01e8ef689121ed2b04",
+      "bytes": 14039
+    },
+    {
+      "path": "docs/target-architecture/10-CONTROL-MATRIX.md",
+      "sha256": "7696e373950a8fb95edea95d8d763290148519f29f9f1e7e5f418d6a77918149",
+      "blob": "b09860cce0d62a46206405862f301ac1543ee2cb",
+      "bytes": 21733
+    },
+    {
+      "path": "docs/target-architecture/12-DATA-MOVEMENT-AND-RESIDENCY-VALIDATION.md",
+      "sha256": "fe2836034ea9fa09afdc95e5c41e705dc2a004f10d071113998d0bdbdeff7a07",
+      "blob": "f2d87ee1ab85c6ca6c41d7d95680ddfea9cc0a7a",
+      "bytes": 8133
+    },
+    {
+      "path": "harness/contracts/custody-chain-contract.mjs",
+      "sha256": "6ac3dd23746f796e2517d28f30a67017972027688a9c017ab152590f20aeca7b",
+      "blob": "592db2e3da8771df6a52a847d0f2c551846cf581",
+      "bytes": 13300
+    },
+    {
+      "path": "PROBLEMSTATEMENT.md",
+      "sha256": "2b5e84bf3faff4914700ae1e996dc0d63c7b27f8e53fd56a781253c81b4f5b80",
+      "blob": "8cdb86b57ed0554a9bfce98eb571a4a909856b84",
+      "bytes": 4104
+    }
+  ],
+  "slides": [
+    {
+      "id": "E01",
+      "tier": "executive",
+      "title": "Certificates a shipowner can verify on their own",
+      "visual": "hero",
+      "contentHash": "e9b94f349fe37775809cee0b7ebbaf9a87575f0ca007d02c13c4b40a314883ce",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [],
+      "claims": [
+        {
+          "id": "E01-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 30
+    },
+    {
+      "id": "E02",
+      "tier": "executive",
+      "title": "A green-fuel premium is only paid if the certificate is believed",
+      "visual": "flow",
+      "contentHash": "4c712d1ed7954e8a0c2ff407a46c1575dfd2e66af078a0d0f8b07536b2bbf3f7",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [],
+      "claims": [
+        {
+          "id": "E02-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 60
+    },
+    {
+      "id": "E03",
+      "tier": "executive",
+      "title": "Reliability decides how much of the premium is kept",
+      "visual": "stats",
+      "contentHash": "8ec3cda5ff00ef5bdca6e2d4bc9b3223b0f2ce6ad839932c8057f8b660869496",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [
+        "PH-VOLUME"
+      ],
+      "claims": [
+        {
+          "id": "E03-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 60
+    },
+    {
+      "id": "E04",
+      "tier": "executive",
+      "title": "Base case: real value, but no three-year payback",
+      "visual": "bars",
+      "contentHash": "0986dcdaaa6288ed954e95172319bf8845a85896b6d95d01682a4019215f6679",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [],
+      "claims": [
+        {
+          "id": "E04-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 90
+    },
+    {
+      "id": "E05",
+      "tier": "executive",
+      "title": "Today's manual process is not known well enough, and fails where it is known",
+      "visual": "table",
+      "contentHash": "5d4a3b1424e4314632884ae16b7e7f9e26156884c6e38775070873554bc2b042",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [],
+      "claims": [
+        {
+          "id": "E05-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 45
+    },
+    {
+      "id": "E06",
+      "tier": "executive",
+      "title": "Four options on eleven criteria: only sovereign cells can be made to meet residency",
+      "visual": "matrix",
+      "contentHash": "1e2c47e3c64c4d12bf30fdcf97cc3f761ec9c85075bd0d5c8fcbeedbf43112cd",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [],
+      "claims": [
+        {
+          "id": "E06-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 75
+    },
+    {
+      "id": "E07",
+      "tier": "executive",
+      "title": "Recommend sovereign cells, a deterministic core and bounded agents",
+      "visual": "cells",
+      "contentHash": "6faf7d50e4e1053b04f1d0131bbac84a898f15946d952e517fe2606d68586403",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [],
+      "claims": [
+        {
+          "id": "E07-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 90
+    },
+    {
+      "id": "E08",
+      "tier": "executive",
+      "title": "It wins on the hard constraints and pays for it in complexity",
+      "visual": "table",
+      "contentHash": "0069412bcd44041d27a359652a0f67d3fcd1dc9711d116b9ac396d1746626ee7",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [],
+      "claims": [
+        {
+          "id": "E08-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 60
+    },
+    {
+      "id": "E09",
+      "tier": "executive",
+      "title": "Agents draft. Services validate and issue. A person approves",
+      "visual": "flow",
+      "contentHash": "1ee65e547d4e957f33ce8cce8814acdba7065da03bb11d94b35ca5b632be5658",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [],
+      "claims": [
+        {
+          "id": "E09-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 60
+    },
+    {
+      "id": "E10",
+      "tier": "executive",
+      "title": "Evidence stays in its port: everywhere else is conditional or prohibited",
+      "visual": "matrix",
+      "contentHash": "da6e9be1763b122803c4078540440b50b5031dea013625cb7b36d419c7769517",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [],
+      "claims": [
+        {
+          "id": "E10-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 60
+    },
+    {
+      "id": "E11",
+      "tier": "executive",
+      "title": "Watch a delivery become a certificate a shipowner can verify",
+      "visual": "timeline",
+      "contentHash": "702e2666955a85f12cf01cc74bb0a7be3b91f49a44c39ba6be2ef821e1bef8f6",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [
+        "PH-TIME"
+      ],
+      "claims": [
+        {
+          "id": "E11-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 120
+    },
+    {
+      "id": "E12",
+      "tier": "executive",
+      "title": "Measured: the rules do the work. AI value is unproven",
+      "visual": "stats",
+      "contentHash": "2cbc75e8b0583bcb40936666f3fe7def4b9f56257e5601ed82c2b0461786d39c",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [],
+      "claims": [
+        {
+          "id": "E12-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 75
+    },
+    {
+      "id": "E13",
+      "tier": "executive",
+      "title": "Base case: $5.2M over three years, and more per certificate than today",
+      "visual": "bars",
+      "contentHash": "ae6bb82243821eb43fb4aa20f5b1af58f26d795535fd2e2fffcc774259e32b54",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [],
+      "claims": [
+        {
+          "id": "E13-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 75
+    },
+    {
+      "id": "E14",
+      "tier": "executive",
+      "title": "Decision: fund a bounded local pilot. Not Azure deployment yet",
+      "visual": "table",
+      "contentHash": "8ebfa605f0a7c7c7a8115222ab9549facd711a5a3c23d885005e9aa7d9d825ec",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [],
+      "claims": [
+        {
+          "id": "E14-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 75
+    },
+    {
+      "id": "T01",
+      "tier": "technical",
+      "title": "99 requirements, 80 of them Must, in six families",
+      "visual": "bars",
+      "contentHash": "7741a90b40eccaf67eb32b3e0459bbd56faff0049e4d9cd96f86b6e9b8bb1708",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [],
+      "claims": [
+        {
+          "id": "T01-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 45
+    },
+    {
+      "id": "T02",
+      "tier": "technical",
+      "title": "Azure services are provisional leans, each with a residency check still to run",
+      "visual": "table",
+      "contentHash": "eb6ca862383dc2631c57e5e941c609226afeae299c1b59230bbce749f0bdcf56",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [],
+      "claims": [
+        {
+          "id": "T02-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 60
+    },
+    {
+      "id": "T03",
+      "tier": "technical",
+      "title": "Thirteen flows are classified. Only some may leave the jurisdiction",
+      "visual": "edge-flow",
+      "contentHash": "567639ca495fd55adebec34d6152568dd48e87d5a026542f3e5dbbeb3a75b8ac",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [],
+      "claims": [
+        {
+          "id": "T03-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 60
+    },
+    {
+      "id": "T04",
+      "tier": "technical",
+      "title": "Four agents may reach L4. One stays at L3. None can approve or file",
+      "visual": "autonomy",
+      "contentHash": "38be1e4cfa1be1a88ec774ac5f95b3a67fef0c570090d19b4da42abe0edd3ce1",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [],
+      "claims": [
+        {
+          "id": "T04-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 60
+    },
+    {
+      "id": "T05",
+      "tier": "technical",
+      "title": "59 controls in seven families. 9 cannot be tested until a product exists",
+      "visual": "bars",
+      "contentHash": "f8eda5486dd2f650670c70d1c8cedd5efe6b12859d0524bc9cea0f86a2b6b096",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [],
+      "claims": [
+        {
+          "id": "T05-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 60
+    },
+    {
+      "id": "T06",
+      "tier": "technical",
+      "title": "Evidence is a signed chain; the certificate binds to its hash",
+      "visual": "trust-chain",
+      "contentHash": "7fe2add633d4c91387a799828d0643a0ea40d36ac733b3bbe058ac7ff51bfd29",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [],
+      "claims": [
+        {
+          "id": "T06-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 60
+    },
+    {
+      "id": "T07",
+      "tier": "technical",
+      "title": "Scalability is argued, not measured",
+      "visual": "review",
+      "contentHash": "9db214ecb1020228dd956b19012daf5efc93b39181476070d66d4c277ac02513",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [
+        "PH-PERF"
+      ],
+      "claims": [
+        {
+          "id": "T07-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 45
+    },
+    {
+      "id": "T08",
+      "tier": "technical",
+      "title": "Recovery stays inside each jurisdiction. Targets are unset and untested",
+      "visual": "table",
+      "contentHash": "e938747bfc6cfcd47cabe80add9132e335ac95e01bb1495d75082ae91d0491e9",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [
+        "PH-DR"
+      ],
+      "claims": [
+        {
+          "id": "T08-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 60
+    },
+    {
+      "id": "T09",
+      "tier": "technical",
+      "title": "Observability is designed per cell. Nothing is instrumented yet",
+      "visual": "table",
+      "contentHash": "883a7f7b2b53aa367e50b7306d0ae6b3308269c76e22a95799fc7e4de23dac38",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [
+        "PH-OBS"
+      ],
+      "claims": [
+        {
+          "id": "T09-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 45
+    },
+    {
+      "id": "T10",
+      "tier": "technical",
+      "title": "Four arms were scored. Both language-model arms are not run",
+      "visual": "table",
+      "contentHash": "aa6b371c2680f53800710528828809201edf551a7fb3f42fc2671b94bf8f6552",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [],
+      "claims": [
+        {
+          "id": "T10-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 60
+    },
+    {
+      "id": "T11",
+      "tier": "technical",
+      "title": "What was rejected, and the requirement that rejected it",
+      "visual": "table",
+      "contentHash": "e4247ed97a47b2db704e813a9f4dca293e77686794cfbbe1c7b4430ebc52f87a",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [],
+      "claims": [
+        {
+          "id": "T11-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 60
+    },
+    {
+      "id": "T12",
+      "tier": "technical",
+      "title": "6 critical gaps stand between this repository and a defensible capstone",
+      "visual": "table",
+      "contentHash": "cd09b762ed3c6a521d11d769b6e2dedcc8bd7e0780aea4b9da9a927a724f1712",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [],
+      "claims": [
+        {
+          "id": "T12-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 60
+    },
+    {
+      "id": "T13",
+      "tier": "technical",
+      "title": "The path to production runs through nine gates. None is passed",
+      "visual": "timeline",
+      "contentHash": "455594b6b990d1450cdbbf0a0e71cb084b60ace8b47b12fedbf53e9fb9b46cb0",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [],
+      "claims": [
+        {
+          "id": "T13-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 45
+    },
+    {
+      "id": "A01",
+      "tier": "appendix",
+      "title": "The target architecture is Blocked in the register, not approved",
+      "visual": "table",
+      "contentHash": "0428c1999b85eee8683bc1ff460731c44505c9c0e38864532fbab0d6b5e19e63",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [],
+      "claims": [
+        {
+          "id": "A01-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 30
+    },
+    {
+      "id": "A02",
+      "tier": "appendix",
+      "title": "3 Must requirements have no decision yet",
+      "visual": "table",
+      "contentHash": "ca9e9c9b4d2157a60f644892ab6087b6eec021e21a8c7c543c09a723c2d8b5f8",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [],
+      "claims": [
+        {
+          "id": "A02-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 30
+    },
+    {
+      "id": "A03",
+      "tier": "appendix",
+      "title": "Reference topology: one Azure cell per port jurisdiction, design only",
+      "visual": "topology",
+      "contentHash": "8aabd7422bbeee39cad272e28d1c65a1eb33fb57bb1aa4e9c55298c2cc80d0c1",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [],
+      "claims": [
+        {
+          "id": "A03-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 45
+    },
+    {
+      "id": "A12",
+      "tier": "appendix",
+      "title": "The 13 classified data flows, with the design position of each",
+      "visual": "table",
+      "contentHash": "a9c377e538ece08d5a97c9d2e13c688725cb19790abbcb80fd40d958d4d6bd1e",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [],
+      "claims": [
+        {
+          "id": "A12-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 30
+    },
+    {
+      "id": "A04",
+      "tier": "appendix",
+      "title": "There is no performance evidence yet",
+      "visual": "review",
+      "contentHash": "7ed2867afff11414fb3a78654b5ad1ba872d58e91980ce2b40b641da3ca398f0",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [
+        "PH-PERF-A"
+      ],
+      "claims": [
+        {
+          "id": "A04-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 15
+    },
+    {
+      "id": "A05",
+      "tier": "appendix",
+      "title": "Cost: the method exists; the Azure run cost has no figure",
+      "visual": "table",
+      "contentHash": "99e27aeccef24264ec77abedf64c59c9581e50cc74f511cac7a592b281b56a94",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [],
+      "claims": [
+        {
+          "id": "A05-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 30
+    },
+    {
+      "id": "A06",
+      "tier": "appendix",
+      "title": "34 threats across six trust boundaries, each with a control and a stated limit",
+      "visual": "stats",
+      "contentHash": "1ca9f08a18769f57d616b5dfd3c3964ad0263b0bf6dbdcb2ec18e07183e0d5c7",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [],
+      "claims": [
+        {
+          "id": "A06-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 45
+    },
+    {
+      "id": "A07",
+      "tier": "appendix",
+      "title": "41 of 42 synthetic cases complete; the one miss is a free-text relative date",
+      "visual": "stats",
+      "contentHash": "1e891817f1d4e6af7d2cd4828f8026b74cddafc7929fd1093a500ab1e2ad0407",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [],
+      "claims": [
+        {
+          "id": "A07-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 30
+    },
+    {
+      "id": "A08",
+      "tier": "appendix",
+      "title": "1,056 of 1,056 automated tests pass on the recorded run",
+      "visual": "stats",
+      "contentHash": "1095ebfdb4c7d204c398ba51ba99aeadc393b8a97b724a176f89fc481a40ae55",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [],
+      "claims": [
+        {
+          "id": "A08-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 30
+    },
+    {
+      "id": "A09",
+      "tier": "appendix",
+      "title": "24 gaps were recorded at the audit. 6 are critical",
+      "visual": "bars",
+      "contentHash": "40a83b8b381f1f0772d104ad398bb21a09ea54db3ba1a55ffe69f07ac67ad848",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [],
+      "claims": [
+        {
+          "id": "A09-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 30
+    },
+    {
+      "id": "A10",
+      "tier": "appendix",
+      "title": "Fifty panel questions are prepared. One per area is shown here",
+      "visual": "table",
+      "contentHash": "d1eca928a6f0d895726face0a7fb6e51d732c5eb0adc45a27ed4107a1cbab95d",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [],
+      "claims": [
+        {
+          "id": "A10-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 30
+    },
+    {
+      "id": "A11",
+      "tier": "appendix",
+      "title": "Presentation criteria: what the deck can serve and what only a live session can",
+      "visual": "table",
+      "contentHash": "434c0e129083caa9d46a9836afb0a03ed91f9ed8ff60f3b84fc5582702624542",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [
+        "PH-REHEARSAL"
+      ],
+      "claims": [
+        {
+          "id": "A11-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 30
+    },
+    {
+      "id": "A13",
+      "tier": "appendix",
+      "title": "This deck was generated from one commit and a recorded set of sources",
+      "visual": "table",
+      "contentHash": "dc8a6fd1a63d1ca87fe11b1ff98ffef2aa2ef0630e70ed70b039e082924189df",
+      "review": "draft",
+      "decidedBy": null,
+      "placeholders": [],
+      "claims": [
+        {
+          "id": "A13-c1",
+          "ok": true
+        }
+      ],
+      "seconds": 15
+    }
+  ],
+  "claims": {
+    "checked": 40,
+    "unsupported": 0
+  },
+  "reviewStateRevision": 0,
+  "assets": [
+    {
+      "slot": "hero",
+      "kind": "photo",
+      "outcome": "fallback",
+      "detail": "No manifest entry."
+    },
+    {
+      "slot": "azure-entra",
+      "kind": "azure-icon",
+      "outcome": "fallback",
+      "detail": "No manifest entry."
+    },
+    {
+      "slot": "azure-containerapps",
+      "kind": "azure-icon",
+      "outcome": "fallback",
+      "detail": "No manifest entry."
+    },
+    {
+      "slot": "azure-policy",
+      "kind": "azure-icon",
+      "outcome": "fallback",
+      "detail": "No manifest entry."
+    },
+    {
+      "slot": "azure-containerapps",
+      "kind": "azure-icon",
+      "outcome": "fallback",
+      "detail": "No manifest entry."
+    },
+    {
+      "slot": "azure-servicebus",
+      "kind": "azure-icon",
+      "outcome": "fallback",
+      "detail": "No manifest entry."
+    },
+    {
+      "slot": "azure-foundry",
+      "kind": "azure-icon",
+      "outcome": "fallback",
+      "detail": "No manifest entry."
+    },
+    {
+      "slot": "azure-postgres",
+      "kind": "azure-icon",
+      "outcome": "fallback",
+      "detail": "No manifest entry."
+    },
+    {
+      "slot": "azure-blob",
+      "kind": "azure-icon",
+      "outcome": "fallback",
+      "detail": "No manifest entry."
+    },
+    {
+      "slot": "azure-keyvault",
+      "kind": "azure-icon",
+      "outcome": "fallback",
+      "detail": "No manifest entry."
+    },
+    {
+      "slot": "azure-monitor",
+      "kind": "azure-icon",
+      "outcome": "fallback",
+      "detail": "No manifest entry."
+    },
+    {
+      "slot": "azure-ledger",
+      "kind": "azure-icon",
+      "outcome": "fallback",
+      "detail": "No manifest entry."
+    },
+    {
+      "slot": "azure-acr",
+      "kind": "azure-icon",
+      "outcome": "fallback",
+      "detail": "No manifest entry."
+    }
+  ],
+  "outputs": {
+    "pptx": {
+      "file": "deck.pptx",
+      "sha256": "d17819a98d44477b15fdd58202d1de2ba7f7f4c630d548e3ae0dd691bad6f21a",
+      "bytes": 1597487
+    },
+    "pdf": {
+      "file": "render/deck.pdf",
+      "sha256": "eafbc918055faa0ccd886feb03cc3f042759a144875d2640acf25d8782c79a0d",
+      "bytes": 346802
+    }
+  },
+  "render": {
+    "performed": true,
+    "tool": "Microsoft PowerPoint (COM automation)",
+    "slidePreviews": 40
+  },
+  "qa": {
+    "errors": 0,
+    "warnings": 0,
+    "info": 8
+  },
+  "gate": [
+    {
+      "id": "baseline",
+      "title": "An authorized, current architecture baseline exists",
+      "blocking": true,
+      "met": false,
+      "detail": "No baseline is authorized. The deck cannot claim to present an approved architecture.",
+      "hint": "Authorize a baseline (docs/architecture-studio/BASELINE.md)."
+    },
+    {
+      "id": "decisions",
+      "title": "Every decision the deck presents is approved",
+      "blocking": true,
+      "met": false,
+      "detail": "7 of 7 presented decisions are not approved: ADR-0016, ADR-0017, ADR-0018, ADR-0019, ADR-0004, ADR-0015, ADR-0020.",
+      "hint": "Decide them in the review workflow. The deck reads their status; it does not change it."
+    },
+    {
+      "id": "claims",
+      "title": "Every claim is supported by a cited source",
+      "blocking": true,
+      "met": true,
+      "detail": "All 40 claim checks pass (a source exists and says what the claim relies on).",
+      "hint": "Fix the source or the claim."
+    },
+    {
+      "id": "slides",
+      "title": "A person has approved every slide at its current content",
+      "blocking": true,
+      "met": false,
+      "detail": "0 of 40 slides approved.",
+      "hint": "Review each slide in the Presentation Studio."
+    },
+    {
+      "id": "qa",
+      "title": "The deck was rendered, measured by PowerPoint, and has no layout error",
+      "blocking": true,
+      "met": true,
+      "detail": "No overflow, overlap, margin, font or content error.",
+      "hint": "Build with rendering on a computer with Microsoft PowerPoint."
+    },
+    {
+      "id": "clean-tree",
+      "title": "The sources are exactly the committed commit",
+      "blocking": true,
+      "met": true,
+      "detail": "Commit 7faeb8c, no uncommitted changes.",
+      "hint": "Commit or discard changes, then build again."
+    },
+    {
+      "id": "placeholders",
+      "title": "Review placeholders",
+      "blocking": false,
+      "met": false,
+      "detail": "7 placeholders on 7 slides stand for evidence the repository does not hold. They are shown on the slides; approving such a slide needs a written acknowledgement."
+    },
+    {
+      "id": "rehearsal",
+      "title": "Delivery rehearsed by a person",
+      "blocking": false,
+      "met": false,
+      "detail": "0 of 10 rehearsal criteria are recorded as rehearsed. The deck does not verify delivery, presence or consultative behaviour."
+    }
+  ],
+  "honesty": "SAMPLE. Not approved for presentation. The gate result above says what is missing."
+}
