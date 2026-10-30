@@ -116,7 +116,7 @@ export default async function ApprovalsPage() {
           ))}
         </ol>
         <p className="mt-4 text-[12.5px] text-ink-3">
-          <Tag>read-only</Tag> This page changes nothing. Write-back is not implemented in this stage.
+          <Tag>read-only</Tag> This page changes nothing. Decisions are reviewed one at a time on each decision&rsquo;s review page, which proposes them as pull requests. Signed approvals still use the commands above.
         </p>
       </Section>
     </>

@@ -1,16 +1,19 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
-import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
+import { expect as baseExpect, test, type APIRequestContext, type Locator, type Page } from '@playwright/test';
 import { USERS } from '../checks/fixtures/review-fixture.ts';
 import { expectNoAxeViolations } from './helpers.ts';
+
+// These tests wait on real git work (fetch, push, a model rebuild after a merge), so assertions get a longer, still bounded, wait.
+const expect = baseExpect.configure({ timeout: 20_000 });
 
 // The whole review workflow, in a real browser, against a throw-away clone of this repository with a local bare "GitHub"
 // remote, a simulated pull-request service and test identities (server on port 3103, STUDIO_TEST_MODE). Nothing here touches the
 // real repository or GitHub. A person's "merge" is done with git on the bare remote, exactly as GitHub would do it.
 const BASE = 'http://localhost:3103';
 test.use({ baseURL: BASE });
-test.describe.configure({ mode: 'serial' });
+test.describe.configure({ mode: 'serial', timeout: 90_000 });
 
 const dir = process.env.STUDIO_E2E_REVIEW_DIR!;
 const state = path.join(dir, 'state');
@@ -55,16 +58,26 @@ async function act(page: Page, action: string, fill: { reason?: string; label?: 
   if (fill.conditions) {
     for (const [i, c] of fill.conditions.entries()) {
       if (i > 0) await d.getByRole('button', { name: 'Add a condition' }).click();
-      await d.getByLabel(`Condition ${i + 1}`).fill(c);
+      await d.getByRole('textbox', { name: `Condition ${i + 1}`, exact: true }).fill(c);
     }
   }
   if (fill.reason !== undefined) await d.getByRole('textbox', { name: fill.label ?? /./ }).last().fill(fill.reason);
+  const t0 = Date.now();
   await d.getByRole('button', { name: fill.submit }).click();
-  await expect(d).toBeHidden();
+  await expect(d).toBeHidden({ timeout: 30_000 });
+  console.log(`SUBMIT-MS ${action} ${Date.now() - t0}`);
 }
 
 const tracker = (page: Page) => page.getByTestId('proposal-tracker');
 const status = (page: Page) => page.getByTestId('review-status');
+
+// Evidence screenshots: real captures from this run, written next to the other Studio screenshots.
+const shotDir = path.resolve(process.cwd(), '..', '..', 'docs', 'architecture-studio', 'screenshots');
+async function shot(target: Page | Locator, name: string, fullPage = false) {
+  await new Promise((r) => setTimeout(r, 400));
+  if ('goto' in target) await target.screenshot({ path: path.join(shotDir, `${name}.png`), fullPage, animations: 'disabled' });
+  else await target.screenshot({ path: path.join(shotDir, `${name}.png`), animations: 'disabled' });
+}
 
 async function csrf(req: APIRequestContext) {
   const s = (await (await req.get('/api/v1/auth/session')).json()) as { csrf?: string };
@@ -89,6 +102,7 @@ test.describe('navigation and the full record', () => {
     await expect(page.getByTestId('dependencies')).toContainText('Depends on');
     await expect(page.getByText('Nothing here is predicted by a model.')).toBeVisible();
     await expect(page.getByTestId('pending-position')).toContainText(/^1 of \d+$/);
+    await shot(page, '31-review-page', true);
 
     await page.getByRole('heading', { level: 1 }).click(); // move focus out of anything editable
     await page.keyboard.press('n');
@@ -137,6 +151,7 @@ test.describe('approval, canonical only after the merge', () => {
     await expect(tracker(page)).toHaveAttribute('data-state', 'pull-request-created');
     await expect(tracker(page).getByRole('listitem').filter({ hasText: 'Pull request created' })).toHaveAttribute('aria-current', 'step');
     await expect(page.getByTestId('rail-notice')).toContainText('Pull request created');
+    await shot(page, '32-review-pull-request-created');
     // Not canonical yet: the pill, the API and main all still say what they said before.
     await expect(status(page)).toContainText('Proposed');
     expect(((await (await request.get('/api/v1/decisions/ADR-0020')).json()) as { decision: { status: string } }).decision.status).toBe('Proposed');
@@ -157,6 +172,7 @@ test.describe('approval, canonical only after the merge', () => {
     await expect(tracker(page)).toBeHidden();
     await expect(status(page)).toContainText('Approved');
     await expect(page.getByText('Status comes from a review record on the canonical branch')).toBeVisible();
+    await shot(page, '33-review-canonical-approved');
     expect(((await (await request.get('/api/v1/decisions/ADR-0020')).json()) as { decision: { status: string; approvalBasis: string } }).decision).toMatchObject({ status: 'Approved', approvalBasis: 'review-record' });
     expect(reviewFiles()).toContain('docs/decision-reviews/ADR-0020/0001-approve.json');
     await expect(page.getByTestId('timeline')).toContainText('Approve the recommended option');
@@ -170,7 +186,7 @@ test.describe('approval, canonical only after the merge', () => {
     const detail = page.getByTestId('decision-detail');
     await expect(detail).toContainText('Approved by a Studio review record');
     await expect(detail).toContainText('not a signed approval under ADR 0008');
-    await page.getByRole('button', { name: /^Approved \d+$/ }).first().waitFor();
+    await page.keyboard.press('Escape');
     await expect(page.getByRole('button', { name: /^Approved 14$/ })).toBeVisible();
   });
 });
@@ -188,6 +204,7 @@ test.describe('alternative, conditional and rejection', () => {
     await expect(d.getByText(/At least 10 characters/)).toBeVisible();
     await expect(d.getByRole('button', { name: 'Submit selection' })).toBeDisabled();
     await d.getByRole('textbox').last().fill(REASON);
+    await shot(page, '34-review-alternative-dialog');
     await d.getByRole('button', { name: 'Submit selection' }).click();
     await expect(d).toBeHidden();
     await expect(tracker(page)).toHaveAttribute('data-state', 'pull-request-created');
@@ -197,8 +214,8 @@ test.describe('alternative, conditional and rejection', () => {
     expect(file.actor.login).toBe('test-owner');
     merge(lastPr().number);
     await tracker(page).getByRole('button', { name: 'Check GitHub status' }).click();
-    await expect(status(page)).toContainText('Approved');
     await expect(page.getByTestId('review-rail')).toContainText('(not the recommended option)');
+    await expect(status(page)).toContainText('Approved');
   });
 
   test('conditional approval needs at least one condition and shows the conditions once it is canonical', async ({ page }) => {
@@ -208,9 +225,9 @@ test.describe('alternative, conditional and rejection', () => {
     const d = page.getByTestId('action-dialog');
     await expect(d.getByRole('button', { name: 'Submit conditional approval' })).toBeDisabled();
     await expect(d.getByText('At least one condition is needed.')).toBeVisible();
-    await d.getByLabel('Condition 1').fill('Confirm in-country region support first');
+    await d.getByRole('textbox', { name: 'Condition 1', exact: true }).fill('Confirm in-country region support first');
     await d.getByRole('button', { name: 'Add a condition' }).click();
-    await d.getByLabel('Condition 2').fill('Re-review after the pilot');
+    await d.getByRole('textbox', { name: 'Condition 2', exact: true }).fill('Re-review after the pilot');
     await d.getByRole('button', { name: 'Submit conditional approval' }).click();
     await expect(d).toBeHidden();
     merge(lastPr().number);
@@ -285,9 +302,10 @@ test.describe('who may act', () => {
     await signIn(page, USERS.outsider);
     await expect(page.getByTestId('identity')).toContainText('Not a registered approver');
     await expect(page.getByTestId('action-reject')).toHaveAttribute('aria-disabled', 'true');
-    await page.getByTestId('action-reject').click();
+    await page.getByTestId('action-reject').click({ force: true }); // aria-disabled, but clickable so that it can explain itself
     await expect(page.getByTestId('rail-notice')).toContainText('is not a registered approver');
     await expect(page.getByTestId('action-dialog')).toHaveCount(0);
+    await shot(page, '35-review-unauthorised');
     await expect(page.getByTestId('action-comment')).not.toHaveAttribute('aria-disabled', 'true');
 
     const token = await csrf(page.request);
@@ -411,6 +429,7 @@ test.describe('duplicate and stale submissions', () => {
     await d.getByRole('textbox').fill('Page B rejects on a stale view.');
     await d.getByRole('button', { name: 'Submit rejection' }).click();
     await expect(d.getByRole('alert')).toContainText('This decision changed after you opened it');
+    await shot(b, '36-review-stale-revision');
     await expect(d.getByRole('button', { name: 'Submit rejection' })).toBeDisabled();
     await d.getByRole('button', { name: 'Reload this decision' }).click();
     await b.keyboard.press('Escape');
@@ -433,6 +452,7 @@ test.describe('GitHub synchronisation failure and recovery', () => {
       await expect(tracker(page)).toHaveAttribute('data-state', 'awaiting-github-update');
       await expect(tracker(page)).toContainText('Last attempt');
       await expect(tracker(page)).toContainText('Could not fetch');
+      await shot(page, '37-review-github-unreachable');
       expect(prs().length).toBe(before);
       await expect(status(page)).toContainText('Pending Review');
       await expect(page.getByTestId('action-reject')).toHaveAttribute('aria-disabled', 'true');
@@ -482,6 +502,7 @@ test.describe('GitHub synchronisation failure and recovery', () => {
     await tracker(page).getByRole('button', { name: 'Check GitHub status' }).click();
     await expect(tracker(page)).toHaveAttribute('data-state', 'conflicted');
     await expect(tracker(page).getByRole('alert')).toContainText('Reload and decide again');
+    await shot(page, '38-review-conflicted');
   });
 });
 

@@ -123,25 +123,32 @@ export function ReviewRail({ id, options }: { id: string; options: OptionChoice[
     else setError(r.body?.detail ?? `HTTP ${r.status}`);
   }, [id]);
 
+  // Session and review state change together: the authorisation of each action depends on who is signed in, so showing a new
+  // identity beside the old authorisation would be wrong, even briefly.
+  const loadBoth = useCallback(async () => {
+    setError(null);
+    const [s, r] = await Promise.all([api<SessionInfo>('/api/v1/auth/session'), api<ReviewData>(`/api/v1/review/${encodeURIComponent(id)}`)]);
+    if (s.ok && s.body) setSession(s.body);
+    if (r.ok && r.body) setData(r.body);
+    else setError(r.body?.detail ?? `HTTP ${r.status}`);
+  }, [id]);
+
   useEffect(() => {
-    void loadSession();
-    void load();
-  }, [loadSession, load]);
+    void loadBoth();
+  }, [loadBoth]);
 
   const signIn = async () => {
     setBusy(true);
     setSignInError(null);
     const r = await api<SessionInfo>('/api/v1/auth/signin', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' });
-    setBusy(false);
     if (!r.ok) setSignInError(r.body?.detail ?? `Sign-in failed (HTTP ${r.status}).`);
-    await loadSession();
-    await load();
+    await loadBoth();
+    setBusy(false);
   };
 
   const signOut = async () => {
     await api('/api/v1/auth/signout', { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' });
-    await loadSession();
-    await load();
+    await loadBoth();
   };
 
   const submit = async (body: Record<string, unknown>): Promise<SubmitResult> => {
@@ -150,10 +157,11 @@ export function ReviewRail({ id, options }: { id: string; options: OptionChoice[
       headers: { 'content-type': 'application/json', 'x-studio-csrf': session?.csrf ?? '' },
       body: JSON.stringify(body),
     });
-    if (r.status === 401) await loadSession();
+    if (r.status === 401) await loadBoth();
     if (r.ok && r.body) {
       setNotice(r.body.duplicate ? 'That submission was already recorded. Nothing new was created.' : `Submitted. ${PROPOSAL_LABEL[r.body.proposal.state as ProposalState]}.`);
-      await load();
+      // Refresh in the background so the dialog can close at once.
+      void load();
       router.refresh();
     }
     return { ok: r.ok, status: r.status, code: r.body?.code, detail: r.body?.detail, proposal: r.body?.proposal, duplicate: r.body?.duplicate };
@@ -164,7 +172,7 @@ export function ReviewRail({ id, options }: { id: string; options: OptionChoice[
     const r = await api<{ proposal: Proposal }>(`/api/v1/review/proposals/${p.id}/sync`, { method: 'POST', headers: { 'content-type': 'application/json', 'x-studio-csrf': session?.csrf ?? '' }, body: '{}' });
     setBusy(false);
     setNotice(r.ok && r.body ? `${PROPOSAL_LABEL[r.body.proposal.state as ProposalState]}.` : (r.body?.detail ?? 'Could not check GitHub.'));
-    await load();
+    void load();
     router.refresh();
   };
 

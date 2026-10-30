@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 export default async function ReviewPage({ params }: { params: Promise<{ id: string }> }) {
   const { id: raw } = await params;
   const id = decodeURIComponent(raw);
-  const m = await getModel({ fresh: true });
+  const m = await getModel();
   const d = m.register.records.find((x) => x.id === id);
   if (!d) notFound();
   const git = openAdapter();

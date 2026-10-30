@@ -2,7 +2,6 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { guard, problem } from '@/lib/api.ts';
 import { COOKIE, runtime, sameOrigin } from '@/lib/workflow/http.ts';
-import { IdentityError } from '@/lib/workflow/identity.ts';
 import { isTestMode } from '@/lib/workflow/runtime.ts';
 
 export const dynamic = 'force-dynamic';
@@ -19,9 +18,12 @@ export function POST(req: NextRequest) {
     try {
       user = await service.deps.identity.verify();
     } catch (e) {
-      const err = e instanceof IdentityError ? e : new IdentityError('GH_UNAVAILABLE', 'GitHub could not confirm who you are.');
-      service.deps.store.audit({ at: new Date().toISOString(), actor: null, decisionId: null, action: 'signin', outcome: 'denied', code: err.code, detail: err.message.slice(0, 300), proposalId: null });
-      return problem(err.code === 'GH_UNAVAILABLE' ? 503 : 401, 'Sign-in refused', err.message, err.code);
+      // Not `instanceof`: the error comes from a service created in another route's bundle.
+      const o = e as { name?: string; code?: string; message?: string } | null;
+      const code = o?.name === 'IdentityError' && typeof o.code === 'string' ? o.code : 'GH_UNAVAILABLE';
+      const message = o?.name === 'IdentityError' && o.message ? o.message : 'GitHub could not confirm who you are.';
+      service.deps.store.audit({ at: new Date().toISOString(), actor: null, decisionId: null, action: 'signin', outcome: 'denied', code, detail: message.slice(0, 300), proposalId: null });
+      return problem(code === 'GH_UNAVAILABLE' ? 503 : 401, 'Sign-in refused', message, code);
     }
     const s = sessions.create(user);
     const policy = service.policy();

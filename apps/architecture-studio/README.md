@@ -1,6 +1,6 @@
-# Architecture Decision Studio (read-only)
+# Architecture Decision Studio
 
-A local web viewer over the decisions, tasks, approvals, assumptions and evidence recorded in this repository. It reads committed git content and shows it. **It writes nothing**: no repository file, no GitHub state, no approval. Write-back is not implemented in this stage.
+A local web application over the decisions, tasks, approvals, assumptions and evidence recorded in this repository. It reads committed git content and shows it. **Reading never changes anything.** The one thing that writes is the [decision review workflow](../../docs/architecture-studio/REVIEW-WORKFLOW.md): it proposes a decision as a pull request, never to your branch or to `main`, and shows a decision as decided only after a person has merged it. Until an approver is registered in `harness/policy/decision-workflow.json`, nobody can decide.
 
 This is **not** the bunkering platform. It is part of the engineering and governance control plane, and no business logic of the Green-Fuel Bunkering Certification Platform lives here.
 
@@ -24,7 +24,9 @@ npm start          # http://localhost:3100, loopback only
 | `STUDIO_REF` | `HEAD` | Branch, tag or commit to read. Only plain ref names are accepted |
 | `STUDIO_ALLOWED_HOSTS` | none | Extra `Host` header values to accept, comma separated. Leave unset |
 | `STUDIO_E2E_DELAY_MS` | `0` | Test only: delays repository reads so loading states can be shown |
-| `STUDIO_CACHE_DIR` | `<working directory>/.studio-cache` (git-ignored) | Where the sync baseline is saved. Never inside the tracked tree |
+| `STUDIO_CACHE_DIR` | `<working directory>/.studio-cache` (git-ignored) | Where the sync baseline, review proposals and the audit log are kept. Never inside the tracked tree |
+| `STUDIO_CANONICAL_REF` | `origin/main` | The branch whose review records make a decision canonical, as `remote/branch` |
+| `STUDIO_TEST_MODE`, `STUDIO_TEST_FIXTURE_DIR`, `STUDIO_TEST_REMOTE_GIT_DIR` | unset | Test only: simulated GitHub identity and pull requests against a throw-away clone. A banner is shown. Never set these for real use |
 
 ## What it shows
 
@@ -50,7 +52,7 @@ git objects at one commit ──► GitRepositoryAdapter (read-only allowlist)
 ```
 
 - **One commit, no drift.** The adapter resolves `HEAD` (or `STUDIO_REF`) once and reads blobs from that commit. Uncommitted edits are never shown; the sync popover reports how many exist.
-- **Read-only by construction.** `git.ts` runs only `rev-parse`, `ls-tree`, `cat-file`, `rev-list`, `for-each-ref`, `log`, `config --get`, `remote get-url`, `status`, `symbolic-ref` and `merge-base`, with `--no-optional-locks`. Any other subcommand throws. There is no method that writes. Tests prove HEAD, refs, the index and `git status` are unchanged after a full tour.
+- **Reading is read-only by construction.** `git.ts` runs only `rev-parse`, `ls-tree`, `cat-file`, `rev-list`, `for-each-ref`, `log`, `config --get`, `remote get-url`, `status`, `symbolic-ref` and `merge-base`, with `--no-optional-locks`. Any other subcommand throws. There is no method that writes. Tests prove HEAD, refs, the index and `git status` are unchanged after a full tour. Writing is a separate module (`workflow/publish.ts`) with its own allowlist.
 - **Traceable to GitHub, honestly.** A record links to a GitHub permalink only when a pushed commit holds a byte-identical copy of the file, so the link shows exactly what the Studio read. Otherwise the record is labelled **Local only**.
 - **Derived data is labelled.** The design-gate result and the `validate-approvals` output come from `docs/architecture-studio/inventory.snapshot.json`, a generated file. The Studio shows them as derived and does not re-run the gate.
 
@@ -65,14 +67,20 @@ git objects at one commit ──► GitRepositoryAdapter (read-only allowlist)
 | `GET /api/v1/register/changes?from=` | what changed since the saved baseline, or since a ref such as `origin/main` |
 | `GET /api/v1/register/sync` | the saved baseline |
 | `POST /api/v1/register/sync` | incremental sync: re-reads changed files only and saves the baseline in `STUDIO_CACHE_DIR`. Writes nothing to the repository |
-| `GET /api/v1/source?path=&line=&context=` | read-only source preview (`docs/`, `harness/policy/`, `harness/scripts/`; text extensions only) |
+| `GET /api/v1/source?path=&line=&context=&at=` | read-only source preview (`docs/`, `harness/policy/`, `harness/scripts/`; text extensions only). `at` is a commit from the file's own history |
+| `GET /api/v1/auth/session` | who is signed in, and the approver policy status |
+| `POST /api/v1/auth/signin`, `POST /api/v1/auth/signout` | sign in as the GitHub account configured on this computer (confirmed by GitHub; bots and agent sessions refused) |
+| `GET /api/v1/review/{id}` | review state: canonical status, request in flight, which actions are available and authorised, timeline, audit, next and previous pending decision |
+| `POST /api/v1/review/{id}/actions` | **one** action on **one** decision (needs session, CSRF token, same origin, the revision seen and an idempotency key). Creates a proposal and sends it to GitHub as a pull request |
+| `POST /api/v1/review/proposals/{pid}/sync` | move a proposal forward, or check whether its pull request was merged |
+| `GET /api/v1/review/next?after=` | the next decision waiting for a person |
 | `GET /api/v1/tasks?status=&blocked=` | tasks |
 | `GET /api/v1/approvals` | approval authority, pending approvals, reviews |
 | `GET /api/v1/search?q=&kind=` | search hits |
 | `GET /api/v1/history?path=` | last five commits touching a tracked file |
 | `POST /api/v1/refresh` | discards the Studio's 5 second cache and re-reads. Does not fetch or write |
 
-Errors are `application/problem+json`. Write methods on the data routes return 405.
+Errors are `application/problem+json`. Write methods on the data routes return 405. The only routes that accept a change are `auth/*` and `review/*` above; `publish.ts` is the only code that writes to git, and it can only add review-record files on a new `decision-review/...` branch.
 
 ## Security
 
@@ -99,4 +107,4 @@ The end-to-end run also regenerates the screenshots in `docs/architecture-studio
 - Roadmap items record no status, so none is shown.
 - The Studio does not recompute the design gate or verify approval signatures. It shows what the files say and what the derived snapshot recorded.
 - Tested on Microsoft Edge (Chromium) only, with automated accessibility checks. No manual screen-reader review has been done.
-- Write-back (proposals as branches and pull requests) is designed in [INTEGRATION-DESIGN](../../docs/architecture-studio/INTEGRATION-DESIGN.md) and is **not** built.
+- Write-back is limited to the review workflow: proposals as branches and pull requests, as designed in [INTEGRATION-DESIGN](../../docs/architecture-studio/INTEGRATION-DESIGN.md) option C, built and tested against a **simulated** GitHub only. See [REVIEW-WORKFLOW](../../docs/architecture-studio/REVIEW-WORKFLOW.md) section 11.

@@ -1,11 +1,11 @@
 {
   "generatedBy": "harness/scripts/studio-inventory.mjs",
   "git": {
-    "head": "b7a7c7ab60c5f60c0ca43aaf2231792eb2c7a8a2",
+    "head": "3f25450a4f66a8db5fb550481418394519b6e388",
     "branch": "studio/ui-readonly",
     "originMain": "c6ff681810c2462144004c01ce2b79ed1e6f7d4f",
-    "commitsAheadOfOriginMain": 29,
-    "dirty": 44
+    "commitsAheadOfOriginMain": 31,
+    "dirty": 57
   },
   "sources": {},
   "counts": {
@@ -161,13 +161,13 @@
     "todoTasks": {
       "source": "docs/state/TODO.md",
       "rule": "rows \"| Tn |\"; status = leading bold keyword, else \"deferred\" in the first section, else \"unmarked\"",
-      "total": 49,
+      "total": 50,
       "byStatus": {
         "deferred": 15,
         "decided": 2,
         "agreed": 1,
         "done": 2,
-        "open": 24,
+        "open": 25,
         "not-granted": 1,
         "approved": 4
       },
@@ -178,7 +178,7 @@
         "Awaiting the owner (Azure readiness stage, 2026-10-28; answered 2026-10-29)": 12,
         "Awaiting the owner (hardening stage, 2026-10-30)": 6,
         "Awaiting the owner (target architecture and business case, 2026-10-29)": 13,
-        "Awaiting the owner (Architecture Decision Studio, 2026-10-29)": 1
+        "Awaiting the owner (Architecture Decision Studio, 2026-10-29)": 2
       },
       "ambiguousForReview": [
         "T2"
@@ -378,7 +378,7 @@
     },
     "policyFiles": {
       "source": "harness/policy/*.json",
-      "total": 12
+      "total": 13
     },
     "criticalBlockers": {
       "rule": "a blocker is something that, by the repository's own gates, stops implementation or approval; each item below is computed or quoted, not judged",
@@ -1627,6 +1627,16 @@
       ],
       "ambiguous": false,
       "title": "Open: owner decisions for the Architecture Decision Studio. A read-only web interface was "
+    },
+    {
+      "id": "T62",
+      "section": "Awaiting the owner (Architecture Decision Studio, 2026-10-29)",
+      "status": "open",
+      "tokens": [
+        "open"
+      ],
+      "ambiguous": false,
+      "title": "Open: owner actions for the decision review workflow. A line-by-line approval workflow was"
     }
   ],
   "phaseFromState": "0",
@@ -2045,7 +2055,7 @@
       "fileCount": 1
     },
     "T": {
-      "distinctIds": 55,
+      "distinctIds": 56,
       "files": [
         "docs/acceptance/HARNESS-ACCEPTANCE-REPORT.md",
         "docs/harness/CAPABILITY-MATRIX.md",
@@ -2113,7 +2123,7 @@
     ".github": 3,
     ".mcp.json": 1,
     ".vscode": 2,
-    "apps": 140,
+    "apps": 174,
     "docs/architecture-studio": 2,
     "docs/azure": 2,
     "docs/business": 3,
@@ -2122,7 +2132,7 @@
     "docs/evidence": 1,
     "docs/orchestration": 1,
     "evaluation": 2,
-    "harness": 35,
+    "harness": 36,
     "infra": 3,
     "memory": 36,
     "package.json": 1,

@@ -1,5 +1,6 @@
 import type { NextRequest } from 'next/server';
 import { guard, ok } from '@/lib/api.ts';
+import { invalidateModel } from '@/lib/repo/index.ts';
 import { requireSession, runtime, serviceProblem } from '@/lib/workflow/http.ts';
 
 export const dynamic = 'force-dynamic';
@@ -12,6 +13,7 @@ export function POST(req: NextRequest, ctx: { params: Promise<{ pid: string }> }
     const { pid } = await ctx.params;
     try {
       const proposal = await runtime().service.sync(decodeURIComponent(pid));
+      if (proposal.state === 'applied') invalidateModel();
       return ok({ proposal });
     } catch (e) {
       return serviceProblem(e) ?? Promise.reject(e);

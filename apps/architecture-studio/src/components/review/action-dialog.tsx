@@ -55,9 +55,12 @@ export function ActionDialog({ action, onClose, decisionId, options, revision, l
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<SubmitResult | null>(null);
   const key = useRef(newKey());
+  const optionsRef = useRef(options);
+  optionsRef.current = options;
   const hasRec = options.some((o) => o.recommended);
   const choices = useMemo(() => (action === 'approve-alternative' && hasRec ? options.filter((o) => !o.recommended) : options), [action, options, hasRec]);
 
+  // Reset only when a different action is opened. A background refresh passes new props; it must never clear what the user typed.
   useEffect(() => {
     if (!action) return;
     key.current = newKey();
@@ -65,8 +68,9 @@ export function ActionDialog({ action, onClose, decisionId, options, revision, l
     setError(null);
     setBusy(false);
     setConditions(['']);
-    setOptionKey(action === 'approve-with-conditions' ? (options.find((o) => o.recommended)?.key ?? options[0]?.key ?? '') : '');
-  }, [action, options]);
+    const o = optionsRef.current;
+    setOptionKey(action === 'approve-with-conditions' ? (o.find((x) => x.recommended)?.key ?? o[0]?.key ?? '') : '');
+  }, [action]);
 
   if (!action) return null;
   const c = COPY[action];

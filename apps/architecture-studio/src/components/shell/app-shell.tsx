@@ -72,9 +72,9 @@ function ReadOnlyFooter({ repo }: { repo: RepoMeta }) {
     <div className="m-3 rounded-xl bg-white/6 p-3 text-[12px] leading-[18px] text-white/65">
       <p className="mb-0.5 flex items-center gap-1.5 font-medium text-white/85">
         <Lock aria-hidden className="size-3.5" />
-        Read-only
+        Reads this commit only
       </p>
-      Showing commit <span className="font-mono text-white/85">{repo.commitShort}</span> on <span className="font-mono text-white/85">{repo.branch ?? 'detached HEAD'}</span>. Nothing is written back.
+      Showing commit <span className="font-mono text-white/85">{repo.commitShort}</span> on <span className="font-mono text-white/85">{repo.branch ?? 'detached HEAD'}</span>. This view never changes the branch. Decisions are proposed as pull requests.
     </div>
   );
 }

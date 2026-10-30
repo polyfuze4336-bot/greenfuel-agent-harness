@@ -41,7 +41,14 @@ export function requireSession(req: NextRequest, opts: { csrf?: boolean } = {}):
   return s;
 }
 
+/** Errors cross bundle boundaries in Next (each route has its own copy of a class), so `instanceof` is not reliable. Check the shape. */
+export function asServiceError(e: unknown): ServiceError | null {
+  const o = e as { name?: unknown; status?: unknown; code?: unknown; message?: unknown; extra?: unknown } | null;
+  return o && typeof o === 'object' && o.name === 'ServiceError' && typeof o.status === 'number' && typeof o.code === 'string' ? (e as ServiceError) : null;
+}
+
 export function serviceProblem(e: unknown): Response | null {
-  if (e instanceof ServiceError) return Response.json({ type: 'about:blank', title: e.code, status: e.status, detail: e.message, code: e.code, ...e.extra }, { status: e.status, headers: { 'Content-Type': 'application/problem+json', 'Cache-Control': 'no-store' } });
+  const s = asServiceError(e);
+  if (s) return Response.json({ type: 'about:blank', title: s.code, status: s.status, detail: s.message, code: s.code, ...(s.extra ?? {}) }, { status: s.status, headers: { 'Content-Type': 'application/problem+json', 'Cache-Control': 'no-store' } });
   return null;
 }

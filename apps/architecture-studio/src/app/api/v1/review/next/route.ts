@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 export function GET(req: NextRequest) {
   return guard(async () => {
     const after = req.nextUrl.searchParams.get('after');
-    const m = await getModel({ fresh: true });
+    const m = await getModel();
     const { service } = runtime();
     const order = pendingOrder(m.register.records, (x) => !!service.deps.store.openFor(x));
     const at = after ? order.findIndex((r) => r.id === after) : -1;

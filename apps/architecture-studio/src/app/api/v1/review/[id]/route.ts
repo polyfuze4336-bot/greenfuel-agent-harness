@@ -12,7 +12,7 @@ export function GET(req: NextRequest, ctx: { params: Promise<{ id: string }> }) 
   return guard(async () => {
     const { id: raw } = await ctx.params;
     const id = decodeURIComponent(raw);
-    const m = await getModel({ fresh: true });
+    const m = await getModel();
     const d = m.register.records.find((r) => r.id === id);
     if (!d) return problem(404, 'Decision not found', `No decision ${id.slice(0, 20)} in the register.`);
     const { service } = runtime();

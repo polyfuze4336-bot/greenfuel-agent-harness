@@ -612,6 +612,16 @@ describe('audit log', () => {
 });
 
 describe('ordering and availability', () => {
+  it('the policy shipped in this repository parses, and can never list a bot, an organisation or a person without a numeric id', async () => {
+    const fs = await import('node:fs');
+    const text = fs.readFileSync(path.resolve(import.meta.dirname, '..', '..', '..', 'harness', 'policy', 'decision-workflow.json'), 'utf8');
+    const p = parsePolicy(text, 'canonical');
+    assert.ok(Object.keys(p.roleAliases).includes('programme-owner'));
+    assert.deepEqual(p.critical.requiredRoles, ['programme-owner']);
+    assert.ok(p.people.every((x) => Number.isInteger(x.githubId) && !/\[bot\]$/i.test(x.githubLogin)));
+    assert.ok(p.problems.every((m) => /No approver is configured/.test(m)), `unexpected policy problems: ${p.problems.join('; ')}`);
+  });
+
   it('orders pending decisions: Must first, ADRs before register entries, Blocked last, skipping those with a request in flight', () => {
     const r = [
       makeDecision({ id: 'D-002', kind: 'register-entry', status: 'Pending Review', priority: { value: 'Must', basis: 'x' } }),

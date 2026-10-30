@@ -10,7 +10,9 @@ import type { StudioModel } from './types.ts';
 export { GitError };
 
 const TTL_MS = 5_000;
-let cached: { key: string; at: number; model: StudioModel } | null = null;
+// Route handlers and pages are bundled separately, so a module-level variable would be a different copy in each.
+// The cache lives on globalThis so that invalidating it in one place is seen everywhere.
+const shared = globalThis as unknown as { __studioModel?: { key: string; at: number; model: StudioModel } | null };
 // Parsed source files, keyed by path and git blob id. Surviving across requests is what makes re-reading incremental.
 const fragmentCache: FragmentCache = new Map();
 
@@ -46,13 +48,19 @@ function withReviews(model: StudioModel): StudioModel {
   }
 }
 
+/** Forget the cached read model, so the next read reflects a change just made (for example a verified merge). */
+export function invalidateModel() {
+  shared.__studioModel = null;
+}
+
 /** Build (or reuse, for a few seconds) the read model. `fresh` forces a re-read of the repository. */
 export async function getModel(opts: { fresh?: boolean } = {}): Promise<StudioModel> {
   const delay = Number(process.env.STUDIO_E2E_DELAY_MS ?? 0);
   if (delay > 0) await new Promise((r) => setTimeout(r, delay));
   const key = `${repoRoot()}::${configuredRef()}`;
-  if (!opts.fresh && cached && cached.key === key && Date.now() - cached.at < TTL_MS) return cached.model;
+  const hit = shared.__studioModel;
+  if (!opts.fresh && hit && hit.key === key && Date.now() - hit.at < TTL_MS) return hit.model;
   const model = withReviews(buildModel(openAdapter(), fragmentCache));
-  cached = { key, at: Date.now(), model };
+  shared.__studioModel = { key, at: Date.now(), model };
   return model;
 }

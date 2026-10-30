@@ -1,6 +1,6 @@
 import type { NextRequest } from 'next/server';
 import { guard, ok, problem } from '@/lib/api.ts';
-import { getModel } from '@/lib/repo/index.ts';
+import { getModel, invalidateModel } from '@/lib/repo/index.ts';
 import { requireSession, runtime, serviceProblem } from '@/lib/workflow/http.ts';
 
 export const dynamic = 'force-dynamic';
@@ -22,7 +22,7 @@ export function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> })
     if (Number(req.headers.get('content-length') ?? 0) > 40_000) return problem(413, 'Request too large', 'The request is too large.');
     const body = (await req.json().catch(() => null)) as Record<string, unknown> | null;
     if (!body || typeof body !== 'object' || Array.isArray(body)) return problem(400, 'Invalid body', 'Send one JSON object describing one action.');
-    const m = await getModel({ fresh: true });
+    const m = await getModel();
     const d = m.register.records.find((r) => r.id === id);
     if (!d) return problem(404, 'Decision not found', `No decision ${id.slice(0, 20)} in the register.`);
     try {
@@ -37,6 +37,8 @@ export function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> })
       });
       // Send it to GitHub straight away. If GitHub cannot be reached the proposal is kept and can be retried.
       const current = duplicate ? proposal : await service.sync(proposal.id);
+      // Only a verified merge changes what is canonical; an opened pull request does not.
+      if (current.state === 'applied') invalidateModel();
       return ok({ duplicate, proposal: current });
     } catch (e) {
       return serviceProblem(e) ?? Promise.reject(e);
