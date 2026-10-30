@@ -45,3 +45,15 @@ export const WORK_ACTIONS = Object.keys(WORK_ACTION_LABEL) as WorkAction[];
 
 /** A readable name for any action, from either workflow. */
 export const actionLabel = (a: string): string => (ACTION_LABEL as Record<string, string>)[a] ?? (WORK_ACTION_LABEL as Record<string, string>)[a] ?? a;
+
+import type { Validation } from './github.ts';
+
+/** One line about what GitHub says the checks and reviews are, for the tracker and the audit log. */
+export function describeValidation(v: Validation | null | undefined): string {
+  if (!v) return 'not checked yet';
+  const failing = v.checks.filter((c) => c.state === 'failure').map((c) => c.name);
+  const checks = v.state === 'none' ? 'no checks are configured' : v.state === 'success' ? 'checks passed' : v.state === 'failure' ? `checks failed (${failing.join(', ') || 'unnamed'})` : 'checks are running';
+  const reviews = v.reviews ? `, ${v.reviews.approvals} approving review(s)${v.reviews.changesRequested ? `, ${v.reviews.changesRequested} requesting changes` : ''}` : '';
+  return `${checks}${reviews}${v.mergeState ? `; merge state: ${v.mergeState}` : ''}`;
+}
+

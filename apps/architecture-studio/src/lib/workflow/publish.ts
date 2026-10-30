@@ -25,7 +25,21 @@ export class PublishError extends Error {
 }
 
 export const BRANCH_RE = /^(?:decision-review|work-item)\/[A-Za-z0-9-]{1,16}\/[0-9]{4}-[a-z-]{3,30}-[a-z0-9]{6,12}$/;
-const FILE_RE = /^docs\/(?:decision-reviews|work-items)\/[A-Za-z0-9-]{1,16}\/\d{4}-[a-z-]+\.json$/;
+export const FILE_RE = /^docs\/(?:decision-reviews|work-items)\/[A-Za-z0-9-]{1,16}\/\d{4}-[a-z-]+\.json$/;
+
+type MaybeAsync<T> = T | Promise<T>;
+
+/**
+ * How the Studio gets a proposal onto GitHub. Two implementations: git plumbing as the signed-in user (GitPublisher) and the
+ * GitHub REST API as a GitHub App (AppPublisher). Both refuse any path or branch outside the review-record allowlists, and
+ * neither can update an existing branch or the canonical branch.
+ */
+export interface Publisher {
+  fetchCanonical(ref: string): MaybeAsync<string>;
+  remoteBranchSha(remote: string, branch: string): MaybeAsync<string | null>;
+  buildCommit(a: { baseSha: string; files: { path: string; content: string }[]; author: { name: string; email: string }; message: string; now: Date }): MaybeAsync<string>;
+  push(remote: string, sha: string, branch: string): MaybeAsync<void>;
+}
 
 /** "origin/main" becomes remote "origin", branch "main". Anything else is not a canonical ref the Studio can publish against. */
 export function splitCanonicalRef(ref: string): { remote: string; branch: string } | null {
@@ -33,7 +47,7 @@ export function splitCanonicalRef(ref: string): { remote: string; branch: string
   return m && !ref.includes('..') ? { remote: m[1]!, branch: m[2]! } : null;
 }
 
-export class GitPublisher {
+export class GitPublisher implements Publisher {
   private readonly root: string;
   private readonly env: NodeJS.ProcessEnv;
   constructor(root: string, env: NodeJS.ProcessEnv = process.env) {

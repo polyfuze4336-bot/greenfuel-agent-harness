@@ -16,6 +16,7 @@ import { Meta, Skeleton, Tag, btn } from '../ui.tsx';
 import { api, type QueueData, type SessionInfo } from './queue-data.tsx';
 import { PriorityTag, WorkStatusPill } from './work-bits.tsx';
 import { WorkActionDialog } from './work-action-dialog.tsx';
+import type { Conflict } from '../review/conflict-panel.tsx';
 
 interface Detail {
   item: WorkItem;
@@ -85,7 +86,7 @@ export function ItemSheet({ id, data, session, onChanged, onSignIn, onOpen }: { 
       void load();
       onChanged();
     }
-    return { ok: r.ok, status: r.status, code: r.body?.code, detail: r.body?.detail, proposal: r.body?.proposal, duplicate: r.body?.duplicate };
+    return { ok: r.ok, status: r.status, code: r.body?.code, detail: r.body?.detail, proposal: r.body?.proposal, duplicate: r.body?.duplicate, currentRevision: (r.body as { currentRevision?: string } | null)?.currentRevision, conflict: (r.body as { conflict?: Conflict } | null)?.conflict };
   };
 
   const check = async (p: Proposal) => {
@@ -381,6 +382,7 @@ export function ItemSheet({ id, data, session, onChanged, onSignIn, onOpen }: { 
           onClose={() => setDialog(null)}
           itemId={item.id}
           revision={v.revision}
+          original={{ status: v.canonical.state.phase, canonicalCommit: v.canonical.commit, lastEvent: ((e) => (e ? { action: e.action, by: e.actor.login, at: e.createdAt, text: e.rationale ?? e.comment ?? null } : null))(v.canonical.state.events[v.canonical.state.events.length - 1]) }}
           login={session?.user?.login ?? ''}
           people={v.people}
           knownIds={data.items.map((i) => i.id)}

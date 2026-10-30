@@ -72,6 +72,9 @@ git objects at one commit ──► GitRepositoryAdapter (read-only allowlist)
 | `POST /api/v1/auth/signin`, `POST /api/v1/auth/signout` | sign in as the GitHub account configured on this computer (confirmed by GitHub; bots and agent sessions refused) |
 | `GET /api/v1/review/{id}` | review state: canonical status, request in flight, which actions are available and authorised, timeline, audit, next and previous pending decision |
 | `POST /api/v1/review/{id}/actions` | **one** action on **one** decision (needs session, CSRF token, same origin, the revision seen and an idempotency key). Creates a proposal and sends it to GitHub as a pull request |
+| `POST /api/v1/sync/reconcile` | re-check every open proposal against GitHub and list pull requests the Studio did not open from here (session and CSRF) |
+| `GET /api/v1/sync/status` | how the Studio is connected to GitHub (App, CLI or simulated), credential expiry, rate limit, proposals in flight, last reconcile. No secret |
+| `POST /api/v1/github/webhook` | GitHub webhook receiver. Authenticated only by the HMAC signature; only names what to re-check |
 | `POST /api/v1/review/proposals/{pid}/sync` | move a proposal forward, or check whether its pull request was merged |
 | `GET /api/v1/review/next?after=` | the next decision waiting for a person |
 | `GET /api/v1/queue` | the Work Queue: every item with its source, the relationships, the build-blocking analysis, decision impacts and view counts |
@@ -85,6 +88,10 @@ git objects at one commit ──► GitRepositoryAdapter (read-only allowlist)
 | `POST /api/v1/refresh` | discards the Studio's 5 second cache and re-reads. Does not fetch or write |
 
 Errors are `application/problem+json`. Write methods on the data routes return 405. The only routes that accept a change are `auth/*`, `review/*` and `queue/*{id}/actions` above; `publish.ts` is the only code that writes to git, and it can only add review-record or work-item files on a new `decision-review/...` or `work-item/...` branch.
+
+## GitHub App
+
+With `STUDIO_GITHUB_APP_ID`, `STUDIO_GITHUB_APP_INSTALLATION_ID`, `STUDIO_GITHUB_REPO` and `STUDIO_GITHUB_APP_PRIVATE_KEY_FILE` set, the Studio writes through a GitHub App (installation token scoped to the one repository, five minimum permissions) instead of the GitHub CLI, and reads `origin/main` by default. Optional: `STUDIO_GITHUB_WEBHOOK_SECRET`, `STUDIO_WEBHOOK_HOSTS`, `STUDIO_GITHUB_API_URL`. Setup, the twelve-step flow, conflict handling, audit fields, reliability and what is and is not verified: [GITHUB-SYNC](../../docs/architecture-studio/GITHUB-SYNC.md). It has been tested against a stand-in for the GitHub API, **not against real GitHub**.
 
 ## Security
 
@@ -100,7 +107,7 @@ Errors are `application/problem+json`. Write methods on the data routes return 4
 npm run typecheck     # tsc --noEmit
 npm run test:unit     # adapter, parsers, read-only guarantee, count agreement (node --test)
 npm run build
-npm run test:e2e      # Playwright on Microsoft Edge; starts its own servers on 3100 to 3103 (3103 is test mode with a simulated GitHub)
+npm run test:e2e      # Playwright on Microsoft Edge; starts its own servers on 3100 to 3105 (3103 is test mode with a simulated GitHub; 3104 is a Studio configured as a GitHub App, talking to the stand-in GitHub API on 3105)
 ```
 
 The end-to-end run also regenerates the screenshots in `docs/architecture-studio/screenshots/`. The unit checks live in `checks/` and the browser tests in `e2e/` so the repository-wide `node --test` does not collect them.

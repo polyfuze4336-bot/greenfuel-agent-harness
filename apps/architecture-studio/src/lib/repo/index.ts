@@ -4,6 +4,7 @@ import { buildModel } from './build.ts';
 import { FileStateStore, type FragmentCache } from '../intel/engine.ts';
 import { applyReviewOverlay } from '../workflow/overlay.ts';
 import { canonicalRefName } from '../workflow/runtime.ts';
+import { appConfigFromEnv } from '../github/app-auth.ts';
 import { loadReviewStates } from '../workflow/review.ts';
 import type { StudioModel } from './types.ts';
 
@@ -18,7 +19,8 @@ const fragmentCache: FragmentCache = new Map();
 
 /** The ref the Studio reads. HEAD by default; STUDIO_REF reads another branch, tag or commit. */
 export function configuredRef(): string {
-  return process.env.STUDIO_REF?.trim() || 'HEAD';
+  // With the GitHub App configured, GitHub is the authority, so read the canonical branch unless told otherwise.
+  return process.env.STUDIO_REF?.trim() || (appConfigFromEnv() ? canonicalRefName() : 'HEAD');
 }
 
 export function repoRoot(): string {

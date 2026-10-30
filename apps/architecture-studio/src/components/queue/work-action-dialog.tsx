@@ -7,6 +7,7 @@ import { PRIORITIES } from '@/lib/queue/types.ts';
 import { WORK_ACTION_LABEL, type WorkAction } from '@/lib/workflow/labels.ts';
 import { btn, btnPrimary } from '../ui.tsx';
 import type { SubmitResult } from '../review/action-dialog.tsx';
+import { ConflictPanel, type Original } from '../review/conflict-panel.tsx';
 
 const MIN_REASON = 10;
 const REASON_REQUIRED: WorkAction[] = ['prioritize', 'mark-blocked', 'unblock', 'request-clarification', 'reject-completion', 'reopen'];
@@ -31,6 +32,7 @@ interface Props {
   onClose: () => void;
   itemId: string;
   revision: string;
+  original: Original;
   login: string;
   people: { login: string; holder: string; roles: string[] }[];
   knownIds: string[];
@@ -39,7 +41,7 @@ interface Props {
   onReload: () => void;
 }
 
-export function WorkActionDialog({ action, onClose, itemId, revision, login, people, knownIds, submittedEvidence, onSubmit, onReload }: Props) {
+export function WorkActionDialog({ action, onClose, itemId, revision, original, login, people, knownIds, submittedEvidence, onSubmit, onReload }: Props) {
   const [text, setText] = useState('');
   const [assignee, setAssignee] = useState('');
   const [due, setDue] = useState('');
@@ -48,6 +50,7 @@ export function WorkActionDialog({ action, onClose, itemId, revision, login, peo
   const [evidence, setEvidence] = useState<string[]>(['']);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<SubmitResult | null>(null);
+  const [override, setOverride] = useState<string | null>(null);
   const key = useRef(newKey());
 
   // Reset only when a different action opens; a background refresh must never clear what was typed.
@@ -62,6 +65,7 @@ export function WorkActionDialog({ action, onClose, itemId, revision, login, peo
     setEvidence(['']);
     setError(null);
     setBusy(false);
+    setOverride(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [action]);
 
@@ -81,11 +85,15 @@ export function WorkActionDialog({ action, onClose, itemId, revision, login, peo
     (action !== 'mark-blocked' || unknownBlockers.length === 0);
   const hint = !reasonOk ? (action === 'comment' ? 'Write a comment.' : `At least ${MIN_REASON} characters are needed (${text.trim().length} so far).`) : null;
 
-  const submit = async () => {
+  const submit = async (reconciledRevision?: string) => {
     if (!valid || busy) return;
+    if (reconciledRevision) {
+      setOverride(reconciledRevision);
+      key.current = newKey();
+    }
     setBusy(true);
     setError(null);
-    const body: Record<string, unknown> = { action, expectedRevision: revision, idempotencyKey: key.current };
+    const body: Record<string, unknown> = { action, expectedRevision: reconciledRevision ?? override ?? revision, idempotencyKey: key.current };
     if (action === 'comment') body.comment = text;
     else if (text.trim()) body.rationale = text;
     if (action === 'assign') {
@@ -101,7 +109,7 @@ export function WorkActionDialog({ action, onClose, itemId, revision, login, peo
     else setError(r);
   };
 
-  const stale = error?.code === 'stale-revision';
+  const stale = error?.code === 'stale-revision' && !error.conflict;
   const field = 'w-full rounded-lg border border-hairline-strong bg-surface px-3 py-1.5 text-[13.5px]';
   return (
     <Dialog.Root open onOpenChange={(o) => !o && !busy && onClose()}>
@@ -235,7 +243,12 @@ export function WorkActionDialog({ action, onClose, itemId, revision, login, peo
             You are acting as <strong>@{login}</strong>. This saves a proposal and opens a pull request on GitHub. The item keeps its current status until a person merges that pull request.
           </p>
 
-          {error ? (
+          {error?.conflict ? (
+            <ConflictPanel conflict={error.conflict} original={original} busy={busy} onReapply={() => void submit(error.currentRevision)} onDiscard={() => {
+              onReload();
+              onClose();
+            }} />
+          ) : error ? (
             <div role="alert" className="mt-3 flex gap-2.5 rounded-xl px-3.5 py-2.5 text-[13.5px] leading-5" style={{ background: 'var(--s-rejected-bg)', color: 'var(--s-rejected-fg)' }}>
               <AlertCircle aria-hidden className="mt-0.5 size-4 shrink-0" />
               <div className="min-w-0">
@@ -253,7 +266,7 @@ export function WorkActionDialog({ action, onClose, itemId, revision, login, peo
             <button type="button" className={btn} onClick={onClose} disabled={busy}>
               Cancel
             </button>
-            <button type="button" data-testid="work-submit" className={btnPrimary} onClick={() => void submit()} disabled={!valid || busy || stale} aria-busy={busy}>
+            <button type="button" data-testid="work-submit" className={btnPrimary} onClick={() => void submit()} disabled={!valid || busy || stale || !!error?.conflict} aria-busy={busy}>
               {busy ? 'Submitting…' : c.submit}
             </button>
           </div>

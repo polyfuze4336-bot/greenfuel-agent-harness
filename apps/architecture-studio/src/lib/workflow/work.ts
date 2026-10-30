@@ -8,8 +8,8 @@ import { canonicalJson, sha256 } from './events.ts';
 import type { VerifiedUser } from './identity.ts';
 import { ServiceError, type ReviewService, type ServiceDeps } from './review.ts';
 import type { Policy } from './rules.ts';
-import { ReviewStore, isOpen, withLock, type Proposal } from './store.ts';
-import { syncProposal, type SyncDeps, type SyncFamily } from './sync-core.ts';
+import { ReviewStore, isOpen, withLock, type AuditFacts, type Proposal } from './store.ts';
+import { factsOf, syncProposal, type SyncDeps, type SyncFamily } from './sync-core.ts';
 import {
   WORK_ACTION_LABEL, WORK_DIR, applyWorkEvent, emptyWorkState, foldWorkEvents, hashWorkEvent, parseWorkEvent, serializeWorkEvent, workEventId, workEventPath,
   type WorkAction, type WorkEvent, type WorkState,
@@ -110,6 +110,22 @@ export interface CanonicalWorkRead {
   states: Map<string, WorkState>;
 }
 
+/** What an action changes on a work item, as a before and after value for the audit log. */
+function workChange(a: WorkAction, item: WorkItem, s: WorkState, c: { assignee: string | null; priority: WorkItem['priority']; blockedBy: string[] }): { field: string; old: string | null; new: string | null } {
+  switch (a) {
+    case 'assign':
+      return { field: 'assignee', old: s.assignee ?? item.assignee, new: c.assignee };
+    case 'prioritize':
+      return { field: 'priority', old: s.priority ?? item.priority, new: c.priority };
+    case 'comment':
+      return { field: 'comment', old: null, new: 'comment added' };
+    default: {
+      const after: Partial<Record<WorkAction, string>> = { 'mark-blocked': 'Blocked', 'request-clarification': 'Awaiting clarification', 'submit-for-review': 'In review', 'approve-completion': 'Done', 'reject-completion': 'Open', reopen: 'Open', unblock: 'Open' };
+      return { field: 'status', old: item.status, new: after[a] ?? item.status };
+    }
+  }
+}
+
 export interface WorkView {
   itemId: string;
   revision: string;
@@ -178,8 +194,8 @@ export class WorkService {
     };
   }
 
-  private audit(user: VerifiedUser | null, id: string, action: string, outcome: Parameters<ReviewStore['audit']>[0]['outcome'], code: string | null, detail: string | null, proposalId: string | null = null) {
-    this.deps.store.audit({ at: this.now().toISOString(), actor: user?.login ?? null, decisionId: `work:${id}`, action, outcome, code, detail: detail?.slice(0, 300) ?? null, proposalId });
+  private audit(user: VerifiedUser | null, id: string, action: string, outcome: Parameters<ReviewStore['audit']>[0]['outcome'], code: string | null, detail: string | null, proposalId: string | null = null, facts?: AuditFacts) {
+    this.deps.store.audit({ at: this.now().toISOString(), actor: user?.login ?? null, decisionId: `work:${id}`, action, outcome, code, detail: detail?.slice(0, 300) ?? null, proposalId, ...(facts ? { facts } : {}) });
   }
 
   private refuse(user: VerifiedUser | null, id: string, action: string, outcome: 'denied' | 'stale' | 'invalid', e: ServiceError): never {
@@ -203,6 +219,11 @@ export class WorkService {
       const v = validateWorkRequest(req);
       if (!v.ok) return this.refuse(current, item.id, action, 'invalid', new ServiceError(400, 'invalid', v.message));
       const a = req.action as WorkAction;
+      try {
+        await this.deps.publisher.fetchCanonical(this.deps.canonicalRef);
+      } catch {
+        /* checked again at sync */
+      }
       const canonical = this.canonical();
       if (!canonical.available) return this.refuse(current, item.id, a, 'invalid', new ServiceError(503, 'canonical-unavailable', canonical.error ?? 'The canonical branch cannot be read.'));
       const policy = this.review.policy();
@@ -217,7 +238,17 @@ export class WorkService {
       }
       const open = this.deps.store.openFor(item.id, 'work');
       const revision = this.revisionOf(item, state, open);
-      if (req.expectedRevision !== revision) return this.refuse(current, item.id, a, 'stale', new ServiceError(409, 'stale-revision', 'This item changed after you opened it. Reload to see the current state, then act again.', { currentRevision: revision }));
+      if (req.expectedRevision !== revision) {
+        const last = state.events[state.events.length - 1];
+        return this.refuse(current, item.id, a, 'stale', new ServiceError(409, 'stale-revision', 'This item changed after you opened it. Review the current state, then act again.', {
+          currentRevision: revision,
+          conflict: {
+            kind: 'stale-revision',
+            current: { status: state.phase, canonicalCommit: canonical.commit, lastEvent: last ? { id: last.id, action: last.action, by: last.actor.login, at: last.createdAt, text: last.rationale ?? last.comment ?? null } : null, openProposal: open ? { id: open.id, state: open.state, action: open.action } : null, source: null },
+            proposed: { action: a, option: null, conditions: null, rationale: req.rationale ?? null, comment: req.comment ?? null },
+          },
+        }));
+      }
       if (open) return this.refuse(current, item.id, a, 'stale', new ServiceError(409, 'proposal-open', `A change to ${item.id} is already in flight (${open.id}, ${open.state}). One change at a time.`, { proposalId: open.id }));
       const av = workAvailability(item, state).find((x) => x.action === a);
       if (!av?.allowed) return this.refuse(current, item.id, a, 'denied', new ServiceError(409, 'not-allowed', av?.reason ?? 'This action is not allowed now.'));
@@ -274,6 +305,8 @@ export class WorkService {
         family: 'work',
         action: a,
         idempotencyKey: req.idempotencyKey!,
+        change: workChange(a, item, state, c),
+        sourceCommit: null,
         submittedBy: current.login,
         event,
         state: 'locally-submitted',
@@ -289,13 +322,13 @@ export class WorkService {
         updatedAt: t.toISOString(),
       };
       this.deps.store.save(proposal);
-      this.audit(current, item.id, a, 'accepted', null, `Recorded ${event.id} as ${proposal.id}`, proposal.id);
+      this.audit(current, item.id, a, 'accepted', null, `Recorded ${event.id} as ${proposal.id}`, proposal.id, { oldValue: proposal.change!.old, newValue: proposal.change!.new, baseCommit: canonical.commit });
       return { proposal, duplicate: false };
     });
   }
 
   private syncDeps(): SyncDeps {
-    return { root: this.deps.root, canonicalRef: this.deps.canonicalRef, store: this.deps.store, github: this.deps.github, publisher: this.deps.publisher, now: () => this.now(), audit: (p, code, detail) => this.audit(null, p.decisionId, p.action, 'sync', code, detail, p.id) };
+    return { root: this.deps.root, canonicalRef: this.deps.canonicalRef, store: this.deps.store, github: this.deps.github, publisher: this.deps.publisher, now: () => this.now(), audit: (p, code, detail) => this.audit({ login: p.submittedBy } as VerifiedUser, p.decisionId, p.action, 'sync', code, detail, p.id, factsOf(p)) };
   }
 
   async sync(proposalId: string): Promise<Proposal> {

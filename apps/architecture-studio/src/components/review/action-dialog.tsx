@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { AlertCircle, Plus, X } from 'lucide-react';
 import { ACTION_LABEL, type ActionKind } from '@/lib/workflow/labels.ts';
 import { btn, btnPrimary } from '../ui.tsx';
+import { ConflictPanel, type Conflict, type Original } from './conflict-panel.tsx';
 
 export interface OptionChoice {
   key: string;
@@ -19,6 +20,9 @@ export interface SubmitResult {
   detail?: string;
   proposal?: { id: string; state: string };
   duplicate?: boolean;
+  /** Set when the submission was refused because GitHub changed: the current revision and the values to compare. */
+  currentRevision?: string;
+  conflict?: Conflict;
 }
 
 const MIN_REASON = 10;
@@ -43,17 +47,21 @@ interface Props {
   decisionId: string;
   options: OptionChoice[];
   revision: string;
+  /** What the person was looking at, so a conflict can show it beside what GitHub holds now. */
+  original: Original;
   login: string;
   onSubmit: (body: Record<string, unknown>) => Promise<SubmitResult>;
   onReload: () => void;
 }
 
-export function ActionDialog({ action, onClose, decisionId, options, revision, login, onSubmit, onReload }: Props) {
+export function ActionDialog({ action, onClose, decisionId, options, revision, original, login, onSubmit, onReload }: Props) {
   const [text, setText] = useState('');
   const [optionKey, setOptionKey] = useState('');
   const [conditions, setConditions] = useState<string[]>(['']);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<SubmitResult | null>(null);
+  // After a conflict the person reads the current state and confirms; only then is the newer revision used.
+  const [override, setOverride] = useState<string | null>(null);
   const key = useRef(newKey());
   const optionsRef = useRef(options);
   optionsRef.current = options;
@@ -68,6 +76,7 @@ export function ActionDialog({ action, onClose, decisionId, options, revision, l
     setError(null);
     setBusy(false);
     setConditions(['']);
+    setOverride(null);
     const o = optionsRef.current;
     setOptionKey(action === 'approve-with-conditions' ? (o.find((x) => x.recommended)?.key ?? o[0]?.key ?? '') : '');
   }, [action]);
@@ -80,11 +89,15 @@ export function ActionDialog({ action, onClose, decisionId, options, revision, l
   const valid = reasonOk && (action !== 'approve-alternative' || !!optionKey) && (action !== 'approve-with-conditions' || (condList.length > 0 && !!optionKey));
   const hint = !reasonOk ? (action === 'comment' ? 'Write a comment.' : `At least ${MIN_REASON} characters are needed (${text.trim().length} so far).`) : null;
 
-  const submit = async () => {
+  const submit = async (reconciledRevision?: string) => {
     if (!valid || busy) return;
+    if (reconciledRevision) {
+      setOverride(reconciledRevision);
+      key.current = newKey(); // a new decision against new content is a new request
+    }
     setBusy(true);
     setError(null);
-    const body: Record<string, unknown> = { action, expectedRevision: revision, idempotencyKey: key.current };
+    const body: Record<string, unknown> = { action, expectedRevision: reconciledRevision ?? override ?? revision, idempotencyKey: key.current };
     if (action === 'comment') body.comment = text;
     else if (text.trim()) body.rationale = text;
     if (optionKey) body.optionKey = optionKey;
@@ -95,7 +108,7 @@ export function ActionDialog({ action, onClose, decisionId, options, revision, l
     else setError(r);
   };
 
-  const stale = error?.code === 'stale-revision';
+  const stale = error?.code === 'stale-revision' && !error.conflict;
   return (
     <Dialog.Root open onOpenChange={(o) => !o && !busy && onClose()}>
       <Dialog.Portal>
@@ -189,7 +202,12 @@ export function ActionDialog({ action, onClose, decisionId, options, revision, l
             You are acting as <strong>@{login}</strong>. This saves a proposal and opens a pull request on GitHub. The decision keeps its current status until a person merges that pull request.
           </p>
 
-          {error ? (
+          {error?.conflict ? (
+            <ConflictPanel conflict={error.conflict} original={original} busy={busy} onReapply={() => void submit(error.currentRevision)} onDiscard={() => {
+              onReload();
+              onClose();
+            }} />
+          ) : error ? (
             <div role="alert" className="mt-3 flex gap-2.5 rounded-xl px-3.5 py-2.5 text-[13.5px] leading-5" style={{ background: 'var(--s-rejected-bg)', color: 'var(--s-rejected-fg)' }}>
               <AlertCircle aria-hidden className="mt-0.5 size-4 shrink-0" />
               <div className="min-w-0">
@@ -207,7 +225,7 @@ export function ActionDialog({ action, onClose, decisionId, options, revision, l
             <button type="button" className={btn} onClick={onClose} disabled={busy}>
               Cancel
             </button>
-            <button type="button" className={btnPrimary} onClick={() => void submit()} disabled={!valid || busy || stale} aria-busy={busy}>
+            <button type="button" className={btnPrimary} onClick={() => void submit()} disabled={!valid || busy || stale || !!error?.conflict} aria-busy={busy}>
               {busy ? 'Submitting…' : c.submit}
             </button>
           </div>

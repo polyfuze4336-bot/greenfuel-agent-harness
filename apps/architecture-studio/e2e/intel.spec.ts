@@ -243,7 +243,7 @@ test.describe('read-only source preview', () => {
 
 test.describe('change detection and synchronisation', () => {
   test('API: comparing with another ref lists what changed, with alerts and files', async ({ request }) => {
-    const r = await api<{ mode: string; changes: { counts: { added: number; changed: number; removed: number; unchanged: number; alerts: number }; records: { id: string; kind: string }[]; files: { path: string; change: string }[]; fromCommit: string; toCommit: string } }>(request, '/api/v1/register/changes?from=origin/main');
+    const r = await api<{ mode: string; changes: { counts: { added: number; changed: number; removed: number; unchanged: number; alerts: number }; records: { id: string; kind: string }[]; files: { path: string; change: string }[]; fromCommit: string; toCommit: string } }>(request, '/api/v1/register/changes?from=origin/capstone/rubric-enhancement');
     expect(r.mode).toBe('ref');
     expect(r.changes.fromCommit).toMatch(/^[0-9a-f]{40}$/);
     expect(r.changes.counts.added).toBeGreaterThan(0);
@@ -281,7 +281,7 @@ test.describe('change detection and synchronisation', () => {
     await ready(page, '/decisions');
     const section = page.getByTestId('register-health');
     await section.getByText('Repository changes and synchronisation').click();
-    await section.getByLabel('Compare with').selectOption('origin/main');
+    await section.getByLabel('Compare with').selectOption('origin/capstone/rubric-enhancement');
     await section.getByRole('button', { name: 'Show changes' }).click();
     const res = section.getByTestId('changes-result');
     await expect(res).toContainText(/\d+ added/);

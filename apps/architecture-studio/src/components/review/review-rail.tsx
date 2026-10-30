@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AlertCircle, CheckCircle2, ChevronLeft, ChevronRight, CircleDot, ExternalLink, LogIn, LogOut, RotateCw, ShieldCheck } from 'lucide-react';
 import type { TimelineEntry } from '@/lib/workflow/context.ts';
-import { ACTION_LABEL, PROPOSAL_LABEL, PROPOSAL_STEPS, actionLabel, type ActionKind, type ProposalState } from '@/lib/workflow/labels.ts';
+import { ACTION_LABEL, PROPOSAL_LABEL, PROPOSAL_STEPS, actionLabel, describeValidation, type ActionKind, type ProposalState } from '@/lib/workflow/labels.ts';
 import type { ReviewView } from '@/lib/workflow/review.ts';
 import type { AuditEntry, Proposal } from '@/lib/workflow/store.ts';
 import type { NormStatus } from '@/lib/intel/schema.ts';
@@ -12,6 +12,7 @@ import { utcDate } from '@/lib/format.ts';
 import { SourcePreviewButton } from '../source-preview.tsx';
 import { Card, NormStatusPill, Skeleton, Tag, btn } from '../ui.tsx';
 import { ActionDialog, type OptionChoice, type SubmitResult } from './action-dialog.tsx';
+import type { Conflict } from './conflict-panel.tsx';
 
 interface SessionInfo {
   authenticated: boolean;
@@ -64,6 +65,11 @@ export function Tracker({ p, onCheck, busy, subject = 'decision' }: { p: Proposa
           );
         })}
       </ol>
+      {p.validation && !failed ? (
+        <p data-testid="validation" data-state={p.validation.state} role="status" className="mt-2.5 rounded-lg px-3 py-2 text-[12.5px] leading-5" style={p.validation.state === 'failure' ? { background: 'var(--s-rejected-bg)', color: 'var(--s-rejected-fg)' } : { background: 'var(--surface-2)' }}>
+          GitHub: {describeValidation(p.validation)}. The Studio never merges or waives a check; a person does that on GitHub.
+        </p>
+      ) : null}
       {failed ? (
         <div role="alert" className="mt-2.5 flex gap-2 rounded-lg px-3 py-2 text-[13px] leading-5" style={{ background: 'var(--s-rejected-bg)', color: 'var(--s-rejected-fg)' }}>
           <AlertCircle aria-hidden className="mt-0.5 size-4 shrink-0" />
@@ -164,7 +170,7 @@ export function ReviewRail({ id, options }: { id: string; options: OptionChoice[
       void load();
       router.refresh();
     }
-    return { ok: r.ok, status: r.status, code: r.body?.code, detail: r.body?.detail, proposal: r.body?.proposal, duplicate: r.body?.duplicate };
+    return { ok: r.ok, status: r.status, code: r.body?.code, detail: r.body?.detail, proposal: r.body?.proposal, duplicate: r.body?.duplicate, currentRevision: (r.body as { currentRevision?: string } | null)?.currentRevision, conflict: (r.body as { conflict?: Conflict } | null)?.conflict };
   };
 
   const check = async (p: Proposal) => {
@@ -450,7 +456,7 @@ export function ReviewRail({ id, options }: { id: string; options: OptionChoice[
         </details>
       </Card>
 
-      <ActionDialog action={dialog} onClose={() => setDialog(null)} decisionId={id} options={options} revision={v.revision} login={session.user?.login ?? ''} onSubmit={submit} onReload={() => void load()} />
+      <ActionDialog action={dialog} onClose={() => setDialog(null)} decisionId={id} options={options} revision={v.revision} original={{ status: data.status, canonicalCommit: v.canonical.commit, lastEvent: ((e) => (e ? { action: e.action, by: e.actor.login, at: e.createdAt, text: e.rationale ?? e.comment ?? null } : null))(v.canonical.state.events[v.canonical.state.events.length - 1]) }} login={session.user?.login ?? ''} onSubmit={submit} onReload={() => void load()} />
     </div>
   );
 }

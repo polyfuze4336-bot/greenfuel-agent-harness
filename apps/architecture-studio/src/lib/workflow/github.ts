@@ -6,19 +6,41 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 
+/** What GitHub says about the checks and reviews a pull request needs. `none` means no check is configured, not that checks passed. */
+export interface Validation {
+  state: 'success' | 'failure' | 'pending' | 'none';
+  checks: { name: string; state: 'success' | 'failure' | 'pending' }[];
+  reviews: { approvals: number; changesRequested: number } | null;
+  /** GitHub's own verdict on whether the merge policy is satisfied, when it gives one (for example `clean`, `blocked`). */
+  mergeState: string | null;
+  at: string;
+}
+
 export interface PullRequestInfo {
   number: number;
   url: string;
   state: 'open' | 'merged' | 'closed';
   headSha: string | null;
+  /** The commit a merge produced, when it is merged. */
+  mergeCommitSha?: string | null;
+  /** The branch the pull request comes from, when the source says. */
+  head?: string;
+  validation?: Validation;
 }
+
+export type GitHubErrorCode = 'AUTH' | 'RATE_LIMIT' | 'NETWORK' | 'SERVER' | 'NOT_FOUND' | 'REJECTED' | 'GITHUB_ERROR';
 
 export class GitHubError extends Error {
   readonly retryable: boolean;
-  constructor(message: string, retryable = true) {
+  readonly code: GitHubErrorCode;
+  /** When GitHub asked us to wait (rate limit), in milliseconds. */
+  readonly retryAfterMs: number | null;
+  constructor(message: string, retryable = true, info: { code?: GitHubErrorCode; retryAfterMs?: number | null } = {}) {
     super(message);
     this.name = 'GitHubError';
     this.retryable = retryable;
+    this.code = info.code ?? 'GITHUB_ERROR';
+    this.retryAfterMs = info.retryAfterMs ?? null;
   }
 }
 
@@ -26,6 +48,8 @@ export interface GitHubPort {
   createPullRequest(a: { base: string; head: string; title: string; body: string }): Promise<PullRequestInfo>;
   findByHead(head: string): Promise<PullRequestInfo | null>;
   get(number: number): Promise<PullRequestInfo>;
+  /** Pull requests the Studio opened (by branch prefix), for reconciliation. Optional: only the API implementation can list them. */
+  listStudio?(): Promise<PullRequestInfo[]>;
 }
 
 function run(root: string, args: string[], input?: string): Promise<string> {

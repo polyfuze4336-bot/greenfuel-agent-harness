@@ -428,10 +428,11 @@ test.describe('duplicate and stale submissions', () => {
     const d = b.getByTestId('action-dialog');
     await d.getByRole('textbox').fill('Page B rejects on a stale view.');
     await d.getByRole('button', { name: 'Submit rejection' }).click();
-    await expect(d.getByRole('alert')).toContainText('This decision changed after you opened it');
+    await expect(d.getByTestId('conflict-view')).toContainText('This changed on GitHub after you opened it');
+    await expect(d.getByTestId('conflict-current')).toContainText('In flight: comment');
     await shot(b, '36-review-stale-revision');
     await expect(d.getByRole('button', { name: 'Submit rejection' })).toBeDisabled();
-    await d.getByRole('button', { name: 'Reload this decision' }).click();
+    await d.getByRole('button', { name: 'Discard my action and reload' }).click();
     await b.keyboard.press('Escape');
     await expect(tracker(b)).toBeVisible();
     await expect(b.getByTestId('action-reject')).toHaveAttribute('aria-disabled', 'true');

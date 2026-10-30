@@ -15,10 +15,10 @@ import {
 } from './events.ts';
 import { GitHubError, type GitHubPort } from './github.ts';
 import type { IdentityProvider, VerifiedUser } from './identity.ts';
-import { GitPublisher, PublishError, splitCanonicalRef } from './publish.ts';
+import { PublishError, splitCanonicalRef, type Publisher } from './publish.ts';
 import { POLICY_PATH, authorise, availability, parsePolicy, rolesHeld, isListed, validateRequest, emptyPolicy, type ActionAvailability, type ActionRequest, type Policy } from './rules.ts';
-import { ReviewStore, isOpen, withLock, type Proposal } from './store.ts';
-import { syncProposal, type SyncDeps, type SyncFamily } from './sync-core.ts';
+import { ReviewStore, isOpen, withLock, type AuditFacts, type Proposal } from './store.ts';
+import { factsOf, syncProposal, type SyncDeps, type SyncFamily } from './sync-core.ts';
 
 export class ServiceError extends Error {
   readonly status: number;
@@ -41,7 +41,7 @@ export interface ServiceDeps {
   readRef: string;
   store: ReviewStore;
   github: GitHubPort;
-  publisher: GitPublisher;
+  publisher: Publisher;
   identity: IdentityProvider;
   now?: () => Date;
 }
@@ -190,8 +190,8 @@ export class ReviewService {
     };
   }
 
-  private audit(user: VerifiedUser | null, d: string | null, action: string, outcome: Parameters<ReviewStore['audit']>[0]['outcome'], code: string | null, detail: string | null, proposalId: string | null = null) {
-    this.deps.store.audit({ at: this.now().toISOString(), actor: user?.login ?? null, decisionId: d, action, outcome, code, detail: detail?.slice(0, 300) ?? null, proposalId });
+  private audit(user: VerifiedUser | null, d: string | null, action: string, outcome: Parameters<ReviewStore['audit']>[0]['outcome'], code: string | null, detail: string | null, proposalId: string | null = null, facts?: AuditFacts) {
+    this.deps.store.audit({ at: this.now().toISOString(), actor: user?.login ?? null, decisionId: d, action, outcome, code, detail: detail?.slice(0, 300) ?? null, proposalId, ...(facts ? { facts } : {}) });
   }
 
   /** Record a refusal in the audit log and throw it. */
@@ -217,6 +217,13 @@ export class ReviewService {
       const v = validateRequest(req, d);
       if (!v.ok) return this.refuse(current, d, action, 'invalid', new ServiceError(400, 'invalid', v.message));
       const a = req.action as ActionKind;
+      // Look at GitHub now, so a change made after this person opened the decision is seen. If GitHub cannot be reached the
+      // submission is still kept, and the sync checks again before anything is written.
+      try {
+        await this.deps.publisher.fetchCanonical(this.deps.canonicalRef);
+      } catch {
+        /* checked again at sync */
+      }
       const canonical = this.canonical();
       if (!canonical.available) return this.refuse(current, d, a, 'invalid', new ServiceError(503, 'canonical-unavailable', canonical.error ?? 'The canonical branch cannot be read.'));
       const policy = this.policy();
@@ -233,8 +240,27 @@ export class ReviewService {
       const state = canonical.states.get(d.id) ?? emptyState(d.id);
       const open = this.deps.store.openFor(d.id);
       const revision = this.revisionOf(d, state, open);
+      const conflict = (kind: string) => ({
+        currentRevision: revision,
+        conflict: {
+          kind,
+          current: {
+            status: state.effectiveStatus ?? d.status,
+            canonicalCommit: canonical.commit,
+            lastEvent: lastEventOf(state),
+            openProposal: open ? { id: open.id, state: open.state, action: open.action } : null,
+            source: { path: d.source.path, canonicalBlob: this.canonicalAdapter()?.oid(d.source.path) ?? null, readBlob: d.source.blob ?? null },
+          },
+          proposed: { action: a, option: v.value.option ? `${v.value.option.key}: ${v.value.option.name}` : null, conditions: v.value.conditions, rationale: v.value.rationale, comment: v.value.comment },
+        },
+      });
+      // The source record itself changed on the canonical branch since the Studio read it: the person decided on old content.
+      const canonicalBlob = this.canonicalAdapter()?.oid(d.source.path);
+      if (canonicalBlob && /^[0-9a-f]{40,64}$/.test(d.source.blob ?? '') && canonicalBlob !== d.source.blob) {
+        return this.refuse(current, d, a, 'stale', new ServiceError(409, 'source-changed', `${d.source.path} changed on ${canonical.ref} after the Studio read it. Review the current content before deciding.`, conflict('source-changed')));
+      }
       if (req.expectedRevision !== revision) {
-        return this.refuse(current, d, a, 'stale', new ServiceError(409, 'stale-revision', 'This decision changed after you opened it. Reload to see the current state, then decide again.', { currentRevision: revision }));
+        return this.refuse(current, d, a, 'stale', new ServiceError(409, 'stale-revision', 'This decision changed after you opened it. Review the current state, then decide again.', conflict('stale-revision')));
       }
       if (open) return this.refuse(current, d, a, 'stale', new ServiceError(409, 'proposal-open', `A change to ${d.id} is already in flight (${open.id}, ${open.state}). One change at a time.`, { proposalId: open.id }));
       const av = availability(d, state).find((x) => x.action === a);
@@ -268,6 +294,8 @@ export class ReviewService {
         decisionId: d.id,
         action: a,
         idempotencyKey: req.idempotencyKey!,
+        change: { field: 'status', old: state.effectiveStatus ?? d.status, new: statusAfter(a, state.effectiveStatus ?? d.status) },
+        sourceCommit: d.source.commit,
         submittedBy: current.login,
         event,
         state: 'locally-submitted',
@@ -283,13 +311,13 @@ export class ReviewService {
         updatedAt: t.toISOString(),
       };
       this.deps.store.save(proposal);
-      this.audit(current, d.id, a, 'accepted', null, `Recorded ${event.id} as ${proposal.id}`, proposal.id);
+      this.audit(current, d.id, a, 'accepted', null, `Recorded ${event.id} as ${proposal.id}`, proposal.id, { oldValue: proposal.change!.old, newValue: proposal.change!.new, sourceCommit: d.source.commit, baseCommit: canonical.commit });
       return { proposal, duplicate: false };
     });
   }
 
   private syncDeps(): SyncDeps {
-    return { root: this.deps.root, canonicalRef: this.deps.canonicalRef, store: this.deps.store, github: this.deps.github, publisher: this.deps.publisher, now: () => this.now(), audit: (p, code, detail) => this.audit(null, p.decisionId, p.action, 'sync', code, detail, p.id) };
+    return { root: this.deps.root, canonicalRef: this.deps.canonicalRef, store: this.deps.store, github: this.deps.github, publisher: this.deps.publisher, now: () => this.now(), audit: (p, code, detail) => this.audit({ login: p.submittedBy } as VerifiedUser, p.decisionId, p.action, 'sync', code, detail, p.id, factsOf(p)) };
   }
 
   /** Move a proposal as far as it can go. Safe to call repeatedly: every step checks what already happened. */
@@ -306,6 +334,15 @@ export class ReviewService {
     for (const p of open) out.push(await this.sync(p.id));
     return out;
   }
+}
+
+const STATUS_AFTER: Partial<Record<ActionKind, string>> = { approve: 'Approved', 'approve-alternative': 'Approved', 'approve-with-conditions': 'Approved', reject: 'Rejected', defer: 'Deferred', 'request-revision': 'Pending Review', reopen: 'Pending Review' };
+/** The status the decision will have once the action is merged. A comment changes nothing. */
+const statusAfter = (a: ActionKind, now: string): string => STATUS_AFTER[a] ?? now;
+
+function lastEventOf(s: ReviewState) {
+  const e = s.events[s.events.length - 1];
+  return e ? { id: e.id, action: e.action, by: e.actor.login, at: e.createdAt, text: e.rationale ?? e.comment ?? null } : null;
 }
 
 function pullRequestBody(e: ReviewEvent, ref: string): string {

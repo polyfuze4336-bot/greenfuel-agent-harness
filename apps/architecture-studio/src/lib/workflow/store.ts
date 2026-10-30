@@ -6,6 +6,7 @@ import path from 'node:path';
 import { canonicalJson, sha256, type ReviewEvent } from './events.ts';
 import { PROPOSAL_LABEL, type ProposalState } from './labels.ts';
 import type { WorkEvent } from './work-events.ts';
+import type { Validation } from './github.ts';
 
 export { PROPOSAL_LABEL, type ProposalState };
 
@@ -31,9 +32,28 @@ export interface Proposal {
   attempts: number;
   /** The last problem, with whether trying again can help. */
   lastError: { code: string; message: string; retryable: boolean; at: string } | null;
+  /** What the change does, for the audit log: the value before and the value after. */
+  change?: { field: string; old: string | null; new: string | null };
+  /** The commit of the source record the person was looking at when they acted. */
+  sourceCommit?: string | null;
+  /** The commit that carries the change: the merge commit once merged, otherwise the pull request's head. */
+  resultCommit?: string | null;
+  /** The checks and reviews GitHub reported at the last sync. */
+  validation?: Validation | null;
   history: { at: string; state: ProposalState; note: string }[];
   createdAt: string;
   updatedAt: string;
+}
+
+/** The facts an audit entry records about a change, beyond who did what. */
+export interface AuditFacts {
+  oldValue?: string | null;
+  newValue?: string | null;
+  sourceCommit?: string | null;
+  baseCommit?: string | null;
+  resultCommit?: string | null;
+  pullRequest?: number | null;
+  validation?: string | null;
 }
 
 export interface AuditEntry {
@@ -45,6 +65,7 @@ export interface AuditEntry {
   code: string | null;
   detail: string | null;
   proposalId: string | null;
+  facts?: AuditFacts;
   prevHash: string | null;
   hash: string;
 }
@@ -143,6 +164,7 @@ export class ReviewStore {
       prev = null;
     }
     const body = { ...e, prevHash: prev };
+    if (body.facts === undefined) delete body.facts;
     const entry: AuditEntry = { ...body, hash: sha256(canonicalJson(body)) };
     fs.mkdirSync(this.dir, { recursive: true });
     fs.appendFileSync(this.auditFile(), `${JSON.stringify(entry)}\n`, { mode: 0o600 });
