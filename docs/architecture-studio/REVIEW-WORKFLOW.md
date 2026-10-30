@@ -53,7 +53,7 @@ Keys on the review page: `N` and `P` for the next and previous pending decision;
 ## 4. Identity and roles
 
 - **Identity** comes from GitHub, not from a typed name. The Studio runs `gh api user` and requires an account of type `User`. It reads no token. It refuses to sign in inside an agent session (`HARNESS_AGENT_SESSION`).
-- **Roles** come from `harness/policy/decision-workflow.json` on the canonical branch. A person is recognised only if **both** the login and the numeric GitHub id match, so a renamed or recycled login gets nothing. The file ships with no people.
+- **Roles** come from `harness/policy/decision-workflow.json` on the canonical branch. A person is recognised only if **both** the login and the numeric GitHub id match, so a renamed or recycled login gets nothing. The file ships with one registered approver; any other account is denied every decision action.
 - If the policy is not yet on the canonical branch, the local copy is used and **every event records that**, so the pull request reviewer sees it.
 - The policy is a control-plane file (`harness/`). Changing who may approve is a reviewed repository change, never a Studio action.
 - A role that a record names but the approver does not hold is listed in the pull request ("roles named by the record but not held").
