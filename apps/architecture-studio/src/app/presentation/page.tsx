@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+import Link from 'next/link';
 import { CircleDashed, Video } from 'lucide-react';
 import { DeckExplorer, QaExplorer } from '@/components/presentation/explorers.tsx';
 import { PageSkeleton } from '@/components/page-skeleton.tsx';
@@ -16,7 +17,15 @@ export default async function PresentationPage() {
   const pkgDocs = m.docs.filter((d) => d.path.startsWith('docs/capstone/presentation/'));
   return (
     <>
-      <PageHeader title="Presentation Studio" lede="The capstone presentation package as it exists in the repository, and how much of it a person has actually rehearsed. The Studio does not edit slides." />
+      <PageHeader title="Presentation Studio" lede="The capstone presentation package as it exists in the repository, and how much of it a person has actually rehearsed. The deck builder generates an editable PowerPoint from the repository; the Studio never edits the repository." />
+
+      <Card className="mb-8 flex flex-wrap items-center justify-between gap-4 p-5" data-testid="deck-builder-card">
+        <div className="max-w-2xl">
+          <h2 className="text-[16px] font-semibold">Deck builder</h2>
+          <p className="mt-1 text-[13.5px] leading-6 text-ink-2">Generate, review and export an editable PowerPoint and PDF. Each slide names its sources and the commit it came from; a final deck is refused until the architecture it presents is approved.</p>
+        </div>
+        <Link href="/presentation/deck" className="inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-3.5 py-1.5 text-[13.5px] font-medium text-accent-ink hover:opacity-90" data-testid="open-deck-builder">Open the deck builder</Link>
+      </Card>
 
       <Section id="rehearsal" title="Rehearsal status" aside={`${rehearsed} of ${p.rehearsal.length} criteria rehearsed`}>
         <p className="mb-4 max-w-3xl text-[14px] leading-6 text-ink-2">A criterion changes status only when a named person has observed the behaviour and recorded it. Until then, delivery and consultative behaviour are <strong>not verified</strong>, whatever the preparation material says.</p>

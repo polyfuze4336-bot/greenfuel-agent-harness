@@ -27,6 +27,8 @@ const securityHeaders = [
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  // pptxgenjs and jszip are plain Node packages; they are loaded as they are rather than bundled.
+  serverExternalPackages: ['pptxgenjs', 'jszip'],
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }];
   },

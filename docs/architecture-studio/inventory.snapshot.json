@@ -1,11 +1,11 @@
 {
   "generatedBy": "harness/scripts/studio-inventory.mjs",
   "git": {
-    "head": "161654f294d2140851ce9d7ba760cab774b1f81d",
+    "head": "46bae60f9a285bd4bec84a88513ba7b931555198",
     "branch": "studio/ui-readonly",
     "originMain": "140c39866d64a2246de0a4a2fb4aa8cc9c5ba75a",
-    "commitsAheadOfOriginMain": 7,
-    "dirty": 20
+    "commitsAheadOfOriginMain": 4,
+    "dirty": 78
   },
   "sources": {},
   "counts": {
@@ -161,13 +161,13 @@
     "todoTasks": {
       "source": "docs/state/TODO.md",
       "rule": "rows \"| Tn |\"; status = leading bold keyword, else \"deferred\" in the first section, else \"unmarked\"",
-      "total": 54,
+      "total": 55,
       "byStatus": {
         "deferred": 15,
         "decided": 2,
         "agreed": 1,
         "done": 2,
-        "open": 29,
+        "open": 30,
         "not-granted": 1,
         "approved": 4
       },
@@ -178,7 +178,7 @@
         "Awaiting the owner (Azure readiness stage, 2026-10-28; answered 2026-10-29)": 12,
         "Awaiting the owner (hardening stage, 2026-10-30)": 6,
         "Awaiting the owner (target architecture and business case, 2026-10-29)": 13,
-        "Awaiting the owner (Architecture Decision Studio, 2026-10-29)": 6
+        "Awaiting the owner (Architecture Decision Studio, 2026-10-29)": 7
       },
       "ambiguousForReview": [
         "T2"
@@ -1677,6 +1677,16 @@
       ],
       "ambiguous": false,
       "title": "Open: owner actions for the architecture baseline and build authorization. A readiness val"
+    },
+    {
+      "id": "T67",
+      "section": "Awaiting the owner (Architecture Decision Studio, 2026-10-29)",
+      "status": "open",
+      "tokens": [
+        "open"
+      ],
+      "ambiguous": false,
+      "title": "Open: owner actions for the Presentation Studio deck builder. An editable 40-slide PowerPo"
     }
   ],
   "phaseFromState": "0",
@@ -1695,6 +1705,13 @@
       "distinctIds": 29,
       "files": [
         "docs/architecture-studio/ACCESS-CONTROL.md"
+      ],
+      "fileCount": 1
+    },
+    "ADR": {
+      "distinctIds": 5,
+      "files": [
+        "docs/baselines/DEPENDENCY-MATRIX.md"
       ],
       "fileCount": 1
     },
@@ -1800,10 +1817,10 @@
       "files": [
         "docs/acceptance/NEXT-PHASE-IMPLEMENTATION-PLAN.md",
         "docs/architecture-studio/DECISION-INVENTORY.md",
-        "docs/capstone/RUBRIC-TRACEABILITY.md",
-        "docs/context/DECISION-REGISTER.md"
+        "docs/baselines/DEPENDENCY-MATRIX.md",
+        "docs/capstone/RUBRIC-TRACEABILITY.md"
       ],
-      "fileCount": 4
+      "fileCount": 5
     },
     "DA": {
       "distinctIds": 9,
@@ -2103,7 +2120,7 @@
       "fileCount": 1
     },
     "T": {
-      "distinctIds": 60,
+      "distinctIds": 61,
       "files": [
         "docs/acceptance/HARNESS-ACCEPTANCE-REPORT.md",
         "docs/harness/CAPABILITY-MATRIX.md",
@@ -2180,7 +2197,7 @@
     ".github": 3,
     ".mcp.json": 1,
     ".vscode": 2,
-    "apps": 252,
+    "apps": 278,
     "docs/architecture-studio": 2,
     "docs/azure": 2,
     "docs/business": 3,

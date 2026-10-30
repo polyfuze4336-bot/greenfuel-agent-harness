@@ -119,6 +119,20 @@ node scripts/baseline.ts verify [--id BL-0001]
 
 CI runs the same check ([architecture-gate.yml](../../.github/workflows/architecture-gate.yml)); it cannot stop a local edit. See [BASELINE](../../docs/architecture-studio/BASELINE.md) and [CHANGE-CONTROL](../../docs/architecture/CHANGE-CONTROL.md).
 
+## Presentation Studio deck builder
+
+`/presentation/deck` generates an editable PowerPoint (and, with Microsoft PowerPoint installed, a PDF and slide previews) from the repository, lets people review, retitle, re-visualize, approve or reject each slide, and refuses a final deck until the architecture it presents is approved. The CLI does the same.
+
+```powershell
+node scripts/deck.ts outline                      # the slides and their timing
+node scripts/deck.ts check                        # claim checks and the gate (exit 2 while a final deck is not allowed)
+node scripts/deck.ts build --mode sample --out <folder>   # always allowed; marked SAMPLE
+node scripts/deck.ts build --mode final --out <folder>    # refused with reasons until the gate is met
+node scripts/deck.ts verify <folder>/<deck id>    # re-hash the outputs and inspect the file
+```
+
+See [PRESENTATION-STUDIO](../../docs/architecture-studio/PRESENTATION-STUDIO.md). Builds and slide decisions live in the Studio's state folder (`STUDIO_DECK_DIR`), never in the repository.
+
 ## Tests
 
 ```powershell
