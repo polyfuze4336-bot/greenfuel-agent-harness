@@ -1,11 +1,11 @@
 {
   "generatedBy": "harness/scripts/studio-inventory.mjs",
   "git": {
-    "head": "46bae60f9a285bd4bec84a88513ba7b931555198",
+    "head": "b5b614b99302c98231cedfaa77444255e8543392",
     "branch": "studio/ui-readonly",
     "originMain": "140c39866d64a2246de0a4a2fb4aa8cc9c5ba75a",
-    "commitsAheadOfOriginMain": 4,
-    "dirty": 78
+    "commitsAheadOfOriginMain": 7,
+    "dirty": 4
   },
   "sources": {},
   "counts": {
@@ -161,13 +161,13 @@
     "todoTasks": {
       "source": "docs/state/TODO.md",
       "rule": "rows \"| Tn |\"; status = leading bold keyword, else \"deferred\" in the first section, else \"unmarked\"",
-      "total": 55,
+      "total": 56,
       "byStatus": {
         "deferred": 15,
         "decided": 2,
         "agreed": 1,
         "done": 2,
-        "open": 30,
+        "open": 31,
         "not-granted": 1,
         "approved": 4
       },
@@ -178,7 +178,7 @@
         "Awaiting the owner (Azure readiness stage, 2026-10-28; answered 2026-10-29)": 12,
         "Awaiting the owner (hardening stage, 2026-10-30)": 6,
         "Awaiting the owner (target architecture and business case, 2026-10-29)": 13,
-        "Awaiting the owner (Architecture Decision Studio, 2026-10-29)": 7
+        "Awaiting the owner (Architecture Decision Studio, 2026-10-29)": 8
       },
       "ambiguousForReview": [
         "T2"
@@ -1687,6 +1687,16 @@
       ],
       "ambiguous": false,
       "title": "Open: owner actions for the Presentation Studio deck builder. An editable 40-slide PowerPo"
+    },
+    {
+      "id": "T68",
+      "section": "Awaiting the owner (Architecture Decision Studio, 2026-10-29)",
+      "status": "open",
+      "tokens": [
+        "open"
+      ],
+      "ambiguous": false,
+      "title": "Open: owner actions after the end-to-end acceptance of the Studio. The 20-step workflow an"
     }
   ],
   "phaseFromState": "0",
@@ -1899,9 +1909,10 @@
       "files": [
         "docs/acceptance/HARNESS-ACCEPTANCE-REPORT.md",
         "docs/context/SOVEREIGNTY-MATRIX.md",
+        "docs/studio-acceptance/ACCEPTANCE-REPORT.md",
         "docs/target-architecture/12-DATA-MOVEMENT-AND-RESIDENCY-VALIDATION.md"
       ],
-      "fileCount": 3
+      "fileCount": 4
     },
     "FR": {
       "distinctIds": 33,
@@ -1924,11 +1935,12 @@
       "fileCount": 5
     },
     "H": {
-      "distinctIds": 5,
+      "distinctIds": 7,
       "files": [
-        "docs/acceptance/HARNESS-ACCEPTANCE-REPORT.md"
+        "docs/acceptance/HARNESS-ACCEPTANCE-REPORT.md",
+        "docs/studio-acceptance/SECURITY-REPORT.md"
       ],
-      "fileCount": 1
+      "fileCount": 2
     },
     "HC": {
       "distinctIds": 12,
@@ -2120,7 +2132,7 @@
       "fileCount": 1
     },
     "T": {
-      "distinctIds": 61,
+      "distinctIds": 62,
       "files": [
         "docs/acceptance/HARNESS-ACCEPTANCE-REPORT.md",
         "docs/harness/CAPABILITY-MATRIX.md",
@@ -2197,14 +2209,15 @@
     ".github": 3,
     ".mcp.json": 1,
     ".vscode": 2,
-    "apps": 278,
+    "apps": 279,
     "docs/architecture-studio": 2,
     "docs/azure": 2,
     "docs/business": 3,
-    "docs/capstone": 9,
+    "docs/capstone": 12,
     "docs/context": 1,
     "docs/evidence": 1,
     "docs/orchestration": 1,
+    "docs/studio-acceptance": 2,
     "evaluation": 2,
     "harness": 37,
     "infra": 3,

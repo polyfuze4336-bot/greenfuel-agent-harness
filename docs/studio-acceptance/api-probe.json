@@ -1,0 +1,821 @@
+{
+  "summary": {
+    "base": "http://localhost:3100",
+    "probedAt": "2026-10-30T22:34:13.180Z",
+    "checks": 90,
+    "failed": 0,
+    "routes": 37,
+    "mutatingRoutes": 13
+  },
+  "failed": [],
+  "latency": {
+    "search: decision text": {
+      "n": 30,
+      "p50": 60.2,
+      "p95": 70.8,
+      "max": 85.5
+    },
+    "search: id": {
+      "n": 30,
+      "p50": 61.1,
+      "p95": 71.4,
+      "max": 2304.7
+    },
+    "search: no match": {
+      "n": 30,
+      "p50": 62.9,
+      "p95": 74.6,
+      "max": 79.3
+    },
+    "decision register": {
+      "n": 30,
+      "p50": 61.3,
+      "p95": 74,
+      "max": 110.9
+    },
+    "decision detail": {
+      "n": 30,
+      "p50": 661.3,
+      "p95": 3368.8,
+      "max": 3466.9
+    },
+    "work queue": {
+      "n": 30,
+      "p50": 631.2,
+      "p95": 973,
+      "max": 1017.4
+    },
+    "baseline readiness": {
+      "n": 30,
+      "p50": 405.7,
+      "p95": 434.5,
+      "max": 450.1
+    },
+    "deck model": {
+      "n": 30,
+      "p50": 562.1,
+      "p95": 604.2,
+      "max": 721.8
+    }
+  },
+  "results": [
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/access/attest origin=none",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/access/attest origin=https://evil.example",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/access/attest origin=http://localhost:3100",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/access/suspend origin=none",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/access/suspend origin=https://evil.example",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/access/suspend origin=http://localhost:3100",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/auth/signin origin=none",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/auth/signin origin=https://evil.example",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/auth/signin origin=http://localhost:3100",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/auth/signout origin=none",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/auth/signout origin=https://evil.example",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/auth/signout origin=http://localhost:3100",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/deck/actions origin=none",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/deck/actions origin=https://evil.example",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/deck/actions origin=http://localhost:3100",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/deck/build origin=none",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/deck/build origin=https://evil.example",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/deck/build origin=http://localhost:3100",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/github/webhook origin=none",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "note": "needs a valid HMAC signature",
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/github/webhook origin=https://evil.example",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "note": "needs a valid HMAC signature",
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/github/webhook origin=http://localhost:3100",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "note": "needs a valid HMAC signature",
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/queue/x/actions origin=none",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/queue/x/actions origin=https://evil.example",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/queue/x/actions origin=http://localhost:3100",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/refresh origin=none",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/refresh origin=https://evil.example",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/refresh origin=http://localhost:3100",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/register/sync origin=none",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/register/sync origin=https://evil.example",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/register/sync origin=http://localhost:3100",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/review/proposals/x/sync origin=none",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/review/proposals/x/sync origin=https://evil.example",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/review/proposals/x/sync origin=http://localhost:3100",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/review/x/actions origin=none",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/review/x/actions origin=https://evil.example",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/review/x/actions origin=http://localhost:3100",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/sync/reconcile origin=none",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/sync/reconcile origin=https://evil.example",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "unauthenticated-writes",
+      "name": "POST /v1/sync/reconcile origin=http://localhost:3100",
+      "pass": true,
+      "detail": {
+        "status": 404,
+        "leaks": false
+      }
+    },
+    {
+      "area": "methods",
+      "name": "DELETE /v1/access/review",
+      "pass": true,
+      "detail": {
+        "status": 404
+      }
+    },
+    {
+      "area": "methods",
+      "name": "DELETE /v1/approvals",
+      "pass": true,
+      "detail": {
+        "status": 404
+      }
+    },
+    {
+      "area": "methods",
+      "name": "DELETE /v1/auth/session",
+      "pass": true,
+      "detail": {
+        "status": 404
+      }
+    },
+    {
+      "area": "methods",
+      "name": "DELETE /v1/baseline",
+      "pass": true,
+      "detail": {
+        "status": 404
+      }
+    },
+    {
+      "area": "methods",
+      "name": "DELETE /v1/decisions",
+      "pass": true,
+      "detail": {
+        "status": 404
+      }
+    },
+    {
+      "area": "methods",
+      "name": "DELETE /v1/decisions/x",
+      "pass": true,
+      "detail": {
+        "status": 404
+      }
+    },
+    {
+      "area": "methods",
+      "name": "DELETE /v1/deck/export/x",
+      "pass": true,
+      "detail": {
+        "status": 404
+      }
+    },
+    {
+      "area": "methods",
+      "name": "DELETE /v1/deck/preview/x",
+      "pass": true,
+      "detail": {
+        "status": 404
+      }
+    },
+    {
+      "area": "methods",
+      "name": "DELETE /v1/deck",
+      "pass": true,
+      "detail": {
+        "status": 404
+      }
+    },
+    {
+      "area": "methods",
+      "name": "DELETE /v1/history",
+      "pass": true,
+      "detail": {
+        "status": 404
+      }
+    },
+    {
+      "area": "methods",
+      "name": "DELETE /v1/queue/requirements",
+      "pass": true,
+      "detail": {
+        "status": 404
+      }
+    },
+    {
+      "area": "methods",
+      "name": "DELETE /v1/queue",
+      "pass": true,
+      "detail": {
+        "status": 404
+      }
+    },
+    {
+      "area": "methods",
+      "name": "DELETE /v1/queue/x",
+      "pass": true,
+      "detail": {
+        "status": 404
+      }
+    },
+    {
+      "area": "methods",
+      "name": "DELETE /v1/register/changes",
+      "pass": true,
+      "detail": {
+        "status": 404
+      }
+    },
+    {
+      "area": "methods",
+      "name": "DELETE /v1/register",
+      "pass": true,
+      "detail": {
+        "status": 404
+      }
+    },
+    {
+      "area": "methods",
+      "name": "DELETE /v1/repository",
+      "pass": true,
+      "detail": {
+        "status": 404
+      }
+    },
+    {
+      "area": "methods",
+      "name": "DELETE /v1/review/next",
+      "pass": true,
+      "detail": {
+        "status": 404
+      }
+    },
+    {
+      "area": "methods",
+      "name": "DELETE /v1/review/x",
+      "pass": true,
+      "detail": {
+        "status": 404
+      }
+    },
+    {
+      "area": "methods",
+      "name": "DELETE /v1/search",
+      "pass": true,
+      "detail": {
+        "status": 404
+      }
+    },
+    {
+      "area": "methods",
+      "name": "DELETE /v1/source",
+      "pass": true,
+      "detail": {
+        "status": 404
+      }
+    },
+    {
+      "area": "methods",
+      "name": "DELETE /v1/sync/status",
+      "pass": true,
+      "detail": {
+        "status": 404
+      }
+    },
+    {
+      "area": "methods",
+      "name": "DELETE /v1/tasks",
+      "pass": true,
+      "detail": {
+        "status": 404
+      }
+    },
+    {
+      "area": "path-traversal",
+      "name": "source?path=\"../package.json\"",
+      "pass": true,
+      "detail": {
+        "status": 400
+      }
+    },
+    {
+      "area": "path-traversal",
+      "name": "source?path=\"..\\\\..\\\\package.json\"",
+      "pass": true,
+      "detail": {
+        "status": 400
+      }
+    },
+    {
+      "area": "path-traversal",
+      "name": "source?path=\"%2e%2e%2f%2e%2e%2fpackage.json\"",
+      "pass": true,
+      "detail": {
+        "status": 400
+      }
+    },
+    {
+      "area": "path-traversal",
+      "name": "source?path=\"/etc/passwd\"",
+      "pass": true,
+      "detail": {
+        "status": 400
+      }
+    },
+    {
+      "area": "path-traversal",
+      "name": "source?path=\"C:\\\\Windows\\\\win.ini\"",
+      "pass": true,
+      "detail": {
+        "status": 400
+      }
+    },
+    {
+      "area": "path-traversal",
+      "name": "source?path=\".git/config\"",
+      "pass": true,
+      "detail": {
+        "status": 400
+      }
+    },
+    {
+      "area": "path-traversal",
+      "name": "source?path=\"docs/../../../.env\"",
+      "pass": true,
+      "detail": {
+        "status": 400
+      }
+    },
+    {
+      "area": "path-traversal",
+      "name": "source?path=\"docs/adr/0001\\u0000.md\"",
+      "pass": true,
+      "detail": {
+        "status": 404
+      }
+    },
+    {
+      "area": "path-traversal",
+      "name": "GET /api/v1/deck/export/..%2f..%2fpackage.json",
+      "pass": true,
+      "detail": {
+        "status": 400
+      }
+    },
+    {
+      "area": "path-traversal",
+      "name": "GET /api/v1/deck/export/pptx%00",
+      "pass": true,
+      "detail": {
+        "status": 400
+      }
+    },
+    {
+      "area": "path-traversal",
+      "name": "GET /api/v1/deck/export/%2e%2e",
+      "pass": true,
+      "detail": {
+        "status": 308
+      }
+    },
+    {
+      "area": "path-traversal",
+      "name": "GET /api/v1/deck/preview/-1",
+      "pass": true,
+      "detail": {
+        "status": 400
+      }
+    },
+    {
+      "area": "path-traversal",
+      "name": "GET /api/v1/deck/preview/999",
+      "pass": true,
+      "detail": {
+        "status": 404
+      }
+    },
+    {
+      "area": "path-traversal",
+      "name": "GET /api/v1/deck/preview/..%2fx",
+      "pass": true,
+      "detail": {
+        "status": 400
+      }
+    },
+    {
+      "area": "path-traversal",
+      "name": "GET /api/v1/review/..%2f..%2fx",
+      "pass": true,
+      "detail": {
+        "status": 404
+      }
+    },
+    {
+      "area": "path-traversal",
+      "name": "GET /api/v1/queue/..%2f..%2fx",
+      "pass": true,
+      "detail": {
+        "status": 404
+      }
+    },
+    {
+      "area": "body-limits",
+      "name": "3 MB body to /api/v1/deck/actions",
+      "pass": true,
+      "detail": {
+        "status": 401
+      }
+    },
+    {
+      "area": "body-limits",
+      "name": "malformed JSON to /api/v1/deck/actions",
+      "pass": true,
+      "detail": {
+        "status": 401
+      }
+    },
+    {
+      "area": "body-limits",
+      "name": "3 MB body to /api/v1/review/ADR-0016/actions",
+      "pass": true,
+      "detail": {
+        "status": 401
+      }
+    },
+    {
+      "area": "body-limits",
+      "name": "malformed JSON to /api/v1/review/ADR-0016/actions",
+      "pass": true,
+      "detail": {
+        "status": 401
+      }
+    },
+    {
+      "area": "headers",
+      "name": "Content-Security-Policy present",
+      "pass": true,
+      "detail": {
+        "value": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src '"
+      }
+    },
+    {
+      "area": "headers",
+      "name": "CSP does not allow unsafe-eval",
+      "pass": true,
+      "detail": {}
+    },
+    {
+      "area": "headers",
+      "name": "X-Content-Type-Options: nosniff",
+      "pass": true,
+      "detail": {
+        "value": "nosniff"
+      }
+    },
+    {
+      "area": "headers",
+      "name": "framing refused",
+      "pass": true,
+      "detail": {}
+    },
+    {
+      "area": "headers",
+      "name": "Referrer-Policy set",
+      "pass": true,
+      "detail": {
+        "value": "no-referrer"
+      }
+    },
+    {
+      "area": "headers",
+      "name": "X-Powered-By absent",
+      "pass": true,
+      "detail": {
+        "value": null
+      }
+    },
+    {
+      "area": "errors",
+      "name": "unknown decision is a 404 problem document without internals",
+      "pass": true,
+      "detail": {
+        "status": 404
+      }
+    },
+    {
+      "area": "errors",
+      "name": "unknown page is a 404 without internals",
+      "pass": true,
+      "detail": {
+        "status": 404
+      }
+    },
+    {
+      "area": "errors",
+      "name": "session endpoint without a cookie reveals no identity",
+      "pass": true,
+      "detail": {
+        "status": 200
+      }
+    }
+  ]
+}

@@ -4,6 +4,8 @@ A one-page statement of where the repository stands against the FY27 Azure Maste
 
 Detail: [FORENSIC-AUDIT](FORENSIC-AUDIT.md) · [RUBRIC-TRACEABILITY](RUBRIC-TRACEABILITY.md) · [CRITICAL-GAPS](CRITICAL-GAPS.md) · [PRIORITIZED-BACKLOG](PRIORITIZED-BACKLOG.md) · [EVIDENCE-REGISTER](EVIDENCE-REGISTER.md).
 
+**Studio validation:** the Architecture Decision Studio was acceptance-tested end to end locally; it strengthens decision-governance evidence but does not move the solution gaps below. See [CAPSTONE-READINESS-ASSESSMENT](../studio-acceptance/CAPSTONE-READINESS-ASSESSMENT.md).
+
 ## The one-paragraph answer
 
 The repository is an unusually honest, well-tested **coding-agent governance harness** and a set of **provisional, unaccepted designs**. It is not a solution: there is no application, no AI agent for the business, no Azure resource, no measured number about the use case, no narrative, no demo and no thought-leadership artifact yet. The strongest assets are the evidence discipline and the trade-off reasoning (A2, C3 honesty, B4 preparation). The weakest are the implementation (A4 to A7), the numbers (B7), the demo (B3) and the artifact (D1 to D3). The most dangerous single fact, given the guide's floors, is that Section A cannot reach its minimum without something working, and that a missing artifact is an "incomplete" that no total can offset.

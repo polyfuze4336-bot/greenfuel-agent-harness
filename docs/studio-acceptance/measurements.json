@@ -1,0 +1,242 @@
+{
+  "measuredAt": "2026-10-30T23:01:26.893Z",
+  "machine": {
+    "os": "Windows_NT 10.0.26300",
+    "cpus": 8,
+    "node": "v22.23.4"
+  },
+  "measurements": {
+    "repository refresh after a pull (ms)": [
+      2568,
+      2853,
+      3092,
+      2702,
+      2781,
+      2803,
+      2684,
+      2743,
+      2680,
+      2892,
+      2789,
+      3063,
+      2668,
+      2649,
+      2617
+    ],
+    "approval transaction: submit to pull request (ms) ADR-0021": 3144,
+    "merge to canonical status in the Studio (ms) ADR-0021": 849,
+    "repository validation on the pull request (ms)": 6614,
+    "baseline authorization visible in the Studio after commit (ms)": 4511,
+    "approval transaction: submit to pull request (ms) ADR-0020": 3302,
+    "merge to canonical status in the Studio (ms) ADR-0020": 750,
+    "approving all 40 slides one by one (ms)": 39772,
+    "presentation generation, sample, rendered by PowerPoint (ms)": 15434,
+    "presentation generation, FINAL, rendered by PowerPoint (ms)": 14767,
+    "final deck wall clock from request (ms)": 14768,
+    "approval transaction: submit to pull request (ms) ADR-0023": 3382,
+    "merge to canonical status in the Studio (ms) ADR-0023": 831
+  },
+  "evidence": {
+    "validationOnPullRequest": {
+      "baseFailures": 22,
+      "prFailures": 22,
+      "introducedByThePullRequest": [],
+      "mentionsAdr0021": 0
+    },
+    "unresolvedBuildBlockers": {
+      "before": 40,
+      "after": 40
+    },
+    "baselineGeneratedAt": "085c4eb15c0984098f2d6e6af0dd5121b7c2cb54",
+    "baseline": {
+      "id": "BL-0001",
+      "sourceCommit": "0a764162ee187f7228d482b11be6de3de6fbf864",
+      "authorizedBy": "AP-e2960ebe56dd"
+    },
+    "deckDecisionsGate": {
+      "id": "decisions",
+      "title": "Every decision the deck presents is approved",
+      "blocking": true,
+      "met": true,
+      "detail": "All 7 presented decisions are approved.",
+      "hint": "Decide them in the review workflow. The deck reads their status; it does not change it."
+    },
+    "finalDeck": {
+      "id": "deck-025d27b-20261030T225756",
+      "commit": "025d27b93d476e84b3befd74b197691a9f401901",
+      "pptxSha256": "bc02d449abff7c7b3a9fa289e1dea3a5fa8757060d2c1577803c2548fc0ef2ef",
+      "pdfSha256": "ec887b34ce5cd6fb08410775a3fc95f624bdafa79ca1282171e09086631bc342",
+      "qa": {
+        "errors": 0,
+        "warnings": 0,
+        "info": 8
+      },
+      "slides": 40,
+      "sources": 35
+    },
+    "verify": "deck-025d27b-20261030T225756 (final) from commit 025d27b: 40 slides, 40 with notes, 5 native charts, 18 native tables, 0 pictures.",
+    "forgedReviewRecord": [
+      "docs/decision-reviews/ADR-0022/0001-approve.json: unknown field(s): sig"
+    ],
+    "githubUnreachable": {
+      "status": 200,
+      "state": "awaiting-github-update",
+      "detail": ""
+    },
+    "duplicates": [
+      {
+        "a": "ADR-0021",
+        "b": "ADR-0021",
+        "kind": "id-collision",
+        "score": 1,
+        "reasons": [
+          "the id ADR-0021 is defined in docs/adr/0021-duplicate-of-keep-decision-records.md and again in docs/adr/0021-keep-decision-records-in-repo.md"
+        ]
+      },
+      {
+        "a": "ADR-0004",
+        "b": "ADR-0015",
+        "kind": "overlap",
+        "score": 0.62,
+        "reasons": [
+          "both cite 8 of the same decisions (D-009, D-010, D-011, D-020, D-018, D-013, D-019, D-033), so their scopes may overlap; this is not evidence that either is redundant"
+        ]
+      },
+      {
+        "a": "ADR-0004",
+        "b": "ADR-0016",
+        "kind": "overlap",
+        "score": 0.57,
+        "reasons": [
+          "both cite 8 of the same decisions (D-003, D-009, D-010, D-011, D-020, D-013, D-031, D-033), so their scopes may overlap; this is not evidence that either is redundant"
+        ]
+      },
+      {
+        "a": "ADR-0004",
+        "b": "ADR-0014",
+        "kind": "overlap",
+        "score": 0.5,
+        "reasons": [
+          "both cite 7 of the same decisions (D-003, D-009, D-010, D-018, D-013, D-031, D-028), so their scopes may overlap; this is not evidence that either is redundant"
+        ]
+      },
+      {
+        "a": "ADR-0015",
+        "b": "ADR-0016",
+        "kind": "overlap",
+        "score": 0.46,
+        "reasons": [
+          "both cite 6 of the same decisions (D-013, D-020, D-009, D-011, D-010, D-033), so their scopes may overlap; this is not evidence that either is redundant"
+        ]
+      },
+      {
+        "a": "ADR-0016",
+        "b": "ADR-0020",
+        "kind": "overlap",
+        "score": 0.46,
+        "reasons": [
+          "both cite 6 of the same decisions (D-011, D-003, D-009, D-010, D-013, D-012), so their scopes may overlap; this is not evidence that either is redundant"
+        ]
+      },
+      {
+        "a": "ADR-0024",
+        "b": "ADR-0025",
+        "kind": "similar",
+        "score": 0.43,
+        "reasons": [
+          "titles share: github, while",
+          "the recorded decisions share 88% of their key terms"
+        ]
+      },
+      {
+        "a": "ADR-0021",
+        "b": "ADR-0022",
+        "kind": "similar",
+        "score": 0.38,
+        "reasons": [
+          "titles share: record",
+          "the recorded decisions share 100% of their key terms"
+        ]
+      },
+      {
+        "a": "ADR-0021",
+        "b": "ADR-0022",
+        "kind": "similar",
+        "score": 0.36,
+        "reasons": [
+          "titles share: record",
+          "the recorded decisions share 100% of their key terms"
+        ]
+      },
+      {
+        "a": "ADR-0021",
+        "b": "ADR-0023",
+        "kind": "similar",
+        "score": 0.3,
+        "reasons": [
+          "the recorded decisions share 100% of their key terms"
+        ]
+      },
+      {
+        "a": "ADR-0021",
+        "b": "ADR-0025",
+        "kind": "similar",
+        "score": 0.3,
+        "reasons": [
+          "the recorded decisions share 100% of their key terms"
+        ]
+      },
+      {
+        "a": "ADR-0021",
+        "b": "ADR-0023",
+        "kind": "similar",
+        "score": 0.3,
+        "reasons": [
+          "the recorded decisions share 100% of their key terms"
+        ]
+      },
+      {
+        "a": "ADR-0021",
+        "b": "ADR-0025",
+        "kind": "similar",
+        "score": 0.3,
+        "reasons": [
+          "the recorded decisions share 100% of their key terms"
+        ]
+      },
+      {
+        "a": "ADR-0022",
+        "b": "ADR-0023",
+        "kind": "similar",
+        "score": 0.3,
+        "reasons": [
+          "the recorded decisions share 100% of their key terms"
+        ]
+      },
+      {
+        "a": "ADR-0022",
+        "b": "ADR-0025",
+        "kind": "similar",
+        "score": 0.3,
+        "reasons": [
+          "the recorded decisions share 100% of their key terms"
+        ]
+      },
+      {
+        "a": "ADR-0023",
+        "b": "ADR-0025",
+        "kind": "similar",
+        "score": 0.3,
+        "reasons": [
+          "the recorded decisions share 100% of their key terms"
+        ]
+      }
+    ],
+    "driftAfterEdit": {
+      "currentness": "drifted",
+      "impacts": [
+        "decision-text-changed"
+      ]
+    }
+  }
+}
