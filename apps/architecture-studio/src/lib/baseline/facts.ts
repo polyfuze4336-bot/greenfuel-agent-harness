@@ -43,10 +43,14 @@ export function materialize(adapter: GitRepositoryAdapter): string {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'baseline-facts-'));
   const paths = [...NEEDED_FILES.filter((p) => adapter.has(p)), ...NEEDED_PREFIXES.flatMap((p) => adapter.list(p))];
   adapter.preload(paths);
+  const root = path.resolve(dir);
   for (const p of paths) {
     const text = adapter.read(p);
     if (text === undefined) continue;
-    const out = path.join(dir, p);
+    // A name in a git tree is not trusted: on Windows a backslash or a drive prefix would otherwise let a crafted entry leave this folder.
+    if (/[\\:]|(^|\/)\.\.(\/|$)/.test(p)) continue;
+    const out = path.resolve(root, p);
+    if (!out.startsWith(root + path.sep)) continue;
     fs.mkdirSync(path.dirname(out), { recursive: true });
     fs.writeFileSync(out, text);
   }

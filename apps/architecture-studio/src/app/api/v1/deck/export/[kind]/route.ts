@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import { guard, problem } from '@/lib/api.ts';
-import { latestFilePath, readLatest } from '@/lib/deck/server.ts';
+import { latestFilePath, verifiedLatest } from '@/lib/deck/server.ts';
+import type { DeckError } from '@/lib/deck/store.ts';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,9 +10,16 @@ export function GET(_req: Request, ctx: { params: Promise<{ kind: string }> }) {
   return guard(async () => {
     const { kind } = await ctx.params;
     if (kind !== 'pptx' && kind !== 'pdf') return problem(400, 'Unknown export', 'Choose pptx or pdf.');
-    const f = latestFilePath(kind);
-    if (!f || !fs.existsSync(f.file)) return problem(404, 'Nothing to export', kind === 'pdf' ? 'There is no PDF: it needs a build rendered with Microsoft PowerPoint.' : 'Build the deck first.');
-    const l = readLatest();
+    let f;
+    try {
+      f = latestFilePath(kind);
+    } catch (err) {
+      const d = err as DeckError;
+      if (d?.name === 'DeckError') return problem(d.status, d.code, d.message, d.code);
+      throw err;
+    }
+    if (!f) return problem(404, 'Nothing to export', 'There is no PDF: it needs a build rendered with Microsoft PowerPoint.');
+    const l = verifiedLatest().rec;
     return new Response(new Uint8Array(fs.readFileSync(f.file)), {
       headers: { 'Content-Type': f.type, 'Content-Disposition': `attachment; filename="${f.name}"`, 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff', 'X-Deck-Mode': l?.mode ?? 'unknown' },
     });

@@ -428,6 +428,12 @@ describe('who may approve, and how recently they proved it', () => {
     assert.equal(broken.entra, null, 'half-configured Entra is not usable');
     assert.ok(broken.problems.length >= 3);
     assert.equal(readAuthConfig({}).mode, 'github-dev', 'default is the development mode');
+    // A deployment sets STUDIO_REQUIRE_ENTRA=1 so that forgetting STUDIO_AUTH_MODE cannot fall back to development sign-in.
+    const required = readAuthConfig({ STUDIO_REQUIRE_ENTRA: '1', STUDIO_ALLOW_DEV_APPROVALS: '1' });
+    assert.equal(required.mode, 'entra');
+    assert.equal(required.devApprovals, false);
+    assert.equal(required.entra, null, 'and it fails closed until Entra is configured');
+    assert.ok(required.problems.length >= 3);
   });
 
   it('an application, bot or agent identity cannot hold a role: no enrollment, and no sign-in', async () => {

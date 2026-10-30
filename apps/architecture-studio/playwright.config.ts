@@ -6,6 +6,7 @@ import { makeFixture, policyJson } from './checks/fixtures/review-fixture.ts';
 import { makeAppKeys } from './checks/fixtures/fake-github.ts';
 import { FakeEntra, entraE2ePolicy } from './checks/fixtures/fake-entra.ts';
 import crypto from 'node:crypto';
+import { makeAcceptanceWorld } from './checks/fixtures/acceptance-world.ts';
 
 // Four production servers, each started by Playwright so the run is repeatable:
 //   3100  normal, reads HEAD
@@ -36,6 +37,10 @@ if (!fs.existsSync(path.join(entraDir, 'work'))) {
   fs.writeFileSync(path.join(entraDir, 'client-secret.txt'), new FakeEntra().secret);
 }
 
+// A fourth world for the end-to-end acceptance chain (e2e/acceptance.spec.ts), served on 3108.
+const accDir = (process.env.STUDIO_E2E_ACC_DIR ??= fs.mkdtempSync(path.join(os.tmpdir(), 'studio-e2e-acc-')));
+if (!fs.existsSync(path.join(accDir, 'work'))) makeAcceptanceWorld(accDir, path.resolve(process.cwd(), '..', '..'));
+
 export default defineConfig({
   testDir: './e2e',
   timeout: 45_000,
@@ -47,6 +52,7 @@ export default defineConfig({
   projects: [{ name: 'desktop', use: { ...devices['Desktop Edge'], channel: 'msedge', viewport: { width: 1440, height: 900 } } }],
   webServer: [
     serve(3100),
+    serve(3108, { STUDIO_REPO_ROOT: path.join(accDir, 'work'), STUDIO_TEST_MODE: '1', STUDIO_TEST_FIXTURE_DIR: path.join(accDir, 'state'), STUDIO_TEST_REMOTE_GIT_DIR: path.join(accDir, 'origin.git'), STUDIO_CACHE_DIR: path.join(accDir, 'cache'), STUDIO_ALLOW_DEV_APPROVALS: '1' }),
     serve(3101, { STUDIO_REF: 'no-such-ref-for-error-test' }),
     serve(3102, { STUDIO_E2E_DELAY_MS: '700' }),
     serve(3103, { STUDIO_REPO_ROOT: path.join(reviewDir, 'work'), STUDIO_TEST_MODE: '1', STUDIO_TEST_FIXTURE_DIR: path.join(reviewDir, 'state'), STUDIO_TEST_REMOTE_GIT_DIR: path.join(reviewDir, 'origin.git'), STUDIO_CACHE_DIR: path.join(reviewDir, 'cache'), STUDIO_ALLOW_DEV_APPROVALS: '1' }),

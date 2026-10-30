@@ -1,5 +1,6 @@
 // The Studio's view of the presentation pipeline: one prepared deck per commit, the people's slide decisions, and the latest build. Builds
 // are written under the Studio's own state folder, never into the repository.
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { authConfig, getTrust } from '../auth/config.ts';
@@ -118,13 +119,41 @@ export async function build(mode: DeckMode, actor: string): Promise<LatestBuild>
   }
 }
 
-/** A file from the latest build, or null. The name is never taken from the request. */
-export function latestFilePath(kind: 'pptx' | 'pdf' | { preview: number }): { file: string; type: string; name: string } | null {
+interface Recorded {
+  mode: DeckMode;
+  git: { commit: string };
+  outputs: { pptx: { file: string; sha256: string } | null; pdf: { file: string; sha256: string } | null };
+}
+
+const sha256File = (f: string) => crypto.createHash('sha256').update(fs.readFileSync(f)).digest('hex');
+
+/**
+ * The latest build's own record, checked against the files. Nothing is served unless the file still has the hash the build recorded, and
+ * whether it is a sample or a final deck is taken from that record, not from the pointer file, which anyone with access to the folder can edit.
+ */
+export function verifiedLatest(): { dir: string; rec: Recorded; commit: string } {
   const l = readLatest();
-  if (!l) return null;
-  const dir = path.join(buildsDir(), l.id);
-  const tag = l.mode === 'sample' ? '-SAMPLE' : '';
-  if (kind === 'pptx') return { file: path.join(dir, 'deck.pptx'), type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation', name: `greenfuel-capstone${tag}-${l.commit.slice(0, 7)}.pptx` };
-  if (kind === 'pdf') return l.pdfBytes ? { file: path.join(dir, 'render', 'deck.pdf'), type: 'application/pdf', name: `greenfuel-capstone${tag}-${l.commit.slice(0, 7)}.pdf` } : null;
-  return { file: path.join(dir, 'render', `slide-${String(kind.preview).padStart(3, '0')}.png`), type: 'image/png', name: `slide-${kind.preview}.png` };
+  if (!l) throw new DeckError('no-build', 404, 'Build the deck first.');
+  const dir = path.join(buildsDir(), path.basename(l.id));
+  let rec: Recorded;
+  try {
+    rec = JSON.parse(fs.readFileSync(path.join(dir, 'generation.json'), 'utf8')) as Recorded;
+  } catch {
+    throw new DeckError('no-record', 409, 'The latest build has no readable generation record, so it cannot be trusted.');
+  }
+  if (rec.mode !== l.mode || rec.git.commit !== l.commit) throw new DeckError('record-mismatch', 409, 'The pointer to the latest build disagrees with the build\'s own record.');
+  return { dir, rec, commit: rec.git.commit };
+}
+
+/** A file from the latest build, or null. The name is never taken from the request, and a file that does not match its recorded hash is refused. */
+export function latestFilePath(kind: 'pptx' | 'pdf' | { preview: number }): { file: string; type: string; name: string } | null {
+  const { dir, rec, commit } = verifiedLatest();
+  const tag = rec.mode === 'sample' ? '-SAMPLE' : '';
+  if (typeof kind !== 'string') return { file: path.join(dir, 'render', `slide-${String(kind.preview).padStart(3, '0')}.png`), type: 'image/png', name: `slide-${kind.preview}.png` };
+  const out = kind === 'pptx' ? rec.outputs.pptx : rec.outputs.pdf;
+  if (!out) return null;
+  const file = path.join(dir, out.file);
+  if (!fs.existsSync(file)) throw new DeckError('output-missing', 409, `The ${kind} is recorded but its file is missing.`);
+  if (sha256File(file) !== out.sha256) throw new DeckError('output-corrupted', 409, `The ${kind} does not match the hash recorded when it was built. It was changed or damaged, and it is not served.`);
+  return { file, type: kind === 'pptx' ? 'application/vnd.openxmlformats-officedocument.presentationml.presentation' : 'application/pdf', name: `greenfuel-capstone${tag}-${commit.slice(0, 7)}.${kind}` };
 }
