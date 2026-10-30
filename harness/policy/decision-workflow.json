@@ -1,24 +1,57 @@
 {
   "version": 1,
-  "description": "Who may decide architecture decisions through the Architecture Studio, and which roles each decision needs. A GitHub account is recognised only if BOTH its login and its numeric id match, so a renamed or recycled login gets nothing. People are empty on purpose: until the owner registers an approver, every decision action is denied (comments are still allowed). Adding or removing a person is a control-plane change made by a human in a reviewed pull request. It is not a signed approval under ADR 0008 and does not enrol a signing key in harness/policy/approvers.json. A bot, organisation or agent account must never be listed.",
-  "people": [],
+  "description": "Who may decide architecture decisions through the Architecture Studio, and which roles each decision needs. A GitHub account is recognised only if BOTH its login and its numeric id match, so a renamed or recycled login gets nothing. People are empty by default so that every decision action is denied until the owner registers an approver (comments are still allowed). On 2026-10-30 the owner instructed in chat that the GitHub account polyfuze4336-bot be registered as programme owner; that instruction is not a signed approval. Adding or removing a person is a control-plane change made by a human in a reviewed pull request. It is not a signed approval under ADR 0008 and does not enrol a signing key in harness/policy/approvers.json. A bot, organisation or agent account must never be listed.",
+  "people": [
+    {
+      "githubLogin": "polyfuze4336-bot",
+      "githubId": 225331490,
+      "holder": "polyfuze4336-bot",
+      "roles": [
+        "programme-owner"
+      ]
+    }
+  ],
   "roleAliases": {
-    "programme-owner": ["programme owner"],
-    "quality-manager": ["quality manager"],
-    "security-architect": ["security architect"],
-    "compliance-counsel": ["compliance counsel"],
-    "enterprise-architect": ["enterprise architect"],
-    "sovereignty-lead": ["sovereignty lead"],
-    "port-operations": ["port operations"],
-    "commercial-lead": ["commercial lead"],
-    "data-protection-lead": ["data protection lead"]
+    "programme-owner": [
+      "programme owner"
+    ],
+    "quality-manager": [
+      "quality manager"
+    ],
+    "security-architect": [
+      "security architect"
+    ],
+    "compliance-counsel": [
+      "compliance counsel"
+    ],
+    "enterprise-architect": [
+      "enterprise architect"
+    ],
+    "sovereignty-lead": [
+      "sovereignty lead"
+    ],
+    "port-operations": [
+      "port operations"
+    ],
+    "commercial-lead": [
+      "commercial lead"
+    ],
+    "data-protection-lead": [
+      "data protection lead"
+    ]
   },
   "critical": {
-    "priorities": ["Must"],
+    "priorities": [
+      "Must"
+    ],
     "includeBlocked": true,
-    "requiredRoles": ["programme-owner"]
+    "requiredRoles": [
+      "programme-owner"
+    ]
   },
   "reopen": {
-    "requiredRoles": ["programme-owner"]
+    "requiredRoles": [
+      "programme-owner"
+    ]
   }
 }

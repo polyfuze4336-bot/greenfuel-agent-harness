@@ -16,7 +16,7 @@ as a pull request. The decision changes status in the Studio only after that pul
 
 Keys on the review page: `N` and `P` for the next and previous pending decision; `A`, `R`, `D`, `V`, `C`, `O` open the approve, reject, defer, request-revision, comment and reopen dialogs. A key only opens a dialog. Nothing is submitted by a key.
 
-**Until you are registered as an approver (section 4), every decision action is denied and the rail says so.** That is the secure default.
+**The policy ships with one registered approver (section 12). Anyone else is denied every decision action.** Comments are allowed to any verified account.
 
 ## 2. What the page shows
 
@@ -147,7 +147,7 @@ Run 2026-10-30: 38 workflow unit tests (85 unit tests in the Studio), 26 review-
 
 Recorded as owner TODO T62.
 
-1. **Register approvers.** Add yourself (GitHub login and numeric id, with roles) to `harness/policy/decision-workflow.json` through a reviewed change. Until then nobody can decide.
+1. **Approvers.** On the owner's chat instruction (2026-10-30) `polyfuze4336-bot`, GitHub id 225331490, is registered as programme owner in `harness/policy/decision-workflow.json`, committed locally and not pushed. Add anyone else, with their roles, through a reviewed change. A programme owner can decide every decision, including critical ones.
 2. **Push the policy and the Studio branches** so the policy is on `origin/main` and decisions record `canonical`.
 3. **Whether a merged review record counts as approval** for this programme, or only as a recommendation until a signed approval exists. The Studio labels it "review record" either way.
 4. **Authorising ADR** for the Studio and this write path (T61 item 3).

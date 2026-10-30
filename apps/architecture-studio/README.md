@@ -1,6 +1,6 @@
 # Architecture Decision Studio
 
-A local web application over the decisions, tasks, approvals, assumptions and evidence recorded in this repository. It reads committed git content and shows it. **Reading never changes anything.** The one thing that writes is the [decision review workflow](../../docs/architecture-studio/REVIEW-WORKFLOW.md): it proposes a decision as a pull request, never to your branch or to `main`, and shows a decision as decided only after a person has merged it. Until an approver is registered in `harness/policy/decision-workflow.json`, nobody can decide.
+A local web application over the decisions, tasks, approvals, assumptions and evidence recorded in this repository. It reads committed git content and shows it. **Reading never changes anything.** The one thing that writes is the [decision review workflow](../../docs/architecture-studio/REVIEW-WORKFLOW.md): it proposes a decision as a pull request, never to your branch or to `main`, and shows a decision as decided only after a person has merged it. Until a person is registered as an approver in `harness/policy/decision-workflow.json`, nobody can decide; one account is registered at present.
 
 This is **not** the bunkering platform. It is part of the engineering and governance control plane, and no business logic of the Green-Fuel Bunkering Certification Platform lives here.
 
