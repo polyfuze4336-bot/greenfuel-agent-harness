@@ -17,7 +17,8 @@ import { GitHubError, type GitHubPort } from './github.ts';
 import type { IdentityProvider, VerifiedUser } from './identity.ts';
 import { GitPublisher, PublishError, splitCanonicalRef } from './publish.ts';
 import { POLICY_PATH, authorise, availability, parsePolicy, rolesHeld, isListed, validateRequest, emptyPolicy, type ActionAvailability, type ActionRequest, type Policy } from './rules.ts';
-import { ReviewStore, isOpen, withLock, type Proposal, type ProposalState } from './store.ts';
+import { ReviewStore, isOpen, withLock, type Proposal } from './store.ts';
+import { syncProposal, type SyncDeps, type SyncFamily } from './sync-core.ts';
 
 export class ServiceError extends Error {
   readonly status: number;
@@ -84,6 +85,33 @@ export function loadReviewStates(adapter: GitRepositoryAdapter): Map<string, Rev
   }
   return out;
 }
+
+const decisionFamily: SyncFamily = {
+  noun: 'decision',
+  file: (p) => {
+    const e = p.event as ReviewEvent;
+    return eventPath(e.decisionId, e.seq, e.action);
+  },
+  serialize: (p) => serializeEvent(p.event as ReviewEvent),
+  chain: (a, p) => {
+    const id = (p.event as ReviewEvent).decisionId;
+    const st = loadReviewStates(a).get(id) ?? emptyState(id);
+    return { length: st.events.length, head: st.headHash, hashes: st.events.map((x) => x.eventHash) };
+  },
+  hashOf: (text) => {
+    const r = parseEvent(text);
+    return 'event' in r ? r.event.eventHash : null;
+  },
+  title: (p) => {
+    const e = p.event as ReviewEvent;
+    return `Decision review: ${e.decisionId}, ${ACTION_LABEL[e.action]} (${e.actor.login})`;
+  },
+  body: (p, ref) => pullRequestBody(p.event as ReviewEvent, ref),
+  message: (p) => {
+    const e = p.event as ReviewEvent;
+    return `Decision review: ${e.decisionId} ${ACTION_LABEL[e.action]}\n\nRecorded through the Architecture Studio by ${e.actor.login}. Event ${e.id}, hash ${e.eventHash}.`;
+  },
+};
 
 export interface ReviewView {
   decisionId: string;
@@ -260,84 +288,15 @@ export class ReviewService {
     });
   }
 
-  private move(p: Proposal, state: ProposalState, note: string, patch: Partial<Proposal> = {}): Proposal {
-    const at = this.now().toISOString();
-    if (p.state === state) return this.deps.store.save({ ...p, ...patch, updatedAt: at });
-    return this.deps.store.transition(p, state, note, at, patch);
-  }
-
-  private fail(p: Proposal, e: unknown): Proposal {
-    const retryable = e instanceof PublishError || e instanceof GitHubError ? e.retryable : true;
-    const code = e instanceof PublishError ? e.code : e instanceof GitHubError ? 'GITHUB_ERROR' : 'UNEXPECTED';
-    const message = e instanceof Error ? e.message : 'Unexpected error.';
-    const lastError = { code, message, retryable, at: this.now().toISOString() };
-    this.audit(null, p.decisionId, p.action, 'sync', code, message, p.id);
-    if (retryable) return this.move(p, p.state === 'locally-submitted' ? 'awaiting-github-update' : p.state, `Could not reach GitHub: ${message}`, { lastError, attempts: p.attempts + 1 });
-    return this.move(p, 'failed', message, { lastError, attempts: p.attempts + 1 });
+  private syncDeps(): SyncDeps {
+    return { root: this.deps.root, canonicalRef: this.deps.canonicalRef, store: this.deps.store, github: this.deps.github, publisher: this.deps.publisher, now: () => this.now(), audit: (p, code, detail) => this.audit(null, p.decisionId, p.action, 'sync', code, detail, p.id) };
   }
 
   /** Move a proposal as far as it can go. Safe to call repeatedly: every step checks what already happened. */
   async sync(proposalId: string): Promise<Proposal> {
     const first = this.deps.store.get(proposalId);
     if (!first) throw new ServiceError(404, 'not-found', 'No such proposal.');
-    return withLock(`decision:${first.decisionId}`, async () => {
-      let p = this.deps.store.get(proposalId)!;
-      if (!isOpen(p.state)) return p;
-      const split = splitCanonicalRef(this.deps.canonicalRef);
-      if (!split) return this.move(p, 'failed', 'The canonical ref is not remote/branch.', { lastError: { code: 'BAD_CONFIG', message: `${this.deps.canonicalRef} is not a remote/branch reference.`, retryable: false, at: this.now().toISOString() } });
-      const e = p.event;
-      try {
-        if (p.state === 'locally-submitted') p = this.move(p, 'awaiting-github-update', 'Sending to GitHub.');
-        this.deps.publisher.fetchCanonical(this.deps.canonicalRef);
-        const adapter = new GitRepositoryAdapter(this.deps.root, this.deps.canonicalRef).open();
-        const states = loadReviewStates(adapter);
-        const st = states.get(e.decisionId) ?? emptyState(e.decisionId);
-        const file = eventPath(e.decisionId, e.seq, e.action);
-
-        const onMain = adapter.read(file);
-        if (onMain !== undefined) {
-          const parsed = parseEvent(onMain);
-          if ('event' in parsed && parsed.event.eventHash === e.eventHash && st.events.some((x) => x.eventHash === e.eventHash)) {
-            this.audit(null, e.decisionId, e.action, 'sync', 'applied', `${e.id} verified on ${this.deps.canonicalRef} at ${short(adapter.commit)}`, p.id);
-            return this.move(p, 'applied', `Merged and verified on ${this.deps.canonicalRef} at ${short(adapter.commit)}.`, { lastError: null });
-          }
-          return this.move(p, 'conflicted', `Another review event with sequence ${e.seq} is on ${this.deps.canonicalRef}.`, { lastError: { code: 'SEQUENCE_TAKEN', message: 'A different review event already occupies this position on the canonical branch. Reload and decide again.', retryable: false, at: this.now().toISOString() } });
-        }
-        if (st.events.length + 1 !== e.seq || st.headHash !== e.prevHash) {
-          return this.move(p, 'conflicted', 'The canonical branch moved after this was submitted.', { lastError: { code: 'CANONICAL_MOVED', message: 'The decision changed on the canonical branch after you submitted. Reload and decide again.', retryable: false, at: this.now().toISOString() } });
-        }
-
-        if (!p.prNumber) {
-          if (!p.headSha) {
-            const sha = this.deps.publisher.buildCommit({
-              baseSha: adapter.commit,
-              files: [{ path: file, content: serializeEvent(e) }],
-              author: { name: e.actor.name ?? e.actor.login, email: `${e.actor.githubId}+${e.actor.login}@users.noreply.github.com` },
-              message: `Decision review: ${e.decisionId} ${ACTION_LABEL[e.action]}\n\nRecorded through the Architecture Studio by ${e.actor.login}. Event ${e.id}, hash ${e.eventHash}.`,
-              now: this.now(),
-            });
-            p = this.move(p, 'awaiting-github-update', 'Commit prepared on top of the canonical branch.', { baseSha: adapter.commit, headSha: sha });
-          }
-          const remoteSha = this.deps.publisher.remoteBranchSha(split.remote, p.branch);
-          if (remoteSha === null) this.deps.publisher.push(split.remote, p.headSha!, p.branch);
-          else if (remoteSha !== p.headSha) throw new PublishError('BRANCH_EXISTS_DIFFERENT', `Branch ${p.branch} already exists on GitHub with different content.`, false);
-          const existing = await this.deps.github.findByHead(p.branch);
-          const pr = existing ?? (await this.deps.github.createPullRequest({ base: split.branch, head: p.branch, title: `Decision review: ${e.decisionId}, ${ACTION_LABEL[e.action]} (${e.actor.login})`, body: pullRequestBody(e, this.deps.canonicalRef) }));
-          p = this.move(p, 'pull-request-created', `Pull request #${pr.number} opened.`, { prNumber: pr.number, prUrl: pr.url, lastError: null });
-          if (pr.state === 'closed') return this.move(p, 'failed', 'The pull request was closed without merging.', { lastError: { code: 'PR_CLOSED', message: 'The pull request was closed without merging. Submit again if you still want this decision.', retryable: false, at: this.now().toISOString() } });
-          return p;
-        }
-
-        const pr = await this.deps.github.get(p.prNumber);
-        if (pr.state === 'closed') return this.move(p, 'failed', 'The pull request was closed without merging.', { lastError: { code: 'PR_CLOSED', message: 'The pull request was closed without merging. Submit again if you still want this decision.', retryable: false, at: this.now().toISOString() } });
-        if (pr.state === 'merged') {
-          return this.move(p, 'conflicted', 'The pull request is merged, but the event is not on the canonical branch as submitted.', { lastError: { code: 'MERGED_BUT_DIFFERENT', message: `Pull request #${pr.number} is merged, but ${file} on ${this.deps.canonicalRef} is missing or different. Investigate before deciding again.`, retryable: false, at: this.now().toISOString() } });
-        }
-        return this.move(p, 'awaiting-merge', `Pull request #${pr.number} is open and waiting for a person to merge it.`, { lastError: null });
-      } catch (err) {
-        return this.fail(p, err);
-      }
-    });
+    return withLock(`decision:${first.decisionId}`, async () => syncProposal(this.syncDeps(), decisionFamily, this.deps.store.get(proposalId)!));
   }
 
   /** Sync every open proposal, optionally for one decision. */

@@ -25,9 +25,11 @@ test('desktop 1440: the six destinations', async ({ page }) => {
   await ready(page, '/decisions?id=ADR-0001');
   await expect(page.getByRole('dialog').locator('ol li').first()).toBeVisible({ timeout: 10_000 });
   await shot(page, '05-decision-detail-unsigned-accepted');
-  await ready(page, '/queue?blocked=1');
+  await ready(page, '/queue?view=blocked');
+  await expect(page.getByTestId('queue-table')).toBeVisible();
   await shot(page, '06-work-queue-blocked');
   await ready(page, '/queue?id=T14');
+  await expect(page.getByTestId('item-detail')).toBeVisible();
   await shot(page, '07-work-queue-detail');
   await ready(page, '/approvals');
   await shot(page, '08-approvals', true);

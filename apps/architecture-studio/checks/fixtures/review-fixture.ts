@@ -30,10 +30,11 @@ export const USERS = {
   bot: { login: 'some-agent[bot]', id: 1004, name: null, type: 'Bot' },
   // Same login as the owner, different GitHub id: a renamed or recycled account must get no roles.
   impostor: { login: 'test-owner', id: 9999, name: 'Not The Owner', type: 'User' },
+  owner2: { login: 'test-owner2', id: 1005, name: 'Test Owner Two', type: 'User' },
 };
 
-export function policyJson(people: unknown[] = PEOPLE) {
-  return `${JSON.stringify({ version: 1, description: 'Test policy.', people, roleAliases: ROLE_ALIASES, critical: { priorities: ['Must'], includeBlocked: true, requiredRoles: ['programme-owner'] }, reopen: { requiredRoles: ['programme-owner'] } }, null, 2)}\n`;
+export function policyJson(people: unknown[] = PEOPLE, work: { completionRoles?: string[]; requireIndependentCompletionApproval?: boolean } = {}) {
+  return `${JSON.stringify({ version: 1, description: 'Test policy.', people, roleAliases: ROLE_ALIASES, critical: { priorities: ['Must'], includeBlocked: true, requiredRoles: ['programme-owner'] }, reopen: { requiredRoles: ['programme-owner'] }, work: { completionRoles: ['programme-owner'], requireIndependentCompletionApproval: true, ...work } }, null, 2)}\n`;
 }
 
 export function git(cwd: string, ...a: string[]) {

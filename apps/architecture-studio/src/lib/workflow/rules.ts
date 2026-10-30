@@ -18,12 +18,14 @@ export interface Policy {
   roleAliases: Record<string, string[]>;
   critical: { priorities: string[]; includeBlocked: boolean; requiredRoles: string[] };
   reopen: { requiredRoles: string[] };
+  /** Rules for work items: who may approve or reject completion, and whether the submitter may not approve their own work. */
+  work: { completionRoles: string[]; requireIndependentApproval: boolean };
   source: 'canonical' | 'local-head-not-canonical' | 'missing';
   problems: string[];
 }
 
 export function emptyPolicy(source: Policy['source'], problem?: string): Policy {
-  return { people: [], roleAliases: {}, critical: { priorities: ['Must'], includeBlocked: true, requiredRoles: [] }, reopen: { requiredRoles: [] }, source, problems: problem ? [problem] : [] };
+  return { people: [], roleAliases: {}, critical: { priorities: ['Must'], includeBlocked: true, requiredRoles: [] }, reopen: { requiredRoles: [] }, work: { completionRoles: [], requireIndependentApproval: true }, source, problems: problem ? [problem] : [] };
 }
 
 const strings = (v: unknown): string[] => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string' && x.trim().length > 0) : []);
@@ -60,6 +62,9 @@ export function parsePolicy(text: string | undefined, source: Policy['source']):
   const c = (o.critical ?? {}) as Record<string, unknown>;
   p.critical = { priorities: strings(c.priorities).length ? strings(c.priorities) : ['Must'], includeBlocked: c.includeBlocked !== false, requiredRoles: strings(c.requiredRoles).filter((r) => r in p.roleAliases) };
   p.reopen = { requiredRoles: strings((o.reopen as Record<string, unknown> | undefined)?.requiredRoles).filter((r) => r in p.roleAliases) };
+  const w = (o.work ?? {}) as Record<string, unknown>;
+  const completion = strings(w.completionRoles).filter((r) => r in p.roleAliases);
+  p.work = { completionRoles: completion.length ? completion : p.critical.requiredRoles, requireIndependentApproval: w.requireIndependentCompletionApproval !== false };
   if (!p.people.length) p.problems.push('No approver is configured, so nobody can decide.');
   return p;
 }

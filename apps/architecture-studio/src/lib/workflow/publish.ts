@@ -10,7 +10,6 @@ import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { REVIEW_DIR } from './events.ts';
 
 const ALLOWED = new Set(['fetch', 'rev-parse', 'cat-file', 'read-tree', 'hash-object', 'update-index', 'write-tree', 'commit-tree', 'push', 'ls-remote', 'merge-base']);
 
@@ -25,8 +24,8 @@ export class PublishError extends Error {
   }
 }
 
-export const BRANCH_RE = /^decision-review\/(ADR-\d{4}|D-\d{3})\/[0-9]{4}-[a-z-]{3,30}-[a-z0-9]{6,12}$/;
-const FILE_RE = new RegExp(`^${REVIEW_DIR}/(ADR-\\d{4}|D-\\d{3})/\\d{4}-[a-z-]+\\.json$`);
+export const BRANCH_RE = /^(?:decision-review|work-item)\/[A-Za-z0-9-]{1,16}\/[0-9]{4}-[a-z-]{3,30}-[a-z0-9]{6,12}$/;
+const FILE_RE = /^docs\/(?:decision-reviews|work-items)\/[A-Za-z0-9-]{1,16}\/\d{4}-[a-z-]+\.json$/;
 
 /** "origin/main" becomes remote "origin", branch "main". Anything else is not a canonical ref the Studio can publish against. */
 export function splitCanonicalRef(ref: string): { remote: string; branch: string } | null {

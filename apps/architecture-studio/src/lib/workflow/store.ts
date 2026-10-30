@@ -4,7 +4,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { canonicalJson, sha256, type ReviewEvent } from './events.ts';
-import { PROPOSAL_LABEL, type ActionKind, type ProposalState } from './labels.ts';
+import { PROPOSAL_LABEL, type ProposalState } from './labels.ts';
+import type { WorkEvent } from './work-events.ts';
 
 export { PROPOSAL_LABEL, type ProposalState };
 
@@ -13,11 +14,14 @@ export const isOpen = (s: ProposalState) => OPEN_STATES.includes(s);
 
 export interface Proposal {
   id: string;
+  /** The id of the subject: a decision id, or a work item id (see `family`). */
   decisionId: string;
-  action: ActionKind;
+  /** Which workflow created it. Proposals written before work items existed have none and are decisions. */
+  family?: 'decision' | 'work';
+  action: string;
   idempotencyKey: string;
   submittedBy: string;
-  event: ReviewEvent;
+  event: ReviewEvent | WorkEvent;
   state: ProposalState;
   branch: string;
   baseSha: string | null;
@@ -107,16 +111,16 @@ export class ReviewStore {
     return out.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
   }
 
-  forDecision(decisionId: string): Proposal[] {
-    return this.list().filter((p) => p.decisionId === decisionId);
+  forDecision(decisionId: string, family: 'decision' | 'work' = 'decision'): Proposal[] {
+    return this.list().filter((p) => p.decisionId === decisionId && (p.family ?? 'decision') === family);
   }
 
-  openFor(decisionId: string): Proposal | null {
-    return this.forDecision(decisionId).find((p) => isOpen(p.state)) ?? null;
+  openFor(decisionId: string, family: 'decision' | 'work' = 'decision'): Proposal | null {
+    return this.forDecision(decisionId, family).find((p) => isOpen(p.state)) ?? null;
   }
 
-  byKey(decisionId: string, key: string): Proposal | null {
-    return this.forDecision(decisionId).find((p) => p.idempotencyKey === key) ?? null;
+  byKey(decisionId: string, key: string, family: 'decision' | 'work' = 'decision'): Proposal | null {
+    return this.forDecision(decisionId, family).find((p) => p.idempotencyKey === key) ?? null;
   }
 
   transition(p: Proposal, state: ProposalState, note: string, now: string, patch: Partial<Proposal> = {}): Proposal {

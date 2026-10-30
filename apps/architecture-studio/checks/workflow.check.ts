@@ -8,7 +8,7 @@ import { FixtureIdentity, GhCliIdentity, IdentityError, SessionStore, type Verif
 import { GitPublisher, PublishError } from '../src/lib/workflow/publish.ts';
 import { ReviewService, ServiceError } from '../src/lib/workflow/review.ts';
 import { authorise, availability, parsePolicy, rolesHeld, validateRequest } from '../src/lib/workflow/rules.ts';
-import { ReviewStore } from '../src/lib/workflow/store.ts';
+import { ReviewStore, type Proposal } from '../src/lib/workflow/store.ts';
 import { pendingOrder } from '../src/lib/workflow/runtime.ts';
 import { PEOPLE, USERS, git, makeDecision, makeFixture, policyJson, type Fixture } from './fixtures/review-fixture.ts';
 import type { NormalizedDecision, RegisterSnapshot } from '../src/lib/intel/schema.ts';
@@ -37,7 +37,8 @@ function world(opts: Parameters<typeof makeFixture>[0] = {}, github?: (real: Loc
   };
   const submit = async (d: NormalizedDecision, u: VerifiedUser | null, action: ActionKind, extra: Record<string, unknown> = {}) => {
     const v = svc.view(d, u);
-    return svc.submit(u, d, { action, expectedRevision: v.revision, idempotencyKey: key(), ...extra });
+    const r = await svc.submit(u, d, { action, expectedRevision: v.revision, idempotencyKey: key(), ...extra });
+    return { ...r, proposal: r.proposal as Proposal & { event: ReviewEvent } };
   };
   /** Submit, send to GitHub, merge as a person would, and let the Studio verify it. */
   const decideAndMerge = async (d: NormalizedDecision, u: VerifiedUser, action: ActionKind, extra: Record<string, unknown> = {}) => {
@@ -47,7 +48,7 @@ function world(opts: Parameters<typeof makeFixture>[0] = {}, github?: (real: Loc
     fx.merge(sent.prNumber!);
     const done = await svc.sync(proposal.id);
     assert.equal(done.state, 'applied');
-    return done;
+    return done as Proposal & { event: ReviewEvent };
   };
   return { fx, svc, store, real, identity, key, as, submit, decideAndMerge };
 }

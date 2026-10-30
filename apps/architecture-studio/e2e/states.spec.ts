@@ -91,8 +91,8 @@ test.describe('loading states', () => {
     await page.goto('http://localhost:3102/');
     await expect(page.getByRole('heading', { level: 1, name: 'Overview' })).toBeVisible({ timeout: 20_000 });
     await page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: /^Work Queue/ }).click();
-    await expect(page.getByTestId('page-skeleton')).toBeVisible();
-    await expect(page.getByTestId('page-skeleton')).toBeHidden({ timeout: 20_000 });
+    await expect(page.getByTestId('queue-loading')).toBeVisible();
+    await expect(page.getByTestId('queue-loading')).toBeHidden({ timeout: 20_000 });
     await expect(page.getByRole('heading', { level: 1, name: 'Work Queue' })).toBeVisible();
   });
 });
@@ -109,7 +109,7 @@ test.describe('empty states', () => {
 
   test('queue, approvals, architecture and presentation explain empty filters', async ({ page }) => {
     await page.goto('/queue?q=zzzz-none');
-    await expect(page.getByText('No tasks match these filters')).toBeVisible();
+    await expect(page.getByText('No items match these filters')).toBeVisible();
     await page.goto('/architecture?rq=zzzz-none&rk=zzzz-none&as=zzzz-none&dq=zzzz-none&ev=zzzz-none');
     await expect(page.getByText('No requirements match')).toBeVisible();
     await expect(page.getByText('No risks match')).toBeVisible();

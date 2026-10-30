@@ -87,7 +87,9 @@ export function AiBadge({ className = '' }: { className?: string }) {
 }
 
 /** A pill chosen by name, so server components can use it (they cannot pass icon functions to client components). */
-export const TonePill = ({ name, children }: { name: 'blocked' | 'neutral' | 'open' | 'accepted'; children: ReactNode }) => <Pill t={tone(name, name === 'blocked' ? OctagonAlert : name === 'accepted' ? CircleCheck : name === 'open' ? CircleDashed : CircleMinus)}>{children}</Pill>;
+export type ToneName = 'blocked' | 'neutral' | 'open' | 'accepted' | 'deferred' | 'rejected' | 'proposed';
+const TONE_ICON: Record<ToneName, Icon> = { blocked: OctagonAlert, accepted: CircleCheck, open: CircleDashed, neutral: CircleMinus, deferred: CirclePause, rejected: CircleX, proposed: CircleDot };
+export const TonePill = ({ name, children, title }: { name: ToneName; children: ReactNode; title?: string }) => <Pill t={tone(name, TONE_ICON[name])} title={title}>{children}</Pill>;
 
 export function Tag({ children, title }: { children: ReactNode; title?: string }) {
   return (

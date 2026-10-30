@@ -27,3 +27,21 @@ export const PROPOSAL_LABEL: Record<ProposalState, string> = {
 
 /** The happy path, in order. Failed and Conflicted are outcomes, not steps. */
 export const PROPOSAL_STEPS: ProposalState[] = ['locally-submitted', 'awaiting-github-update', 'pull-request-created', 'awaiting-merge', 'applied'];
+
+export const WORK_ACTION_LABEL = {
+  assign: 'Assign',
+  prioritize: 'Prioritize',
+  comment: 'Comment',
+  'mark-blocked': 'Mark blocked',
+  unblock: 'Clear blocked or clarification',
+  'request-clarification': 'Request clarification',
+  'submit-for-review': 'Submit for review',
+  'approve-completion': 'Approve completion',
+  'reject-completion': 'Reject completion',
+  reopen: 'Reopen',
+} as const;
+export type WorkAction = keyof typeof WORK_ACTION_LABEL;
+export const WORK_ACTIONS = Object.keys(WORK_ACTION_LABEL) as WorkAction[];
+
+/** A readable name for any action, from either workflow. */
+export const actionLabel = (a: string): string => (ACTION_LABEL as Record<string, string>)[a] ?? (WORK_ACTION_LABEL as Record<string, string>)[a] ?? a;

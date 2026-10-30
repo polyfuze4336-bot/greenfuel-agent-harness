@@ -34,7 +34,7 @@ npm start          # http://localhost:3100, loopback only
 |---|---|
 | Overview | Every figure is derived; each carries its definition |
 | Decision Register | `docs/adr/*.md` (20 ADRs) and `docs/context/DECISION-REGISTER.md` (37 open entries) |
-| Work Queue | `docs/state/TODO.md` (owner tasks) and `docs/harness/IMPLEMENTATION-ROADMAP.md` |
+| Work Queue | TODO, the roadmap, the capstone backlog, gaps and rubric traceability, the security review, residency validation, the risk register, decisions, design gates and requirement gaps; merged records under `docs/work-items/`. See [WORK-QUEUE](../../docs/architecture-studio/WORK-QUEUE.md) |
 | Approvals | `harness/policy/approvers.json`, `docs/approvals/`, Proposed ADRs and design reviews |
 | Architecture & Evidence | design reviews, requirements and traceability, risks, assumptions, evidence records, documents |
 | Presentation Studio | `docs/capstone/presentation/` |
@@ -74,13 +74,17 @@ git objects at one commit ──► GitRepositoryAdapter (read-only allowlist)
 | `POST /api/v1/review/{id}/actions` | **one** action on **one** decision (needs session, CSRF token, same origin, the revision seen and an idempotency key). Creates a proposal and sends it to GitHub as a pull request |
 | `POST /api/v1/review/proposals/{pid}/sync` | move a proposal forward, or check whether its pull request was merged |
 | `GET /api/v1/review/next?after=` | the next decision waiting for a person |
+| `GET /api/v1/queue` | the Work Queue: every item with its source, the relationships, the build-blocking analysis, decision impacts and view counts |
+| `GET /api/v1/queue/{id}` | one work item: what each action would do for the signed-in person, history, what depends on it, and for a decision what rejecting or deferring it would touch |
+| `POST /api/v1/queue/{id}/actions` | **one** action on **one** work item (same guards as the review actions). Creates a proposal and sends it to GitHub as a pull request |
+| `GET /api/v1/queue/requirements?from=` | decisions flagged for review because a linked requirement differs from the one at `from` |
 | `GET /api/v1/tasks?status=&blocked=` | tasks |
 | `GET /api/v1/approvals` | approval authority, pending approvals, reviews |
 | `GET /api/v1/search?q=&kind=` | search hits |
 | `GET /api/v1/history?path=` | last five commits touching a tracked file |
 | `POST /api/v1/refresh` | discards the Studio's 5 second cache and re-reads. Does not fetch or write |
 
-Errors are `application/problem+json`. Write methods on the data routes return 405. The only routes that accept a change are `auth/*` and `review/*` above; `publish.ts` is the only code that writes to git, and it can only add review-record files on a new `decision-review/...` branch.
+Errors are `application/problem+json`. Write methods on the data routes return 405. The only routes that accept a change are `auth/*`, `review/*` and `queue/*{id}/actions` above; `publish.ts` is the only code that writes to git, and it can only add review-record or work-item files on a new `decision-review/...` or `work-item/...` branch.
 
 ## Security
 
@@ -96,7 +100,7 @@ Errors are `application/problem+json`. Write methods on the data routes return 4
 npm run typecheck     # tsc --noEmit
 npm run test:unit     # adapter, parsers, read-only guarantee, count agreement (node --test)
 npm run build
-npm run test:e2e      # Playwright on Microsoft Edge; starts its own servers on 3100, 3101, 3102
+npm run test:e2e      # Playwright on Microsoft Edge; starts its own servers on 3100 to 3103 (3103 is test mode with a simulated GitHub)
 ```
 
 The end-to-end run also regenerates the screenshots in `docs/architecture-studio/screenshots/`. The unit checks live in `checks/` and the browser tests in `e2e/` so the repository-wide `node --test` does not collect them.

@@ -70,7 +70,7 @@ test.describe('overview shows repository-derived figures only', () => {
     await expect(page.getByTestId('result-count')).toContainText('44 of 57');
     await page.goto('/');
     await page.getByRole('link', { name: /Blocked tasks/ }).click();
-    await expect(page.getByTestId('result-count')).toContainText(`${t.blocked} of ${t.total}`);
+    await expect(page.getByTestId('result-count')).toContainText(`Showing ${t.blocked} of`);
   });
 
   test('blockers are listed with their basis and link to detail', async ({ page }) => {
@@ -184,30 +184,118 @@ test.describe('Decision Register', () => {
 });
 
 test.describe('Work Queue', () => {
-  test('filters to blocked tasks and shows why', async ({ page, request }) => {
-    const t = ((await (await request.get('/api/v1/repository')).json()) as { metrics: { tasks: { blocked: number; total: number } } }).metrics.tasks;
+  test('shows every view with the same counts as the API, and each view applies its stated rule', async ({ page, request }) => {
+    const q = (await (await request.get('/api/v1/queue')).json()) as { items: { id: string; class: string }[]; counts: Record<string, number>; views: { id: string }[] };
     await ready(page, '/queue');
-    await expect(page.getByTestId('queue-row')).toHaveCount(t.total);
-    await page.getByRole('button', { name: /^Blocked only/ }).click();
-    await expect(page.getByTestId('queue-row')).toHaveCount(t.blocked);
-    await page.getByTestId('queue-row').first().locator('[data-row-btn]').click();
-    const d = page.getByRole('dialog');
-    await expect(d.getByText('Why it is shown as blocked')).toBeVisible();
-    await expect(d.getByText('Rule: the task is not closed')).toBeVisible();
-    await page.keyboard.press('Escape');
-    await page.getByLabel('Source').selectOption('roadmap');
-    await expect(page.getByTestId('result-count')).toContainText(`0 of ${t.total}`);
-    await expect(page.getByText('No tasks match these filters')).toBeVisible();
+    await expect(page.getByTestId('queue-table')).toBeVisible();
+    for (const v of q.views) {
+      if (v.id === 'mine') continue;
+      await page.getByTestId(`view-${v.id}`).click();
+      await expect(page.getByTestId(`count-${v.id}`)).toHaveText(String(q.counts[v.id]));
+      await expect(page.getByTestId('result-count')).toContainText(`of ${q.counts[v.id]} in`);
+      await expect(page.getByTestId('view-rule')).not.toBeEmpty();
+    }
+    await page.getByTestId('view-all').click();
+    expect(q.counts.all! + q.counts.evidence!).toBe(q.items.length);
   });
 
-  test('roadmap items do not invent a status', async ({ page }) => {
-    await ready(page, '/queue?family=roadmap');
-    const rows = page.getByTestId('queue-row');
-    await expect(rows).toHaveCount(18);
-    await expect(rows.first()).toContainText('No status recorded');
+  test('rubric evidence gaps are kept out of All tasks and shown in their own view', async ({ page, request }) => {
+    const q = (await (await request.get('/api/v1/queue')).json()) as { items: { id: string; class: string }[] };
+    const gap = q.items.find((i) => i.class === 'evidence-gap' && /^RC-/.test(i.id))!;
+    await ready(page, '/queue?q=' + gap.id);
+    await expect(page.getByText('No items match these filters')).toBeVisible();
+    await page.goto(`/queue?view=evidence&q=${gap.id}`);
+    await expect(page.getByTestId('queue-row')).toHaveCount(1);
+  });
+
+  test('the old blocked link still lands on the blocked view', async ({ page, request }) => {
+    const q = (await (await request.get('/api/v1/queue')).json()) as { counts: Record<string, number> };
+    await ready(page, '/queue?blocked=1');
+    await expect(page.getByTestId('view-blocked')).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByTestId('queue-row')).toHaveCount(q.counts.blocked!);
+  });
+
+  test('an item shows every requested field, with gaps stated rather than filled', async ({ page }) => {
+    await ready(page, '/queue?id=T14');
+    const d = page.getByTestId('item-detail');
+    await expect(d).toBeVisible();
+    for (const label of ['Status', 'Priority', 'Owner', 'Due date', 'Acceptance criteria', 'Evidence required', 'Completion evidence', 'Related decisions', 'Related requirements']) {
+      await expect(d.getByText(label, { exact: true }).first()).toBeVisible();
+    }
+    await expect(d.getByText('Dependencies', { exact: true })).toBeVisible();
+    await expect(d.getByText('GitHub reference')).toBeVisible();
+    await expect(d.getByText('does not invent one')).toBeVisible();
+    await expect(d.getByTestId('work-assign')).toBeVisible();
+  });
+
+  test('actions need a signed-in, registered person: signed out they explain why', async ({ page }) => {
+    await ready(page, '/queue?id=T14');
+    const assign = page.getByTestId('work-assign');
+    await expect(assign).toHaveAttribute('aria-disabled', 'true');
+    await expect(assign).toHaveAttribute('title', /Sign in/);
+  });
+
+  test('My tasks asks you to sign in rather than guessing who you are', async ({ page }) => {
+    await ready(page, '/queue?view=mine');
+    await expect(page.getByText('Sign in to see your tasks')).toBeVisible();
+  });
+
+  test('search and filters narrow the list, the count follows, and clearing restores it', async ({ page }) => {
+    await ready(page, '/queue');
+    await expect(page.getByTestId('queue-table')).toBeVisible();
+    const total = await page.getByTestId('queue-row').count();
+    await page.getByRole('searchbox', { name: 'Search the queue' }).fill('branch protection');
+    await expect.poll(async () => page.getByTestId('queue-row').count()).toBeLessThan(total);
+    await page.getByRole('button', { name: 'Clear filters' }).click();
+    await expect(page.getByTestId('queue-row')).toHaveCount(total);
+    await page.getByRole('button', { name: /^Blocks the build/ }).click();
+    await expect(page).toHaveURL(/build=1/);
+    await expect.poll(async () => page.getByTestId('queue-row').count()).toBeLessThan(total);
+  });
+
+  test('keyboard: arrow keys move between rows and Enter opens the item', async ({ page }) => {
+    await ready(page, '/queue');
+    const first = page.getByTestId('queue-row').first().locator('[data-row-btn]');
+    await first.focus();
+    await page.keyboard.press('ArrowDown');
+    await expect(page.getByTestId('queue-row').nth(1).locator('[data-row-btn]')).toBeFocused();
+    await page.keyboard.press('Enter');
+    await expect(page.getByTestId('item-detail')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.getByTestId('item-detail')).toBeHidden();
+  });
+
+  test('What is blocking the build? lists ready work, waiting work and the graph from the same analysis', async ({ page, request }) => {
+    const q = (await (await request.get('/api/v1/queue')).json()) as { blocking: { analysis: { unresolvedCount: number; ready: unknown[] }; nodes: unknown[] } };
+    await ready(page, '/queue/blocking');
+    await expect(page.getByTestId('blocking-count')).toHaveText(String(q.blocking.analysis.unresolvedCount));
+    await expect(page.getByTestId('ready-count')).toHaveText(String(q.blocking.analysis.ready.length));
+    await expect(page.getByTestId('ready-item')).toHaveCount(q.blocking.analysis.ready.length);
+    await expect(page.getByTestId('graph-node')).toHaveCount(q.blocking.nodes.length);
+    await expect(page.getByText('HC-11').first()).toBeVisible();
+    await page.getByTestId('ready-item').first().getByRole('button').first().click();
+    await expect(page.getByTestId('item-detail')).toBeVisible();
+  });
+
+  test('a graph node opens its item from the keyboard', async ({ page }) => {
+    await ready(page, '/queue/blocking');
+    const node = page.getByTestId('graph-hit').first();
+    await node.focus();
+    await page.keyboard.press('Enter');
+    await expect(page.getByTestId('item-detail')).toBeVisible();
+  });
+
+  test('a requirement-change check explains an unreadable ref and a clean comparison', async ({ page }) => {
+    await ready(page, '/queue/blocking');
+    const box = page.getByTestId('requirement-check');
+    await box.getByLabel('Compare against').fill('no-such-ref-xyz');
+    await box.getByRole('button', { name: 'Find affected decisions' }).click();
+    await expect(box.getByRole('alert')).toContainText('not a ref');
+    await box.getByLabel('Compare against').fill('HEAD');
+    await box.getByRole('button', { name: 'Find affected decisions' }).click();
+    await expect(page.getByTestId('requirement-result')).toContainText('No requirement differs');
   });
 });
-
 test.describe('Approvals', () => {
   test('states plainly that no approval can exist, and offers a request command without signing', async ({ page, context }) => {
     await context.grantPermissions(['clipboard-read', 'clipboard-write']);

@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AlertCircle, CheckCircle2, ChevronLeft, ChevronRight, CircleDot, ExternalLink, LogIn, LogOut, RotateCw, ShieldCheck } from 'lucide-react';
 import type { TimelineEntry } from '@/lib/workflow/context.ts';
-import { ACTION_LABEL, PROPOSAL_LABEL, PROPOSAL_STEPS, type ActionKind, type ProposalState } from '@/lib/workflow/labels.ts';
+import { ACTION_LABEL, PROPOSAL_LABEL, PROPOSAL_STEPS, actionLabel, type ActionKind, type ProposalState } from '@/lib/workflow/labels.ts';
 import type { ReviewView } from '@/lib/workflow/review.ts';
 import type { AuditEntry, Proposal } from '@/lib/workflow/store.ts';
 import type { NormStatus } from '@/lib/intel/schema.ts';
@@ -45,12 +45,12 @@ const PRIMARY: ActionKind[] = ['approve', 'approve-alternative', 'approve-with-c
 const SECONDARY: ActionKind[] = ['request-revision', 'defer', 'reject', 'comment', 'reopen'];
 const HOTKEY: Partial<Record<ActionKind, string>> = { approve: 'A', reject: 'R', defer: 'D', 'request-revision': 'V', comment: 'C', reopen: 'O' };
 
-function Tracker({ p, onCheck, busy }: { p: Proposal; onCheck: () => void; busy: boolean }) {
+export function Tracker({ p, onCheck, busy, subject = 'decision' }: { p: Proposal; onCheck: () => void; busy: boolean; subject?: string }) {
   const failed = p.state === 'failed' || p.state === 'conflicted';
   const at = PROPOSAL_STEPS.indexOf(p.state);
   return (
     <div data-testid="proposal-tracker" data-state={p.state} className="rounded-xl border border-hairline p-3.5">
-      <p className="text-[12px] font-medium tracking-wide text-ink-3 uppercase">{ACTION_LABEL[p.action]}</p>
+      <p className="text-[12px] font-medium tracking-wide text-ink-3 uppercase">{actionLabel(p.action)}</p>
       <ol className="mt-2 space-y-1.5" aria-label="Where this change stands">
         {PROPOSAL_STEPS.map((s, i) => {
           const done = !failed && at > i;
@@ -80,7 +80,7 @@ function Tracker({ p, onCheck, busy }: { p: Proposal; onCheck: () => void; busy:
         </p>
       ) : null}
       {p.state !== 'applied' && !failed ? (
-        <p className="mt-2.5 text-[12.5px] leading-5 text-ink-3">The decision keeps its current status until this pull request is merged and the Studio has verified it on {`the canonical branch`}.</p>
+        <p className="mt-2.5 text-[12.5px] leading-5 text-ink-3">The {subject} keeps its current status until this pull request is merged and the Studio has verified it on {`the canonical branch`}.</p>
       ) : null}
       <div className="mt-3 flex flex-wrap items-center gap-2">
         {p.state !== 'applied' && !failed ? (

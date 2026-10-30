@@ -53,5 +53,12 @@
     "requiredRoles": [
       "programme-owner"
     ]
+  },
+  "work": {
+    "completionRoles": [
+      "programme-owner"
+    ],
+    "requireIndependentCompletionApproval": false,
+    "note": "Only one approver is registered, so the person who submits work for review cannot be a different person from the one who approves it. Set this to true once a second approver is registered; this is an owner decision recorded in docs/state/TODO.md."
   }
 }

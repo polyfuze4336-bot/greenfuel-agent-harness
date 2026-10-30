@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { defineConfig, devices } from '@playwright/test';
-import { makeFixture } from './checks/fixtures/review-fixture.ts';
+import { PEOPLE, makeFixture, policyJson } from './checks/fixtures/review-fixture.ts';
 
 // Four production servers, each started by Playwright so the run is repeatable:
 //   3100  normal, reads HEAD
@@ -14,7 +14,7 @@ const serve = (port: number, env: Record<string, string> = {}) => ({ command: `n
 
 // The fixture is created once, by the process that loads this file first; workers inherit the folder through the environment.
 const reviewDir = (process.env.STUDIO_E2E_REVIEW_DIR ??= fs.mkdtempSync(path.join(os.tmpdir(), 'studio-e2e-review-')));
-if (!fs.existsSync(path.join(reviewDir, 'work'))) makeFixture({ dir: reviewDir, cloneFrom: path.resolve(process.cwd(), '..', '..') });
+if (!fs.existsSync(path.join(reviewDir, 'work'))) makeFixture({ dir: reviewDir, cloneFrom: path.resolve(process.cwd(), '..', '..'), policy: policyJson([...PEOPLE, { githubLogin: 'test-owner2', githubId: 1005, holder: 'Test Owner Two', roles: ['programme-owner'] }]) });
 
 export default defineConfig({
   testDir: './e2e',

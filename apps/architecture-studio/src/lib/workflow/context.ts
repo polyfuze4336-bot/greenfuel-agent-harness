@@ -5,6 +5,7 @@ import type { NormalizedDecision } from '../intel/schema.ts';
 import { ACTION_LABEL, eventPath, type ReviewState } from './events.ts';
 import type { Proposal } from './store.ts';
 import { PROPOSAL_LABEL } from './store.ts';
+import { actionLabel } from './labels.ts';
 
 export interface Diagram {
   path: string;
@@ -107,7 +108,7 @@ export function timelineOf(d: NormalizedDecision, state: ReviewState, proposals:
   }
   for (const p of proposals) {
     if (p.state === 'applied') continue;
-    out.push({ at: p.updatedAt, kind: 'proposal', title: `${ACTION_LABEL[p.action]}: ${PROPOSAL_LABEL[p.state]}`, detail: p.lastError?.message ?? p.history[p.history.length - 1]?.note ?? null, actor: `@${p.submittedBy}`, tone: p.state === 'failed' || p.state === 'conflicted' ? 'blocked' : 'open', ref: null });
+    out.push({ at: p.updatedAt, kind: 'proposal', title: `${actionLabel(p.action)}: ${PROPOSAL_LABEL[p.state]}`, detail: p.lastError?.message ?? p.history[p.history.length - 1]?.note ?? null, actor: `@${p.submittedBy}`, tone: p.state === 'failed' || p.state === 'conflicted' ? 'blocked' : 'open', ref: null });
   }
   for (const a of d.approvalHistory) {
     if (a.type === 'review-event') continue;

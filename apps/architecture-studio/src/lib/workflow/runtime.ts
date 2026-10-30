@@ -9,6 +9,7 @@ import { FixtureIdentity, GhCliIdentity, SessionStore } from './identity.ts';
 import { GitPublisher } from './publish.ts';
 import { ReviewService } from './review.ts';
 import { ReviewStore } from './store.ts';
+import { WorkService } from './work.ts';
 import type { NormalizedDecision } from '../intel/schema.ts';
 
 export const canonicalRefName = () => process.env.STUDIO_CANONICAL_REF?.trim() || 'origin/main';
@@ -17,6 +18,7 @@ export const isTestMode = () => process.env.STUDIO_TEST_MODE === '1';
 interface Runtime {
   key: string;
   service: ReviewService;
+  work: WorkService;
   sessions: SessionStore;
 }
 
@@ -38,7 +40,7 @@ export function reviewRuntime(root: string, readRef: string): Runtime {
     publisher: new GitPublisher(root),
     identity: test ? new FixtureIdentity(path.join(fixtures, 'identity.json')) : new GhCliIdentity(),
   });
-  g.__studioReview = { key, service, sessions: g.__studioReview?.sessions ?? new SessionStore() };
+  g.__studioReview = { key, service, work: new WorkService(service.deps, service), sessions: g.__studioReview?.sessions ?? new SessionStore() };
   return g.__studioReview;
 }
 

@@ -72,7 +72,7 @@ export default async function Overview() {
             <Metric label="Approved decisions" value={rs.byStatus.Approved} caption={`${rs.byStatus.Approved - approvedUnsigned} with a signed approval record. ${approvedUnsigned} were approved on the owner's instruction without a signature.`} href="/decisions?status=Approved" />
             <Metric label="Rejected decisions" value={rs.byStatus.Rejected} caption="No ADR or register entry has a Rejected status." href="/decisions?status=Rejected" />
             <Metric label="Deferred decisions" value={rs.byStatus.Deferred} caption={t2 && t2.status === 'deferred' ? 'No decision has a Deferred status. Owner task T2 records that answering the register was deferred.' : 'No decision has a Deferred status.'} href="/decisions?status=Deferred" />
-            <Metric label="Blocked tasks" value={t.blocked} caption={`of ${t.ownerTodo} owner tasks state an unmet prerequisite (rule-based)`} href="/queue?blocked=1" tone={t.blocked > 0 ? 'bad' : undefined} />
+            <Metric label="Blocked tasks" value={t.blocked} caption={`of ${t.ownerTodo} owner tasks state an unmet prerequisite (rule-based)`} href="/queue?prereq=1" tone={t.blocked > 0 ? 'bad' : undefined} />
             <Metric label="Outstanding approvals" value={a.outstanding} caption={`${a.adrs} Proposed ADRs and ${a.reviews} design reviews`} href="/approvals" />
             <Metric label="Architecture readiness" value={r.reviewsApproved === r.reviewsTotal && r.reviewsTotal > 0 ? 'Gate passed' : 'Not ready'} caption={`${r.reviewsApproved} of ${r.reviewsTotal} design reviews Approved`} href="/architecture#reviews" tone={r.reviewsApproved < r.reviewsTotal ? 'bad' : undefined} />
           </div>

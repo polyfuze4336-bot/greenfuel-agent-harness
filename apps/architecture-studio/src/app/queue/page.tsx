@@ -2,20 +2,16 @@ import { Suspense } from 'react';
 import { QueueExplorer } from '@/components/queue/queue-explorer.tsx';
 import { PageSkeleton } from '@/components/page-skeleton.tsx';
 import { PageHeader } from '@/components/ui.tsx';
-import { buildLookup } from '@/lib/lookup.ts';
-import { getModel } from '@/lib/repo/index.ts';
 
 export const metadata = { title: 'Work Queue' };
 export const dynamic = 'force-dynamic';
 
-export default async function QueuePage() {
-  const m = await getModel();
-  const t = m.metrics.tasks;
+export default function QueuePage() {
   return (
     <>
-      <PageHeader title="Work Queue" lede={`${t.ownerTodo} owner tasks from docs/state/TODO.md and ${t.total - t.ownerTodo} items from the implementation roadmap. Roadmap rows record no status, so none is shown for them.`} />
+      <PageHeader title="Work Queue" lede="Everything that must be completed before the application build, derived from the repository’s own tasks, decisions, risks, security findings, gaps and validation procedures. Rubric evidence gaps are kept apart from engineering work." />
       <Suspense fallback={<PageSkeleton />}>
-        <QueueExplorer tasks={m.tasks} lookup={buildLookup(m)} />
+        <QueueExplorer />
       </Suspense>
     </>
   );

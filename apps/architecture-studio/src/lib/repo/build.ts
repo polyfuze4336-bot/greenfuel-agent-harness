@@ -2,6 +2,7 @@ import { GitRepositoryAdapter } from './git.ts';
 import { buildRegister, type FragmentCache } from '../intel/engine.ts';
 import { adrRefs, assumptionRefs, dRefs, field, lineOf, parseAdr, parseAssumptions, parseRegister, parseRequirements, parseRisks, parseRoadmap, parseTodo, plain, tableRows } from './parse.ts';
 import type { Approvals, Attention, Blocker, Decision, Doc, DesignReview, EvidenceRun, Metrics, PendingApproval, QaItem, RehearsalCriterion, Recording, RepoMeta, Slide, StudioModel, Task } from './types.ts';
+import { SOURCE_PATHS } from '../queue/derive.ts';
 
 const P = {
   register: 'docs/context/DECISION-REGISTER.md',
@@ -310,7 +311,7 @@ export function buildModel(git: GitRepositoryAdapter, fragmentCache: FragmentCac
 
   // ---- GitHub traceability
   const regPaths = regSnap.records.flatMap((r) => [r.source.path, ...r.citedBy, ...r.evidence.flatMap((e) => (e.src ? [e.src.path] : [])), ...r.rubric.map((x) => x.src.path), ...r.approvalHistory.map((e) => e.src.path), ...r.options.flatMap((o) => [...o.pros, ...o.cons, ...o.conditional, ...o.unknown].map((c) => c.src.path)), ...Object.values(r.implications).flatMap((i) => (i ? [i.src.path] : []))]).concat(regSnap.suggestions.map((s) => s.src.path), regSnap.suggestions.flatMap((s) => s.basedOn.filter((b) => b.includes('/'))));
-  const used = new Set<string>([...regPaths, ...decisions.map((d) => d.src.path), ...tasks.map((t) => t.src.path), ...requirements.map((r) => r.src.path), ...risks.map((r) => r.src.path), ...assumptions.map((a) => a.src.path), ...reviews.flatMap((r) => [r.src.path, r.designSrc.path]), ...docs.map((d) => d.path), ...runs.map((r) => r.src.path), ...recordings.map((r) => r.path), P.qa, P.rehearsal, P.deck, P.trace, P.approvers, P.snapshot, P.state, P.todo, P.register, 'harness/scripts/approval.mjs']);
+  const used = new Set<string>([...Object.values(SOURCE_PATHS), ...regPaths, ...decisions.map((d) => d.src.path), ...tasks.map((t) => t.src.path), ...requirements.map((r) => r.src.path), ...risks.map((r) => r.src.path), ...assumptions.map((a) => a.src.path), ...reviews.flatMap((r) => [r.src.path, r.designSrc.path]), ...docs.map((d) => d.path), ...runs.map((r) => r.src.path), ...recordings.map((r) => r.path), P.qa, P.rehearsal, P.deck, P.trace, P.approvers, P.snapshot, P.state, P.todo, P.register, 'harness/scripts/approval.mjs']);
   const links = git.githubCommitsFor([...used].filter((p) => git.has(p)));
 
   return {
