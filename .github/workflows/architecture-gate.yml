@@ -1,0 +1,95 @@
+name: architecture-gate
+
+# The architecture build gate. It stops CI from AUTHORIZING implementation or deployment work while the architecture decisions it depends on
+# are unresolved, and it stops an approved architecture from being changed without a controlled reopening.
+#
+# What it is not: it does not prevent anyone from editing files on their own computer, or from pushing to an unprotected branch. It is a
+# CI check. It only becomes a merge control when branch protection requires it (TODO T14); until then it detects, and a person decides.
+#
+# Trust: on a pull request the gate's CODE comes from the BASE commit and only the DATA from the proposed change, so a change cannot weaken
+# the gate that judges it. When the base has no gate yet (the pull request that introduces it) the proposed code is used and a warning is
+# printed. On a push to main the commit judges itself, so a bad merge is detected after the fact, not prevented.
+#
+# Deployment and release workflows must call this one first, so nothing they do runs while it is blocked:
+#   jobs:
+#     architecture-gate:
+#       uses: ./.github/workflows/architecture-gate.yml
+#       with: { area: deployment }
+#     deploy:
+#       needs: architecture-gate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_call:
+    inputs:
+      area:
+        description: 'The area whose authorization is required (application, infrastructure, deployment).'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          path: data
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 0 # baselines are checked against the history: ancestry of the source commit, and the files at it
+          persist-credentials: false
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        if: github.event_name == 'pull_request'
+        with:
+          path: trusted
+          ref: ${{ github.event.pull_request.base.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+      - name: Choose the code that judges, and the keys that check review signatures
+        env:
+          EVENT: ${{ github.event_name }}
+          STUDIO_KEYS: ${{ vars.STUDIO_TRUSTED_SIGNING_KEYS }}
+        run: |
+          set -eu
+          CODE=data
+          if [ "$EVENT" = "pull_request" ]; then
+            if [ -f trusted/apps/architecture-studio/scripts/baseline.ts ] && [ -f trusted/harness/policy/baseline-policy.json ]; then
+              CODE=trusted
+            else
+              echo "::warning::The base commit has no architecture gate (this change introduces it), so the proposed gate code judges itself. Review it by hand."
+            fi
+          fi
+          echo "CODE=$CODE" >> "$GITHUB_ENV"
+          # The Studio's public signing keys, as a repository variable. Without them review-record signatures are not checked, and the gate says so.
+          if [ -n "${STUDIO_KEYS:-}" ]; then
+            printf '%s' "$STUDIO_KEYS" > "$RUNNER_TEMP/studio-keys.json"
+            echo "STUDIO_TRUSTED_SIGNING_KEYS_FILE=$RUNNER_TEMP/studio-keys.json" >> "$GITHUB_ENV"
+          fi
+      - name: Gate a called workflow (deployment and release workflows)
+        # In a called workflow github.event_name is the CALLER's event, so a call is recognised by its input, not by the event.
+        if: inputs.area != ''
+        env:
+          AREA: ${{ inputs.area }}
+        run: node "$CODE/apps/architecture-studio/scripts/baseline.ts" gate --area "$AREA" --root data --code-root "$CODE"
+      - name: Gate the change (pull request)
+        if: inputs.area == '' && github.event_name == 'pull_request'
+        env:
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: node "$CODE/apps/architecture-studio/scripts/baseline.ts" gate --changed "$BASE..$HEAD" --change-control --root data --code-root "$CODE"
+      - name: Gate the change (push)
+        if: inputs.area == '' && github.event_name == 'push'
+        env:
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+        run: |
+          set -eu
+          case "$BEFORE" in 0000000000000000000000000000000000000000) BEFORE="$AFTER~1" ;; esac
+          node "$CODE/apps/architecture-studio/scripts/baseline.ts" gate --changed "$BEFORE..$AFTER" --change-control --root data --code-root "$CODE"

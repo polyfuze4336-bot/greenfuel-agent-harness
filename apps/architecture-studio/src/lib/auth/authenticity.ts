@@ -21,6 +21,13 @@ export interface Authenticity {
   trust: Trust;
   policy: AccessPolicy;
   allowDevKeys: boolean;
+  /**
+   * verify (the default, and the only mode the running Studio uses): every record needs a signature the server's trust accepts.
+   * skip: only the architecture baseline tool in CI uses it, where the server's public key is not available. The hash chain, the
+   * enrollment-at-the-time check and everything else still apply, but a forged signature is NOT detected, so whoever reads the result must
+   * say so. It is chosen in code by the caller, never by repository data.
+   */
+  signatures?: 'verify' | 'skip';
 }
 
 /** The trust and the policy as found at a ref, so the policy that governed a record is the one on the branch the record is on. */
@@ -32,8 +39,10 @@ export function authenticityAt(read: (path: string) => string | undefined): Auth
 /** Null if the record counts, otherwise the reason it does not. */
 export function checkRecord(a: Authenticity, r: RecordFacts): string | null {
   const at = Date.parse(r.createdAt);
-  const sig = verifyRecordSignature(a.trust, r.signature, r.eventHash, at, { allowDevKeys: a.allowDevKeys });
-  if (sig) return sig;
+  if (a.signatures !== 'skip') {
+    const sig = verifyRecordSignature(a.trust, r.signature, r.eventHash, at, { allowDevKeys: a.allowDevKeys });
+    if (sig) return sig;
+  }
   if (!r.approvalClass) return null;
   if (a.policy.pinMismatch || a.policy.source === 'missing') return 'there is no trusted access policy to say who may approve';
   const key = subjectKeyOf(r.actor);

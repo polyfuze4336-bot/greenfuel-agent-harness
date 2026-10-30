@@ -19,6 +19,11 @@ const RULES = {
   adr: { decision: 'accept', classes: ['architecture'] },
   review: { decision: 'approve', classes: ['architecture'] },
   phase: { decision: 'raise', classes: ['architecture', 'deployment'] },
+  // An architecture baseline (docs/baselines/BL-nnnn/manifest.json) and the controlled reopening of one. Each is bound to the hash of its own
+  // record, so editing the manifest after it was authorized voids the authorization. Authorizing a baseline is not raising the phase: the phase
+  // is a separate decision with its own two-class approval, and a build needs both.
+  baseline: { decision: 'authorize', classes: ['architecture'] },
+  'baseline-reopen': { decision: 'reopen', classes: ['architecture'] },
 };
 // ADRs accepted before signed approvals existed (by the owner's instruction in chat, 2026-10-28 to 2026-10-29). Fixed list: a new ADR is never added to it.
 const GRANDFATHERED_ADRS = new Set(Array.from({ length: 15 }, (_, i) => String(i + 1).padStart(4, '0')));
@@ -32,6 +37,19 @@ const only = (root, dir, prefix) => { try { const m = fs.readdirSync(path.join(r
 // The text an approval is bound to: the document with its status (and, for a review, decider) lines neutralised.
 function normalisedSubject(type, id, root) {
   if (type === 'phase') return /^phase-[1-9]$/.test(id) ? { ok: true, sha256: registry.sha256(`phase:${id}`), file: 'harness/policy/command-policy.json' } : { ok: false, error: 'phase subject id must look like phase-1' };
+  if (type === 'baseline') {
+    if (!/^BL-\d{4}$/.test(id)) return { ok: false, error: 'baseline subject id must look like BL-0001' };
+    const file = `docs/baselines/${id}/manifest.json`;
+    if (!exists(root, file)) return { ok: false, error: `no manifest at ${file}` };
+    try { const m = JSON.parse(read(root, file)); delete m.authorization; return { ok: true, file, sha256: registry.sha256(registry.canonical(m)) }; } catch { return { ok: false, error: `the manifest at ${file} is not valid JSON` }; }
+  }
+  if (type === 'baseline-reopen') {
+    const m = /^(BL-\d{4})-R(\d{2})$/.exec(id);
+    if (!m) return { ok: false, error: 'baseline-reopen subject id must look like BL-0001-R01' };
+    const file = `docs/baselines/${m[1]}/reopen-${m[2]}.json`;
+    if (!exists(root, file)) return { ok: false, error: `no reopening record at ${file}` };
+    try { return { ok: true, file, sha256: registry.sha256(registry.canonical(JSON.parse(read(root, file)))) }; } catch { return { ok: false, error: `the record at ${file} is not valid JSON` }; }
+  }
   if (type === 'adr') {
     if (!/^\d{4}$/.test(id)) return { ok: false, error: 'adr subject id must be four digits' };
     const file = only(root, 'docs/adr', `${id}-`); if (!file) return { ok: false, error: `no single ADR file for ${id}` };
@@ -131,4 +149,18 @@ function gateProblems(root) {
   return { errors, warnings, stats };
 }
 
-module.exports = { DECISION_SCHEMA, RULES, GRANDFATHERED_ADRS, normalisedSubject, buildDecisionRequest, verifyDecisionApproval, loadApprovalRecords, gateProblems };
+// Every decision approval in the repository that verifies, keyed "type:id". Used by the baseline validator, which needs to know which approvals are real
+// without re-implementing the rules. Invalid records are returned so a caller can say why they count for nothing.
+function validApprovals(root) {
+  let approvers = []; try { approvers = JSON.parse(read(root, 'harness/policy/approvers.json')).approvers ?? []; } catch { /* no registry: nothing verifies */ }
+  const trusted = registry.trustedApprovers(approvers);
+  const valid = new Map(); const invalid = [];
+  for (const { file, rec } of loadApprovalRecords(root).filter((r) => r.rec?.schema === DECISION_SCHEMA)) {
+    const v = verifyDecisionApproval(rec, { root, approvers: trusted });
+    if (v.ok) { const k = `${rec.subject.type}:${rec.subject.id}`; valid.set(k, [...(valid.get(k) ?? []), { approval: rec.id, file, signers: v.signers, issuedAt: rec.issuedAt }]); }
+    else invalid.push({ file, reason: v.reasons[0] });
+  }
+  return { valid, invalid, trusted };
+}
+
+module.exports = { validApprovals, DECISION_SCHEMA, RULES, GRANDFATHERED_ADRS, normalisedSubject, buildDecisionRequest, verifyDecisionApproval, loadApprovalRecords, gateProblems };

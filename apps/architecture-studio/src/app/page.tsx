@@ -53,6 +53,9 @@ export default async function Overview() {
                 <span className="tnum font-medium text-ink">{a.enrolledApprovers}</span> approvers are enrolled, and <span className="tnum font-medium text-ink">{a.signedRecords}</span> signed approval records exist.
               </li>
               <li>Implementation phase: <span className="font-medium text-ink">{r.phase ?? 'unknown'}</span>{r.phase === '0' ? ' (not unlocked).' : '.'}</li>
+              <li>
+                <Link href="/baseline" data-testid="baseline-link" className="font-medium text-accent hover:underline">Build authorization</Link>: which kinds of work the architecture authorizes, and exactly what blocks each.
+              </li>
             </ul>
             <p className="mt-4 text-[12.5px] leading-5 text-ink-3">This is a statement of what the design gate and approval registry say, not a percentage. It changes only when those records change.</p>
           </div>

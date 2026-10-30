@@ -202,3 +202,32 @@ test('a request converts to the registry entry the owner would commit, and that 
   assert.deepEqual(gates.gateProblems(root).errors, []);
   assert.ok(gates.gateProblems(fakeRepo({ approvers: [{ ...entry, holder: 'Edited' }] })).errors.length > 0);
 });
+
+test('decision gates: a baseline and its reopening need a signed architecture approval bound to the exact record, and no other class can give one', () => {
+  const arch = approver('Owner One', ['architecture']);
+  const dep = approver('Owner Two', ['deployment'], ['P3']);
+  const approvers = [arch.entry, dep.entry];
+  const root = fakeRepo({ approvers });
+  const w = (rel, text) => { mkdirSync(path.dirname(path.join(root, rel)), { recursive: true }); writeFileSync(path.join(root, rel), text); };
+  assert.deepEqual(Object.keys(gates.RULES).filter((k) => k.startsWith('baseline')).sort(), ['baseline', 'baseline-reopen']);
+  assert.throws(() => gates.buildDecisionRequest({ type: 'baseline', id: 'BL-0001', reason: 'x', root }), /no manifest/);
+  assert.equal(gates.normalisedSubject('baseline', 'not-an-id', root).ok, false);
+  w('docs/baselines/BL-0001/manifest.json', JSON.stringify({ id: 'BL-0001', decisions: ['ADR-0001'] }));
+  const rec = decisionFor(root, 'baseline', 'BL-0001', [arch]);
+  assert.equal(rec.decision, 'authorize');
+  assert.deepEqual(rec.requiredClasses, ['architecture']);
+  const ok = (r) => gates.verifyDecisionApproval(r, { root, approvers: registry.trustedApprovers(approvers) });
+  assert.equal(ok(rec).ok, true);
+  assert.equal(ok(decisionFor(root, 'baseline', 'BL-0001', [dep])).ok, false, 'a deployment key cannot authorize a baseline');
+  // One changed byte in the manifest voids the approval.
+  w('docs/baselines/BL-0001/manifest.json', JSON.stringify({ id: 'BL-0001', decisions: ['ADR-0001', 'ADR-0002'] }));
+  assert.match(ok(rec).reasons[0], /approved text is not the text in the repository/);
+  // Reopening.
+  w('docs/baselines/BL-0001/reopen-01.json', JSON.stringify({ id: 'BL-0001-R01', decisions: [] }));
+  const re = decisionFor(root, 'baseline-reopen', 'BL-0001-R01', [arch]);
+  assert.equal(re.decision, 'reopen');
+  assert.equal(ok(re).ok, true);
+  assert.equal(ok({ ...re, decision: 'authorize' }).ok, false, 'a reopening cannot carry an authorization');
+  const v = gates.validApprovals(root);
+  assert.equal(v.trusted.length, 2);
+});

@@ -54,6 +54,9 @@ export function BlockingView() {
           The build waits on every build blocker the repository records, and on the work each one is stated to require. Work that is Done, Rejected or Superseded is no longer waited on. “Closed, no evidence” still blocks, because a claim of closure is not evidence. Starting the build also needs the owner’s approval under rule HC-11; resolving this list does not grant it.
           {analysis.cycles.length ? ` ${analysis.cycles.length} circular dependenc${analysis.cycles.length === 1 ? 'y was' : 'ies were'} found in the sources.` : ' No circular dependency was found.'}
         </p>
+        <p className="mt-2 text-[12.5px] leading-5">
+          <Link href="/baseline" data-testid="baseline-link" className="font-medium text-accent hover:underline">Build authorization</Link> shows, per kind of work, which gates are met and what a CI check would say about it.
+        </p>
       </Card>
 
       <Section title="Work you can start now" aside={<span className="text-[12.5px] text-ink-3">Ordered by how much of the chain each item unlocks</span>}>

@@ -26,7 +26,7 @@
   "controlPlanePaths": [
     "^\\.github/hooks/", "^\\.github/workflows/", "^\\.github/agents/", "^\\.github/instructions/", "^\\.github/skills/", "^\\.github/CODEOWNERS$",
     "^harness/", "^evaluation/", "^\\.vscode/", "^\\.devcontainer/", "^\\.mcp\\.json$", "^package\\.json$", "^\\.gitignore$", "^\\.gitattributes$",
-    "^memory/", "^docs/approvals/", "^docs/state/runs/", "^docs/state/loops/", "^\\.git/(hooks|config)"
+    "^memory/", "^docs/approvals/", "^docs/baselines/", "^docs/state/runs/", "^docs/state/loops/", "^\\.git/(hooks|config)"
   ],
   "evidenceRecordPaths": ["^docs/evidence/records/", "^docs/evidence/logs/", "^docs/evidence/MANIFEST\\.json$"],
   "secretFilePaths": [

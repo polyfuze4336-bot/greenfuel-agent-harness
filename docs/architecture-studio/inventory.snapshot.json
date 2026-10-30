@@ -1,11 +1,11 @@
 {
   "generatedBy": "harness/scripts/studio-inventory.mjs",
   "git": {
-    "head": "1436188ace07f5828d0f453eb07653a60f50820e",
+    "head": "161654f294d2140851ce9d7ba760cab774b1f81d",
     "branch": "studio/ui-readonly",
     "originMain": "140c39866d64a2246de0a4a2fb4aa8cc9c5ba75a",
-    "commitsAheadOfOriginMain": 1,
-    "dirty": 114
+    "commitsAheadOfOriginMain": 7,
+    "dirty": 20
   },
   "sources": {},
   "counts": {
@@ -161,13 +161,13 @@
     "todoTasks": {
       "source": "docs/state/TODO.md",
       "rule": "rows \"| Tn |\"; status = leading bold keyword, else \"deferred\" in the first section, else \"unmarked\"",
-      "total": 53,
+      "total": 54,
       "byStatus": {
         "deferred": 15,
         "decided": 2,
         "agreed": 1,
         "done": 2,
-        "open": 28,
+        "open": 29,
         "not-granted": 1,
         "approved": 4
       },
@@ -178,7 +178,7 @@
         "Awaiting the owner (Azure readiness stage, 2026-10-28; answered 2026-10-29)": 12,
         "Awaiting the owner (hardening stage, 2026-10-30)": 6,
         "Awaiting the owner (target architecture and business case, 2026-10-29)": 13,
-        "Awaiting the owner (Architecture Decision Studio, 2026-10-29)": 5
+        "Awaiting the owner (Architecture Decision Studio, 2026-10-29)": 6
       },
       "ambiguousForReview": [
         "T2"
@@ -378,7 +378,7 @@
     },
     "policyFiles": {
       "source": "harness/policy/*.json",
-      "total": 13
+      "total": 14
     },
     "criticalBlockers": {
       "rule": "a blocker is something that, by the repository's own gates, stops implementation or approval; each item below is computed or quoted, not judged",
@@ -1667,6 +1667,16 @@
       ],
       "ambiguous": false,
       "title": "Open: owner actions for Entra authentication and access control. Roles, enrollment, approv"
+    },
+    {
+      "id": "T66",
+      "section": "Awaiting the owner (Architecture Decision Studio, 2026-10-29)",
+      "status": "open",
+      "tokens": [
+        "open"
+      ],
+      "ambiguous": false,
+      "title": "Open: owner actions for the architecture baseline and build authorization. A readiness val"
     }
   ],
   "phaseFromState": "0",
@@ -2093,7 +2103,7 @@
       "fileCount": 1
     },
     "T": {
-      "distinctIds": 59,
+      "distinctIds": 60,
       "files": [
         "docs/acceptance/HARNESS-ACCEPTANCE-REPORT.md",
         "docs/harness/CAPABILITY-MATRIX.md",
@@ -2138,6 +2148,15 @@
   },
   "workflows": [
     {
+      "file": ".github/workflows/architecture-gate.yml",
+      "name": "architecture-gate",
+      "onPush": true,
+      "onPullRequest": true,
+      "branches": "main",
+      "permissions": "contents: read",
+      "usesPinnedSha": true
+    },
+    {
       "file": ".github/workflows/infra-validate.yml",
       "name": "infra-validate",
       "onPush": true,
@@ -2161,7 +2180,7 @@
     ".github": 3,
     ".mcp.json": 1,
     ".vscode": 2,
-    "apps": 241,
+    "apps": 252,
     "docs/architecture-studio": 2,
     "docs/azure": 2,
     "docs/business": 3,
@@ -2170,7 +2189,7 @@
     "docs/evidence": 1,
     "docs/orchestration": 1,
     "evaluation": 2,
-    "harness": 36,
+    "harness": 37,
     "infra": 3,
     "memory": 36,
     "package.json": 1,

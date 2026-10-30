@@ -24,7 +24,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '.
 const ZERO = /^0+$/;
 
 // Always protected, whatever the base policy says. The base policy can only add to this list.
-const BASELINE_PATTERNS = ['^\\.github/', '^harness/', '^evaluation/', '^\\.vscode/', '^\\.devcontainer/', '^\\.mcp\\.json$', '^package\\.json$', '^\\.gitignore$', '^\\.gitattributes$', '^memory/', '^docs/approvals/', '^docs/adr/', '^docs/evidence/'];
+const BASELINE_PATTERNS = ['^\\.github/', '^harness/', '^evaluation/', '^\\.vscode/', '^\\.devcontainer/', '^\\.mcp\\.json$', '^package\\.json$', '^\\.gitignore$', '^\\.gitattributes$', '^memory/', '^docs/approvals/', '^docs/baselines/', '^docs/adr/', '^docs/evidence/'];
 
 function realDeps(repoDir = root) {
   const git = (args) => execFileSync('git', args, { cwd: repoDir, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, windowsHide: true });

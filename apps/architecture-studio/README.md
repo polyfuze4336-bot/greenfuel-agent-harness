@@ -105,6 +105,20 @@ With `STUDIO_GITHUB_APP_ID`, `STUDIO_GITHUB_APP_INSTALLATION_ID`, `STUDIO_GITHUB
 
 Entra mode needs: `STUDIO_AUTH_MODE=entra`, `STUDIO_ENTRA_TENANT_ID`, `STUDIO_ENTRA_CLIENT_ID`, `STUDIO_ENTRA_CLIENT_SECRET_FILE` (a file, never the secret itself), `STUDIO_ENTRA_REDIRECT_URI` (`https://<host>/api/v1/auth/entra/callback`), `STUDIO_SIGNING_KEY_FILE` (Ed25519 private key, PEM) and, recommended, `STUDIO_ACCESS_POLICY_SHA256`. Without a signing key the server refuses to record any approval. Roles, enrollment, designated approvers and segregation rules are in `harness/policy/access-policy.json`, changed only by a reviewed pull request. Administrators review access at `/access`. None of this has been run against a real Entra tenant; see the limitations in [ACCESS-CONTROL](../../docs/architecture-studio/ACCESS-CONTROL.md).
 
+## Build authorization
+
+`/baseline` shows, for application code, infrastructure and deployment, whether the architecture authorizes that work yet and exactly what blocks it. It is **read-only**: the Studio never generates, authorizes or reopens a baseline. The CLI does that, and a person signs with a harness approver key.
+
+```powershell
+node scripts/baseline.ts report [--write] [--json]            # readiness for every area (exit 0)
+node scripts/baseline.ts gate --area application               # exit 2 when blocked, with numbered reasons
+node scripts/baseline.ts gate --changed origin/main..HEAD --change-control
+node scripts/baseline.ts generate --id BL-0001 --areas application   # refused unless every gate is met
+node scripts/baseline.ts verify [--id BL-0001]
+```
+
+CI runs the same check ([architecture-gate.yml](../../.github/workflows/architecture-gate.yml)); it cannot stop a local edit. See [BASELINE](../../docs/architecture-studio/BASELINE.md) and [CHANGE-CONTROL](../../docs/architecture/CHANGE-CONTROL.md).
+
 ## Tests
 
 ```powershell

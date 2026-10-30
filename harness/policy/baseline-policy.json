@@ -1,0 +1,115 @@
+{
+  "version": 1,
+  "description": "Architecture baseline and build authorization policy. It decides which architecture decisions and gates must be satisfied before implementation or deployment of a given kind of work may be authorized, and which paths that work covers. It is a control-plane file: changing it changes what CI authorizes, so it is changed only by a reviewed pull request, and a baseline records its hash, so a baseline made under an older policy stops being current when this file changes. THIS FILE IS A PROPOSAL: the gate groupings below are taken from docs/phase/PHASE-1-BLOCKER-REPORT.md (gates G1 to G6) and ADR 0020, which are themselves not yet approved. The owner must review it before the first baseline is authorized (TODO T66). It never grants anything: it only describes what must be true before a human signs.",
+  "activeStage": "phase-1a",
+  "rules": {
+    "reviewRecordsCountAsApproval": true,
+    "grandfatheredAdrsCountAsApproval": true,
+    "conditionalApprovals": "flag",
+    "requirementChange": "review",
+    "supersededBySuccessor": true
+  },
+  "gates": [
+    {
+      "id": "phase-raised",
+      "title": "The phase has been raised by a human",
+      "type": "harness",
+      "check": "phase",
+      "source": "HC-11, BR-009, ADR 0002; PHASE-1-BLOCKER-REPORT gate G1. Needs signed architecture and deployment approvals (harness/approvals/approval-gates.cjs)."
+    },
+    {
+      "id": "approver-registry",
+      "title": "An architecture-class approver is enrolled",
+      "type": "harness",
+      "check": "approvers",
+      "class": "architecture",
+      "source": "PHASE-1-BLOCKER-REPORT gate G2. A baseline is authorized by a signed approval of the architecture class."
+    },
+    {
+      "id": "branch-protection",
+      "title": "Branch protection is in force on main",
+      "type": "harness",
+      "check": "branch-protection",
+      "source": "harness/policy/github-protection.json, TODO T14. Without it a CI gate can be bypassed by anyone who can push."
+    },
+    {
+      "id": "scope-adr",
+      "title": "The Phase 1a scope ADR is accepted",
+      "type": "decisions",
+      "decisions": ["ADR-0020"],
+      "source": "ADR 0020 and PHASE-1-BLOCKER-REPORT section 4 step 3: the scope of a local, synthetic-data slice is decided in an ADR."
+    },
+    {
+      "id": "architecture-approved",
+      "title": "The target architecture is approved",
+      "type": "decisions",
+      "decisions": ["ADR-0016", "ADR-0017", "ADR-0018", "ADR-0019"],
+      "designReviews": ["RV-0003"],
+      "source": "PHASE-1-BLOCKER-REPORT gate G3. A design ADR cannot be Accepted unless its review is Approved (DESIGN-REVIEW-GATE section 2.4)."
+    },
+    {
+      "id": "sovereignty",
+      "title": "Sovereignty decisions are made",
+      "type": "decisions",
+      "decisions": ["D-003", "D-009", "D-010", "D-011"],
+      "source": "PHASE-1-BLOCKER-REPORT gate G4 (HC-01). Residency is not proven by choosing a region."
+    },
+    {
+      "id": "certificate-integrity",
+      "title": "Certificate and integrity design is decided",
+      "type": "decisions",
+      "decisions": ["D-006", "D-012", "D-013"],
+      "source": "PHASE-1-BLOCKER-REPORT gate G5 (HC-03, HC-08)."
+    },
+    {
+      "id": "identity-roles",
+      "title": "Identity, roles and the approval model are decided",
+      "type": "decisions",
+      "decisions": ["D-007", "D-027", "D-033"],
+      "source": "PHASE-1-BLOCKER-REPORT gate G6 (HC-04, HC-09)."
+    }
+  ],
+  "stages": [
+    {
+      "id": "phase-1a",
+      "title": "Phase 1a: local, synthetic-data vertical slice (ADR 0020)",
+      "gates": ["phase-raised", "approver-registry", "scope-adr"],
+      "includeMilestones": [],
+      "blockOn": ["critical-assumptions"]
+    },
+    {
+      "id": "production",
+      "title": "Production architecture: the full set of gates",
+      "gates": ["phase-raised", "approver-registry", "branch-protection", "architecture-approved", "sovereignty", "certificate-integrity", "identity-roles"],
+      "includeMilestones": ["M1", "M2"],
+      "blockOn": ["critical-assumptions", "missing-evidence", "requirements-without-decisions", "decisions-without-validation", "blocking-tasks"]
+    }
+  ],
+  "areas": [
+    {
+      "id": "application",
+      "title": "Application code and its tests",
+      "kind": "implementation",
+      "stage": "active",
+      "paths": ["^src/", "^tests/product/"]
+    },
+    {
+      "id": "infrastructure",
+      "title": "Infrastructure as code and Azure configuration",
+      "kind": "implementation",
+      "stage": "production",
+      "paths": ["^infra/", "^\\.azure/", "^azure\\.yaml$", "^Dockerfile$", "\\.bicep$", "\\.bicepparam$", "\\.tf$", "\\.tfvars$"]
+    },
+    {
+      "id": "deployment",
+      "title": "Deployment and release workflows",
+      "kind": "deployment",
+      "stage": "production",
+      "paths": ["^\\.github/workflows/(deploy|release)[^/]*\\.ya?ml$"]
+    }
+  ],
+  "criticalAssumptions": {
+    "include": [],
+    "exclude": []
+  }
+}
