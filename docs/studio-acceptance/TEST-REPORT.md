@@ -1,6 +1,6 @@
 # Test report: end-to-end acceptance of Architecture Decision Studio
 
-**Tested commit:** `b5b614b` (local; nothing is pushed). **Machine:** Windows 10.0.26300, 8 CPUs, Node 22.23.4, Microsoft PowerPoint (for rendering).
+**Tested commit:** `b5b614b` (documents in `cb5e84b`; pushed to `main` afterwards). **Machine:** Windows 10.0.26300, 8 CPUs, Node 22.23.4, Microsoft PowerPoint (for rendering).
 **What was tested:** the Studio running as a production build on localhost. **What was not:** a deployed application. No Azure resource exists ([ACCEPTANCE-REPORT](ACCEPTANCE-REPORT.md)).
 
 ## 1. Suites, run on this commit
@@ -103,7 +103,7 @@ Reading these honestly: search is fast (~60 ms p50), but **decision detail has a
 ## 4. Not tested
 
 - The deployed application (does not exist).
-- Real Entra ID sign-in (a stand-in was used), a real GitHub App, real webhooks, real GitHub Actions, real branch protection, real merge policies.
+- Real Entra ID sign-in (a stand-in was used), a real GitHub App, real webhooks, GitHub Actions on a Studio-created pull request, real branch protection, real merge policies. (After the push, `validate` and `architecture-gate` succeeded on GitHub for `cb5e84b`.)
 - Concurrent users and load.
 - Screen-reader use; PowerPoint accessibility (alt text, reading order); a human visual design review of the final deck.
 - Linux hosting of the Studio and any final-deck rendering without PowerPoint.
