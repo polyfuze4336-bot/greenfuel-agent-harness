@@ -31,7 +31,7 @@ Tests added (`checks/adapter.check.ts`): the fingerprint is stable, changes on a
 
 ## A2: the Studio is now built and tested in CI
 
-New workflow `.github/workflows/studio.yml`: `npm ci`, typecheck, unit tests, `next build` on Ubuntu, actions pinned by SHA, `contents: read`, no path filter (a skipped required check would block merging). **CI result: see the end of this page.**
+New workflow `.github/workflows/studio.yml`: `npm ci`, typecheck, unit tests, `next build` on Ubuntu, actions pinned by SHA, `contents: read`, no path filter (a skipped required check would block merging). **CI result (PR #1): the job passed in 1 minute on GitHub.** It ran 383 unit tests in 37 s on Linux (typecheck 1.5 s, build 4 s), against 7 minutes on this Windows machine. All the new tests ran in CI. CI counted 383 where my local run counted 385; the 2-test difference was not traced.
 
 ## A3: console errors and raw Markdown
 
@@ -55,8 +55,8 @@ New workflow `.github/workflows/studio.yml`: `npm ci`, typecheck, unit tests, `n
 |---|---|
 | Studio unit tests | **385 / 385** (was 373; +12 new) |
 | `npm run typecheck` | clean |
-| `npm run validate` | OK after this page exists |
+| `npm run validate` | OK |
 | Polish e2e (`e2e/polish.spec.ts`) | 2 / 2 |
-| Full Playwright suite | see below |
-| `studio` CI job on GitHub | see below |
+| Full Playwright suite (Windows, local) | **227 passed, 1 skipped (pre-existing), 0 failed**, 29.6 min; the second clean full pass |
+| `studio`, `validate`, `evaluate`, `gate`, `control-plane-guard` on PR #1 | all pass |
 | Ruleset on `main` (A6) | see below |
