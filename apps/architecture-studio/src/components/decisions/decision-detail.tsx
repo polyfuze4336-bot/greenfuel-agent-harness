@@ -3,9 +3,9 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { ArrowRightLeft, Gavel, Info, TriangleAlert } from 'lucide-react';
-import { FIELD_LABEL, type Claim, type DuplicateCandidate, type NormalizedDecision, type OptionInfo, type Suggestion } from '@/lib/intel/schema.ts';
+import { FIELD_LABEL, NATURE_LABEL, reviewLane, type Claim, type DuplicateCandidate, type NormalizedDecision, type OptionInfo, type ReviewLane, type Suggestion } from '@/lib/intel/schema.ts';
 import type { Lookup } from '@/lib/lookup.ts';
-import { RefChips, SourceBlock } from '../record-bits.tsx';
+import { LastModified, RefChips, SourceBlock } from '../record-bits.tsx';
 import { SourcePreviewButton } from '../source-preview.tsx';
 import { AiBadge, NeutralPill, NormStatusPill, SourceLink, Tag, VerdictPill } from '../ui.tsx';
 import { RichText } from '../rich-text.tsx';
@@ -28,6 +28,28 @@ function Block({ title, children, id }: { title: string; children: ReactNode; id
   );
 }
 
+/** What a record is, said plainly, so a stakeholder question or a regulatory claim is never mistaken for an architecture option to approve. */
+const LANE_NOTICE: Record<ReviewLane, { title: string; body: string } | null> = {
+  architecture: null,
+  stakeholder: { title: 'A stakeholder clarification, not an architecture decision', body: 'This asks for a fact only the business can supply. It is answered by recording that fact in the repository, by the named role. The Studio does not approve it, and the options below are possible answers, not architecture options.' },
+  verification: { title: 'Needs verification by a qualified person', body: "This is a regulatory or certification claim. It is not approved on anyone's recommendation, including an AI's. A qualified person verifies it against the source and the evidence is recorded. An architecture approval never authorises a filing." },
+  unclassified: { title: 'The register does not state what kind of decision this is', body: 'The Studio does not guess. It cannot be approved until the register states its Kind.' },
+};
+
+/** The plain-language statement of what a record is, for the record, its review page and its comparison. Nothing for an ordinary architecture choice. */
+export function LaneNotice({ natures }: { natures: NormalizedDecision['natures'] }) {
+  const notice = LANE_NOTICE[reviewLane(natures)];
+  if (!notice) return null;
+  return (
+    <div role="note" data-testid="lane-notice" className="mt-4 flex gap-2.5 rounded-xl px-3.5 py-3 text-[13.5px] leading-5" style={{ background: 'var(--s-open-bg)', color: 'var(--s-open-fg)' }}>
+      <Info aria-hidden className="mt-0.5 size-4 shrink-0" />
+      <span>
+        <span className="block font-semibold">{notice.title}</span>
+        {notice.body}
+      </span>
+    </div>
+  );
+}
 const Missing = ({ children }: { children?: ReactNode }) => <p className="text-[13.5px] text-ink-3 italic">{children ?? 'Not stated in any source.'}</p>;
 
 function ClaimList({ claims, empty }: { claims: Claim[]; empty: string }) {
@@ -141,6 +163,8 @@ export function DecisionDetail({ d, lookup, duplicates = [], suggestions = [], t
   const Title = titleAs;
   const mine = suggestions.filter((s) => s.decisionId === d.id);
   const prov = Object.entries(d.fieldSources);
+  const lane = reviewLane(d.natures);
+  const optionsTitle = lane === 'stakeholder' ? 'Possible answers' : lane === 'verification' ? 'Ways to verify' : FIELD_LABEL.options!;
   return (
     <article data-testid="decision-detail" aria-label={`${d.id} ${d.title}`}>
       {bare ? null : (
@@ -150,18 +174,26 @@ export function DecisionDetail({ d, lookup, duplicates = [], suggestions = [], t
             <NormStatusPill status={d.status} />
             {d.status === 'Approved' && d.approvalBasis !== 'signed' ? <NeutralPill title={APPROVAL_TEXT[d.approvalBasis]}>Unsigned</NeutralPill> : null}
             <span className="text-[12.5px] text-ink-3">{d.kind === 'adr' ? `Architecture decision record${d.category ? ` · ${adrTypeLabel(d.category)}` : ''}` : 'Open register entry'}</span>
+            {d.natures.map((n) => (
+              <span key={n} data-testid="nature" className="rounded-full border border-hairline-strong bg-surface-2 px-2 py-0.5 text-[11.5px] font-medium text-ink-2">
+                {NATURE_LABEL[n]}
+              </span>
+            ))}
+            {d.natures.length === 0 ? <span data-testid="nature" className="rounded-full border border-dashed border-hairline-strong px-2 py-0.5 text-[11.5px] text-ink-3 italic">Kind not stated</span> : null}
           </div>
           <Title className="text-[22px] leading-[1.25] font-semibold">{d.title}</Title>
+          <LastModified path={d.source.path} />
+          <LaneNotice natures={d.natures} />
 
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <Link href={`/decisions/${d.id}/review`} className="inline-flex items-center gap-1.5 rounded-lg bg-selected px-3 py-1.5 text-[13px] font-medium text-selected-ink hover:opacity-90">
               <Gavel aria-hidden className="size-3.5" />
-              Review and decide
+              {lane === 'architecture' ? 'Review and decide' : 'Comment and track'}
             </Link>
-            <Link href={`/decisions/${d.id}/compare`} className="inline-flex items-center gap-1.5 rounded-lg border border-hairline-strong bg-surface px-3 py-1.5 text-[13px] font-medium text-ink hover:bg-surface-2">
+            {lane === 'architecture' ? <Link href={`/decisions/${d.id}/compare`} className="inline-flex items-center gap-1.5 rounded-lg border border-hairline-strong bg-surface px-3 py-1.5 text-[13px] font-medium text-ink hover:bg-surface-2">
               <ArrowRightLeft aria-hidden className="size-3.5" />
               Compare alternatives
-            </Link>
+            </Link> : null}
             <SourcePreviewButton src={{ path: d.source.path, line: d.source.line }} />
           </div>
         </>
@@ -201,11 +233,11 @@ export function DecisionDetail({ d, lookup, duplicates = [], suggestions = [], t
             <Tag>{d.recommendedOption.key}</Tag> <span className="font-medium">{d.recommendedOption.name}</span> <span className="text-ink-3">({d.recommendedOption.disposition})</span>
           </p>
         ) : (
-          <Missing>{d.kind === 'register-entry' ? 'None. The register records known options and states that none is chosen.' : 'The source does not mark a selected or proposed option.'}</Missing>
+          <Missing>{lane === 'stakeholder' ? 'Not applicable: this is answered by a fact, not by choosing an option.' : lane === 'verification' ? 'Not applicable: a claim is verified, not chosen.' : d.kind === 'register-entry' ? 'None. The register records known options and states that none is chosen.' : 'The source does not mark a selected or proposed option.'}</Missing>
         )}
       </Block>
 
-      <Block title={`${FIELD_LABEL.options!} (${d.options.length})`}>
+      <Block title={`${optionsTitle} (${d.options.length})`}>
         {d.options.length ? (
           <div className="space-y-2">
             {d.options.map((o) => (
@@ -267,6 +299,37 @@ export function DecisionDetail({ d, lookup, duplicates = [], suggestions = [], t
           <Missing>No requirement is recorded as blocked by this decision.</Missing>
         )}
       </Block>
+      <Block title={`Related requirements (${d.relatedRequirements.length})`} id="related-requirements">
+        {d.relatedRequirements.length ? (
+          <ul className="space-y-1.5" data-testid="related-requirements">
+            {d.relatedRequirements.map((r) => (
+              <li key={r.id} className="flex flex-wrap items-center gap-2 text-[13px]">
+                <Link href={lookup[r.id]?.href ?? `/architecture?rq=${r.id}#requirements`} className="inline-flex items-center gap-1 rounded-md border border-hairline bg-surface-2 px-1.5 py-px font-mono text-[12px] leading-5 text-accent hover:border-accent">
+                  {r.id}
+                  {r.priority ? <span className="text-[10.5px] text-ink-3">{r.priority}</span> : null}
+                </Link>
+                <span className="text-ink-3">{r.relation === 'blocked-until-decided' ? 'cannot be fully accepted until this is decided' : r.relation === 'addressed-by-this-adr' ? 'cited by this ADR' : 'names this decision in its traceability row'}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <Missing>No requirement is tied to this decision in any source.</Missing>
+        )}
+      </Block>
+      {d.invalidReferences.length ? (
+        <Block title={`Invalid references (${d.invalidReferences.length})`} id="invalid-references">
+          <ul className="space-y-2" data-testid="invalid-references">
+            {d.invalidReferences.map((r) => (
+              <li key={`${r.kind}-${r.id}`} className="flex gap-2.5 rounded-xl px-3.5 py-2.5 text-[13.5px] leading-5" style={{ background: 'var(--s-rejected-bg)', color: 'var(--s-rejected-fg)' }}>
+                <TriangleAlert aria-hidden className="mt-0.5 size-4 shrink-0" />
+                <span>
+                  <span className="font-mono">{r.id}</span> is cited ({r.via}) but no {r.kind} with that id exists at this commit. It is shown here, not dropped, so someone can correct the source.
+                </span>
+              </li>
+            ))}
+          </ul>
+        </Block>
+      ) : null}
       <Block title="Related ADRs, risks, tasks and reviews">
         <div className="space-y-2.5 text-[12.5px] text-ink-3">
           {[

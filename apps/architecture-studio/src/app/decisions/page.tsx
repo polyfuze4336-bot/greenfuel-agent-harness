@@ -17,7 +17,7 @@ export default async function DecisionsPage() {
   const m = await getModel();
   const r = m.register;
   const store = runtime().service.deps.store;
-  const queue = pendingOrder(r.records, (id) => !!store.openFor(id));
+  const queue = pendingOrder(r.records, (id) => !!store.openFor(id), runtime().service.policy());
   // Commits the register can be compared with: remote-tracking branches, and the commit before this one.
   const refs = [...new Set([...m.repo.remoteRefs.map((x) => x.name), 'HEAD~1'])];
   return (
@@ -26,7 +26,7 @@ export default async function DecisionsPage() {
         {queue[0] ? (
           <Link href={`/decisions/${queue[0].id}/review`} data-testid="start-review" className="inline-flex items-center gap-2 rounded-lg bg-selected px-3.5 py-2 text-[13.5px] font-medium text-selected-ink hover:opacity-90">
             <Gavel aria-hidden className="size-4" />
-            Review pending decisions ({queue.length})
+            Review architecture decisions ({queue.length})
           </Link>
         ) : null}
       </PageHeader>

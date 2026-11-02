@@ -10,7 +10,7 @@ import { ReviewService, ServiceError } from '../src/lib/workflow/review.ts';
 import { availability, validateRequest } from '../src/lib/workflow/rules.ts';
 import { parseAccessPolicy, rolesNamed } from '../src/lib/auth/access-policy.ts';
 import { ReviewStore, type Proposal } from '../src/lib/workflow/store.ts';
-import { pendingOrder } from '../src/lib/workflow/runtime.ts';
+import { pendingOrder, reviewableInStudio } from '../src/lib/workflow/runtime.ts';
 import { PEOPLE, USERS, git, installTestAuth, makeDecision, makeFixture, policyJson, subjectOf, type Fixture } from './fixtures/review-fixture.ts';
 import type { NormalizedDecision, RegisterSnapshot } from '../src/lib/intel/schema.ts';
 
@@ -659,6 +659,20 @@ describe('ordering and availability', () => {
     ];
     assert.deepEqual(pendingOrder(r, () => false).map((x) => x.id), ['ADR-0002', 'D-002', 'D-003', 'D-001', 'ADR-0003']);
     assert.deepEqual(pendingOrder(r, (id) => id === 'D-002').map((x) => x.id), ['ADR-0002', 'D-003', 'D-001', 'ADR-0003']);
+  });
+
+  it('keeps stakeholder clarifications and regulatory verifications out of the review queue, whoever owns them', () => {
+    const r = [
+      makeDecision({ id: 'D-010', kind: 'register-entry', status: 'Pending Review', natures: ['architecture-choice'] }),
+      makeDecision({ id: 'D-003', kind: 'register-entry', status: 'Pending Review', natures: ['stakeholder-clarification'], requiredApproverRole: { text: 'Programme owner', basis: 'x' } }),
+      makeDecision({ id: 'D-001', kind: 'register-entry', status: 'Pending Review', natures: ['stakeholder-clarification', 'regulatory-verification'] }),
+      makeDecision({ id: 'D-011', kind: 'register-entry', status: 'Pending Review', natures: ['architecture-choice', 'stakeholder-clarification'] }),
+      makeDecision({ id: 'D-099', kind: 'register-entry', status: 'Pending Review', natures: [] }),
+    ];
+    assert.deepEqual(pendingOrder(r, () => false).map((x) => x.id), ['D-010']);
+    const p = parseAccessPolicy(policyJson(), 'canonical');
+    assert.deepEqual(pendingOrder(r, () => false, p).map((x) => x.id), ['D-010']);
+    assert.equal(reviewableInStudio(r[1]!, p), false, 'a clarification owned by the programme owner is still not an architecture approval');
   });
 
   it('offers every action with a reason when it is unavailable, and parses role names through aliases', () => {

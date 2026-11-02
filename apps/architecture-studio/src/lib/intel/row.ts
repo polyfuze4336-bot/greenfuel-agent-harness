@@ -1,4 +1,4 @@
-import type { NormalizedDecision, NormStatus } from './schema.ts';
+import { NATURE_LABEL, reviewLane, type DecisionNature, type NormalizedDecision, type NormStatus, type ReviewLane } from './schema.ts';
 
 /**
  * What the Decision Register table needs about one decision, and nothing more. The full record (options, pros and cons, field sources,
@@ -19,6 +19,11 @@ export interface DecisionRow {
   relatedReviews: string[];
   flagged: boolean;
   hasMissing: boolean;
+  /** What the record asks for, from the register's Kind column. Empty when unstated. */
+  natures: DecisionNature[];
+  /** Which review queue it belongs in. Only "architecture" is an architecture approval. */
+  lane: ReviewLane;
+  invalidReferences: number;
   source: { path: string; line: number };
   /** Lower-cased text the search box matches against. Built on the server so the search behaves exactly as before. */
   hay: string;
@@ -26,7 +31,7 @@ export interface DecisionRow {
 
 /** The text a search matches: id, title, description, justification, owner, status, milestone, category and option names. */
 export function searchText(d: NormalizedDecision): string {
-  return `${d.id} ${d.title} ${d.description ?? ''} ${d.businessJustification ?? ''} ${d.decisionOwner ?? ''} ${d.statusRaw} ${d.milestone ?? ''} ${d.category ?? ''} ${d.options.map((o) => o.name).join(' ')}`.toLowerCase();
+  return `${d.id} ${d.title} ${d.description ?? ''} ${d.businessJustification ?? ''} ${d.decisionOwner ?? ''} ${d.statusRaw} ${d.milestone ?? ''} ${d.category ?? ''} ${d.natures.map((n) => NATURE_LABEL[n]).join(' ')} ${d.options.map((o) => o.name).join(' ')}`.toLowerCase();
 }
 
 export function toRow(d: NormalizedDecision): DecisionRow {
@@ -44,6 +49,9 @@ export function toRow(d: NormalizedDecision): DecisionRow {
     relatedReviews: d.relatedReviews,
     flagged: d.flags.length > 0,
     hasMissing: d.missing.length > 0,
+    natures: d.natures,
+    lane: reviewLane(d.natures),
+    invalidReferences: d.invalidReferences.length,
     source: { path: d.source.path, line: d.source.line },
     hay: searchText(d),
   };

@@ -5,7 +5,7 @@ import { RecentChanges } from '@/components/recent-changes.tsx';
 import { StatusBar } from '@/components/status-bar.tsx';
 import { utcDate } from '@/lib/format.ts';
 import { getModel } from '@/lib/repo/index.ts';
-import type { NormStatus } from '@/lib/intel/schema.ts';
+import { reviewLane, type NormStatus } from '@/lib/intel/schema.ts';
 import { runtime } from '@/lib/workflow/http.ts';
 import { pendingOrder } from '@/lib/workflow/runtime.ts';
 
@@ -45,11 +45,13 @@ export default async function Overview() {
   const m = await getModel();
   const { tasks: t, approvals: a, readiness: r } = m.metrics;
   const store = runtime().service.deps.store;
-  const queue = pendingOrder(m.register.records, (id) => !!store.openFor(id));
+  const queue = pendingOrder(m.register.records, (id) => !!store.openFor(id), runtime().service.policy());
   const next = queue[0];
   const rs = m.register.stats;
   const counts = rs.byStatus;
   const pendingN = counts.Proposed + counts['Pending Review'] + counts.Blocked;
+  const lanes = { architecture: 0, stakeholder: 0, verification: 0, unclassified: 0 };
+  for (const x of m.register.records) if (x.status === 'Proposed' || x.status === 'Pending Review' || x.status === 'Blocked') lanes[reviewLane(x.natures)]++;
   const flagged = m.register.records.filter((x) => x.flags.length > 0).length;
   const m1 = m.register.records.filter((x) => x.kind === 'register-entry' && x.milestone === 'M1' && x.status === 'Pending Review').length;
   const ready = r.reviewsApproved === r.reviewsTotal && r.reviewsTotal > 0;
@@ -83,11 +85,14 @@ export default async function Overview() {
 
       <div className="mb-2 grid gap-x-6 lg:grid-cols-2">
         <div className="min-w-0">
-        <Section id="attention" title="Needs your attention" aside={`${queue.length} decisions waiting`}>
+        <Section id="attention" title="Needs your attention" aside={`${queue.length} to review in the Studio`}>
           <Card className="overflow-hidden">
             <ul className="divide-y divide-hairline">
               {next ? <Row href={`/decisions/${next.id}/review`} title={`Review ${next.id}`} detail={next.title} trailing="Next" /> : null}
-              <Row href="/decisions?status=Proposed,Pending%20Review,Blocked" title="Decisions awaiting a decision" detail={`${counts['Pending Review']} pending review, ${counts.Proposed} proposed, ${counts.Blocked} blocked`} trailing={String(pendingN)} />
+              <Row href="/decisions?lane=architecture&status=Proposed,Pending%20Review,Blocked" title="Architecture decisions awaiting review" detail="Options are known; choosing needs analysis and an approval from the named role" trailing={String(lanes.architecture)} />
+              {lanes.stakeholder > 0 ? <Row href="/decisions?lane=stakeholder&status=Proposed,Pending%20Review,Blocked" title="Stakeholder answers needed" detail="Facts only the business can supply. They are answered in the repository, not approved" trailing={String(lanes.stakeholder)} /> : null}
+              {lanes.verification > 0 ? <Row href="/decisions?lane=verification&status=Proposed,Pending%20Review,Blocked" title="Needs qualified verification" detail="Regulatory or certification claims. Not approved on a recommendation, human or AI" trailing={String(lanes.verification)} /> : null}
+              {lanes.unclassified > 0 ? <Row href="/decisions?lane=unclassified&status=Proposed,Pending%20Review,Blocked" title="Kind not stated" detail="The register does not say what these ask for, so the Studio does not guess" trailing={String(lanes.unclassified)} /> : null}
               <Row href="/approvals" title="Approvals outstanding" detail={`${a.adrs} proposed ADRs and ${a.reviews} design reviews need a signed approval`} trailing={String(a.outstanding)} />
               {m1 > 0 ? <Row href="/decisions?milestone=M1&status=open" title="Needed by milestone M1" detail="Open decisions that must be settled before options analysis can start" trailing={String(m1)} /> : null}
               {flagged > 0 ? <Row href="/decisions?scope=review" title="Flagged for human review" detail="The register validator marked these records for a person to look at" trailing={String(flagged)} /> : null}

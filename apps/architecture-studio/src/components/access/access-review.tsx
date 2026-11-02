@@ -166,7 +166,7 @@ export function AccessReview() {
           {Object.entries(report.decisionsByDomain).map(([d, v]) => (
             <li key={d} className="rounded-xl border border-hairline px-3.5 py-2.5 text-[13.5px]">
               <span className="font-medium">{d}</span>: {v.total} records
-              {d === 'regulatory' || d === 'unclassified' ? <span className="text-ink-3"> (never approvable in the Studio)</span> : v.noDesignatedApprover ? <span className="text-[var(--s-open-fg)]"> · {v.noDesignatedApprover} with no designated approver</span> : null}
+              {d === 'regulatory' || d === 'clarification' || d === 'unclassified' ? <span className="text-ink-3"> (never approvable in the Studio)</span> : v.noDesignatedApprover ? <span className="text-[var(--s-open-fg)]"> · {v.noDesignatedApprover} with no designated approver</span> : null}
             </li>
           ))}
         </ul>

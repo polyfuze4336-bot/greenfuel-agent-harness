@@ -89,10 +89,16 @@ test.beforeEach(() => as(USERS.owner));
 
 test.describe('navigation and the full record', () => {
   test('starts from the register, shows everything needed to decide, and moves to the next pending decision with the keyboard', async ({ page }) => {
+    // The queue holds architecture decisions only, so the first one is learned from the server, not assumed.
+    const q1 = (await (await page.request.get('/api/v1/review/next')).json()) as { total: number; next: { id: string; title: string } };
+    const q2 = (await (await page.request.get(`/api/v1/review/next?after=${q1.next.id}`)).json()) as { next: { id: string } };
+    expect(q1.total).toBeGreaterThan(1);
+    expect(q1.next.id).not.toBe(q2.next.id);
     await page.goto('/decisions');
+    await expect(page.getByTestId('start-review')).toContainText(`Review architecture decisions (${q1.total})`);
     await page.getByTestId('start-review').click();
-    await expect(page).toHaveURL(/\/decisions\/D-001\/review$/);
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('Which certification schemes');
+    await expect(page).toHaveURL(new RegExp(`/decisions/${q1.next.id}/review$`));
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(q1.next.title.slice(0, 24));
 
     for (const name of ['What decision is required', 'Why it matters', 'Business and technical context', 'Consequences of approval or rejection', 'Recommended option, alternatives, pros and cons', 'Relevant requirements, risks and dependencies', 'Related architecture diagrams', 'Previous versions of the source']) {
       await expect(page.getByRole('heading', { level: 2, name }), name).toBeVisible();
@@ -106,12 +112,12 @@ test.describe('navigation and the full record', () => {
 
     await page.getByRole('heading', { level: 1 }).click(); // move focus out of anything editable
     await page.keyboard.press('n');
-    await expect(page).toHaveURL(/\/decisions\/D-003\/review$/);
+    await expect(page).toHaveURL(new RegExp(`/decisions/${q2.next.id}/review$`));
     await expect(page.getByTestId('pending-position')).toContainText(/^2 of \d+$/);
     await page.keyboard.press('p');
-    await expect(page).toHaveURL(/\/decisions\/D-001\/review$/);
+    await expect(page).toHaveURL(new RegExp(`/decisions/${q1.next.id}/review$`));
     await page.getByTestId('next-pending').click();
-    await expect(page).toHaveURL(/\/decisions\/D-003\/review$/);
+    await expect(page).toHaveURL(new RegExp(`/decisions/${q2.next.id}/review$`));
   });
 
   test('previous versions and the timeline come from the repository, and an old version opens read-only', async ({ page }) => {
@@ -312,6 +318,30 @@ test.describe('reopening', () => {
 });
 
 test.describe('who may act', () => {
+  test('a stakeholder clarification is not approved here, whoever asks: the server refuses, the page explains, nothing reaches GitHub', async ({ page }) => {
+    await open(page, 'D-005');
+    await expect(page.getByTestId('lane-notice')).toContainText(/stakeholder clarification, not an architecture decision/i);
+    await signIn(page, USERS.owner); // an architecture owner: the role is right, the kind of record is not
+    await expect(page.getByTestId('identity-roles')).toContainText('architecture-owner');
+    await expect(page.getByTestId('action-approve-alternative')).toHaveAttribute('aria-disabled', 'true');
+    await page.getByTestId('action-approve-alternative').click({ force: true });
+    await expect(page.getByTestId('action-dialog')).toHaveCount(0);
+
+    const token = await csrf(page.request);
+    const rev = (await (await page.request.get('/api/v1/review/D-005')).json()) as { view: { revision: string } };
+    const before = prs().length;
+    for (const action of ['reject', 'defer']) {
+      const r = await post(page.request, '/api/v1/review/D-005/actions', { action, rationale: REASON, expectedRevision: rev.view.revision, idempotencyKey: `clarification-${action}-1` }, { 'x-studio-csrf': token });
+      expect(r.status(), action).toBe(403);
+      const body = (await r.json()) as { code: string; detail?: string };
+      expect(body.code, action).toBe('domain-not-approvable');
+      expect(JSON.stringify(body)).toMatch(/stakeholder clarification/i);
+    }
+    expect(prs().length, 'no pull request was created').toBe(before);
+    const audit = (await (await page.request.get('/api/v1/review/D-005')).json()) as { audit: { outcome: string; code: string }[] };
+    expect(audit.audit.filter((a) => a.code === 'domain-not-approvable').length).toBeGreaterThanOrEqual(2);
+  });
+
   test('a person with no role can read but cannot decide or comment, in the UI or through the API', async ({ page }) => {
     await open(page, 'D-004');
     await signIn(page, USERS.outsider);

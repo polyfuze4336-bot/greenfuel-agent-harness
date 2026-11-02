@@ -6,7 +6,7 @@ import { ArrowUpRight, ChevronDown, FilterX, Inbox, SlidersHorizontal } from 'lu
 import { useQueryState } from '@/lib/use-query-state.ts';
 import { adrTypeLabel } from '@/lib/format.ts';
 import { rowMatches, type DecisionRow } from '@/lib/intel/row.ts';
-import { STATUSES, type DuplicateCandidate, type NormStatus, type NormalizedDecision, type Suggestion } from '@/lib/intel/schema.ts';
+import { LANE_LABEL, NATURE_SHORT, STATUSES, type DuplicateCandidate, type NormStatus, type NormalizedDecision, type ReviewLane, type Suggestion } from '@/lib/intel/schema.ts';
 import type { Lookup } from '@/lib/lookup.ts';
 import { ChipGroup, SearchField, SelectField, Sheet, SortHeader, ToggleChip, rowNav } from '../explorer-kit.tsx';
 import { Card, EmptyState, NormStatusPill, Skeleton, SourceLink, Tag, btn } from '../ui.tsx';
@@ -57,6 +57,7 @@ export function DecisionExplorer({ rows: records, duplicates, suggestionIds }: {
   const text = qs.get('q').trim().toLowerCase();
   const statuses = qs.list('status');
   const type = qs.get('type');
+  const lane = qs.get('lane');
   const milestone = qs.get('milestone');
   const priority = qs.get('priority');
   const category = qs.get('category');
@@ -74,6 +75,7 @@ export function DecisionExplorer({ rows: records, duplicates, suggestionIds }: {
     (d: DecisionRow) =>
       rowMatches(d, text) &&
       (!type || d.kind === type) &&
+      (!lane || d.lane === lane) &&
       (!milestone || d.milestone === milestone) &&
       (!priority || (priority === 'none' ? !d.priority : d.priority === priority)) &&
       (!category || (d.category ? adrTypeLabel(d.category) === category : false)) &&
@@ -82,7 +84,7 @@ export function DecisionExplorer({ rows: records, duplicates, suggestionIds }: {
       (scope !== 'duplicate' || dupIds.has(d.id)) &&
       (scope !== 'suggestions' || sugIds.has(d.id)) &&
       (scope !== 'missing' || d.hasMissing),
-    [text, type, milestone, priority, category, scope, dupIds, sugIds],
+    [text, type, lane, milestone, priority, category, scope, dupIds, sugIds],
   );
 
   const counts = useMemo(() => {
@@ -110,8 +112,8 @@ export function DecisionExplorer({ rows: records, duplicates, suggestionIds }: {
     return entries.map(([name, items]) => ({ name, items }));
   }, [filtered, group]);
 
-  const filtersActive = !!(text || statuses.length || type || milestone || priority || category || scope);
-  const clear = () => qs.set({ q: null, status: null, type: null, milestone: null, priority: null, category: null, scope: null });
+  const filtersActive = !!(text || statuses.length || type || lane || milestone || priority || category || scope);
+  const clear = () => qs.set({ q: null, status: null, type: null, lane: null, milestone: null, priority: null, category: null, scope: null });
   const toggleStatus = (s: string) => qs.set({ status: (statuses.includes(s) ? statuses.filter((x) => x !== s) : [...statuses, s]).join(',') || null });
   const toggleScope = (s: string) => qs.set({ scope: scope === s ? null : s });
   const onSort = (f: string) => qs.set(sort === f ? { dir: dir === 'asc' ? 'desc' : 'asc' } : { sort: f === 'id' ? null : f, dir: null });
@@ -127,6 +129,7 @@ export function DecisionExplorer({ rows: records, duplicates, suggestionIds }: {
     <div>
       <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-3">
         <SearchField value={qs.get('q')} onChange={(v) => qs.set({ q: v })} label="Search decisions" placeholder="Search id, title, owner, text" />
+        <SelectField label="Kind" value={lane} onChange={(v) => qs.set({ lane: v })} options={[{ value: '', label: 'All kinds' }, ...(['architecture', 'stakeholder', 'verification', 'unclassified'] as ReviewLane[]).map((l) => ({ value: l, label: LANE_LABEL[l] }))]} />
         <SelectField label="Priority" value={priority} onChange={(v) => qs.set({ priority: v })} options={[{ value: '', label: 'Any priority' }, { value: 'Must', label: 'Must' }, { value: 'Should', label: 'Should' }, { value: 'Could', label: 'Could' }, { value: 'none', label: 'None traced' }]} />
         <button type="button" aria-expanded={moreOpen} aria-controls="more-filters" onClick={() => setMoreOpen((o) => !o)} className={`${btn} h-9`} data-testid="more-filters">
           <SlidersHorizontal aria-hidden className="size-4" />
@@ -203,10 +206,11 @@ export function DecisionExplorer({ rows: records, duplicates, suggestionIds }: {
                         <button type="button" data-row-btn onClick={() => qs.set({ id: d.id }, 'push')} className="block w-full text-left">
                           <span className="clamp-2 font-medium text-ink">{d.title}</span>
                           <span className="mt-0.5 block text-[12.5px] text-ink-3">
-                            {d.kind === 'adr' ? adrTypeLabel(d.category ?? undefined) : (d.category ?? 'Open entry')}
+                            {d.kind === 'adr' ? adrTypeLabel(d.category ?? undefined) : d.natures.length ? d.natures.map((n) => NATURE_SHORT[n]).join(' + ') : 'Kind not stated'}
                             {d.status === 'Approved' && d.approvalBasis !== 'signed' ? ' · unsigned' : ''}
                             {d.relatedReviews.length && d.kind === 'adr' ? ` · ${d.relatedReviews.join(', ')}` : ''}
                             {d.flagged ? ' · flagged for review' : ''}
+                            {d.invalidReferences ? ` · ${d.invalidReferences} invalid reference${d.invalidReferences > 1 ? 's' : ''}` : ''}
                             {dupIds.has(d.id) ? ' · overlap candidate' : ''}
                             {sugIds.has(d.id) ? ' · AI suggestions' : ''}
                           </span>

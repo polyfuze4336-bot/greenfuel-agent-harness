@@ -196,7 +196,9 @@ export function authorizeDecision(r: DecisionRequest, ctx: AuthContext): Authz {
     const why =
       cls.domain === 'regulatory'
         ? 'This is a regulatory or certification-scheme matter. Approving it, or approving a filing, is a separate process with its own approver; the Studio has no role for it and cannot record it. An architecture approval never authorises a filing or a deployment.'
-        : 'This record is not classified, so the Studio cannot tell which approval it needs. Classify it in the access policy first.';
+        : cls.domain === 'clarification'
+          ? 'This is a stakeholder clarification: a fact only the business can supply. It is answered by recording the fact in the repository, by the named role. It is not approved here, and its options are possible answers, not architecture options.'
+          : 'This record is not classified, so the Studio cannot tell which approval it needs. Classify it in the access policy first.';
     return fail('domain-not-approvable', why);
   }
   const has = permissionsOf(roles).has(permission);

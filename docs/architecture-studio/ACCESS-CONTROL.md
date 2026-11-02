@@ -24,7 +24,12 @@ An Administrator does not override approval requirements: `administrator` carrie
 
 ## Approval domains
 
-A decision's domain is **derived** from the record's own stated approver and id by rules in the access policy. A user never chooses it. The most restrictive match wins: regulatory, then deployment, then security, then architecture.
+A decision's domain is **derived** from the record itself. A user never chooses it. Two things decide it, in this order:
+
+1. **What the record asks for.** The register's Kind column says whether an entry is a stakeholder clarification (C), a regulatory verification (D) or an architecture decision (X). This comes first and overrides the owner's role text: a clarification owned by the programme owner is still a clarification. See [DECISION-WORKSPACE](../studio/DECISION-WORKSPACE.md).
+2. **Its stated approver and id**, through the rules in the access policy.
+
+The most restrictive match wins: regulatory, then clarification, then deployment, then security, then architecture.
 
 | Domain | Who can approve in the Studio |
 |---|---|
@@ -32,7 +37,8 @@ A decision's domain is **derived** from the record's own stated approver and id 
 | security | Security Reviewer, if designated |
 | deployment | Deployment Approver, if designated (the shipped policy has none) |
 | **regulatory** (certification-scheme or filing matters) | **Nobody.** The Studio has no role for it and cannot record it |
-| **unclassified** | **Nobody**, until the policy classifies it |
+| **clarification** (a stakeholder fact only the business can supply) | **Nobody.** It is answered by recording the fact in the repository. The Studio shows it and takes comments, and refuses to approve, reject, defer or reopen it |
+| **unclassified** | **Nobody**, until the policy classifies it. A register entry whose Kind is missing or unrecognised is unclassified: the Studio does not guess |
 
 Architecture approval therefore cannot authorise a regulatory filing or a production deployment: those are different permissions, different roles, or not Studio actions at all.
 
@@ -106,6 +112,8 @@ Validation of the request itself (valid option, rationale length, state machine)
 - **F-5 (consequence for this repository, see below):** under the shipped policy, many register decisions are not approvable in the Studio at all.
 
 ## What this means for this repository today
+
+**Update, Decision Workspace:** the table below classifies by owner text alone and predates the Kind rule. Applying the Kind first moves every stakeholder-only entry to `clarification` and every D entry to `regulatory`. At the commit this was checked against, 28 of 58 records are architecture choices, 22 are stakeholder clarifications and 8 are regulatory verifications, and only architecture choices appear in the review queue.
 
 Estimated from the 37 register entries in `docs/context/DECISION-REGISTER.md` using the shipped classification rules (text match on the stated approver; the live figure is the "Approval domains" panel on `/access`, which also counts ADRs):
 

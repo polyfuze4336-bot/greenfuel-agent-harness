@@ -413,7 +413,7 @@ const STATUS_AFTER: Partial<Record<ActionKind, string>> = { approve: 'Approved',
 const statusAfter = (a: ActionKind, now: string): string => STATUS_AFTER[a] ?? now;
 
 /** What the policy needs to classify a decision: its id, kind, and the approver the record itself names. */
-const recOf = (d: NormalizedDecision) => ({ id: d.id, kind: d.kind, approverText: d.requiredApproverRole?.text ?? null });
+const recOf = (d: NormalizedDecision) => ({ id: d.id, kind: d.kind, approverText: d.requiredApproverRole?.text ?? null, natures: d.natures });
 
 /** A person who is not signed in, used only to ask the policy how a decision is classified. */
 const ANON: VerifiedUser = { provider: 'github', subject: '0', tenantId: null, login: 'anonymous', name: null, id: null, type: 'User', verifiedBy: 'github-api', entraRoles: [], entraGroups: [], mfa: false, authAt: 0 };

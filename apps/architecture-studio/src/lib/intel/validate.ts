@@ -9,6 +9,7 @@ export const populated: Record<string, (r: NormalizedDecision) => boolean> = {
   description: (r) => !!r.description,
   businessJustification: (r) => !!r.businessJustification,
   category: (r) => !!r.category,
+  natures: (r) => r.natures.length > 0,
   priority: (r) => !!r.priority,
   recommendedOption: (r) => !!r.recommendedOption,
   options: (r) => r.options.length > 0,
@@ -26,7 +27,7 @@ export const populated: Record<string, (r: NormalizedDecision) => boolean> = {
 };
 
 /** Fields that must carry a source when populated. */
-const NEEDS_SOURCE = ['description', 'businessJustification', 'category', 'priority', 'recommendedOption', 'options', 'implications.cost', 'implications.security', 'implications.reliability', 'implications.dataSovereignty', 'implications.operational', 'requiredApproverRole', 'decisionOwner', 'decisionDate'];
+const NEEDS_SOURCE = ['description', 'businessJustification', 'category', 'natures', 'priority', 'recommendedOption', 'options', 'implications.cost', 'implications.security', 'implications.reliability', 'implications.dataSovereignty', 'implications.operational', 'requiredApproverRole', 'decisionOwner', 'decisionDate'];
 
 export function validateRecord(r: NormalizedDecision): ValidationIssue[] {
   const out: ValidationIssue[] = [];

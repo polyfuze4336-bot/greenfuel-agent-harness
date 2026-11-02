@@ -32,19 +32,21 @@ export const PRIVILEGED_ROLES: Role[] = [...APPROVER_ROLES, 'administrator'];
  *   security     : a security-specific gate.
  *   deployment   : an Azure deployment gate.
  *   regulatory   : a regulatory or certification-scheme matter, including filings. Not approvable in the Studio.
+ *   clarification: a stakeholder clarification, a fact only the business can supply. It is answered in the repository, not approved. Not approvable in the Studio.
  *   unclassified : no rule or designation says what it is. Not approvable until it is classified.
  */
-export const DOMAINS = ['architecture', 'security', 'deployment', 'regulatory', 'unclassified'] as const;
+export const DOMAINS = ['architecture', 'security', 'deployment', 'regulatory', 'clarification', 'unclassified'] as const;
 export type Domain = (typeof DOMAINS)[number];
 
 /** Most restrictive first. When a record matches several rules, the first listed domain wins. */
-export const DOMAIN_PRECEDENCE: Domain[] = ['regulatory', 'deployment', 'security', 'architecture'];
+export const DOMAIN_PRECEDENCE: Domain[] = ['regulatory', 'clarification', 'deployment', 'security', 'architecture'];
 
 export const DOMAIN_LABEL: Record<Domain, string> = {
   architecture: 'Architecture',
   security: 'Security gate',
   deployment: 'Azure deployment gate',
   regulatory: 'Regulatory or certification-scheme matter',
+  clarification: 'Stakeholder clarification',
   unclassified: 'Not classified',
 };
 

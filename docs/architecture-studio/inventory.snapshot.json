@@ -1,11 +1,11 @@
 {
   "generatedBy": "harness/scripts/studio-inventory.mjs",
   "git": {
-    "head": "ade030e83a8ded1d0f47213c73764bb4e604ed2c",
-    "branch": "studio/ui-four-destinations",
-    "originMain": "ade030e83a8ded1d0f47213c73764bb4e604ed2c",
+    "head": "81dea1a7ce9241464e46c8d7f5dc65617e603e13",
+    "branch": "studio/decision-workspace",
+    "originMain": "81dea1a7ce9241464e46c8d7f5dc65617e603e13",
     "commitsAheadOfOriginMain": 0,
-    "dirty": 32
+    "dirty": 33
   },
   "sources": {},
   "counts": {
@@ -2301,7 +2301,7 @@
     ".github": 3,
     ".mcp.json": 1,
     ".vscode": 2,
-    "apps": 391,
+    "apps": 395,
     "docs/architecture-studio": 2,
     "docs/azure": 2,
     "docs/business": 3,
