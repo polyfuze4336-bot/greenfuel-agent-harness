@@ -152,6 +152,14 @@ test.describe('approval, canonical only after the merge', () => {
     await expect(tracker(page).getByRole('listitem').filter({ hasText: 'Pull request created' })).toHaveAttribute('aria-current', 'step');
     await expect(page.getByTestId('rail-notice')).toContainText('Pull request created');
     await shot(page, '32-review-pull-request-created');
+    // The Changes page shows the same proposal, in the same state, with its pull request. It is not yet counted as applied.
+    const changes = await page.context().newPage();
+    await changes.goto('/changes');
+    const inFlight = changes.getByTestId('proposal-row').filter({ hasText: 'ADR-0020' });
+    await expect(inFlight).toHaveCount(1);
+    await expect(inFlight).toContainText('Pull request created');
+    await expect(inFlight.getByRole('link', { name: /^Pull request \d+ on GitHub/ })).toBeVisible();
+    await changes.close();
     // Not canonical yet: the pill, the API and main all still say what they said before.
     await expect(status(page)).toContainText('Proposed');
     expect(((await (await request.get('/api/v1/decisions/ADR-0020')).json()) as { decision: { status: string } }).decision.status).toBe('Proposed');
@@ -173,6 +181,13 @@ test.describe('approval, canonical only after the merge', () => {
     await expect(status(page)).toContainText('Approved');
     await expect(page.getByText('Status comes from a review record on the canonical branch')).toBeVisible();
     await shot(page, '33-review-canonical-approved');
+    // After the merge it is no longer pending, and the approval is in the recorded history with the person who made it.
+    const after = await page.context().newPage();
+    await after.goto('/changes');
+    await expect(after.getByTestId('proposal-row').filter({ hasText: 'ADR-0020' })).toHaveCount(0);
+    await expect(after.getByTestId('audit-list')).toContainText('ADR-0020');
+    await expect(after.getByTestId('audit-list')).toContainText(`${USERS.owner.login}`);
+    await after.close();
     expect(((await (await request.get('/api/v1/decisions/ADR-0020')).json()) as { decision: { status: string; approvalBasis: string } }).decision).toMatchObject({ status: 'Approved', approvalBasis: 'review-record' });
     expect(reviewFiles()).toContain('docs/decision-reviews/ADR-0020/0001-approve.json');
     await expect(page.getByTestId('timeline')).toContainText('Approve the recommended option');

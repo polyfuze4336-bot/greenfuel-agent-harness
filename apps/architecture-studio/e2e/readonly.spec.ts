@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { ROUTES, gitOut, ready } from './helpers.ts';
+import { ALL_PAGES, gitOut, ready } from './helpers.ts';
 
 test.describe('read-only proof', () => {
   test('a full tour issues only GET requests (plus the cache-reset POST) and leaves the repository untouched', async ({ page }) => {
@@ -10,7 +10,7 @@ test.describe('read-only proof', () => {
       if (u.origin !== 'http://localhost:3100') writes.push(`EXTERNAL ${r.method()} ${r.url()}`);
       else if (r.method() !== 'GET' && !(r.method() === 'POST' && (u.pathname === '/api/v1/refresh' || u.pathname === '/api/v1/register/sync'))) writes.push(`${r.method()} ${u.pathname}`);
     });
-    for (const r of ROUTES) await ready(page, r.path);
+    for (const r of ALL_PAGES) await ready(page, r.path);
     await ready(page, '/decisions?id=D-003');
     await page.keyboard.press('Escape');
     await page.keyboard.press('Control+k');
@@ -25,7 +25,7 @@ test.describe('read-only proof', () => {
   });
 
   test('there is no control that writes: no form, no submit, no editable record field', async ({ page }) => {
-    for (const r of ROUTES) {
+    for (const r of ALL_PAGES) {
       await ready(page, r.path);
       expect(await page.locator('form, input[type=submit], button[type=submit], textarea, [contenteditable=true]').count(), r.path).toBe(0);
     }
@@ -36,7 +36,7 @@ test.describe('read-only proof', () => {
     page.on('request', (r) => {
       if (!r.url().startsWith('http://localhost:3100') && !r.url().startsWith('data:') && !r.url().startsWith('blob:')) external.push(r.url());
     });
-    for (const r of ROUTES) await ready(page, r.path);
+    for (const r of ALL_PAGES) await ready(page, r.path);
     expect(external).toEqual([]);
   });
 });

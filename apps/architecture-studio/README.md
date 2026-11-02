@@ -32,10 +32,13 @@ npm start          # http://localhost:3100, loopback only
 
 ## What it shows
 
+The Studio has four destinations: **Overview**, **Decisions**, **Changes** and **Presentation**. Pages that used to be top-level (Work queue, Architecture & evidence, Approvals, Readiness) are reached from section tabs inside Decisions and Changes, and keep their own addresses. Press `g` then `o`, `d`, `c` or `p` to move between destinations. See [FRONTEND-ACCEPTANCE](../../docs/studio/FRONTEND-ACCEPTANCE.md) for the measurements and screenshots.
+
 | Page | Source of truth it reads |
 |---|---|
-| Overview | Every figure is derived; each carries its definition |
-| Decision Register | `docs/adr/*.md` (20 ADRs) and `docs/context/DECISION-REGISTER.md` (37 open entries) |
+| Overview | Every figure is derived; each carries its definition. Answers what needs attention, what is blocking progress and what changed |
+| Changes | Pull requests and review actions recorded by this Studio, the approval registry and git history |
+| Decisions (Register) | `docs/adr/*.md` (20 ADRs) and `docs/context/DECISION-REGISTER.md` (37 open entries) |
 | Work Queue | TODO, the roadmap, the capstone backlog, gaps and rubric traceability, the security review, residency validation, the risk register, decisions, design gates and requirement gaps; merged records under `docs/work-items/`. See [WORK-QUEUE](../../docs/architecture-studio/WORK-QUEUE.md) |
 | Approvals | `harness/policy/approvers.json`, `docs/approvals/`, Proposed ADRs and design reviews |
 | Architecture & Evidence | design reviews, requirements and traceability, risks, assumptions, evidence records, documents |

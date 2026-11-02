@@ -90,7 +90,9 @@ test.describe('loading states', () => {
   test('client navigation shows a skeleton while repository data loads', async ({ page }) => {
     await page.goto('http://localhost:3102/');
     await expect(page.getByRole('heading', { level: 1, name: 'Overview' })).toBeVisible({ timeout: 20_000 });
-    await page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: /^Work Queue/ }).click();
+    await page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: /^Decisions/ }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Decisions' })).toBeVisible({ timeout: 20_000 });
+    await page.getByRole('navigation', { name: 'Section' }).getByRole('link', { name: 'Work queue' }).click();
     await expect(page.getByTestId('queue-loading')).toBeVisible();
     await expect(page.getByTestId('queue-loading')).toBeHidden({ timeout: 20_000 });
     await expect(page.getByRole('heading', { level: 1, name: 'Work Queue' })).toBeVisible();

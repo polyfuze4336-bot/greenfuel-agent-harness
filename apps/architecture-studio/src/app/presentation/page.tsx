@@ -7,7 +7,7 @@ import { Card, NeutralPill, PageHeader, Section, SourceLink, Tag } from '@/compo
 import { utcDateTime } from '@/lib/format.ts';
 import { getModel } from '@/lib/repo/index.ts';
 
-export const metadata = { title: 'Presentation Studio' };
+export const metadata = { title: 'Presentation' };
 export const dynamic = 'force-dynamic';
 
 export default async function PresentationPage() {
@@ -17,7 +17,7 @@ export default async function PresentationPage() {
   const pkgDocs = m.docs.filter((d) => d.path.startsWith('docs/capstone/presentation/'));
   return (
     <>
-      <PageHeader title="Presentation Studio" lede="The capstone presentation package as it exists in the repository, and how much of it a person has actually rehearsed. The deck builder generates an editable PowerPoint from the repository; the Studio never edits the repository." />
+      <PageHeader title="Presentation" lede="The capstone package as it exists in the repository, and how much of it a person has actually rehearsed. The deck builder generates an editable PowerPoint from the repository; it never edits the repository." />
 
       <Card className="mb-8 flex flex-wrap items-center justify-between gap-4 p-5" data-testid="deck-builder-card">
         <div className="max-w-2xl">

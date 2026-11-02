@@ -11,6 +11,7 @@ The Studio is a web application in [`apps/architecture-studio/`](../../apps/arch
 | Understand the current state and its problems | [CURRENT-STATE-AUDIT](CURRENT-STATE-AUDIT.md) |
 | See where it is going | [TARGET-ARCHITECTURE](TARGET-ARCHITECTURE.md), [SIMPLIFICATION-PLAN](SIMPLIFICATION-PLAN.md) |
 | Judge "done" | [PRODUCT-ACCEPTANCE-CRITERIA](PRODUCT-ACCEPTANCE-CRITERIA.md) |
+| See the four-destination interface, its performance numbers and screenshots | [FRONTEND-ACCEPTANCE](FRONTEND-ACCEPTANCE.md) |
 | Approve a decision | [APPROVAL-WORKFLOW-GUIDE](../studio-acceptance/APPROVAL-WORKFLOW-GUIDE.md) |
 
 ## Reference, by topic

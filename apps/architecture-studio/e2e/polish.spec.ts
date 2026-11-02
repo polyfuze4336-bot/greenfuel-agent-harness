@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 
 // Product polish checks (acceptance criteria UX-01 and UX-02): a quiet console on every page, and no raw Markdown markers in any decision.
-const PAGES = ['/', '/decisions', '/queue', '/queue/blocking', '/approvals', '/architecture', '/baseline', '/access', '/presentation', '/presentation/deck', '/decisions/ADR-0016', '/decisions/ADR-0016/review', '/decisions/ADR-0016/compare'];
+const PAGES = ['/', '/decisions', '/changes', '/queue', '/queue/blocking', '/approvals', '/architecture', '/baseline', '/access', '/presentation', '/presentation/deck', '/decisions/ADR-0016', '/decisions/ADR-0016/review', '/decisions/ADR-0016/compare'];
 
 function watch(page: Page) {
   const problems: string[] = [];

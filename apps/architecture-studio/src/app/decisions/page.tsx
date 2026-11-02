@@ -10,7 +10,7 @@ import { getModel } from '@/lib/repo/index.ts';
 import { runtime } from '@/lib/workflow/http.ts';
 import { pendingOrder } from '@/lib/workflow/runtime.ts';
 
-export const metadata = { title: 'Decision Register' };
+export const metadata = { title: 'Decisions' };
 export const dynamic = 'force-dynamic';
 
 export default async function DecisionsPage() {
@@ -22,18 +22,20 @@ export default async function DecisionsPage() {
   const refs = [...new Set([...m.repo.remoteRefs.map((x) => x.name), 'HEAD~1'])];
   return (
     <>
-      <PageHeader title="Decision Register" lede={`${r.stats.byKind.adr} architecture decision records and ${r.stats.byKind['register-entry']} open register entries, normalized to one schema. Every field is copied from a source file with its line, or left empty and declared. Statuses are mapped by written rules and never promoted.`}>
+      <PageHeader title="Decisions" lede={`${r.stats.byKind.adr} architecture decision records and ${r.stats.byKind['register-entry']} open register entries. Every field comes from a source file, or is shown as empty.`}>
         {queue[0] ? (
-          <Link href={`/decisions/${queue[0].id}/review`} data-testid="start-review" className="inline-flex items-center gap-2 rounded-lg bg-navy px-3.5 py-2 text-[13.5px] font-medium text-white hover:opacity-90">
+          <Link href={`/decisions/${queue[0].id}/review`} data-testid="start-review" className="inline-flex items-center gap-2 rounded-lg bg-selected px-3.5 py-2 text-[13.5px] font-medium text-selected-ink hover:opacity-90">
             <Gavel aria-hidden className="size-4" />
             Review pending decisions ({queue.length})
           </Link>
         ) : null}
       </PageHeader>
-      <RegisterHealth stats={r.stats} validation={r.validation} duplicates={r.duplicates} suggestionCount={r.suggestions.length} commit={r.commit} refs={refs} warnings={r.warnings} />
       <Suspense fallback={<PageSkeleton />}>
         <DecisionExplorer rows={r.records.map(toRow)} duplicates={r.duplicates} suggestionIds={[...new Set(r.suggestions.map((s) => s.decisionId))]} />
       </Suspense>
+      <div className="mt-10">
+        <RegisterHealth stats={r.stats} validation={r.validation} duplicates={r.duplicates} suggestionCount={r.suggestions.length} commit={r.commit} refs={refs} warnings={r.warnings} />
+      </div>
     </>
   );
 }

@@ -137,7 +137,7 @@ export function QueueExplorer() {
 
       <div role="group" aria-label="Queue views" className="mb-1 flex flex-wrap gap-1.5">
         {VIEWS.map((v) => (
-          <button key={v} type="button" data-testid={`view-${v}`} aria-pressed={v === view} onClick={() => setView(v)} className={`inline-flex h-9 items-center gap-2 rounded-lg border px-3 text-[13.5px] font-medium transition-colors ${v === view ? 'border-navy bg-navy text-white' : 'border-hairline-strong bg-surface text-ink-2 hover:bg-surface-2'}`}>
+          <button key={v} type="button" data-testid={`view-${v}`} aria-pressed={v === view} onClick={() => setView(v)} className={`inline-flex h-9 items-center gap-2 rounded-lg border px-3 text-[13.5px] font-medium transition-colors ${v === view ? 'border-selected bg-selected text-selected-ink' : 'border-hairline-strong bg-surface text-ink-2 hover:bg-surface-2'}`}>
             {VIEW_SHORT[v]}
             <span className={`tnum text-[12px] ${v === view ? 'text-white/70' : 'text-ink-3'}`} data-testid={`count-${v}`}>
               {v === 'mine' && !me ? '–' : counts[v]}
