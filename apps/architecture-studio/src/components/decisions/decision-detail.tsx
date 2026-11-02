@@ -8,6 +8,7 @@ import type { Lookup } from '@/lib/lookup.ts';
 import { RefChips, SourceBlock } from '../record-bits.tsx';
 import { SourcePreviewButton } from '../source-preview.tsx';
 import { AiBadge, NeutralPill, NormStatusPill, SourceLink, Tag, VerdictPill } from '../ui.tsx';
+import { RichText } from '../rich-text.tsx';
 import { adrTypeLabel } from '@/lib/format.ts';
 
 const APPROVAL_TEXT: Record<NormalizedDecision['approvalBasis'], string> = {
@@ -35,7 +36,7 @@ function ClaimList({ claims, empty }: { claims: Claim[]; empty: string }) {
     <ul className="space-y-1.5">
       {claims.map((c, i) => (
         <li key={i} className="text-[13px] leading-5 text-ink-2">
-          {c.text}
+          <RichText text={c.text} />
           <span className="ml-2 inline-block align-middle">
             <SourceLink src={c.src} />
           </span>
@@ -116,17 +117,17 @@ export function SuggestionList({ items, lookup, empty }: { items: Suggestion[]; 
               {s.optionKey ? ` · option ${s.optionKey}` : ''}
             </span>
           </div>
-          <p className="text-[13.5px] leading-5">{s.text}</p>
+          <p className="text-[13.5px] leading-5"><RichText text={s.text} /></p>
           <p className="mt-1.5 text-[12.5px] leading-5 text-ink-3">
             <span className="font-medium">Why: </span>
             {s.rationale}
           </p>
-          <p className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[12px] text-ink-3">
+          <div className="mt-1.5 flex flex-wrap items-center gap-1.5 text-[12px] text-ink-3">
             Drawn from <RefChips ids={s.basedOn.filter((b) => !b.includes('/'))} lookup={lookup} />
             {s.basedOn.filter((b) => b.includes('/')).map((b) => (
               <SourceLink key={b} src={{ path: b, line: 1 }} />
             ))}
-          </p>
+          </div>
           <p className="mt-1 text-[11.5px] text-ink-3">
             Written by {s.generatedBy.tool} on {s.generatedBy.date}. A suggestion, not a fact: it changes no status and grants no approval.
           </p>
@@ -191,8 +192,8 @@ export function DecisionDetail({ d, lookup, duplicates = [], suggestions = [], t
         </Block>
       ) : null}
 
-      <Block title={FIELD_LABEL.description!}>{d.description ? <p className="text-[14px] leading-6 whitespace-pre-line text-ink">{d.description}</p> : <Missing />}</Block>
-      <Block title={FIELD_LABEL.businessJustification!}>{d.businessJustification ? <p className="text-[14px] leading-6 whitespace-pre-line text-ink">{d.businessJustification}</p> : <Missing />}</Block>
+      <Block title={FIELD_LABEL.description!}>{d.description ? <p className="text-[14px] leading-6 whitespace-pre-line text-ink"><RichText text={d.description} /></p> : <Missing />}</Block>
+      <Block title={FIELD_LABEL.businessJustification!}>{d.businessJustification ? <p className="text-[14px] leading-6 whitespace-pre-line text-ink"><RichText text={d.businessJustification} /></p> : <Missing />}</Block>
 
       <Block title={FIELD_LABEL.recommendedOption!}>
         {d.recommendedOption ? (
@@ -226,7 +227,7 @@ export function DecisionDetail({ d, lookup, duplicates = [], suggestions = [], t
                 <dd className="text-[13.5px] leading-5 text-ink-2">
                   {v ? (
                     <>
-                      <span className="whitespace-pre-line">{v.text}</span>
+                      <span className="whitespace-pre-line"><RichText text={v.text} /></span>
                       <span className="mt-1 block">
                         <SourceLink src={v.src} />
                       </span>
@@ -327,7 +328,7 @@ export function DecisionDetail({ d, lookup, duplicates = [], suggestions = [], t
                   <span className="text-ink-3">{e.date ?? 'no date'}</span>
                   {e.actor ? <span className="text-ink-3">· {e.actor}</span> : null}
                 </span>
-                <span className="mt-1 block text-ink-2">{e.text}</span>
+                <span className="mt-1 block text-ink-2"><RichText text={e.text} /></span>
                 <span className="mt-1 block">
                   <SourceLink src={e.src} />
                 </span>

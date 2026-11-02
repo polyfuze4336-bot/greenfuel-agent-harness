@@ -4,6 +4,8 @@ A GitHub Copilot harness for VS Code, built to help design, implement, test, dep
 
 **Status: Phase 0, harness foundation only.** This repository contains no bunkering application code, no infrastructure code that can be deployed, and has created no Azure resources. Raising the phase is a human decision recorded in an ADR. The harness has passed a final acceptance review as a Phase 0 design-and-governance harness; it is **not ready** for application development or Azure deployment. See the [acceptance report](docs/acceptance/HARNESS-ACCEPTANCE-REPORT.md) for what is verified, what is not and the critical blockers. Licensed under the [MIT licence](LICENSE).
 
+The repository also contains the **Architecture Decision Studio** (`apps/architecture-studio/`, Next.js). It was acceptance-tested locally but has **not been deployed**, and its approval workflow has not yet been used for a real approval; see [docs/studio-acceptance/ACCEPTANCE-REPORT.md](docs/studio-acceptance/ACCEPTANCE-REPORT.md).
+
 Every standard, scheme and Azure capability named in the documents is a candidate to verify, not a confirmed fact, and no figure in the designs is sourced unless it says so.
 
 ## What is here
@@ -18,6 +20,7 @@ Every standard, scheme and Azure capability named in the documents is a candidat
 | Evidence | `harness/scripts/record-evidence.mjs`, `harness/scripts/validate-harness.mjs`, `harness/scripts/validate-context.mjs`, `harness/scripts/validate-architecture.mjs`, `harness/scripts/design-gate.mjs`, `tests/`, CI in `.github/workflows/validate.yml` |
 | Decisions and state | [docs/adr/](docs/adr/), [docs/state/STATE.md](docs/state/STATE.md), [docs/state/TODO.md](docs/state/TODO.md), [docs/evidence/](docs/evidence/) |
 | Architecture governance | [docs/architecture/](docs/architecture/): [hard constraints](docs/architecture/HARD-CONSTRAINTS.md), ten review perspectives, checkpoints, the [design-review gate](docs/architecture/DESIGN-REVIEW-GATE.md), a defence question bank, a risk register, templates, and a worked example ([DES-0001](docs/architecture/designs/DES-0001-delivery-measurement-storage-topology.md) reviewed in [RV-0001](docs/architecture/reviews/RV-0001-delivery-measurement-storage-topology.md)). Roles: `design-reviewer`, `architecture-critic` |
+| Architecture Decision Studio | A web application in [apps/architecture-studio/](apps/architecture-studio/) that reads the decisions, tasks and approvals in this repository, lets authorized people review and approve them one at a time through reviewed pull requests, and computes build readiness. **It is governance tooling, not the bunkering application** (the Studio is outside the application's sovereignty rules, owner decision under HC-11). Run it, and read what is and is not verified: [docs/studio/](docs/studio/) and [docs/studio-acceptance/](docs/studio-acceptance/) |
 | Design of the harness | [docs/harness/](docs/harness/) |
 | Product context baseline | [PROBLEMSTATEMENT.md](PROBLEMSTATEMENT.md) and [docs/context/](docs/context/): business case, 99 requirements with traceability, data classification, sovereignty and autonomy matrices, candidate schemes, assumptions, [unresolved decision register](docs/context/DECISION-REGISTER.md), [context-loading strategy](docs/context/CONTEXT-LOADING-STRATEGY.md) |
 

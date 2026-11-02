@@ -15,6 +15,7 @@ Forbidden until a human raises the phase through an Accepted ADR: application co
 | Layer | Lives in | Purpose |
 |---|---|---|
 | Coding harness | `.github/` (agents, skills, instructions, hooks), `harness/`, `docs/`, `tests/` | Helps people design, build, test and operate the product |
+| Architecture Decision Studio | `apps/architecture-studio/` | A governance web application for these decisions. It is not the bunkering application and is outside its sovereignty rules (owner decision, HC-11). Agents may change it only under the same approval rules as any code; it never approves anything |
 | Business agents (future) | `src/` (does not exist yet) | Run inside the product, serve end users, have their own identities, data scope and evaluations |
 
 Never define a business agent in `.github/agents/`. Never give a harness agent a production credential. Harness agents are not part of the product runtime.
@@ -37,12 +38,13 @@ npm run validate    # structural, baseline, architecture-gate and policy checks 
 node harness/scripts/design-gate.mjs <review.md>   # design review gate (add --select X for a what-if, --coverage for trace coverage)
 node harness/scripts/record-evidence.mjs --id EV-NNNN --claim "..." -- <command>
 ```
-Requires Node.js 20 or later. There are no packages to install.
+Requires Node.js 20 or later. The harness has no packages to install. The Studio is separate: Node 22.18 or later, and `npm ci` in `apps/architecture-studio/`; its commands are `npm run typecheck`, `npm run test:unit`, `npm run build` and `npm run start` (http://localhost:3100).
 
 ## Where things are
 - Harness design: [docs/harness/](docs/harness/) — start with [HARNESS-ARCHITECTURE](docs/harness/HARNESS-ARCHITECTURE.md).
 - Product context baseline: [PROBLEMSTATEMENT](PROBLEMSTATEMENT.md) and [docs/context/](docs/context/) (requirements, traceability, decision register, matrices). Load through profiles; see [CONTEXT-LOADING-STRATEGY](docs/context/CONTEXT-LOADING-STRATEGY.md).
 - Architecture governance: [docs/architecture/](docs/architecture/) (hard constraints, perspectives, checkpoints, gate, question bank, risk register, templates, designs and reviews).
+- Architecture Decision Studio: [docs/studio/](docs/studio/) (audit, target architecture, acceptance criteria) and [docs/studio-acceptance/](docs/studio-acceptance/) (test, security and acceptance reports, runbook).
 - Decisions: [docs/adr/](docs/adr/). Evidence: [docs/evidence/](docs/evidence/). Resume point: [docs/state/STATE.md](docs/state/STATE.md). Owner to-do list: [docs/state/TODO.md](docs/state/TODO.md).
 - Agents: twelve specialists in `.github/agents/`, summarised in [AGENT-ROSTER](docs/agents/AGENT-ROSTER.md). Planners (`orchestrator`, `maritime-domain`, `security-reviewer`, `architecture-critic`) are read-only. Authors edit only their own folders and cannot run commands. Executors (`qa-engineer`, `design-reviewer`) run a short allow-list of single commands. Only the `orchestrator` delegates. Policy: [agent-policy.json](harness/policy/agent-policy.json); check: `node harness/scripts/validate-agents.mjs`.
 - Policy data: `harness/policy/command-policy.json`. Hook: `harness/hooks/policy-guard.cjs`, registered by `.github/hooks/policy.json`.

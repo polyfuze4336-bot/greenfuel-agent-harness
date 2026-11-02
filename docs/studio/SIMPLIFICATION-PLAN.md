@@ -13,7 +13,7 @@ Based on [CURRENT-STATE-AUDIT](CURRENT-STATE-AUDIT.md). Principle: **the Studio 
 | Three `createRequire` sites into `harness/` | **Merge** into one module `src/lib/harness-bridge.ts` | F-09 |
 | Deck builder (`src/lib/deck`, `components/deck`, `scripts/deck.ts`, `render-deck.ps1`, `pptxgenjs`, `jszip`) | **Isolate** as an optional feature: own folder, own route group, loaded only when enabled; declare `jszip`. Not deleted: it supports a capstone deliverable | F-10, F-11 |
 | Studio docs in `docs/architecture-studio/` (14), `docs/studio-acceptance/` (10), `docs/studio/` (4) | **Merge** into `docs/studio/` with a one-page index; leave short redirect stubs so existing links do not break | F-04 |
-| `docs/state/loops/` (65 files) and similar generated traces | **Stop tracking new ones** (publish as CI artifacts); keep the existing audit trail; redact the 6 files with a local path in a new commit | F-12 |
+| `docs/state/loops/` (65 files) and similar generated traces | **Stop tracking new ones** (publish as CI artifacts); keep the existing audit trail untouched (it is hash-sealed, see A5) | F-12 |
 | `memory/decisions/DEC-*.json` mirror of ADRs | **Derive** by the existing importer in CI instead of hand-synchronizing; the ADR stays authoritative | F-08 |
 | Register and Work Queue server-rendered in full | **Page** them (50 rows) and load detail on demand | U-5, U-6, U-10 |
 | Explanatory prose on every page | **Cut** to one headline, one number, one action; move definitions behind an info popover | U-4, U-7 |
@@ -45,7 +45,7 @@ Each phase ends with a measurable exit. Effort: S under 1 day, M 1 to 3 days, L 
 | A2 | `studio` CI job: `npm ci`, `tsc`, unit tests, `next build` on Ubuntu | S | Job green on a PR; fails on an injected type error |
 | A3 | Fix hydration #418 and render Markdown in decision text | S | Zero console errors on 13 pages; no literal `**` |
 | A4 | Update README, AGENTS.md, Studio `package.json` description; docs index | S | A newcomer reaches the Studio from README in one click |
-| A5 | Declare `jszip`; redact the 6 local paths | S | `npm ls` clean; grep finds no local path |
+| A5 | Declare `jszip`. **Redaction of the 6 local-path files was tried and reverted:** those loop records are hash-sealed, redacting breaks `validate-loop` (verified), and rewriting evidence to hide a path is the wrong trade. The path stays in history and in those 6 files | S | `npm ls` clean; a test fails on any undeclared import |
 | A6 **(owner)** | Ruleset on `main`: PR required, `validate` and the new `studio` job required, CODEOWNERS review, no force push, no bypass for the Studio's App | S | `gh api …/branches/main/protection` returns rules; a direct push is refused |
 
 ### Phase B: make it a control centre with real data (about 3 days)

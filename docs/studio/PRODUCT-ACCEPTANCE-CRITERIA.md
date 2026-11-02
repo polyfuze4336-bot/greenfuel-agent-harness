@@ -57,7 +57,7 @@ How a reviewer decides that the simplified Studio is a polished, trustworthy dec
 | SEC-03 | A deployment cannot start in development sign-in mode | `STUDIO_REQUIRE_ENTRA=1` enforced by configuration check | Unit test and startup refusal |
 | SEC-04 | Step-up re-authentication uses `auth_time` or equivalent | Met | Unit test with real Entra claim shapes |
 | SEC-05 | CSP without `unsafe-inline` for scripts | Met | Probe |
-| SEC-06 | No secret or local path in tree or history going forward; the 6 local-path files are redacted in a new commit | 0 matches | Secret and path scan in CI |
+| SEC-06 | No secret and no new local path in the tree going forward. The 6 existing local-path files are hash-sealed evidence and stay as they are (redaction breaks `validate-loop`) | 0 secret matches; 0 local paths outside those 6 sealed files | Secret and path scan in CI |
 | SEC-07 | Dependency audit clean | 0 high or critical | `npm audit` in CI |
 | SEC-08 | A pull request from a fork cannot reach secrets or write to the repository | Verified | Repo settings check plus a test PR from a fork |
 | SEC-09 | AI, bots and agents cannot approve; hand-written, replayed or altered approvals are rejected | Met | Existing tests (must stay green) |

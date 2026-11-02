@@ -5,6 +5,7 @@ import type { NormalizedDecision } from '@/lib/intel/schema.ts';
 import type { Consequences, Diagram } from '@/lib/workflow/context.ts';
 import type { Requirement, Risk } from '@/lib/repo/types.ts';
 import { utcDate } from '@/lib/format.ts';
+import { RichText } from '../rich-text.tsx';
 import { SourcePreviewButton } from '../source-preview.tsx';
 import { NeutralPill, SourceLink, Tag } from '../ui.tsx';
 
@@ -26,10 +27,10 @@ export function Required({ d, dependents, blocked }: { d: NormalizedDecision; de
   return (
     <>
       <PacketBlock title="What decision is required" id="required">
-        {d.description ? <p className="text-[14.5px] leading-6 whitespace-pre-line">{d.description}</p> : <Missing />}
+        {d.description ? <p className="text-[14.5px] leading-6 whitespace-pre-line"><RichText text={d.description} /></p> : <Missing />}
       </PacketBlock>
       <PacketBlock title="Why it matters" id="why">
-        {d.businessJustification ? <p className="text-[14.5px] leading-6 whitespace-pre-line">{d.businessJustification}</p> : <Missing />}
+        {d.businessJustification ? <p className="text-[14.5px] leading-6 whitespace-pre-line"><RichText text={d.businessJustification} /></p> : <Missing />}
         <dl className="mt-3 grid gap-x-6 gap-y-1.5 text-[13.5px] sm:grid-cols-2">
           <div>
             <dt className="inline text-ink-3">Priority: </dt>
@@ -80,7 +81,7 @@ export function ConsequencesBlock({ c }: { c: Consequences }) {
         <li key={i} className="flex gap-2">
           <span aria-hidden className="mt-2 size-1 shrink-0 rounded-full bg-ink-3" />
           <span>
-            {x.text}
+            <RichText text={x.text} />
             {x.src ? (
               <>
                 {' '}
