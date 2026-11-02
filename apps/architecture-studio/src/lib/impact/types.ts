@@ -75,7 +75,10 @@ export interface UnresolvedReference {
 
 export interface SuggestedRelationship {
   id: string;
+  /** The other end of the suggested link. */
   targetId: string;
+  /** Whether the AI suggested this decision relates to the other record, or the other record relates to this decision. */
+  direction: 'from-this' | 'to-this';
   relation: string;
   rationale: string;
   generatedBy: { tool: string; date: string };

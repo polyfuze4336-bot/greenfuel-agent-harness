@@ -57,8 +57,14 @@ export function validateAiChallenge(raw: unknown, path: string, decisionId: stri
       else {
         const text = files.read(p) ?? '';
         const lines = text.split('\n').length;
-        if (line !== null && (line < 1 || line > lines)) problem = `line ${line} is outside the file (${lines} lines)`;
-        else if (quote && !norm(text).includes(norm(quote))) problem = 'the quoted text does not appear in the file';
+        if (line === null) problem = 'no line number is given';
+        else if (!quote) problem = 'no quoted text is given';
+        else if (line < 1 || line > lines) problem = `line ${line} is outside the file (${lines} lines)`;
+        else {
+          // The quote must sit at the cited line, or run on from it: a quote found elsewhere in the file does not support this citation.
+          const window = text.split('\n').slice(Math.max(0, line - 2), line + 5).join(' ');
+          if (!norm(window).includes(norm(quote))) problem = norm(text).includes(norm(quote)) ? 'the quoted text is in the file but not at the cited line' : 'the quoted text does not appear in the file';
+        }
       }
       return { path: p, line, quote, verified: problem === null, problem };
     });

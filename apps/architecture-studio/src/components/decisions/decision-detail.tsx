@@ -204,9 +204,22 @@ export function DecisionDetail({ d, lookup, duplicates = [], suggestions = [], t
               Challenge this decision
             </button>
           </div>
-          <div role="tablist" aria-label="Decision views" className="mt-5 flex gap-1 border-b border-hairline">
+          <div
+            role="tablist"
+            aria-label="Decision views"
+            className="mt-5 flex gap-1 border-b border-hairline"
+            onKeyDown={(e) => {
+              const order = ['record', 'impact', 'challenge'] as const;
+              const at = order.indexOf(view);
+              const next = e.key === 'ArrowRight' ? order[(at + 1) % 3] : e.key === 'ArrowLeft' ? order[(at + 2) % 3] : e.key === 'Home' ? order[0] : e.key === 'End' ? order[2] : null;
+              if (!next) return;
+              e.preventDefault();
+              setView(next);
+              document.getElementById(`tab-${next}`)?.focus();
+            }}
+          >
             {([['record', 'Record'], ['impact', 'Impact'], ['challenge', 'Challenge']] as const).map(([k, label]) => (
-              <button key={k} type="button" role="tab" id={`tab-${k}`} aria-selected={view === k} aria-controls={`panel-${k}`} data-testid={`tab-${k}`} onClick={() => setView(k)} className={`relative px-3 pt-1.5 pb-2.5 text-[13.5px] transition-colors ${view === k ? 'font-semibold text-ink after:absolute after:inset-x-3 after:bottom-[-1px] after:h-[2px] after:rounded-full after:bg-accent' : 'text-ink-2 hover:text-ink'}`}>
+              <button key={k} type="button" role="tab" id={`tab-${k}`} aria-selected={view === k} tabIndex={view === k ? 0 : -1} aria-controls={`panel-${k}`} data-testid={`tab-${k}`} onClick={() => setView(k)} className={`relative px-3 pt-1.5 pb-2.5 text-[13.5px] transition-colors ${view === k ? 'font-semibold text-ink after:absolute after:inset-x-3 after:bottom-[-1px] after:h-[2px] after:rounded-full after:bg-accent' : 'text-ink-2 hover:text-ink'}`}>
                 {label}
               </button>
             ))}

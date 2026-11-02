@@ -139,6 +139,11 @@ export function ExaminerPanel({ id }: { id: string }) {
       <section className="mt-4" aria-labelledby="against-h">
         <h3 id="against-h" className="mb-1 text-[13px] font-semibold text-ink-2">The strongest argument against</h3>
         <ul className="rounded-xl border border-hairline px-3.5" data-testid="examiner-headline"><Entry e={d.headline.counterArgument} /></ul>
+        {aiBySection('against').filter((c) => c.supported).length ? (
+          <ul className="mt-2 divide-y divide-hairline rounded-xl border border-dashed border-hairline-strong px-3.5" data-testid="ai-against">
+            {aiBySection('against').filter((c) => c.supported).map((c, i) => <Claim key={i} c={c} />)}
+          </ul>
+        ) : null}
       </section>
 
       {d.injection.length ? (

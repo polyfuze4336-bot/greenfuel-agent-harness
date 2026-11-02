@@ -206,8 +206,8 @@ export function analyzeImpact(input: ImpactInput, id: string, action: ImpactActi
   // ---- AI-suggested relationships, kept apart and unverified until a record says so
   const explicit = new Set([...direct.values(), ...potential.values()].map((x) => x.id).concat(d.dependsOn, d.dependedOnBy, d.supersedes, d.supersededBy));
   const unverified: SuggestedRelationship[] = input.suggestions
-    .filter((s) => s.kind === 'relationship' && s.decisionId === id && s.targetId)
-    .map((s) => ({ id: s.id, targetId: s.targetId!, relation: s.text, rationale: s.rationale, generatedBy: { tool: s.generatedBy.tool, date: s.generatedBy.date }, src: s.src, nowExplicit: explicit.has(s.targetId!) }));
+    .filter((s) => s.kind === 'relationship' && s.targetId && (s.decisionId === id || s.targetId === id))
+    .map((s) => ({ id: s.id, targetId: s.decisionId === id ? s.targetId! : s.decisionId, direction: (s.decisionId === id ? 'from-this' : 'to-this') as 'from-this' | 'to-this', relation: s.text, rationale: s.rationale, generatedBy: { tool: s.generatedBy.tool, date: s.generatedBy.date }, src: s.src, nowExplicit: explicit.has(s.decisionId === id ? s.targetId! : s.decisionId) }));
 
   // ---- follow-up work and rework, by what the action does
   const directList = [...direct.values()];
