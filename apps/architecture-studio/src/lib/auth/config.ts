@@ -7,8 +7,12 @@ import type { AccessPolicy } from './access-policy.ts';
 import { loadTrust, type Trust } from './signing.ts';
 import { SuspensionStore } from './suspensions.ts';
 
-/** entra: Microsoft Entra ID sign-in, the production mode. github-dev: the GitHub CLI account, for development; it is labelled as such everywhere. */
-export type AuthMode = 'entra' | 'github-dev';
+/**
+ * entra: Microsoft Entra ID sign-in, the production mode. github-dev: the GitHub CLI account, for development; it is labelled as such everywhere.
+ * public-readonly: no sign-in at all. Anyone who can reach the server can read; nobody can approve, propose, sign or change anything, because no
+ * session can exist. Only for a deployment of already-public repository content. Selected explicitly with STUDIO_AUTH_MODE=public-readonly.
+ */
+export type AuthMode = 'entra' | 'github-dev' | 'public-readonly';
 
 export interface EntraConfig {
   tenantId: string;
@@ -37,7 +41,9 @@ const GUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export function readAuthConfig(env: Record<string, string | undefined> = process.env): AuthConfig {
   const requireEntra = env.STUDIO_REQUIRE_ENTRA?.trim() === '1';
-  const mode: AuthMode = requireEntra || env.STUDIO_AUTH_MODE?.trim().toLowerCase() === 'entra' ? 'entra' : 'github-dev';
+  const asked = env.STUDIO_AUTH_MODE?.trim().toLowerCase();
+  // Entra wins over everything else, so STUDIO_REQUIRE_ENTRA=1 can never be weakened by a second setting.
+  const mode: AuthMode = requireEntra || asked === 'entra' ? 'entra' : asked === 'public-readonly' ? 'public-readonly' : 'github-dev';
   const cacheDir = env.STUDIO_CACHE_DIR?.trim() || path.resolve(process.cwd(), '.studio-cache');
   const problems: string[] = [];
   let entra: EntraConfig | null = null;
@@ -62,7 +68,7 @@ export function readAuthConfig(env: Record<string, string | undefined> = process
   return {
     mode,
     policyPin: pin && /^[0-9a-f]{64}$/.test(pin) ? pin : null,
-    devApprovals: mode !== 'entra' && env.STUDIO_ALLOW_DEV_APPROVALS === '1',
+    devApprovals: mode === 'github-dev' && env.STUDIO_ALLOW_DEV_APPROVALS === '1',
     cacheDir,
     entra,
     secureCookies: mode === 'entra' ? !/^http:\/\/(localhost|127\.0\.0\.1)/.test(redirect) : false,
@@ -86,7 +92,7 @@ export function getTrust(): Trust {
   if (g.__studioTrustOverride) return g.__studioTrustOverride;
   const cfg = authConfig();
   const key = envKey();
-  if (!g.__studioTrust || g.__studioTrust.key !== key) g.__studioTrust = { key, trust: loadTrust(process.env, cfg.cacheDir, cfg.mode !== 'entra') };
+  if (!g.__studioTrust || g.__studioTrust.key !== key) g.__studioTrust = { key, trust: loadTrust(process.env, cfg.cacheDir, cfg.mode === 'github-dev') };
   return g.__studioTrust.trust;
 }
 
@@ -102,5 +108,5 @@ export function suspensions(): SuspensionStore {
 
 export function authContextFor(policy: AccessPolicy, now: number = Date.now()): AuthContext {
   const cfg = authConfig();
-  return { policy, now, devApprovals: cfg.mode !== 'entra' && cfg.devApprovals, suspended: suspensions().set() };
+  return { policy, now, devApprovals: cfg.mode === 'github-dev' && cfg.devApprovals, suspended: suspensions().set() };
 }

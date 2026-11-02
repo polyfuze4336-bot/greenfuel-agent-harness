@@ -1,4 +1,5 @@
 import { guard, ok } from '@/lib/api.ts';
+import { authConfig } from '@/lib/auth/config.ts';
 import { getModel } from '@/lib/repo/index.ts';
 
 export const dynamic = 'force-dynamic';
@@ -9,7 +10,8 @@ export const dynamic = 'force-dynamic';
  */
 export function POST() {
   return guard(async () => {
-    const m = await getModel({ fresh: true });
+    // Anyone can call this in the public read-only mode, so it must not be a way to make the server rebuild on demand.
+    const m = await getModel({ fresh: authConfig().mode !== 'public-readonly' });
     return ok({ refreshedAt: m.repo.generatedAt, commit: m.repo.commit });
   });
 }

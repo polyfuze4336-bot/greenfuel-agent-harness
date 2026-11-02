@@ -447,6 +447,18 @@ describe('who may approve, and how recently they proved it', () => {
     assert.ok(required.problems.length >= 3);
   });
 
+  it('public-readonly mode is explicit, never weakens Entra, and enables no development shortcut', async () => {
+    const { readAuthConfig } = await import('../src/lib/auth/config.ts');
+    assert.equal(readAuthConfig({ STUDIO_AUTH_MODE: 'public-readonly' }).mode, 'public-readonly');
+    assert.equal(readAuthConfig({ STUDIO_AUTH_MODE: 'PUBLIC-READONLY' }).entra, null);
+    assert.equal(readAuthConfig({}).mode, 'github-dev', 'the default is unchanged');
+    assert.equal(readAuthConfig({ STUDIO_AUTH_MODE: 'public' }).mode, 'github-dev', 'a near miss does not select it');
+    const both = readAuthConfig({ STUDIO_AUTH_MODE: 'public-readonly', STUDIO_REQUIRE_ENTRA: '1', STUDIO_ENTRA_TENANT_ID: TID });
+    assert.equal(both.mode, 'entra', 'STUDIO_REQUIRE_ENTRA=1 always wins');
+    const pub = readAuthConfig({ STUDIO_AUTH_MODE: 'public-readonly', STUDIO_ALLOW_DEV_APPROVALS: '1' });
+    assert.equal(pub.devApprovals, false, 'no development approvals without a sign-in');
+    assert.equal(pub.secureCookies, false);
+  });
   it('the sign-in scope is configurable but limited to openid, profile and email, and must include openid', async () => {
     const { readAuthConfig } = await import('../src/lib/auth/config.ts');
     const base = { STUDIO_AUTH_MODE: 'entra', STUDIO_ENTRA_TENANT_ID: TID, STUDIO_ENTRA_CLIENT_ID: 'c', STUDIO_ENTRA_CLIENT_SECRET_FILE: 'f', STUDIO_ENTRA_REDIRECT_URI: REDIRECT };

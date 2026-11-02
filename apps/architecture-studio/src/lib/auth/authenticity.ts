@@ -33,7 +33,7 @@ export interface Authenticity {
 /** The trust and the policy as found at a ref, so the policy that governed a record is the one on the branch the record is on. */
 export function authenticityAt(read: (path: string) => string | undefined): Authenticity {
   const cfg = authConfig();
-  return { trust: getTrust(), policy: parseAccessPolicy(read(ACCESS_POLICY_PATH), 'canonical', cfg.policyPin), allowDevKeys: cfg.mode !== 'entra' };
+  return { trust: getTrust(), policy: parseAccessPolicy(read(ACCESS_POLICY_PATH), 'canonical', cfg.policyPin), allowDevKeys: cfg.mode === 'github-dev' };
 }
 
 /** Null if the record counts, otherwise the reason it does not. */
