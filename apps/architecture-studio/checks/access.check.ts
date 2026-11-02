@@ -170,6 +170,17 @@ describe('Entra ID token: every check refuses what it should', () => {
     assert.equal(q.get('response_type'), 'code');
   });
 
+  it('passes an email-shaped login_hint to Microsoft and drops anything else, and the hint grants nothing', async () => {
+    const { safeLoginHint } = await import('../src/lib/auth/entra.ts');
+    assert.equal(safeLoginHint('admin@MngEnvMCAP682563.onmicrosoft.com'), 'admin@MngEnvMCAP682563.onmicrosoft.com');
+    for (const bad of [null, undefined, '', 'not an email', 'a@b', 'a@b.c d', 'x@y.com\r\nSet-Cookie: a=b', '<script>@x.io', 'a'.repeat(300) + '@x.io', 'a@b.com&prompt=none', 'a@b.com#frag']) assert.equal(safeLoginHint(bad as string), null, `ignored: ${String(bad).slice(0, 30)}`);
+    const w = entraWorld();
+    const q = new URL((await w.client.begin({ reauth: false, maxAgeSeconds: 900, loginHint: 'admin@MngEnvMCAP682563.onmicrosoft.com' })).url).searchParams;
+    assert.equal(q.get('login_hint'), 'admin@MngEnvMCAP682563.onmicrosoft.com');
+    const none = new URL((await w.client.begin({ reauth: false, maxAgeSeconds: 900, loginHint: 'a@b.com&prompt=none' })).url).searchParams;
+    assert.equal(none.get('login_hint'), null);
+    assert.equal(none.get('prompt'), null, 'an injected parameter does not reach Microsoft');
+  });
   it('refuses a replayed callback, a callback in another browser, an unknown state, and an IdP error', async () => {
     const w = entraWorld();
     const a = await w.browse();
