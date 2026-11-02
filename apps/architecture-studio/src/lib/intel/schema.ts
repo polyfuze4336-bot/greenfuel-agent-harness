@@ -251,7 +251,9 @@ export interface Suggestion {
   id: string;
   decisionId: string;
   optionKey: string | null;
-  kind: 'pro' | 'con' | 'alternative' | 'consequence';
+  kind: 'pro' | 'con' | 'alternative' | 'consequence' | 'relationship';
+  /** For a relationship: the record the AI suggests is affected. Unverified until a repository record states the link itself. */
+  targetId?: string;
   text: string;
   rationale: string;
   basedOn: string[];

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowRightLeft, ChevronLeft } from 'lucide-react';
 import { DecisionDetail, LaneNotice } from '@/components/decisions/decision-detail.tsx';
+import { ReviewAids } from '@/components/review/review-aids.tsx';
 import { ReviewRail } from '@/components/review/review-rail.tsx';
 import { ConsequencesBlock, DiagramsBlock, PacketBlock, Required, RequirementsRisks, VersionsBlock } from '@/components/review/review-packet.tsx';
 import { Card, NormStatusPill, Tag } from '@/components/ui.tsx';
@@ -85,6 +86,7 @@ export default async function ReviewPage({ params }: { params: Promise<{ id: str
           </Card>
         </div>
         <aside aria-label="Review actions" className="min-w-0">
+          <ReviewAids id={d.id} />
           <ReviewRail id={d.id} options={options} />
         </aside>
       </div>

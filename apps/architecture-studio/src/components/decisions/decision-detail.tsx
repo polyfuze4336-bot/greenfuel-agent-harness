@@ -1,14 +1,16 @@
 'use client';
 
 import Link from 'next/link';
-import type { ReactNode } from 'react';
-import { ArrowRightLeft, Gavel, Info, TriangleAlert } from 'lucide-react';
+import { useEffect, useState, type ReactNode } from 'react';
+import { ArrowRightLeft, Gavel, Info, Swords, TriangleAlert } from 'lucide-react';
 import { FIELD_LABEL, NATURE_LABEL, reviewLane, type Claim, type DuplicateCandidate, type NormalizedDecision, type OptionInfo, type ReviewLane, type Suggestion } from '@/lib/intel/schema.ts';
 import type { Lookup } from '@/lib/lookup.ts';
 import { LastModified, RefChips, SourceBlock } from '../record-bits.tsx';
 import { SourcePreviewButton } from '../source-preview.tsx';
 import { AiBadge, NeutralPill, NormStatusPill, SourceLink, Tag, VerdictPill } from '../ui.tsx';
 import { RichText } from '../rich-text.tsx';
+import { ExaminerPanel } from './examiner-panel.tsx';
+import { ImpactPanel } from './impact-panel.tsx';
 import { adrTypeLabel } from '@/lib/format.ts';
 
 const APPROVAL_TEXT: Record<NormalizedDecision['approvalBasis'], string> = {
@@ -164,6 +166,8 @@ export function DecisionDetail({ d, lookup, duplicates = [], suggestions = [], t
   const mine = suggestions.filter((s) => s.decisionId === d.id);
   const prov = Object.entries(d.fieldSources);
   const lane = reviewLane(d.natures);
+  const [view, setView] = useState<'record' | 'impact' | 'challenge'>('record');
+  useEffect(() => setView('record'), [d.id]);
   const optionsTitle = lane === 'stakeholder' ? 'Possible answers' : lane === 'verification' ? 'Ways to verify' : FIELD_LABEL.options!;
   return (
     <article data-testid="decision-detail" aria-label={`${d.id} ${d.title}`}>
@@ -195,9 +199,28 @@ export function DecisionDetail({ d, lookup, duplicates = [], suggestions = [], t
               Compare alternatives
             </Link> : null}
             <SourcePreviewButton src={{ path: d.source.path, line: d.source.line }} />
+            <button type="button" data-testid="challenge-this" onClick={() => setView('challenge')} className="inline-flex items-center gap-1.5 rounded-lg border border-hairline-strong bg-surface px-3 py-1.5 text-[13px] font-medium text-ink hover:bg-surface-2">
+              <Swords aria-hidden className="size-3.5" />
+              Challenge this decision
+            </button>
+          </div>
+          <div role="tablist" aria-label="Decision views" className="mt-5 flex gap-1 border-b border-hairline">
+            {([['record', 'Record'], ['impact', 'Impact'], ['challenge', 'Challenge']] as const).map(([k, label]) => (
+              <button key={k} type="button" role="tab" id={`tab-${k}`} aria-selected={view === k} aria-controls={`panel-${k}`} data-testid={`tab-${k}`} onClick={() => setView(k)} className={`relative px-3 pt-1.5 pb-2.5 text-[13.5px] transition-colors ${view === k ? 'font-semibold text-ink after:absolute after:inset-x-3 after:bottom-[-1px] after:h-[2px] after:rounded-full after:bg-accent' : 'text-ink-2 hover:text-ink'}`}>
+                {label}
+              </button>
+            ))}
           </div>
         </>
       )}
+      {!bare && view === 'impact' ? (
+        <div role="tabpanel" id="panel-impact" aria-labelledby="tab-impact" className="mt-5"><ImpactPanel id={d.id} /></div>
+      ) : null}
+      {!bare && view === 'challenge' ? (
+        <div role="tabpanel" id="panel-challenge" aria-labelledby="tab-challenge" className="mt-5"><ExaminerPanel id={d.id} /></div>
+      ) : null}
+      {bare || view === 'record' ? (
+        <div role={bare ? undefined : 'tabpanel'} id={bare ? undefined : 'panel-record'} aria-labelledby={bare ? undefined : 'tab-record'}>
 
       <Block title="Status, verbatim from the source">
         <blockquote className="rounded-xl border-l-[3px] border-hairline-strong bg-surface-2 px-4 py-3 text-[13.5px] leading-6 text-ink-2">{d.statusRaw || 'No status recorded'}</blockquote>
@@ -541,6 +564,8 @@ export function DecisionDetail({ d, lookup, duplicates = [], suggestions = [], t
         ) : null}
         <SourceBlock src={d.source} label="Source link and history" />
       </div>
+        </div>
+      ) : null}
     </article>
   );
 }

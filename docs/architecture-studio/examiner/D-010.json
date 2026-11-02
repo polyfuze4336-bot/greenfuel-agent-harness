@@ -1,0 +1,104 @@
+{
+  "decisionId": "D-010",
+  "label": "AI CHALLENGE",
+  "reviewState": "unreviewed",
+  "generatedBy": { "kind": "ai", "agent": "architecture-critic (rules applied in a Copilot session)", "tool": "GitHub Copilot", "date": "2026-11-02" },
+  "entries": [
+    {
+      "section": "against",
+      "text": "This cannot be decided honestly before D-009. The register says an in-country Azure region and its fit with D-009 must be verified, not assumed, and it says a region name does not answer what residency requires. Choosing a hosting model now would present an assumption about regions as a decision.",
+      "evidence": [
+        { "path": "docs/context/DECISION-REGISTER.md", "line": 35, "quote": "Whether an in-country Azure region exists and meets D-009 must be verified, not assumed" },
+        { "path": "docs/context/DECISION-REGISTER.md", "line": 34, "quote": "A region name does not answer this" }
+      ]
+    },
+    {
+      "section": "alternatives",
+      "text": "The register names four hosting routes but chooses none: an in-country Azure region, Azure hybrid or Arc-enabled infrastructure, on-premises, or partner-hosted. A fifth route is implied by ADR 0016: where a region does not qualify, a cell runs on a jurisdiction-local host. A principal architect would present the decision as a per-port default (jurisdiction-local host) with Azure regions admitted port by port once verified, rather than one model for all ports.",
+      "evidence": [
+        { "path": "docs/context/DECISION-REGISTER.md", "line": 35, "quote": "Azure in-country region; Azure hybrid or Arc-enabled infrastructure; on-premises; partner-hosted" },
+        { "path": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md", "line": 48, "quote": "otherwise on a jurisdiction-local host" }
+      ]
+    },
+    {
+      "section": "pros-cons",
+      "text": "The register records no pros or cons for any of the four routes, only the options. Anything said in favour of a route in the panel would be new and unsupported by the repository. The only recorded trade-off that bears on it is ADR 0016's: one deployment and one operating arrangement per jurisdiction.",
+      "evidence": [
+        { "path": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md", "line": 58, "quote": "one deployment and one operating arrangement per jurisdiction" }
+      ]
+    },
+    {
+      "section": "assumptions",
+      "text": "Hidden assumption: that at least one Azure option exists per port. The register frames Azure first in its option list, but the repository records no verified region availability for any jurisdiction. The ports and jurisdictions themselves (D-003) are not yet known.",
+      "evidence": [
+        { "path": "docs/context/DECISION-REGISTER.md", "line": 35, "quote": "Whether an in-country Azure region exists" }
+      ]
+    },
+    {
+      "section": "reliability",
+      "text": "Different hosting models per port mean different failure modes and recovery paths per port. ADR 0016 forbids production data in a cell until its recovery path is inside its jurisdiction, so a hosting choice that has no second in-jurisdiction location blocks go-live for that port. The availability targets that would judge this are not set (D-031).",
+      "evidence": [
+        { "path": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md", "line": 50, "quote": "A cell is not allowed to hold production data until its recovery path is inside its jurisdiction" }
+      ]
+    },
+    {
+      "section": "security-compliance",
+      "text": "Hosting determines who can administer the cell, where keys live and whether telemetry or backups leave the jurisdiction. All of that rests on D-009, which is marked as needing verification by a qualified person (kind C+D). Until D-009 is verified, no hosting model can be shown compliant.",
+      "evidence": [
+        { "path": "docs/context/DECISION-REGISTER.md", "line": 34, "quote": "Residency interpretation per port: legal source" }
+      ]
+    },
+    {
+      "section": "cost-operations",
+      "text": "No cost figure is recorded for any hosting route. The only recorded statement is that fixed costs repeat per cell and that operating a cell needs local or approved-inside operators. A cost comparison between the four routes cannot be supported from this repository.",
+      "evidence": [
+        { "path": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md", "line": 71, "quote": "Drivers, not amounts: fixed costs per cell" }
+      ]
+    },
+    {
+      "section": "questions",
+      "text": "Which Azure services and regions does this rely on, and how was availability in each jurisdiction verified? (The programme's own question DQ-04-01, applied to this decision.)",
+      "evidence": [{ "path": "docs/architecture/DEFENSE-QUESTION-BANK.md", "line": 31, "quote": "how was availability in each jurisdiction verified" }]
+    },
+    {
+      "section": "questions",
+      "text": "What does within the jurisdiction mean for each port, and who decided? Your hosting model depends on the answer.",
+      "evidence": [{ "path": "docs/architecture/DEFENSE-QUESTION-BANK.md", "line": 26, "quote": "What does \"within the jurisdiction\" mean for each port, and who decided?" }]
+    },
+    {
+      "section": "questions",
+      "text": "If no in-country region qualifies at a port, which of the other three routes do you take, and who owns the hardware and the operators?",
+      "evidence": [{ "path": "docs/context/DECISION-REGISTER.md", "line": 35, "quote": "Azure in-country region; Azure hybrid or Arc-enabled infrastructure; on-premises; partner-hosted" }]
+    },
+    {
+      "section": "questions",
+      "text": "What availability and recovery targets apply per port, and whose are they? Without them the hosting choice cannot be judged.",
+      "evidence": [{ "path": "docs/architecture/DEFENSE-QUESTION-BANK.md", "line": 38, "quote": "Which availability, recovery and performance targets apply, whose are they, and what is the source?" }]
+    },
+    {
+      "section": "questions",
+      "text": "Which of these four routes would you drop first if the budget were halved, and what would break?",
+      "evidence": [{ "path": "docs/context/DECISION-REGISTER.md", "line": 35, "quote": "Hosting model per port" }]
+    },
+    {
+      "section": "evidence",
+      "text": "To defend any choice here the panel will want, per port: a verified source and date for region availability (or an explicit not-verified that blocks approval), the D-009 legal source, and the recovery design. The question bank states that standard for region availability. None exists in the repository today.",
+      "evidence": [
+        { "path": "docs/architecture/DEFENSE-QUESTION-BANK.md", "line": 31, "quote": "A verified source and date, or an explicit \"not verified\" that blocks approval" }
+      ]
+    },
+    {
+      "section": "recommendation",
+      "text": "Do not decide D-010 ahead of D-009. When D-009 is verified, decide the hosting model per port, starting from a jurisdiction-local host as the default and admitting an Azure region for a port only where its availability and controls are verified. This challenge does not assess any Azure region, law or cost: the repository supplies no verified source for them.",
+      "evidence": [
+        { "path": "docs/context/DECISION-REGISTER.md", "line": 35, "quote": "must be verified, not assumed" },
+        { "path": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md", "line": 48, "quote": "It runs on an Azure region only where residency, service availability and the needed controls are verified for that jurisdiction" }
+      ]
+    }
+  ],
+  "notAssessed": [
+    "Availability of any Azure region or Arc-enabled service in any jurisdiction: no verified source in the repository",
+    "The legal meaning of within the jurisdiction (D-009)",
+    "Cost of any hosting route: none is recorded"
+  ]
+}

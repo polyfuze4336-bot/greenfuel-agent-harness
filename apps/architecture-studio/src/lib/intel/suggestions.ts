@@ -5,8 +5,8 @@ import type { NormalizedDecision, Suggestion } from './schema.ts';
 // beside a decision. They are never merged into a decision's fields, never change a status, and never count as evidence.
 // Anything that does not meet the schema is rejected and reported, not silently repaired.
 
-const KINDS = ['pro', 'con', 'alternative', 'consequence'];
-const ALLOWED_KEYS = new Set(['id', 'decisionId', 'optionKey', 'kind', 'text', 'rationale', 'basedOn', 'label', 'reviewState', 'generatedBy', 'line']);
+const KINDS = ['pro', 'con', 'alternative', 'consequence', 'relationship'];
+const ALLOWED_KEYS = new Set(['id', 'decisionId', 'optionKey', 'targetId', 'kind', 'text', 'rationale', 'basedOn', 'label', 'reviewState', 'generatedBy', 'line']);
 
 export interface SuggestionContext {
   records: NormalizedDecision[];
@@ -37,6 +37,7 @@ export function collectSuggestions(fragments: Fragment[], ctx: SuggestionContext
         decisionId: String(s.decisionId),
         optionKey: s.optionKey === null || s.optionKey === undefined ? null : String(s.optionKey),
         kind: s.kind as Suggestion['kind'],
+        ...(s.kind === 'relationship' ? { targetId: String(s.targetId) } : {}),
         text: String(s.text),
         rationale: String(s.rationale),
         basedOn: (s.basedOn as unknown[]).map(String),
@@ -58,7 +59,11 @@ function reject(s: Record<string, unknown>, byId: Map<string, NormalizedDecision
   if (!rec) return 'decisionId does not match any decision at this commit';
   if (s.optionKey !== null && s.optionKey !== undefined && !rec.options.some((o) => o.key === s.optionKey)) return `optionKey "${String(s.optionKey)}" is not an option of ${rec.id}`;
   if (!KINDS.includes(String(s.kind))) return `kind must be one of ${KINDS.join(', ')}`;
-  if (s.kind !== 'alternative' && s.kind !== 'consequence' && (s.optionKey === null || s.optionKey === undefined)) return 'a pro or con must name the option it is about';
+  if (s.kind === 'relationship') {
+    if (typeof s.targetId !== 'string' || !ctx.knownIds.has(s.targetId)) return 'a relationship must name a targetId that is a known record at this commit';
+    if (s.targetId === s.decisionId) return 'a decision cannot be suggested to affect itself';
+  } else if (s.targetId !== undefined) return 'targetId is only for a relationship';
+  if ((s.kind === 'pro' || s.kind === 'con') && (s.optionKey === null || s.optionKey === undefined)) return 'a pro or con must name the option it is about';
   if (typeof s.text !== 'string' || !s.text.trim()) return 'text is empty';
   if (typeof s.rationale !== 'string' || !s.rationale.trim()) return 'rationale is empty';
   if (s.label !== 'AI SUGGESTION') return 'label must be "AI SUGGESTION"';
