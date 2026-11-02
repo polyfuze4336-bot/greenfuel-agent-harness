@@ -52,7 +52,7 @@ How a reviewer decides that the simplified Studio is a polished, trustworthy dec
 
 | ID | Criterion | Target | Validation |
 |---|---|---|---|
-| SEC-01 | Branch ruleset on `main`: pull request required, `validate` and `studio` checks required, CODEOWNERS review, no force push or deletion | Active | `gh api repos/…/rulesets`; a direct push is refused |
+| SEC-01 | Branch ruleset on `main`: pull request required, `validate` and `studio` checks required, no force push or deletion; CODEOWNERS review once a second approver exists | Active (since 2026-11-02, without required reviews: one approver) | `gh api repos/…/rulesets`; a direct push is refused |
 | SEC-02 | Every mutating route authorizes server-side, including sync, reconcile and refresh, with Origin and CSRF checks | 0 unauthenticated or cross-origin writes | API probe (extend to 100 % of mutating routes) |
 | SEC-03 | A deployment cannot start in development sign-in mode | `STUDIO_REQUIRE_ENTRA=1` enforced by configuration check | Unit test and startup refusal |
 | SEC-04 | Step-up re-authentication uses `auth_time` or equivalent | Met | Unit test with real Entra claim shapes |

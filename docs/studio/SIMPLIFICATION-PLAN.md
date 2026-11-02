@@ -46,7 +46,7 @@ Each phase ends with a measurable exit. Effort: S under 1 day, M 1 to 3 days, L 
 | A3 | Fix hydration #418 and render Markdown in decision text | S | Zero console errors on 13 pages; no literal `**` |
 | A4 | Update README, AGENTS.md, Studio `package.json` description; docs index | S | A newcomer reaches the Studio from README in one click |
 | A5 | Declare `jszip`. **Redaction of the 6 local-path files was tried and reverted:** those loop records are hash-sealed, redacting breaks `validate-loop` (verified), and rewriting evidence to hide a path is the wrong trade. The path stays in history and in those 6 files | S | `npm ls` clean; a test fails on any undeclared import |
-| A6 **(owner)** | Ruleset on `main`: PR required, `validate` and the new `studio` job required, CODEOWNERS review, no force push, no bypass for the Studio's App | S | `gh api …/branches/main/protection` returns rules; a direct push is refused |
+| A6 **(owner; done 2026-11-02, see [PHASE-A-RESULTS](PHASE-A-RESULTS.md))** | Ruleset on `main`: PR required, `validate`, `evaluate`, `studio` and `gate` required, no force push, no deletion, no bypass. **CODEOWNERS review and required approvals were not enabled** because there is one approver | S | `gh api …/branches/main/protection` returns rules; a direct push is refused |
 
 ### Phase B: make it a control centre with real data (about 3 days)
 
