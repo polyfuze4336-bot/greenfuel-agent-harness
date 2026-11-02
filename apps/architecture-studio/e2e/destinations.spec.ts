@@ -151,6 +151,17 @@ test.describe('Changes', () => {
   });
 });
 
+test.describe('build identity', () => {
+  test('the version endpoint says which code and which repository commit are running, and its counts equal the register', async ({ request }) => {
+    const v = (await (await request.get('/api/v1/version')).json()) as { build: string; authMode: string; data: { commit: string; commitShort: string }; counts: Record<string, number> };
+    expect(v.build).toMatch(/^([0-9a-f]{7}(\+dirty)?|unknown)$/);
+    expect(v.data.commit).toBe(gitOut('rev-parse', 'HEAD'));
+    const register = (await (await request.get('/api/v1/decisions')).json()) as { count: number };
+    expect(v.counts.decisions).toBe(register.count);
+    expect(v.counts.adrs + v.counts.registerEntries).toBe(v.counts.decisions);
+    expect(JSON.stringify(v)).not.toMatch(/secret|token|password|key/i);
+  });
+});
 test.describe('loading and error states for the new page', () => {
   test('Changes shows the repository error panel when the repository cannot be read', async ({ page }) => {
     await page.goto('http://localhost:3101/changes');
