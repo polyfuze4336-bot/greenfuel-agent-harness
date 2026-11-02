@@ -10,7 +10,7 @@ Records what was deployed under [ADR-0021](../adr/0021-deploy-studio-to-azure-ne
 | Status | **Running and healthy, read-only, Entra sign-in only.** Signed-in behaviour is **not yet verified** (see below) |
 | Subscription | `870b491d-74bb-4aa7-95ab-647f262444d5` (the owner's sandbox) |
 | Resource group | `rg-greenfuel-studio-sea`, `southeastasia`, created for this; no other group touched |
-| Image | `greenfuel-studio:m3-3ae0777`, digest `sha256:8e56429917257582017f8563362badfdcd4f8ba455b8dd79e09f7cb4cc501247`; built from the Studio at repository commit `3ae0777` (Phase A and B). Replaced `m2-dbbf889` the same day (revision `ca-gfstudio--0000002`, healthy) |
+| Image | `greenfuel-studio:m4-c11049f`, digest `sha256:51e68bdbc38c7e02e6c2d2198b61ed07ed018120b7f81a20459d9fa05960b1c0`, repository commit `c11049f` (revision `ca-gfstudio--0000003`). Earlier: `m3-3ae0777`, digest `sha256:8e56429917257582017f8563362badfdcd4f8ba455b8dd79e09f7cb4cc501247`; built from the Studio at repository commit `3ae0777` (Phase A and B). Replaced `m2-dbbf889` the same day (revision `ca-gfstudio--0000002`, healthy) |
 | Repository the Studio reads | this repository, cloned inside the container from `origin/main`, re-fetched every 60 s |
 | Phase | unchanged (0). No bunkering application, no production or certification data |
 
@@ -62,7 +62,7 @@ The container secret is encrypted by the platform and not readable through the A
 
 ## Signing in, and a tenant limit found on 2026-11-02
 
-The owner first tried their corporate Microsoft account and got `AADSTS90072`: that account belongs to Microsoft's corporate tenant, and the app registration lives in the sandbox tenant ("Contoso"), where only `admin@MngEnvMCAP682563.onmicrosoft.com` is enrolled. A guest invitation for the corporate account was attempted and **refused by the tenant** ("Guest invitations not allowed for your company"). Changing a tenant-wide external-collaboration setting was not done without the owner's decision. **To sign in today, use the enrolled `admin@MngEnvMCAP682563.onmicrosoft.com` account.** Options if the corporate account is wanted: allow guest invitations in the tenant (an owner action), or register the app in the corporate tenant instead.
+The owner first tried their corporate Microsoft account and got `AADSTS90072`: that account belongs to Microsoft's corporate tenant, and the app registration lives in the sandbox tenant ("Contoso"), where only `admin@MngEnvMCAP682563.onmicrosoft.com` is enrolled. A guest invitation for the corporate account was attempted and **refused by the tenant** ("Guest invitations not allowed for your company"). Changing a tenant-wide external-collaboration setting was not done without the owner's decision. **To sign in today, use the enrolled `admin@MngEnvMCAP682563.onmicrosoft.com` account.** A browser already signed in as another account defaults to it silently, so the login route accepts an optional, validated `login_hint` (image m4): open `/api/v1/auth/entra/login?login_hint=admin@MngEnvMCAP682563.onmicrosoft.com`, or use a private window. The hint only chooses which account Microsoft offers; identity is still proven by the signed token and the enrolment. Options if the corporate account is wanted: allow guest invitations in the tenant (an owner action), or register the app in the corporate tenant instead.
 
 ## GitHub App (registered 2026-11-02, not yet connected to the deployment)
 
