@@ -447,6 +447,18 @@ describe('who may approve, and how recently they proved it', () => {
     assert.ok(required.problems.length >= 3);
   });
 
+  it('the sign-in scope is configurable but limited to openid, profile and email, and must include openid', async () => {
+    const { readAuthConfig } = await import('../src/lib/auth/config.ts');
+    const base = { STUDIO_AUTH_MODE: 'entra', STUDIO_ENTRA_TENANT_ID: TID, STUDIO_ENTRA_CLIENT_ID: 'c', STUDIO_ENTRA_CLIENT_SECRET_FILE: 'f', STUDIO_ENTRA_REDIRECT_URI: REDIRECT };
+    assert.equal(readAuthConfig(base).entra?.scope, 'openid profile', 'the default is unchanged');
+    assert.equal(readAuthConfig({ ...base, STUDIO_ENTRA_SCOPE: 'openid' }).entra?.scope, 'openid');
+    assert.equal(readAuthConfig({ ...base, STUDIO_ENTRA_SCOPE: 'openid  profile openid' }).entra?.scope, 'openid profile', 'duplicates and spacing are normalised');
+    for (const bad of ['profile', 'openid User.Read', 'openid https://graph.microsoft.com/.default', 'openid offline_access']) {
+      const c = readAuthConfig({ ...base, STUDIO_ENTRA_SCOPE: bad });
+      assert.equal(c.entra, null, `refused: ${bad}`);
+      assert.ok(c.problems.some((p) => /STUDIO_ENTRA_SCOPE/.test(p)), `explained: ${bad}`);
+    }
+  });
   it('an application, bot or agent identity cannot hold a role: no enrollment, and no sign-in', async () => {
     const agent: Principal = { ...owner(), subject: `${TID}:${guid(80)}`, login: 'copilot-agent' };
     assert.deepEqual(effectiveRoles(agent, ctxFor()).roles, []);
