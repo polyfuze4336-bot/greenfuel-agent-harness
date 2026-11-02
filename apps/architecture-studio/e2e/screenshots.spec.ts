@@ -120,7 +120,7 @@ test('decision intelligence: register health, provenance, compare, source previe
   await h2.getByText('Repository changes and synchronisation').click();
   await h2.getByRole('button', { name: 'Sync now' }).click();
   await h2.getByRole('button', { name: 'Sync now' }).click();
-  await expect(h2.getByTestId('changes-result')).toContainText('57 unchanged');
+  await expect(h2.getByTestId('changes-result')).toContainText('58 unchanged');
   await h2.getByLabel('Compare with').selectOption('origin/main');
   await h2.getByRole('button', { name: 'Show changes' }).click();
   await expect(h2.getByTestId('changes-result')).toContainText(/\d+ added/);

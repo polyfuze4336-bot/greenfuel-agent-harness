@@ -59,7 +59,7 @@ test.describe('overview shows repository-derived figures only', () => {
     expect(snap.count).toBe(m.decisions.register);
     await expect(page.getByText(api.repo.commitShort, { exact: false }).first()).toBeVisible();
     // The independent discovery snapshot recorded these counts; the figures must agree.
-    expect(m.decisions).toMatchObject({ total: 57, pending: 44, accepted: 13, rejected: 0, deferred: 0 });
+    expect(m.decisions).toMatchObject({ total: 58, pending: 45, accepted: 13, rejected: 0, deferred: 0 });
   });
 
   test('each key figure links to the records behind it', async ({ page, request }) => {
@@ -67,7 +67,7 @@ test.describe('overview shows repository-derived figures only', () => {
     await ready(page, '/');
     await page.getByRole('link', { name: /Pending decisions/ }).click();
     await expect(page).toHaveURL(/\/decisions\?status=Proposed,Pending(%20| )Review,Blocked/);
-    await expect(page.getByTestId('result-count')).toContainText('44 of 57');
+    await expect(page.getByTestId('result-count')).toContainText('45 of 58');
     await page.goto('/');
     await page.getByRole('link', { name: /Blocked tasks/ }).click();
     await expect(page.getByTestId('result-count')).toContainText(`Showing ${t.blocked} of`);
@@ -86,25 +86,25 @@ test.describe('Decision Register', () => {
   test('lists every decision, and filters, sorts and groups', async ({ page }) => {
     await ready(page, '/decisions');
     const rows = page.getByTestId('decision-row');
-    await expect(rows).toHaveCount(57);
+    await expect(rows).toHaveCount(58);
 
     await page.getByRole('button', { name: /^Proposed\b/ }).click();
-    await expect(rows).toHaveCount(1);
+    await expect(rows).toHaveCount(2);
     await page.getByRole('button', { name: /^Blocked\b/ }).click();
-    await expect(rows).toHaveCount(7);
+    await expect(rows).toHaveCount(8);
     await page.getByRole('button', { name: /^Pending Review\b/ }).click();
-    await expect(rows).toHaveCount(44);
+    await expect(rows).toHaveCount(45);
     await page.getByRole('button', { name: /^Pending Review\b/ }).click();
     await page.getByRole('button', { name: /^Blocked\b/ }).click();
     await page.getByRole('button', { name: /^Proposed\b/ }).click();
-    await expect(rows).toHaveCount(57);
+    await expect(rows).toHaveCount(58);
 
     await page.getByLabel('Type').selectOption('register-entry');
     await expect(rows).toHaveCount(37);
     await page.getByLabel('Needed by').selectOption('M1');
     await expect(rows).toHaveCount(17);
     await page.getByRole('button', { name: 'Clear filters' }).click();
-    await expect(rows).toHaveCount(57);
+    await expect(rows).toHaveCount(58);
 
     await page.getByLabel('Group by').selectOption('status');
     await expect(page.locator('th[scope="colgroup"]')).toHaveCount(4);
@@ -127,7 +127,7 @@ test.describe('Decision Register', () => {
     await expect(page).toHaveURL(/q=D-003/);
     await page.getByRole('searchbox', { name: 'Search decisions' }).fill('port');
     await expect.poll(() => page.getByTestId('decision-row').count()).toBeGreaterThan(1);
-    expect(await page.getByTestId('decision-row').count()).toBeLessThan(57);
+    expect(await page.getByTestId('decision-row').count()).toBeLessThan(58);
   });
 
   test('opens a record in a panel, with provenance, and closes with Escape returning focus', async ({ page }) => {
@@ -304,7 +304,7 @@ test.describe('Approvals', () => {
     await expect(page.getByTestId('authority-signed')).toHaveText('0');
     await expect(page.getByText('No approver is enrolled, so no signed approval of any class can exist.')).toBeVisible();
     const pending = page.getByTestId('pending-list').locator('> li');
-    await expect(pending).toHaveCount(10);
+    await expect(pending).toHaveCount(11);
     await page.getByRole('button', { name: /^Design reviews/ }).click();
     await expect(pending).toHaveCount(3);
     await page.getByRole('button', { name: /^Design reviews/ }).click();

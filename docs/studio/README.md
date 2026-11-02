@@ -31,4 +31,4 @@ The reports live in two older folders, `docs/architecture-studio/` and `docs/stu
 
 ## Status in one paragraph
 
-Acceptance-tested locally with synthetic data; **not deployed**; its approval workflow has **not yet been used for a real approval** (no approver key is enrolled). Phase A of the simplification plan (performance, CI, console errors, documentation) is recorded in [PHASE-A-RESULTS](PHASE-A-RESULTS.md).
+Acceptance-tested locally with synthetic data; **not deployed**; its approval workflow has **not yet been used for a real approval** (no approver key is enrolled). Phase A (performance, CI, console errors, documentation, ruleset) is in [PHASE-A-RESULTS](PHASE-A-RESULTS.md); Phase B (design-gate equivalence, harness bridge, smaller pages) is in [PHASE-B-RESULTS](PHASE-B-RESULTS.md). The Azure deployment is in [AZURE-DEPLOYMENT](../studio-acceptance/AZURE-DEPLOYMENT.md).

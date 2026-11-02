@@ -1,5 +1,5 @@
 {
-  "measuredAt": "2026-10-30T23:01:26.893Z",
+  "measuredAt": "2026-11-02T07:38:00.726Z",
   "machine": {
     "os": "Windows_NT 10.0.26300",
     "cpus": 8,
@@ -7,51 +7,51 @@
   },
   "measurements": {
     "repository refresh after a pull (ms)": [
-      2568,
-      2853,
-      3092,
-      2702,
-      2781,
-      2803,
-      2684,
-      2743,
-      2680,
-      2892,
-      2789,
-      3063,
-      2668,
-      2649,
-      2617
+      2656,
+      2693,
+      3590,
+      3143,
+      2529,
+      1618,
+      1582,
+      1682,
+      1771,
+      1480,
+      1660,
+      1772,
+      1484,
+      1676,
+      1574
     ],
-    "approval transaction: submit to pull request (ms) ADR-0021": 3144,
-    "merge to canonical status in the Studio (ms) ADR-0021": 849,
-    "repository validation on the pull request (ms)": 6614,
-    "baseline authorization visible in the Studio after commit (ms)": 4511,
-    "approval transaction: submit to pull request (ms) ADR-0020": 3302,
-    "merge to canonical status in the Studio (ms) ADR-0020": 750,
-    "approving all 40 slides one by one (ms)": 39772,
-    "presentation generation, sample, rendered by PowerPoint (ms)": 15434,
-    "presentation generation, FINAL, rendered by PowerPoint (ms)": 14767,
-    "final deck wall clock from request (ms)": 14768,
-    "approval transaction: submit to pull request (ms) ADR-0023": 3382,
-    "merge to canonical status in the Studio (ms) ADR-0023": 831
+    "approval transaction: submit to pull request (ms) ADR-0031": 5000,
+    "merge to canonical status in the Studio (ms) ADR-0031": 1212,
+    "repository validation on the pull request (ms)": 11433,
+    "baseline authorization visible in the Studio after commit (ms)": 5694,
+    "approval transaction: submit to pull request (ms) ADR-0020": 4571,
+    "merge to canonical status in the Studio (ms) ADR-0020": 959,
+    "approving all 40 slides one by one (ms)": 30348,
+    "presentation generation, sample, rendered by PowerPoint (ms)": 22199,
+    "presentation generation, FINAL, rendered by PowerPoint (ms)": 16756,
+    "final deck wall clock from request (ms)": 16757,
+    "approval transaction: submit to pull request (ms) ADR-0033": 2338,
+    "merge to canonical status in the Studio (ms) ADR-0033": 545
   },
   "evidence": {
     "validationOnPullRequest": {
       "baseFailures": 22,
       "prFailures": 22,
       "introducedByThePullRequest": [],
-      "mentionsAdr0021": 0
+      "mentionsAdr0031": 0
     },
     "unresolvedBuildBlockers": {
       "before": 40,
       "after": 40
     },
-    "baselineGeneratedAt": "085c4eb15c0984098f2d6e6af0dd5121b7c2cb54",
+    "baselineGeneratedAt": "4ca2a97a9d6be22884180c92081f319be8e3ac06",
     "baseline": {
       "id": "BL-0001",
-      "sourceCommit": "0a764162ee187f7228d482b11be6de3de6fbf864",
-      "authorizedBy": "AP-e2960ebe56dd"
+      "sourceCommit": "a2a419b852f22422d30e4e607a7f3325f8dc4af6",
+      "authorizedBy": "AP-3c64dff7001d"
     },
     "deckDecisionsGate": {
       "id": "decisions",
@@ -62,10 +62,10 @@
       "hint": "Decide them in the review workflow. The deck reads their status; it does not change it."
     },
     "finalDeck": {
-      "id": "deck-025d27b-20261030T225756",
-      "commit": "025d27b93d476e84b3befd74b197691a9f401901",
-      "pptxSha256": "bc02d449abff7c7b3a9fa289e1dea3a5fa8757060d2c1577803c2548fc0ef2ef",
-      "pdfSha256": "ec887b34ce5cd6fb08410775a3fc95f624bdafa79ca1282171e09086631bc342",
+      "id": "deck-762efe6-20261102T073524",
+      "commit": "762efe614df80c01c8c25fb56069a1ef6bc87cc4",
+      "pptxSha256": "4561bb6942d31c28e2e6191ea815be92295a52d4b9ff865e4b76a4c9a26b9158",
+      "pdfSha256": "ab904bdc7c2f974d7a1dd43581a9ff5f26c1bfe7006b666c42a19cffb570861c",
       "qa": {
         "errors": 0,
         "warnings": 0,
@@ -74,9 +74,9 @@
       "slides": 40,
       "sources": 35
     },
-    "verify": "deck-025d27b-20261030T225756 (final) from commit 025d27b: 40 slides, 40 with notes, 5 native charts, 18 native tables, 0 pictures.",
+    "verify": "deck-762efe6-20261102T073524 (final) from commit 762efe6: 40 slides, 40 with notes, 5 native charts, 18 native tables, 0 pictures.",
     "forgedReviewRecord": [
-      "docs/decision-reviews/ADR-0022/0001-approve.json: unknown field(s): sig"
+      "docs/decision-reviews/ADR-0032/0001-approve.json: unknown field(s): sig"
     ],
     "githubUnreachable": {
       "status": 200,
@@ -85,12 +85,12 @@
     },
     "duplicates": [
       {
-        "a": "ADR-0021",
-        "b": "ADR-0021",
+        "a": "ADR-0031",
+        "b": "ADR-0031",
         "kind": "id-collision",
         "score": 1,
         "reasons": [
-          "the id ADR-0021 is defined in docs/adr/0021-duplicate-of-keep-decision-records.md and again in docs/adr/0021-keep-decision-records-in-repo.md"
+          "the id ADR-0031 is defined in docs/adr/0031-duplicate-of-keep-decision-records.md and again in docs/adr/0031-keep-decision-records-in-repo.md"
         ]
       },
       {
@@ -139,8 +139,8 @@
         ]
       },
       {
-        "a": "ADR-0024",
-        "b": "ADR-0025",
+        "a": "ADR-0034",
+        "b": "ADR-0035",
         "kind": "similar",
         "score": 0.43,
         "reasons": [
@@ -149,8 +149,8 @@
         ]
       },
       {
-        "a": "ADR-0021",
-        "b": "ADR-0022",
+        "a": "ADR-0031",
+        "b": "ADR-0032",
         "kind": "similar",
         "score": 0.38,
         "reasons": [
@@ -159,8 +159,8 @@
         ]
       },
       {
-        "a": "ADR-0021",
-        "b": "ADR-0022",
+        "a": "ADR-0031",
+        "b": "ADR-0032",
         "kind": "similar",
         "score": 0.36,
         "reasons": [
@@ -169,8 +169,8 @@
         ]
       },
       {
-        "a": "ADR-0021",
-        "b": "ADR-0023",
+        "a": "ADR-0031",
+        "b": "ADR-0033",
         "kind": "similar",
         "score": 0.3,
         "reasons": [
@@ -178,8 +178,8 @@
         ]
       },
       {
-        "a": "ADR-0021",
-        "b": "ADR-0025",
+        "a": "ADR-0031",
+        "b": "ADR-0035",
         "kind": "similar",
         "score": 0.3,
         "reasons": [
@@ -187,8 +187,8 @@
         ]
       },
       {
-        "a": "ADR-0021",
-        "b": "ADR-0023",
+        "a": "ADR-0031",
+        "b": "ADR-0033",
         "kind": "similar",
         "score": 0.3,
         "reasons": [
@@ -196,8 +196,8 @@
         ]
       },
       {
-        "a": "ADR-0021",
-        "b": "ADR-0025",
+        "a": "ADR-0031",
+        "b": "ADR-0035",
         "kind": "similar",
         "score": 0.3,
         "reasons": [
@@ -205,8 +205,8 @@
         ]
       },
       {
-        "a": "ADR-0022",
-        "b": "ADR-0023",
+        "a": "ADR-0032",
+        "b": "ADR-0033",
         "kind": "similar",
         "score": 0.3,
         "reasons": [
@@ -214,8 +214,8 @@
         ]
       },
       {
-        "a": "ADR-0022",
-        "b": "ADR-0025",
+        "a": "ADR-0032",
+        "b": "ADR-0035",
         "kind": "similar",
         "score": 0.3,
         "reasons": [
@@ -223,8 +223,8 @@
         ]
       },
       {
-        "a": "ADR-0023",
-        "b": "ADR-0025",
+        "a": "ADR-0033",
+        "b": "ADR-0035",
         "kind": "similar",
         "score": 0.3,
         "reasons": [

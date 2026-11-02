@@ -1,8 +1,8 @@
 // Everything the presentation pipeline reads, gathered once and read from a single commit. Each source it touches is recorded with its
 // content hash, so a deck can say exactly which evidence version it was made from.
 import crypto from 'node:crypto';
-import { createRequire } from 'node:module';
 import path from 'node:path';
+import { requireHarness } from '../harness-bridge.ts';
 import { GitRepositoryAdapter } from '../repo/git.ts';
 import { loadReadinessInput, type LoadOptions } from '../baseline/input.ts';
 import { computeReadiness, type Readiness } from '../baseline/readiness.ts';
@@ -104,11 +104,10 @@ export function openDeckContext(root: string, ref: string, o: ContextOptions): D
     view = { readiness, baselines, gates: evaluateAreas(readiness, baselines, cur.input.policy), decisions: cur.input.decisions, requirements: cur.input.requirements, signatures: readiness.signatures, commit: cur.input.commit };
   }
 
-  const req = createRequire(path.join(root, 'package.json'));
   // facts.mjs reads the committed sources it needs from the working tree of the repository it lives in.
-  const facts = req(path.join(root, 'harness', 'demo', 'facts.mjs')).loadFacts() as Facts;
+  const facts = requireHarness<{ loadFacts(): Facts }>(root, 'demo', 'facts.mjs').loadFacts();
   const legacy: Record<string, LegacySlide> = {};
-  for (const s of req(path.join(root, 'harness', 'demo', 'deck-data.mjs')).buildSlides(facts) as LegacySlide[]) legacy[s.id] = s;
+  for (const s of requireHarness<{ buildSlides(f: Facts): LegacySlide[] }>(root, 'demo', 'deck-data.mjs').buildSlides(facts)) legacy[s.id] = s;
 
   const rubric: RubricCriterion[] = [];
   const rt = read('docs/capstone/RUBRIC-TRACEABILITY.md');

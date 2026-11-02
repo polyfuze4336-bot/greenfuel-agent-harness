@@ -5,7 +5,7 @@
 //   - the baseline policy is a small one (an enrolled approver plus one scope ADR), as in baseline.check.ts;
 //   - the design reviews and the supporting ADRs the deck presents are marked Approved / Accepted in the world's first commit, so the
 //     deck's decision gate can be reached. In the real repository they are Blocked or Proposed.
-// The decision under test (ADR-0021) and everything after it go through the real workflow.
+// The decision under test (ADR-0031) and everything after it go through the real workflow.
 import fs from 'node:fs';
 import path from 'node:path';
 import { git, makeFixture, policyJson, type Fixture } from './review-fixture.ts';
@@ -71,7 +71,7 @@ export function makeAcceptanceWorld(dir: string, repoRoot: string): AcceptanceWo
     rules: { reviewRecordsCountAsApproval: true, grandfatheredAdrsCountAsApproval: true, conditionalApprovals: 'flag', requirementChange: 'review', supersededBySuccessor: true },
     gates: [
       { id: 'approver-registry', title: 'An architecture-class approver is enrolled', type: 'harness', check: 'approvers', class: 'architecture', source: 'acceptance world: an architecture key must exist' },
-      { id: 'scope-adr', title: 'The new decision ADR-0021 is approved', type: 'decisions', decisions: ['ADR-0021'], source: 'acceptance world: the decision under test' },
+      { id: 'scope-adr', title: 'The new decision ADR-0031 is approved', type: 'decisions', decisions: ['ADR-0031'], source: 'acceptance world: the decision under test' },
     ],
     stages: [{ id: 'acceptance', title: 'Acceptance world', gates: ['approver-registry', 'scope-adr'], includeMilestones: [], blockOn: [] }],
     areas: [{ id: 'application', title: 'Application', kind: 'implementation', stage: 'active', paths: ['^src/'] }],

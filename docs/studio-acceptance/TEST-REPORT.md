@@ -22,11 +22,14 @@ During this work the acceptance spec first failed three times, each time for a r
 
 ## 2. How the complete workflow was tested (the "acceptance world")
 
-A throw-away clone of this repository with its own bare git remote standing in for GitHub, a simulated pull-request service, a stand-in identity provider with test users, and a reduced baseline policy (gates: an enrolled architecture-class approver and ADR-0021). People are simulated by `git` operations on the remote.
+A throw-away clone of this repository with its own bare git remote standing in for GitHub, a simulated pull-request service, a stand-in identity provider with test users, and a reduced baseline policy (gates: an enrolled architecture-class approver and ADR-0031). People are simulated by `git` operations on the remote.
 
-**Synthetic, so proving the mechanism and not a real approval:** the reduced policy; the supporting ADRs 0004, 0015-0019 and reviews RV-0001 to 0003 are marked Accepted/Approved as text in the world's first commit (the real repository has them Proposed or Blocked); the enrolled approver key and every "person". The decision under test, ADR-0021, and everything after it use the real workflow code.
+**Synthetic, so proving the mechanism and not a real approval:** the reduced policy; the supporting ADRs 0004, 0015-0019 and reviews RV-0001 to 0003 are marked Accepted/Approved as text in the world's first commit (the real repository has them Proposed or Blocked); the enrolled approver key and every "person". The decision under test, ADR-0031, and everything after it use the real workflow code.
 
 ### The twenty steps
+
+> **Numbering note (2026-11-02):** the world's synthetic ADRs were numbered 0021 to 0025 when this was run. The real repository now has its own ADR-0021 (Azure deployment), so the world's decisions are numbered **0031 to 0035** from here on. Figures in the first run's evidence file used the old numbers.
+
 
 | # | Step | Result | Evidence |
 |---|---|---|---|
@@ -38,11 +41,11 @@ A throw-away clone of this repository with its own bare git remote standing in f
 | 6 | Pros, cons, costs, risks, dependencies | Pass, with a stated limit | Alternatives show only the trade-offs the author wrote; **nothing is fabricated** (asserted). AI suggestions are separate and labelled |
 | 7 | Approve with rationale | Pass | Action accepted with expected revision and idempotency key |
 | 8 | Rationale and authenticated identity recorded | Pass | Review record on the branch holds actor `test-owner` / id and the rationale text, bound by signature |
-| 9 | GitHub change generated | Pass | Branch `decision-review/ADR-0021/…`, commit, PR; `main` untouched |
-| 10 | Repository validation runs | Pass (delta) | `validate-harness` on the PR head: 22 failures both on base and PR head (all from the synthetic text-only approvals), **0 introduced**, 0 mentioning ADR-0021. This is the real validator, **not GitHub Actions** |
+| 9 | GitHub change generated | Pass | Branch `decision-review/ADR-0031/…`, commit, PR; `main` untouched |
+| 10 | Repository validation runs | Pass (delta) | `validate-harness` on the PR head: 22 failures both on base and PR head (all from the synthetic text-only approvals), **0 introduced**, 0 mentioning ADR-0031. This is the real validator, **not GitHub Actions** |
 | 11 | Merge through authorized workflow | Pass (simulated) | A person's fast-forward of the remote's `main` to the PR head |
 | 12 | Studio refreshes canonical status | Pass | Approved with basis `review-record` only after the merge, within 0.7-0.9 s |
-| 13 | Related tasks and dependencies update | Pass | Queue shows ADR-0021 `Done`; nothing unrelated changed status (only derived build blockers may move) |
+| 13 | Related tasks and dependencies update | Pass | Queue shows ADR-0031 `Done`; nothing unrelated changed status (only derived build blockers may move) |
 | 14 | Readiness gate recalculates | Pass | The decision gate is met; the only remaining reason is `baseline` |
 | 15 | Baseline generated | Pass | `baseline generate` for BL-0001; **proposed** until a person signs; signed with the enrolled key; Studio then shows approved/current and gate open |
 | 16 | Presentation Studio reads the baseline | Pass | Deck model cites the baseline; screenshot `step-16` |
@@ -64,7 +67,7 @@ Before step 15 the test also proves a **final deck is refused** with no baseline
 | Stale repository revision | Pass | Stale `expectedRevision` refused |
 | GitHub API failure | Pass | Bare remote made unreachable: HTTP 200 with state `awaiting-github-update`, **never** "applied"; the same request succeeds once restored |
 | Missing source file | Pass | The deck states what is missing instead of inventing |
-| Duplicate decision | Pass | Two files claiming ADR-0021 are flagged `id-collision` (score 1) and not merged |
+| Duplicate decision | Pass | Two files claiming ADR-0031 are flagged `id-collision` (score 1) and not merged |
 | Missing presentation evidence | Pass | Placeholders appear and a final deck is refused |
 | Unavailable image generation | Pass, by design | No image generation is configured; the hero and Azure icon slots fall back to labelled vector artwork. No generated imagery is claimed |
 | Corrupted presentation output | Pass | Flipped bytes, a swapped file and a tampered mode are detected on export and not served (`output-corrupted`, `record-mismatch`) |

@@ -91,3 +91,18 @@ It is **accepted as a control centre** only when FUN-07 also passes (a real appr
 It is **not accepted for deployment** by any of the above; deployment needs the separate approval and the [DEPLOYMENT-PLAN](../studio-acceptance/DEPLOYMENT-PLAN.md) inputs.
 
 Criteria that cannot be automated (UX-13, SEC-08, FUN-07) are called out so a green automated run is not mistaken for acceptance.
+
+## 8. Status after Phase B (2026-11-02)
+
+| Criterion | Status |
+|---|---|
+| PERF-01 (p95 under 500 ms after idle) | APIs met; `/queue` and `/baseline` borderline; `/decisions`, `/decisions/{id}` and the review endpoint **not met** (Windows process start-up dominates) |
+| PERF-05 (`/decisions` under 150 KB) | **Not met**: 340 KB (was 760 KB) |
+| PERF-06 (queue under 1,500 initial DOM nodes) | Improved from about 9,900; the test asserts under 4,500; **1,500 not demonstrated** |
+| UX-01, UX-02 (no console errors; no raw Markdown) | **Met** (Phase A, e2e) |
+| FUN-03 (Studio Blocked equals the design gate) | **Met**, CI test, mutation-checked |
+| FUN-07 (one real approval) | **Open**: needs the owner's signing key |
+| SEC-01 (ruleset on main) | **Met**, with the owner able to bypass the review rule only; tested |
+| QA-01 (CI builds and tests the Studio) | **Met** |
+| QA-04 (undeclared imports) | **Met** |
+| Others (UX-03 to UX-13, SEC-02 to SEC-08, DOC-02, QA-06) | Not started or not assessed |
