@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { FilterX, Inbox, LogIn } from 'lucide-react';
 import { useQueryState } from '@/lib/use-query-state.ts';
 import { PRIORITIES, PRIORITY_RANK, KIND_LABEL, WORK_STATUSES, type Priority, type WorkItem } from '@/lib/queue/types.ts';
@@ -11,6 +11,8 @@ import { ItemSheet } from './item-sheet.tsx';
 import { useQueue } from './queue-data.tsx';
 import { QueueError, QueueLoading, QueueTabs, SourceStrip } from './queue-frame.tsx';
 import { PriorityTag, WorkStatusPill } from './work-bits.tsx';
+
+const PAGE = 100;
 
 const VIEW_SHORT: Record<View, string> = {
   all: 'All tasks',
@@ -95,6 +97,25 @@ export function QueueExplorer() {
     for (const i of filtered) map.set(key(i), [...(map.get(key(i)) ?? []), i]);
     return [...map.entries()].map(([name, list]) => ({ name, items: list }));
   }, [filtered, group]);
+
+  // Only the first PAGE rows are in the page at once: all 329 items made the Work Queue about 10,000 DOM nodes and 24,000 px tall.
+  const [limit, setLimit] = useState(PAGE);
+  // A string, not the array: `filtered` is a new array whenever any dependency is a new object, which would reset the window at once.
+  const filterSignature = `${group}|${filtered.map((i) => i.id).join(',')}`;
+  useEffect(() => setLimit(PAGE), [filterSignature]);
+  const flat = useMemo(() => groups.flatMap((g) => g.items), [groups]);
+  const selectedPos = selectedId ? flat.findIndex((i) => i.id === selectedId) : -1;
+  const shown = Math.max(limit, selectedPos + 1);
+  const visibleGroups = useMemo(() => {
+    let left = shown;
+    return groups
+      .map((g) => {
+        const items = g.items.slice(0, Math.max(0, left));
+        left -= g.items.length;
+        return { name: g.name, total: g.items.length, items };
+      })
+      .filter((g) => g.items.length > 0);
+  }, [groups, shown]);
 
   if (error && !data) return <QueueError message={error} onRetry={() => void reload()} />;
   if (loading || !data) return <QueueLoading />;
@@ -187,12 +208,12 @@ export function QueueExplorer() {
                   <th scope="col" className="hidden w-[150px] py-2.5 pr-5 font-medium xl:table-cell">Source</th>
                 </tr>
               </thead>
-              {groups.map((g) => (
+              {visibleGroups.map((g) => (
                 <tbody key={g.name || 'all'} className="divide-y divide-hairline border-b border-hairline last:border-b-0">
                   {g.name ? (
                     <tr className="bg-surface-2/70">
                       <th scope="colgroup" colSpan={cols} className="px-5 py-2 text-[12.5px] font-semibold text-ink-2">
-                        {g.name} <span className="ml-1 font-normal text-ink-3 tnum">{g.items.length}</span>
+                        {g.name} <span className="ml-1 font-normal text-ink-3 tnum">{g.total}</span>
                       </th>
                     </tr>
                   ) : null}
@@ -230,6 +251,16 @@ export function QueueExplorer() {
                 </tbody>
               ))}
             </table>
+            {flat.length > shown ? (
+              <div className="flex items-center justify-between gap-3 border-t border-hairline px-5 py-3 text-[13px] text-ink-2">
+                <span data-testid="queue-window">
+                  Showing <span className="font-medium tnum text-ink">{shown}</span> of <span className="tnum">{flat.length}</span>
+                </span>
+                <button type="button" className={btn} onClick={() => setLimit(shown + PAGE)}>
+                  Show {Math.min(PAGE, flat.length - shown)} more
+                </button>
+              </div>
+            ) : null}
           </div>
         )}
       </Card>

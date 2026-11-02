@@ -102,9 +102,9 @@ test.describe('empty states', () => {
     await page.goto('/decisions');
     await page.getByRole('searchbox', { name: 'Search decisions' }).fill('zzzz-no-such-decision');
     await expect(page.getByText('No decisions match these filters')).toBeVisible();
-    await expect(page.getByTestId('result-count')).toContainText('0 of 57');
+    await expect(page.getByTestId('result-count')).toContainText('0 of 58');
     await page.getByRole('button', { name: 'Clear filters' }).last().click();
-    await expect(page.getByTestId('decision-row')).toHaveCount(57);
+    await expect(page.getByTestId('decision-row')).toHaveCount(58);
   });
 
   test('queue, approvals, architecture and presentation explain empty filters', async ({ page }) => {

@@ -50,6 +50,8 @@ Each phase ends with a measurable exit. Effort: S under 1 day, M 1 to 3 days, L 
 
 ### Phase B: make it a control centre with real data (about 3 days)
 
+**Status 2026-11-02:** B2 and B4 done; B3 partly done (payload and queue cut, page-latency target not met); B1 needs the owner's signing key. See [PHASE-B-RESULTS](PHASE-B-RESULTS.md).
+
 | # | Work | Effort | Exit |
 |---|---|---|---|
 | B1 **(owner)** | Enrol one architecture-class approver key; take **one** real decision (a genuinely small one, for example a new ADR on the Studio's own hosting or the ruleset in A6) through review, PR, validation, merge | S | A real `docs/decision-reviews/…` record and signed approval exist on `main`; the Overview shows 1 signed approval |

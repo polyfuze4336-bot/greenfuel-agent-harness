@@ -22,7 +22,7 @@ test.describe('the register is populated from repository data', () => {
     const { items, commit } = await api<{ items: Rec[]; commit: string }>(request, '/api/v1/decisions');
     const reg = await api<{ commit: string; stats: { total: number; byKind: Record<string, number> }; validation: { checked: number; valid: number; issues: unknown[] } }>(request, '/api/v1/register');
     expect(items.length).toBe(reg.stats.total);
-    expect(items.filter((r) => r.kind === 'adr').length).toBe(20);
+    expect(items.filter((r) => r.kind === 'adr').length).toBe(21);
     expect(items.filter((r) => r.kind === 'register-entry').length).toBe(37);
     expect(reg.validation).toMatchObject({ checked: items.length, valid: items.length, issues: [] });
     for (const r of items) {
@@ -81,12 +81,12 @@ test.describe('the register is populated from repository data', () => {
     await health.getByText('How complete is the register?').click();
     await expect(health.getByTestId('completeness-table').locator('tr')).toHaveCount(17);
     await expect(health.getByTestId('completeness-table')).toContainText('Description');
-    await expect(health.getByTestId('completeness-table')).toContainText('of 57');
+    await expect(health.getByTestId('completeness-table')).toContainText('of 58');
   });
 
   test('UI: status chips carry the seven normalized statuses and their counts', async ({ page }) => {
     await ready(page, '/decisions');
-    for (const [s, n] of [['Proposed', 1], ['Pending Review', 37], ['Approved', 13], ['Rejected', 0], ['Deferred', 0], ['Superseded', 0], ['Blocked', 6]] as const) {
+    for (const [s, n] of [['Proposed', 2], ['Pending Review', 37], ['Approved', 13], ['Rejected', 0], ['Deferred', 0], ['Superseded', 0], ['Blocked', 6]] as const) {
       const chip = page.getByRole('button', { name: new RegExp(`^${s} ${n}$`) });
       await expect(chip, s).toBeVisible();
     }
@@ -249,7 +249,7 @@ test.describe('change detection and synchronisation', () => {
     expect(r.changes.counts.added).toBeGreaterThan(0);
     expect(r.changes.records.some((x) => x.kind === 'added')).toBe(true);
     expect(r.changes.files.length).toBeGreaterThan(0);
-    expect(r.changes.counts.added + r.changes.counts.changed + r.changes.counts.unchanged).toBe(57);
+    expect(r.changes.counts.added + r.changes.counts.changed + r.changes.counts.unchanged).toBe(58);
   });
 
   test('API: bad refs are refused and unknown refs are reported', async ({ request }) => {
@@ -263,11 +263,11 @@ test.describe('change detection and synchronisation', () => {
     const section = page.getByTestId('register-health');
     await section.getByText('Repository changes and synchronisation').click();
     await section.getByRole('button', { name: 'Sync now' }).click();
-    await expect(section.getByText(/First synchronisation: 57 records were read|0 added, 0 changed, 0 removed, 57 unchanged/)).toBeVisible();
+    await expect(section.getByText(/First synchronisation: 58 records were read|0 added, 0 changed, 0 removed, 58 unchanged/)).toBeVisible();
     await expect(section.getByText(/Last sync: commit/)).toBeVisible();
     await section.getByRole('button', { name: 'Sync now' }).click();
     const res = section.getByTestId('changes-result');
-    await expect(res).toContainText('0 added, 0 changed, 0 removed, 57 unchanged');
+    await expect(res).toContainText('0 added, 0 changed, 0 removed, 58 unchanged');
     await expect(res).toContainText('The register and its source files are unchanged.');
     const again = await (await request.post('/api/v1/register/sync')).json();
     expect(again.stats.filesReparsed).toBe(0);

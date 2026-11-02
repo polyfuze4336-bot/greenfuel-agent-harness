@@ -1,21 +1,22 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ArrowUpRight, FilterX, Inbox } from 'lucide-react';
 import { useQueryState } from '@/lib/use-query-state.ts';
 import { adrTypeLabel } from '@/lib/format.ts';
+import { rowMatches, type DecisionRow } from '@/lib/intel/row.ts';
 import { STATUSES, type DuplicateCandidate, type NormStatus, type NormalizedDecision, type Suggestion } from '@/lib/intel/schema.ts';
 import type { Lookup } from '@/lib/lookup.ts';
 import { ChipGroup, SearchField, SelectField, Sheet, SortHeader, ToggleChip, rowNav } from '../explorer-kit.tsx';
-import { Card, EmptyState, NormStatusPill, SourceLink, Tag, btn } from '../ui.tsx';
+import { Card, EmptyState, NormStatusPill, Skeleton, SourceLink, Tag, btn } from '../ui.tsx';
 import { DecisionDetail } from './decision-detail.tsx';
 
 const rank = (s: NormStatus) => STATUSES.indexOf(s);
 const PRI = { Must: 3, Should: 2, Could: 1 } as const;
 
 type GroupKey = 'none' | 'status' | 'type' | 'category' | 'priority' | 'milestone' | 'owner';
-const groupOf = (d: NormalizedDecision, g: GroupKey): string => {
+const groupOf = (d: DecisionRow, g: GroupKey): string => {
   switch (g) {
     case 'status':
       return d.status;
@@ -24,7 +25,7 @@ const groupOf = (d: NormalizedDecision, g: GroupKey): string => {
     case 'category':
       return d.category ? adrTypeLabel(d.category) : 'No category stated';
     case 'priority':
-      return d.priority ? d.priority.value : 'No priority (no requirement traces to it)';
+      return d.priority ?? 'No priority (no requirement traces to it)';
     case 'milestone':
       return d.milestone ? `Needed by ${d.milestone}` : 'No milestone (ADRs)';
     case 'owner':
@@ -34,12 +35,12 @@ const groupOf = (d: NormalizedDecision, g: GroupKey): string => {
   }
 };
 
-const cmp = (a: NormalizedDecision, b: NormalizedDecision, sort: string): number => {
+const cmp = (a: DecisionRow, b: DecisionRow, sort: string): number => {
   switch (sort) {
     case 'status':
       return rank(a.status) - rank(b.status);
     case 'priority':
-      return (PRI[b.priority?.value as keyof typeof PRI] ?? 0) - (PRI[a.priority?.value as keyof typeof PRI] ?? 0);
+      return (PRI[b.priority as keyof typeof PRI] ?? 0) - (PRI[a.priority as keyof typeof PRI] ?? 0);
     case 'milestone':
       return (a.milestone ?? 'ZZ').localeCompare(b.milestone ?? 'ZZ');
     case 'title':
@@ -51,13 +52,7 @@ const cmp = (a: NormalizedDecision, b: NormalizedDecision, sort: string): number
   }
 };
 
-function matches(d: NormalizedDecision, text: string): boolean {
-  if (!text) return true;
-  const hay = `${d.id} ${d.title} ${d.description ?? ''} ${d.businessJustification ?? ''} ${d.decisionOwner ?? ''} ${d.statusRaw} ${d.milestone ?? ''} ${d.category ?? ''} ${d.options.map((o) => o.name).join(' ')}`.toLowerCase();
-  return text.split(/\s+/).every((t) => hay.includes(t));
-}
-
-export function DecisionExplorer({ records, duplicates, suggestions, lookup }: { records: NormalizedDecision[]; duplicates: DuplicateCandidate[]; suggestions: Suggestion[]; lookup: Lookup }) {
+export function DecisionExplorer({ rows: records, duplicates, suggestionIds }: { rows: DecisionRow[]; duplicates: DuplicateCandidate[]; suggestionIds: string[] }) {
   const qs = useQueryState();
   const text = qs.get('q').trim().toLowerCase();
   const statuses = qs.list('status');
@@ -72,21 +67,21 @@ export function DecisionExplorer({ records, duplicates, suggestions, lookup }: {
   const selectedId = qs.get('id');
 
   const dupIds = useMemo(() => new Set(duplicates.flatMap((d) => (d.a === d.b ? [d.a] : [d.a, d.b]))), [duplicates]);
-  const sugIds = useMemo(() => new Set(suggestions.map((s) => s.decisionId)), [suggestions]);
+  const sugIds = useMemo(() => new Set(suggestionIds), [suggestionIds]);
   const categories = useMemo(() => [...new Set(records.flatMap((d) => (d.category ? [adrTypeLabel(d.category)] : [])))].sort(), [records]);
 
   const baseFilter = useCallback(
-    (d: NormalizedDecision) =>
-      matches(d, text) &&
+    (d: DecisionRow) =>
+      rowMatches(d, text) &&
       (!type || d.kind === type) &&
       (!milestone || d.milestone === milestone) &&
-      (!priority || (priority === 'none' ? !d.priority : d.priority?.value === priority)) &&
+      (!priority || (priority === 'none' ? !d.priority : d.priority === priority)) &&
       (!category || (d.category ? adrTypeLabel(d.category) === category : false)) &&
       (scope !== 'gate' || d.relatedReviews.length > 0) &&
-      (scope !== 'review' || d.flags.length > 0) &&
+      (scope !== 'review' || d.flagged) &&
       (scope !== 'duplicate' || dupIds.has(d.id)) &&
       (scope !== 'suggestions' || sugIds.has(d.id)) &&
-      (scope !== 'missing' || d.missing.length > 0),
+      (scope !== 'missing' || d.hasMissing),
     [text, type, milestone, priority, category, scope, dupIds, sugIds],
   );
 
@@ -104,7 +99,7 @@ export function DecisionExplorer({ records, duplicates, suggestions, lookup }: {
 
   const groups = useMemo(() => {
     if (group === 'none') return [{ name: '', items: filtered }];
-    const map = new Map<string, NormalizedDecision[]>();
+    const map = new Map<string, DecisionRow[]>();
     for (const d of filtered) {
       const k = groupOf(d, group);
       map.set(k, [...(map.get(k) ?? []), d]);
@@ -197,7 +192,7 @@ export function DecisionExplorer({ records, duplicates, suggestions, lookup }: {
                             {d.kind === 'adr' ? adrTypeLabel(d.category ?? undefined) : (d.category ?? 'Open entry')}
                             {d.status === 'Approved' && d.approvalBasis !== 'signed' ? ' · unsigned' : ''}
                             {d.relatedReviews.length && d.kind === 'adr' ? ` · ${d.relatedReviews.join(', ')}` : ''}
-                            {d.flags.length ? ' · flagged for review' : ''}
+                            {d.flagged ? ' · flagged for review' : ''}
                             {dupIds.has(d.id) ? ' · overlap candidate' : ''}
                             {sugIds.has(d.id) ? ' · AI suggestions' : ''}
                           </span>
@@ -206,7 +201,7 @@ export function DecisionExplorer({ records, duplicates, suggestions, lookup }: {
                       <td className="py-3 pr-4 align-top">
                         <NormStatusPill status={d.status} />
                       </td>
-                      <td className="hidden py-3 pr-4 align-top text-ink-2 md:table-cell">{d.priority?.value ?? <span className="text-ink-3">–</span>}</td>
+                      <td className="hidden py-3 pr-4 align-top text-ink-2 md:table-cell">{d.priority ?? <span className="text-ink-3">–</span>}</td>
                       <td className="hidden py-3 pr-4 align-top text-ink-2 lg:table-cell">{d.milestone ?? '–'}</td>
                       <td className="hidden max-w-[132px] py-3 pr-5 align-top xl:table-cell">
                         <SourceLink src={{ path: d.source.path, line: d.source.line }} />
@@ -223,7 +218,7 @@ export function DecisionExplorer({ records, duplicates, suggestions, lookup }: {
       <Sheet open={!!selected} onClose={() => qs.set({ id: null })} title="Decision">
         {selected ? (
           <>
-            <DecisionDetail d={selected} lookup={lookup} duplicates={duplicates.filter((x) => x.a === selected.id || x.b === selected.id)} suggestions={suggestions} />
+            <DecisionSheetBody id={selected.id} />
             <div className="mt-6">
               <Link href={`/decisions/${selected.id}`} className="inline-flex items-center gap-1.5 text-[13.5px] font-medium text-accent hover:underline">
                 Open as a full page
@@ -235,4 +230,54 @@ export function DecisionExplorer({ records, duplicates, suggestions, lookup }: {
       </Sheet>
     </div>
   );
+}
+
+type SheetData = { decision: NormalizedDecision; duplicates: DuplicateCandidate[]; suggestions: Suggestion[]; lookup: Lookup };
+
+/** Loads one decision's full record when its panel opens. The register page itself carries only the table rows. */
+function DecisionSheetBody({ id }: { id: string }) {
+  const [state, setState] = useState<{ id: string; data?: SheetData; error?: string }>({ id });
+  const [attempt, setAttempt] = useState(0);
+  useEffect(() => {
+    let live = true;
+    fetch(`/api/v1/decisions/${encodeURIComponent(id)}/sheet`, { credentials: 'same-origin' })
+      .then(async (r) => {
+        if (!r.ok) throw new Error(((await r.json().catch(() => null)) as { detail?: string } | null)?.detail ?? `HTTP ${r.status}`);
+        return (await r.json()) as SheetData;
+      })
+      .then((data) => live && setState({ id, data }))
+      .catch((e: unknown) => live && setState({ id, error: e instanceof Error ? e.message : 'Could not load this decision.' }));
+    return () => {
+      live = false;
+    };
+  }, [id, attempt]);
+
+  if (state.id !== id || (!state.data && !state.error))
+    return (
+      <div aria-busy="true" aria-label="Loading decision" data-testid="decision-loading">
+        <Skeleton className="h-6 w-2/3" />
+        <Skeleton className="mt-4 h-4 w-full" />
+        <Skeleton className="mt-2 h-4 w-5/6" />
+        <Skeleton className="mt-6 h-32 w-full" />
+      </div>
+    );
+  if (state.error)
+    return (
+      <div role="alert" className="text-[13.5px] text-[var(--s-rejected-fg)]">
+        <p className="font-semibold">This decision could not be loaded.</p>
+        <p>{state.error}</p>
+        <button
+          type="button"
+          className={`${btn} mt-3`}
+          onClick={() => {
+            setState({ id });
+            setAttempt((n) => n + 1);
+          }}
+        >
+          Retry
+        </button>
+      </div>
+    );
+  const d = state.data!;
+  return <DecisionDetail d={d.decision} lookup={d.lookup} duplicates={d.duplicates} suggestions={d.suggestions} />;
 }

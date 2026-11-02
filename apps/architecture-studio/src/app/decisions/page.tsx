@@ -5,7 +5,7 @@ import { DecisionExplorer } from '@/components/decisions/decision-explorer.tsx';
 import { RegisterHealth } from '@/components/decisions/register-health.tsx';
 import { PageHeader } from '@/components/ui.tsx';
 import { PageSkeleton } from '@/components/page-skeleton.tsx';
-import { buildLookup } from '@/lib/lookup.ts';
+import { toRow } from '@/lib/intel/row.ts';
 import { getModel } from '@/lib/repo/index.ts';
 import { runtime } from '@/lib/workflow/http.ts';
 import { pendingOrder } from '@/lib/workflow/runtime.ts';
@@ -32,7 +32,7 @@ export default async function DecisionsPage() {
       </PageHeader>
       <RegisterHealth stats={r.stats} validation={r.validation} duplicates={r.duplicates} suggestionCount={r.suggestions.length} commit={r.commit} refs={refs} warnings={r.warnings} />
       <Suspense fallback={<PageSkeleton />}>
-        <DecisionExplorer records={r.records} duplicates={r.duplicates} suggestions={r.suggestions} lookup={buildLookup(m)} />
+        <DecisionExplorer rows={r.records.map(toRow)} duplicates={r.duplicates} suggestionIds={[...new Set(r.suggestions.map((s) => s.decisionId))]} />
       </Suspense>
     </>
   );

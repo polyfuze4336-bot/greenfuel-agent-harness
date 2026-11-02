@@ -161,35 +161,35 @@ test.describe('the complete workflow', () => {
     void csrf;
     queueBefore = await getJson(request, '/api/v1/queue');
     oldCommit = g(work, 'rev-parse', 'HEAD');
-    expect((await request.get('/api/v1/decisions/ADR-0021')).status(), 'unknown before it exists').toBe(404);
+    expect((await request.get('/api/v1/decisions/ADR-0031')).status(), 'unknown before it exists').toBe(404);
 
-    pushToGitHub({ [adrPath('0021', 'keep-decision-records-in-repo')]: adrText('0021', 'Keep decision records in this repository') }, 'ADR 0021: keep decision records in this repository');
+    pushToGitHub({ [adrPath('0031', 'keep-decision-records-in-repo')]: adrText('0031', 'Keep decision records in this repository') }, 'ADR 0031: keep decision records in this repository');
     g(work, 'fetch', '-q', 'origin');
     expect(Number(g(work, 'rev-list', '--count', 'HEAD..origin/main')), 'the working copy is one commit behind GitHub').toBe(1);
-    expect((await request.get('/api/v1/decisions/ADR-0021')).status(), 'the Studio reads what is checked out, so it has not seen it yet').toBe(404);
+    expect((await request.get('/api/v1/decisions/ADR-0031')).status(), 'the Studio reads what is checked out, so it has not seen it yet').toBe(404);
 
     g(work, 'merge', '-q', '--ff-only', 'origin/main');
     await refresh(request);
-    const d = await decision(request, 'ADR-0021');
+    const d = await decision(request, 'ADR-0031');
     expect(d.status).toBe('Proposed');
     expect(d.options).toHaveLength(3);
     const changes = await getJson(request, `/api/v1/register/changes?from=${oldCommit}`);
-    expect(changes.changes.records.find((r: { id: string }) => r.id === 'ADR-0021')?.kind).toBe('added');
+    expect(changes.changes.records.find((r: { id: string }) => r.id === 'ADR-0031')?.kind).toBe('added');
     const list = await getJson(request, '/api/v1/decisions');
-    expect(list.items.some((i: { id: string; status: string }) => i.id === 'ADR-0021' && i.status === 'Proposed')).toBe(true);
+    expect(list.items.some((i: { id: string; status: string }) => i.id === 'ADR-0031' && i.status === 'Proposed')).toBe(true);
     const q = await getJson(request, '/api/v1/queue');
-    expect(q.items.find((i: { id: string }) => i.id === 'ADR-0021')?.status, 'it is in the work queue as open work').toBe('Open');
+    expect(q.items.find((i: { id: string }) => i.id === 'ADR-0031')?.status, 'it is in the work queue as open work').toBe('Open');
     const gate = (await getJson(request, '/api/v1/baseline')).gates[0];
     expect(gate.state).toBe('blocked');
-    expect(gate.reasons.some((r: { code: string; text: string }) => r.code === 'pending' && /ADR-0021/.test(r.text)), 'readiness recalculated: the new decision is a pending gate').toBe(true);
+    expect(gate.reasons.some((r: { code: string; text: string }) => r.code === 'pending' && /ADR-0031/.test(r.text)), 'readiness recalculated: the new decision is a pending gate').toBe(true);
 
-    await page.goto('/decisions/ADR-0021');
+    await page.goto('/decisions/ADR-0031');
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Keep decision records');
     await page.screenshot({ path: path.join(REAL, 'docs', 'studio-acceptance', 'step-03-new-decision-pending.png'), animations: 'disabled' });
   });
 
   test('4-6: opening it shows the recommended option, the alternatives, pros, cons, cost and dependencies', async ({ request, page }) => {
-    const d = await decision(request, 'ADR-0021');
+    const d = await decision(request, 'ADR-0031');
     expect(d.recommendedOption?.name).toMatch(/Keep decision records/);
     const alts = d.options.filter((o: { recommended: boolean }) => !o.recommended);
     expect(alts.map((o: { name: string }) => o.name).join('|')).toMatch(/separate decision database.*Do nothing/);
@@ -204,34 +204,34 @@ test.describe('the complete workflow', () => {
     }
     expect(JSON.stringify(d.options)).toMatch(/hosted database/);
     expect(d.requiredApproverRole?.text).toMatch(/Programme owner/);
-    expect(d.source.path).toBe('docs/adr/0021-keep-decision-records-in-repo.md');
+    expect(d.source.path).toBe('docs/adr/0031-keep-decision-records-in-repo.md');
     expect(d.source.commit).toMatch(/^[0-9a-f]{40}$/);
-    await page.goto('/decisions/ADR-0021/review');
+    await page.goto('/decisions/ADR-0031/review');
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     for (const t of ['Keep decision records in this repository', 'A separate decision database', 'Do nothing']) await expect(page.getByText(t).first()).toBeVisible();
     await expectNoAxeViolations(page, 'review page of a new decision');
     await page.screenshot({ path: path.join(REAL, 'docs', 'studio-acceptance', 'step-04-review-page.png'), fullPage: true, animations: 'disabled' });
-    await page.goto('/decisions/ADR-0021/compare');
+    await page.goto('/decisions/ADR-0031/compare');
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   });
 
   test('7-12: approve with a rationale and an authenticated identity; a change reaches GitHub, validates, merges, and becomes canonical', async ({ request }) => {
     const csrf = await login(request, USERS.owner);
     const rationale = 'One source of truth and a reviewable history; the cost of the review workflow is accepted.';
-    const { pr, proposal } = await decideViaWorkflow(request, csrf, 'ADR-0021', { action: 'approve', rationale }, 'Approved');
+    const { pr, proposal } = await decideViaWorkflow(request, csrf, 'ADR-0031', { action: 'approve', rationale }, 'Approved');
 
     // 8: rationale and authenticated identity are in the record that GitHub holds.
-    const file = JSON.parse(fileOnMain('docs/decision-reviews/ADR-0021/0001-approve.json'));
+    const file = JSON.parse(fileOnMain('docs/decision-reviews/ADR-0031/0001-approve.json'));
     expect(file.actor).toMatchObject({ login: 'test-owner', githubId: 1001 });
     expect(JSON.stringify(file)).toContain(rationale);
     expect(file.sig ?? file.signature ?? file.basis, 'the record is bound to its content and signed').toBeTruthy();
     // 9: the change is a branch and a pull request, not a push to main.
-    expect(pr.head).toMatch(/^decision-review\/ADR-0021\//);
+    expect(pr.head).toMatch(/^decision-review\/ADR-0031\//);
     expect(proposal.change).toEqual({ field: 'status', old: 'Proposed', new: 'Approved' });
     // 10: the repository's own validation runs on the pull request's content.
     g(person, 'fetch', '-q', 'origin', pr.head);
     // The world's supporting records are SYNTHETIC text-only approvals, which the real validators correctly refuse. So the proof here is the
-    // delta: the pull request must introduce no validator failure that the canonical branch did not already have, and none about ADR-0021.
+    // delta: the pull request must introduce no validator failure that the canonical branch did not already have, and none about ADR-0031.
     const validate = (rev: string) => {
       g(person, 'checkout', '-q', '--detach', rev);
       const r = spawnSync('node', ['harness/scripts/validate-harness.mjs'], { cwd: person, encoding: 'utf8', windowsHide: true });
@@ -241,11 +241,11 @@ test.describe('the complete workflow', () => {
     const v = await timed('repository validation on the pull request (ms)', async () => validate(pr.headSha));
     g(person, 'checkout', '-q', '-B', 'main', 'origin/main');
     const introduced = v.fails.filter((l) => !baseRun.fails.includes(l));
-    evidence.validationOnPullRequest = { baseFailures: baseRun.fails.length, prFailures: v.fails.length, introducedByThePullRequest: introduced, mentionsAdr0021: v.fails.filter((l) => /0021/.test(l)).length };
+    evidence.validationOnPullRequest = { baseFailures: baseRun.fails.length, prFailures: v.fails.length, introducedByThePullRequest: introduced, mentionsAdr0031: v.fails.filter((l) => /0031/.test(l)).length };
     expect(introduced, 'the pull request introduces no new validator failure').toEqual([]);
-    expect(v.fails.filter((l) => /0021/.test(l))).toEqual([]);
+    expect(v.fails.filter((l) => /0031/.test(l))).toEqual([]);
     // 11-12: merged by a person on GitHub, then the Studio verifies it on the canonical branch.
-    const d = await decision(request, 'ADR-0021');
+    const d = await decision(request, 'ADR-0031');
     expect(d).toMatchObject({ status: 'Approved', approvalBasis: 'review-record' });
     expect(d.approvalHistory.length).toBeGreaterThan(0);
   });
@@ -253,7 +253,7 @@ test.describe('the complete workflow', () => {
   test('13-14: related work and dependencies update, and the readiness gate recalculates', async ({ request }) => {
     const q = await getJson(request, '/api/v1/queue');
     // The queue's vocabulary: an approved decision is finished work.
-    expect(q.items.find((i: { id: string }) => i.id === 'ADR-0021').status).toBe('Done');
+    expect(q.items.find((i: { id: string }) => i.id === 'ADR-0031').status).toBe('Done');
     const changed = q.items.filter((i: { id: string; status: string }) => {
       const b = queueBefore.items.find((x) => x.id === i.id);
       return b && b.status !== i.status;
@@ -308,8 +308,8 @@ test.describe('the complete workflow', () => {
     const files = ['manifest.json', 'decision-register.snapshot.json', 'READINESS-REPORT.md', 'DEPENDENCY-MATRIX.md', 'SUMMARY.md'].map((f) => `docs/baselines/BL-0001/${f}`);
     for (const f of files) expect(fs.existsSync(path.join(person, f)), f).toBe(true);
     const manifest = JSON.parse(fs.readFileSync(path.join(person, files[0]!), 'utf8'));
-    expect(manifest.scope.areas[0].decisions).toContain('ADR-0021');
-    const snap = manifest.requiredDecisions.find((d: { id: string }) => d.id === 'ADR-0021');
+    expect(manifest.scope.areas[0].decisions).toContain('ADR-0031');
+    const snap = manifest.requiredDecisions.find((d: { id: string }) => d.id === 'ADR-0031');
     expect(snap.approvedOption, 'the snapshot records which option was approved').toBeTruthy();
 
     // Generated and committed, but not authorized: the Studio calls it proposed and the gate stays closed.
@@ -325,7 +325,7 @@ test.describe('the complete workflow', () => {
     const gates = require('../../../harness/approvals/approval-gates.cjs');
     const engine = require('../../../harness/hooks/permission-engine.cjs');
     g(person, 'checkout', '-q', '-B', 'main', 'origin/main');
-    let rec = gates.buildDecisionRequest({ type: 'baseline', id: 'BL-0001', reason: 'Reviewed the manifest and the summary; ADR-0021 is approved.', root: person, now: new Date(Date.now() - 3600000) });
+    let rec = gates.buildDecisionRequest({ type: 'baseline', id: 'BL-0001', reason: 'Reviewed the manifest and the summary; ADR-0031 is approved.', root: person, now: new Date(Date.now() - 3600000) });
     rec = engine.signApproval(rec, key.privateKeyPem, key.keyId, ACC_PASS);
     await timed('baseline authorization visible in the Studio after commit (ms)', async () => {
       pushAndPull({ [`docs/approvals/${rec.id}.json`]: `${JSON.stringify(rec, null, 2)}\n` }, 'Approval: authorize baseline BL-0001');
@@ -484,10 +484,10 @@ test.describe('negative tests', () => {
 
   test('setup: four more decisions arrive on GitHub', async ({ request }) => {
     const files: Record<string, string> = {};
-    for (const [n, slug, t] of [['0022', 'forged', 'A decision someone tries to approve with a forged record'], ['0023', 'rejected', 'A decision the owner rejects'], ['0024', 'conflict', 'A decision changed on GitHub while it is open'], ['0025', 'outage', 'A decision submitted while GitHub is unreachable']]) files[adrPath(n!, slug!)] = adrText(n!, t!);
-    pushAndPull(files, 'ADRs 0022 to 0025');
+    for (const [n, slug, t] of [['0032', 'forged', 'A decision someone tries to approve with a forged record'], ['0033', 'rejected', 'A decision the owner rejects'], ['0034', 'conflict', 'A decision changed on GitHub while it is open'], ['0035', 'outage', 'A decision submitted while GitHub is unreachable']]) files[adrPath(n!, slug!)] = adrText(n!, t!);
+    pushAndPull(files, 'ADRs 0032 to 0035');
     await refresh(request);
-    for (const n of ['0022', '0023', '0024', '0025']) expect((await decision(request, `ADR-${n}`)).status).toBe('Proposed');
+    for (const n of ['0032', '0033', '0034', '0035']) expect((await decision(request, `ADR-${n}`)).status).toBe('Proposed');
   });
 
   test('unauthorized approval: no role, a viewer, a contributor, a security reviewer, an agent identity and an impostor are all refused by the server', async ({ request }) => {
@@ -502,7 +502,7 @@ test.describe('negative tests', () => {
         continue;
       }
       const csrf = ((await (await request.get('/api/v1/auth/session')).json()) as { csrf: string }).csrf;
-      const r = await submit(request, csrf, 'ADR-0022', { action: 'approve' });
+      const r = await submit(request, csrf, 'ADR-0032', { action: 'approve' });
       expect([401, 403, 409, 422], `${who}: ${JSON.stringify(r.body).slice(0, 200)}`).toContain(r.resp.status());
       expect(r.resp.ok(), `${who} must not be able to approve`).toBe(false);
     }
@@ -510,19 +510,19 @@ test.describe('negative tests', () => {
     expect(bare('rev-parse', 'refs/heads/main')).toBe(before);
     // no session at all
     await request.post('/api/v1/auth/signout', { headers: H, data: {} });
-    expect((await post(request, '/api/v1/review/ADR-0022/actions', '', { action: 'approve', expectedRevision: 'x', idempotencyKey: 'k' })).status()).toBe(401);
+    expect((await post(request, '/api/v1/review/ADR-0032/actions', '', { action: 'approve', expectedRevision: 'x', idempotencyKey: 'k' })).status()).toBe(401);
   });
 
   test('forged approval: a hand-written review record, a forged baseline approval and a forged slide approval all change nothing', async ({ request }) => {
     const csrf = await login(request, USERS.owner);
-    const rv = (await getJson(request, '/api/v1/review/ADR-0022')).view.revision;
+    const rv = (await getJson(request, '/api/v1/review/ADR-0032')).view.revision;
     // A review record written by hand and committed to main, claiming the owner approved. It has no valid signature or hash chain.
-    const fake = { schema: 'greenfuel.decision-review-event/v2', id: 'DR-ADR-0022-0001', decisionId: 'ADR-0022', seq: 1, action: 'approve', actor: { login: 'test-owner', githubId: 1001, name: 'Test Owner', verifiedBy: 'test-fixture', provider: 'github', subject: '1001', tenantId: null }, createdAt: new Date().toISOString(), rationale: 'Approved (forged).', basis: { recordHash: 'a'.repeat(64) }, sig: 'b'.repeat(64) };
-    pushAndPull({ 'docs/decision-reviews/ADR-0022/0001-approve.json': `${JSON.stringify(fake, null, 2)}\n` }, 'a hand-written approval record');
+    const fake = { schema: 'greenfuel.decision-review-event/v2', id: 'DR-ADR-0032-0001', decisionId: 'ADR-0032', seq: 1, action: 'approve', actor: { login: 'test-owner', githubId: 1001, name: 'Test Owner', verifiedBy: 'test-fixture', provider: 'github', subject: '1001', tenantId: null }, createdAt: new Date().toISOString(), rationale: 'Approved (forged).', basis: { recordHash: 'a'.repeat(64) }, sig: 'b'.repeat(64) };
+    pushAndPull({ 'docs/decision-reviews/ADR-0032/0001-approve.json': `${JSON.stringify(fake, null, 2)}\n` }, 'a hand-written approval record');
     await refresh(request);
-    const d = await decision(request, 'ADR-0022');
+    const d = await decision(request, 'ADR-0032');
     expect(d.status, 'the forged record does not approve the decision').toBe('Proposed');
-    const view = (await getJson(request, '/api/v1/review/ADR-0022')).view;
+    const view = (await getJson(request, '/api/v1/review/ADR-0032')).view;
     expect(JSON.stringify(view.canonical.state.problems), 'the Studio reports the forged record').toMatch(/./);
     evidence.forgedReviewRecord = view.canonical.state.problems.slice(0, 2);
     void rv;
@@ -536,37 +536,37 @@ test.describe('negative tests', () => {
     const b2 = bv.baselines.find((x: { id: string }) => x.id === 'BL-0002');
     expect(b2?.status, 'a forged authorization does not authorize').not.toBe('approved');
     expect(bv.baselines.find((x: { id: string }) => x.id === 'BL-0001').status, 'the genuine baseline is unaffected').toBe('approved');
-    pushAndPull({}, 'remove the forged baseline', ['docs/baselines/BL-0002/manifest.json', 'docs/approvals/APPROVAL-FORGED-BL-0002.json', 'docs/decision-reviews/ADR-0022/0001-approve.json']);
+    pushAndPull({}, 'remove the forged baseline', ['docs/baselines/BL-0002/manifest.json', 'docs/approvals/APPROVAL-FORGED-BL-0002.json', 'docs/decision-reviews/ADR-0032/0001-approve.json']);
     await refresh(request);
   });
 
   test('rejected decision: needs a rationale, is recorded, is not resolved, and cannot be approved over', async ({ request }) => {
     const csrf = await login(request, USERS.owner);
-    const none = await submit(request, csrf, 'ADR-0023', { action: 'reject' });
+    const none = await submit(request, csrf, 'ADR-0033', { action: 'reject' });
     expect(none.resp.status(), 'a rejection without a reason is refused').toBeGreaterThanOrEqual(400);
-    await decideViaWorkflow(request, csrf, 'ADR-0023', { action: 'reject', rationale: 'Violates the residency constraint HC-01.' }, 'Rejected');
+    await decideViaWorkflow(request, csrf, 'ADR-0033', { action: 'reject', rationale: 'Violates the residency constraint HC-01.' }, 'Rejected');
     const q = await getJson(request, '/api/v1/queue');
-    expect(q.items.find((i: { id: string }) => i.id === 'ADR-0023').status).toBe('Rejected');
+    expect(q.items.find((i: { id: string }) => i.id === 'ADR-0033').status).toBe('Rejected');
     const bv = await getJson(request, '/api/v1/baseline');
     expect(bv.readiness.global.rejected, 'a rejected decision is counted as rejected, not resolved').toBeGreaterThanOrEqual(1);
-    const over = await submit(request, csrf, 'ADR-0023', { action: 'approve' });
+    const over = await submit(request, csrf, 'ADR-0033', { action: 'approve' });
     expect(over.resp.status(), 'a rejected decision cannot be silently approved').toBeGreaterThanOrEqual(400);
-    expect((await decision(request, 'ADR-0023')).status).toBe('Rejected');
+    expect((await decision(request, 'ADR-0033')).status).toBe('Rejected');
   });
 
   test('conflicting GitHub changes and a stale revision: the submission is refused and nothing is sent', async ({ request }) => {
     const csrf = await login(request, USERS.owner);
-    const seen = (await getJson(request, '/api/v1/review/ADR-0024')).view.revision as string;
-    const text = fileOnMain(adrPath('0024', 'conflict'));
-    pushAndPull({ [adrPath('0024', 'conflict')]: text.replace('Keep decision records in this repository', 'Keep decision records somewhere else') }, 'someone edits ADR 0024 on GitHub');
+    const seen = (await getJson(request, '/api/v1/review/ADR-0034')).view.revision as string;
+    const text = fileOnMain(adrPath('0034', 'conflict'));
+    pushAndPull({ [adrPath('0034', 'conflict')]: text.replace('Keep decision records in this repository', 'Keep decision records somewhere else') }, 'someone edits ADR 0034 on GitHub');
     await refresh(request);
     const before = prs().length;
-    const resp = await post(request, '/api/v1/review/ADR-0024/actions', csrf, { action: 'approve', expectedRevision: seen, idempotencyKey: crypto.randomUUID() });
+    const resp = await post(request, '/api/v1/review/ADR-0034/actions', csrf, { action: 'approve', expectedRevision: seen, idempotencyKey: crypto.randomUUID() });
     expect(resp.status(), await resp.text()).toBe(409);
     expect(prs().length, 'no pull request was created').toBe(before);
-    expect((await decision(request, 'ADR-0024')).status).toBe('Proposed');
+    expect((await decision(request, 'ADR-0034')).status).toBe('Proposed');
     // and with the current revision it goes through, so the refusal was about staleness and not a broken decision
-    const ok = await submit(request, csrf, 'ADR-0024', { action: 'approve' });
+    const ok = await submit(request, csrf, 'ADR-0034', { action: 'approve' });
     expect(ok.resp.status()).toBe(200);
     // the deck's own state is also protected by a revision
     const dv = await getJson(request, '/api/v1/deck');
@@ -576,12 +576,12 @@ test.describe('negative tests', () => {
 
   test('GitHub unreachable: no false success, the failure is visible, and the same request succeeds once GitHub is back', async ({ request }) => {
     const csrf = await login(request, USERS.owner);
-    const rv = (await getJson(request, '/api/v1/review/ADR-0025')).view.revision as string;
+    const rv = (await getJson(request, '/api/v1/review/ADR-0035')).view.revision as string;
     const key = crypto.randomUUID();
     fs.renameSync(remote, `${remote}.off`);
     let resp;
     try {
-      resp = await post(request, '/api/v1/review/ADR-0025/actions', csrf, { action: 'approve', expectedRevision: rv, idempotencyKey: key });
+      resp = await post(request, '/api/v1/review/ADR-0035/actions', csrf, { action: 'approve', expectedRevision: rv, idempotencyKey: key });
     } finally {
       fs.renameSync(`${remote}.off`, remote);
     }
@@ -589,35 +589,35 @@ test.describe('negative tests', () => {
     const falseSuccess = resp.ok() && ['applied', 'awaiting-merge', 'pull-request-created'].includes(body?.proposal?.state);
     evidence.githubUnreachable = { status: resp.status(), state: body?.proposal?.state ?? null, detail: String(body?.detail ?? body?.proposal?.failure ?? '').slice(0, 160) };
     expect(falseSuccess, `must not claim a pull request exists: ${JSON.stringify(evidence.githubUnreachable)}`).toBe(false);
-    expect((await decision(request, 'ADR-0025')).status, 'still not decided').toBe('Proposed');
+    expect((await decision(request, 'ADR-0035')).status, 'still not decided').toBe('Proposed');
     // retry: the idempotency key makes it safe, and it now goes through
-    const retry = await post(request, '/api/v1/review/ADR-0025/actions', csrf, { action: 'approve', expectedRevision: rv, idempotencyKey: key });
+    const retry = await post(request, '/api/v1/review/ADR-0035/actions', csrf, { action: 'approve', expectedRevision: rv, idempotencyKey: key });
     const rb = await retry.json();
-    const open = (await getJson(request, '/api/v1/review/ADR-0025')).view.open;
+    const open = (await getJson(request, '/api/v1/review/ADR-0035')).view.open;
     if (!(retry.ok() && rb.proposal?.state === 'pull-request-created')) {
       const s = await post(request, `/api/v1/review/proposals/${open?.id ?? rb?.proposal?.id}/sync`, csrf, {});
       expect(s.ok(), await s.text()).toBe(true);
     }
-    expect((await getJson(request, '/api/v1/review/ADR-0025')).view.open.state).toBe('pull-request-created');
-    expect(prs().filter((p) => p.head.includes('/ADR-0025/')).length, 'exactly one pull request').toBe(1);
+    expect((await getJson(request, '/api/v1/review/ADR-0035')).view.open.state).toBe('pull-request-created');
+    expect(prs().filter((p) => p.head.includes('/ADR-0035/')).length, 'exactly one pull request').toBe(1);
   });
 
   test('duplicate decision: two files claiming the same ADR number are flagged and not silently merged', async ({ request }) => {
-    pushAndPull({ [adrPath('0021', 'duplicate-of-keep-decision-records')]: adrText('0021', 'A second record that claims number 0021') }, 'a duplicate ADR number');
+    pushAndPull({ [adrPath('0031', 'duplicate-of-keep-decision-records')]: adrText('0031', 'A second record that claims number 0031') }, 'a duplicate ADR number');
     await refresh(request);
     const reg = await getJson(request, '/api/v1/register');
     evidence.duplicates = reg.duplicates;
-    expect(JSON.stringify(reg.duplicates) + JSON.stringify(reg.warnings) + JSON.stringify(reg.validation), 'the register reports the duplicate').toMatch(/0021/);
-    const dup = await decision(request, 'ADR-0021');
+    expect(JSON.stringify(reg.duplicates) + JSON.stringify(reg.warnings) + JSON.stringify(reg.validation), 'the register reports the duplicate').toMatch(/0031/);
+    const dup = await decision(request, 'ADR-0031');
     expect(JSON.stringify(dup.flags) + JSON.stringify(dup.missing) + dup.status, 'the original is not silently overwritten by the duplicate').toMatch(/Approved|duplicate/i);
-    pushAndPull({}, 'remove the duplicate', [adrPath('0021', 'duplicate-of-keep-decision-records')]);
+    pushAndPull({}, 'remove the duplicate', [adrPath('0031', 'duplicate-of-keep-decision-records')]);
     await refresh(request);
   });
 
   test('change after approval: editing an approved decision invalidates the baseline and the final deck is refused again', async ({ request }) => {
     const csrf = await login(request, USERS.owner);
-    const text = fileOnMain(adrPath('0021', 'keep-decision-records-in-repo'));
-    pushAndPull({ [adrPath('0021', 'keep-decision-records-in-repo')]: text.replace('every change has an author, a reviewer and a commit', 'every change has an author and a commit') }, 'edit the approved ADR 0021 without reopening it');
+    const text = fileOnMain(adrPath('0031', 'keep-decision-records-in-repo'));
+    pushAndPull({ [adrPath('0031', 'keep-decision-records-in-repo')]: text.replace('every change has an author, a reviewer and a commit', 'every change has an author and a commit') }, 'edit the approved ADR 0031 without reopening it');
     await refresh(request);
     const bv = await getJson(request, '/api/v1/baseline');
     const b = bv.baselines.find((x: { id: string }) => x.id === 'BL-0001');
@@ -649,14 +649,14 @@ test.describe('negative tests', () => {
 
 test.describe('the interface under test', () => {
   test('the pages named in the workflow are accessible and responsive', async ({ page }) => {
-    for (const p of ['/decisions', '/decisions/ADR-0021', '/queue', '/baseline', '/presentation/deck']) {
+    for (const p of ['/decisions', '/decisions/ADR-0031', '/queue', '/baseline', '/presentation/deck']) {
       await page.goto(p);
       await expect(page.locator('main h1').first()).toBeVisible();
       await expectNoAxeViolations(page, p);
     }
     const overflow = async (pg: Page) => pg.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1);
     await page.setViewportSize({ width: 820, height: 1100 });
-    for (const p of ['/decisions/ADR-0021/review', '/baseline', '/presentation/deck']) {
+    for (const p of ['/decisions/ADR-0031/review', '/baseline', '/presentation/deck']) {
       await page.goto(p);
       await expect(page.locator('main h1').first()).toBeVisible();
       expect(await overflow(page), `${p} at tablet width`).toBe(false);

@@ -3,9 +3,9 @@
 // the harness itself would refuse. That code reads files from a folder, so the files the rules need are copied out of git at the ref
 // into a temporary folder first. The code that runs comes from `codeRoot` (in CI, the trusted base checkout); the data comes from the ref.
 import fs from 'node:fs';
-import { createRequire } from 'node:module';
 import os from 'node:os';
 import path from 'node:path';
+import { requireHarness } from '../harness-bridge.ts';
 import type { GitRepositoryAdapter } from '../repo/git.ts';
 
 export interface ApprovalInfo {
@@ -64,13 +64,11 @@ interface RegistryModule {
 
 /** The harness's own canonical JSON and hash, so a manifest is hashed exactly the way the approval rules hash it. */
 export function loadRegistry(codeRoot: string): RegistryModule {
-  const req = createRequire(path.join(codeRoot, 'package.json'));
-  return req(path.join(codeRoot, 'harness', 'approvals', 'registry.cjs')) as RegistryModule;
+  return requireHarness<RegistryModule>(codeRoot, 'approvals', 'registry.cjs');
 }
 
 export function loadGates(codeRoot: string): GatesModule {
-  const req = createRequire(path.join(codeRoot, 'package.json'));
-  return req(path.join(codeRoot, 'harness', 'approvals', 'approval-gates.cjs')) as GatesModule;
+  return requireHarness<GatesModule>(codeRoot, 'approvals', 'approval-gates.cjs');
 }
 
 export function harnessFacts(adapter: GitRepositoryAdapter, codeRoot: string): HarnessFacts {
