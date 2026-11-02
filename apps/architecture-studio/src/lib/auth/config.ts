@@ -17,6 +17,8 @@ export interface EntraConfig {
   redirectUri: string;
   /** https://login.microsoftonline.com unless a sovereign cloud or a test authority is used. */
   authority: string;
+  /** OpenID Connect scopes requested at sign-in. Only the sign-in scopes are allowed, never an API permission. Default: openid profile. */
+  scope?: string;
 }
 
 export interface AuthConfig {
@@ -48,7 +50,11 @@ export function readAuthConfig(env: Record<string, string | undefined> = process
     if (!clientId) problems.push('STUDIO_ENTRA_CLIENT_ID is not set.');
     if (!clientSecretFile) problems.push('STUDIO_ENTRA_CLIENT_SECRET_FILE is not set.');
     if (!/^https?:\/\/[^/]+\/api\/v1\/auth\/entra\/callback$/.test(redirectUri)) problems.push('STUDIO_ENTRA_REDIRECT_URI must be this server\'s /api/v1/auth/entra/callback URL, and registered on the app registration.');
-    if (!problems.length) entra = { tenantId: tenantId.toLowerCase(), clientId, clientSecretFile, redirectUri, authority: (env.STUDIO_ENTRA_AUTHORITY?.trim() || 'https://login.microsoftonline.com').replace(/\/+$/, '') };
+    // Some tenants do not let users consent to an unverified app, and ask for an administrator even for `profile`. `openid` alone is enough for
+    // the Studio (it needs oid, tid, roles and amr), at the cost of showing the object id instead of the sign-in name.
+    const wanted = (env.STUDIO_ENTRA_SCOPE?.trim() || 'openid profile').split(/\s+/);
+    if (!wanted.includes('openid') || wanted.some((s) => !['openid', 'profile', 'email'].includes(s))) problems.push('STUDIO_ENTRA_SCOPE may only list openid, profile and email, and must include openid.');
+    if (!problems.length) entra = { tenantId: tenantId.toLowerCase(), clientId, clientSecretFile, redirectUri, authority: (env.STUDIO_ENTRA_AUTHORITY?.trim() || 'https://login.microsoftonline.com').replace(/\/+$/, ''), scope: [...new Set(wanted)].join(' ') };
   }
   const pin = env.STUDIO_ACCESS_POLICY_SHA256?.trim().toLowerCase() || null;
   if (pin && !/^[0-9a-f]{64}$/.test(pin)) problems.push('STUDIO_ACCESS_POLICY_SHA256 must be a 64-digit hex sha256.');
@@ -66,7 +72,7 @@ export function readAuthConfig(env: Record<string, string | undefined> = process
 
 const g = globalThis as unknown as { __studioAuthConfig?: { key: string; cfg: AuthConfig }; __studioTrust?: { key: string; trust: Trust }; __studioAuthOverride?: Partial<AuthConfig> | null; __studioTrustOverride?: Trust | null };
 
-const ENV_KEYS = ['STUDIO_AUTH_MODE', 'STUDIO_REQUIRE_ENTRA', 'STUDIO_ENTRA_TENANT_ID', 'STUDIO_ENTRA_CLIENT_ID', 'STUDIO_ENTRA_CLIENT_SECRET_FILE', 'STUDIO_ENTRA_REDIRECT_URI', 'STUDIO_ENTRA_AUTHORITY', 'STUDIO_ACCESS_POLICY_SHA256', 'STUDIO_ALLOW_DEV_APPROVALS', 'STUDIO_CACHE_DIR', 'STUDIO_SIGNING_KEY_FILE', 'STUDIO_TRUSTED_SIGNING_KEYS_FILE'];
+const ENV_KEYS = ['STUDIO_AUTH_MODE', 'STUDIO_REQUIRE_ENTRA', 'STUDIO_ENTRA_SCOPE', 'STUDIO_ENTRA_TENANT_ID', 'STUDIO_ENTRA_CLIENT_ID', 'STUDIO_ENTRA_CLIENT_SECRET_FILE', 'STUDIO_ENTRA_REDIRECT_URI', 'STUDIO_ENTRA_AUTHORITY', 'STUDIO_ACCESS_POLICY_SHA256', 'STUDIO_ALLOW_DEV_APPROVALS', 'STUDIO_CACHE_DIR', 'STUDIO_SIGNING_KEY_FILE', 'STUDIO_TRUSTED_SIGNING_KEYS_FILE'];
 const envKey = () => ENV_KEYS.map((k) => process.env[k] ?? '').join('|');
 
 export function authConfig(): AuthConfig {

@@ -131,7 +131,7 @@ export class EntraClient {
       response_type: 'code',
       redirect_uri: this.cfg.redirectUri,
       response_mode: 'query',
-      scope: 'openid profile',
+      scope: this.cfg.scope ?? 'openid profile',
       state,
       nonce,
       code_challenge: b64u(sha256(verifier)),
