@@ -2,8 +2,8 @@
   "version": 2,
   "description": "Who may do what in the Architecture Decision Studio. This file is a control plane: changing it changes who can approve, so it is changed only by a human in a reviewed pull request, never by a Studio action, an AI agent or a Markdown comment. People are identified by a stable subject (github:<numeric id> or entra:<tenant id>:<object id>), never by a name or an email. Only entries marked kind human are read; a bot, service principal or agent entry is dropped. Approvals are accepted only from the providers listed in authentication.approvalProviders (production: entra). An approval is also recorded in a signed event whose signing key lives with the server, not in this repository. Architecture approval never authorises a regulatory filing or a production deployment; those are separate processes outside the Studio.",
   "authentication": {
-    "tenantId": null,
-    "clientId": null,
+    "tenantId": "08cef5cb-15fe-4756-9dd1-598a659ff06a",
+    "clientId": "0f1982fa-032c-47f5-a2da-ae6cd319708a",
     "approvalProviders": ["entra"],
     "entraRoleMap": {
       "Studio.Viewer": "viewer",
@@ -46,7 +46,7 @@
     "overrides": {}
   },
   "ownership": [
-    { "domain": "architecture", "scope": { "all": true }, "owners": ["github:225331490"] }
+    { "domain": "architecture", "scope": { "all": true }, "owners": ["github:225331490", "entra:08cef5cb-15fe-4756-9dd1-598a659ff06a:eb96b05f-f6a6-48f4-9348-d37b3abad1a8"] }
   ],
   "segregation": {
     "enforce": true,
@@ -66,6 +66,20 @@
         "requestedBy": null,
         "approvedBy": null,
         "reference": "Owner instruction in chat on 2026-10-30 that this GitHub account be registered as programme owner. Bootstrap: no second person approved it, and a chat instruction is not a signed approval. A GitHub sign-in is accepted for approvals only on a development server (STUDIO_ALLOW_DEV_APPROVALS=1). Replace with an Entra enrollment once a tenant exists."
+      }
+    },
+    {
+      "subject": "entra:08cef5cb-15fe-4756-9dd1-598a659ff06a:eb96b05f-f6a6-48f4-9348-d37b3abad1a8",
+      "kind": "human",
+      "login": "admin@MngEnvMCAP682563.onmicrosoft.com",
+      "holder": "MOD Administrator (the programme owner's Entra sign-in)",
+      "roles": ["architecture-owner"],
+      "enrolledAt": "2026-11-02T00:00:00Z",
+      "enrollment": {
+        "basis": "bootstrap",
+        "requestedBy": null,
+        "approvedBy": null,
+        "reference": "Owner instruction in chat on 2026-11-02, recorded in ADR-0021 (Proposed): enrol this Entra identity as the sole Architecture Owner for the deployed Studio. Bootstrap: no second person approved it, and a chat instruction is not a signed approval. Entra app roles are assigned to this identity on the enterprise application greenfuel-architecture-studio."
       }
     }
   ]
