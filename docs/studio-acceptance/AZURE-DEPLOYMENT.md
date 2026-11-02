@@ -56,10 +56,26 @@ The container secret is encrypted by the platform and not readable through the A
 
 1. **Signed-in use.** Signing in needs the owner's password and multi-factor prompt, which I did not enter. So **not verified on Azure**: that the sign-in completes, that the owner's enrolment and role are honoured, that the register and review pages render with data, that the cookie works behind the Container Apps ingress (including the Origin check on POST requests), and that the policy pin is accepted.
 2. That the in-container clone has advanced to the latest `main` after the policy change merged (the log only prints the first sync).
-3. Any write path: no GitHub App is configured, so approvals and proposals are unavailable by design.
+3. Any write path: the GitHub App is registered but not connected to the deployment, so approvals and proposals are unavailable by design.
 4. Behaviour under load, restart and failure; the 60-second sync under network failure.
 5. Final-deck rendering: needs Windows PowerPoint, so a final deck cannot be built here (a sample deck can).
 
+## Signing in, and a tenant limit found on 2026-11-02
+
+The owner first tried their corporate Microsoft account and got `AADSTS90072`: that account belongs to Microsoft's corporate tenant, and the app registration lives in the sandbox tenant ("Contoso"), where only `admin@MngEnvMCAP682563.onmicrosoft.com` is enrolled. A guest invitation for the corporate account was attempted and **refused by the tenant** ("Guest invitations not allowed for your company"). Changing a tenant-wide external-collaboration setting was not done without the owner's decision. **To sign in today, use the enrolled `admin@MngEnvMCAP682563.onmicrosoft.com` account.** Options if the corporate account is wanted: allow guest invitations in the tenant (an owner action), or register the app in the corporate tenant instead.
+
+## GitHub App (registered 2026-11-02, not yet connected to the deployment)
+
+| | |
+|---|---|
+| Name and id | `greenfuel-architecture-studio`, App id `5576378`, owner `polyfuze4336-bot`, private |
+| Installation | id `177749564`, on **`polyfuze4336-bot/greenfuel-agent-harness` only** (the account has many other repositories; "All repositories" was deliberately not chosen) |
+| Permissions | Contents read and write, Pull requests read and write, Checks read, Commit statuses read, Metadata read. No Administration, Workflows, Actions or Secrets. Webhooks off, no events |
+| Credentials | Private key, client secret and webhook secret are stored **outside the repository and outside OneDrive**, in `%USERPROFILE%\.greenfuel-studio\github-app`, readable only by the owner. They were first written inside the OneDrive-synced folder for a few minutes before being moved; if that concerns you, generate a new private key in the App's settings and delete the old one |
+
+Verified against GitHub, without printing any secret: the App authenticates (JWT, RS256); an installation token has exactly those five permissions and is limited to the one repository; the token can create and delete a branch (so the write path is real); and a **direct write to `main` is refused** by the ruleset ("Changes must be made through a pull request"), so the App cannot bypass review. The App is not on any ruleset bypass list. It can still read other **public** repositories, as any installation can; that was observed.
+
+**Not done:** the App is not configured on the Azure app, so approvals and proposals are still unavailable there. Connecting it needs the App id, installation id, repository, the private key as a secret file, and a server signing key for the signed review events, plus a redeploy. That should follow a successful signed-in check of the deployed Studio.
 ## Observed issues
 
 - **Log noise:** every signed-out page request logs an `AccessDeniedError: Sign in to read the Architecture Studio` stack trace, because the page throws and the framework logs it. It is expected behaviour logged as an error. It should be caught and logged as one line; recorded for Phase B.
@@ -92,6 +108,6 @@ Estimated from the Azure Retail Prices API (southeastasia, queried 2026-11-02) a
 ## Next actions for the owner
 
 1. Open the URL, sign in with Microsoft, and tell me what you see; then I can finish the signed-in verification.
-2. Register the GitHub App (GitHub UI) to enable the write path, then a second change configures it.
+2. ~~Register the GitHub App~~ Done 2026-11-02 (see above); connecting it to the deployment is the next change.
 3. Enrol an approver signing key (TODO T13) so ADR-0021 can be Accepted with a signed approval.
 4. Decide whether to move the secret to a private-endpoint Key Vault, and where the IaC should live.

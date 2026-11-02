@@ -44,7 +44,9 @@ An item shows its new status only after step 11. Until then the screen says "Loc
 
 Do **not** give the app Administration, Workflows, Actions or Secrets. Do **not** add it to any ruleset or branch-protection bypass list.
 
-### Registering the app (a human step, not done yet)
+### Registering the app
+
+*(Done 2026-11-02 for the sandbox: App id 5576378, installation 177749564; see [AZURE-DEPLOYMENT](../studio-acceptance/AZURE-DEPLOYMENT.md). The steps below are how it is done.)*
 
 1. GitHub → Settings → Developer settings → GitHub Apps → New GitHub App. Name it, for example, `greenfuel-architecture-studio`. Untick **Active** under Webhook for now (see below).
 2. Set the permissions in the table above. "Where can this app be installed": only on this account.
