@@ -118,7 +118,7 @@ Phase 0. Baseline v0.1 is **approved** (ADR 0003); the 37 decisions stay open, d
 
 ## Open approvals
 - none for memory (ADR 0010 Accepted)
-- Applying GitHub branch protection (T14, T45): not possible on this private repository's plan (HTTP 403); the interim alternative needs your enrollment and signed commits (T43). Not applied; changing remote settings needs your approval
+- Applying GitHub branch protection (T14, T45): superseded 2026-11-02, a ruleset is now active (see T14); previously not possible on this private repository's plan (HTTP 403); the interim alternative needs your enrollment and signed commits (T43). Not applied; changing remote settings needs your approval
 - ADR 0015 (Proposed; cannot be Accepted while RV-0002 is Blocked)
 - The Azure approvals and decisions in TODO T31 to T34 (ports and legal basis, subscription, read-only sign-in, key custody and AI location and targets). None requested yet. Deployment is deferred (T36)
 - Azure and GitHub sign-in, and any pending MCP candidate (none approved)
@@ -130,7 +130,7 @@ Phase 0. Baseline v0.1 is **approved** (ADR 0003); the 37 decisions stay open, d
 - No design can be Approved without a named human decider; none is named.
 - Hooks are not loaded in untrusted folders, silently. Trust the folder first.
 - The CLI's built-in GitHub MCP server stays on for sessions that are not specialist agents.
-- No agent has any P2+ ability until approvers are registered (T13). GitHub branch protection cannot be applied on this plan (T14).
+- No agent has any P2+ ability until approvers are registered (T13). A `main` ruleset has been active since 2026-11-02 (T14), without required reviews because there is one approver.
 - Agents run as the developer's OS user unless the dev container is built and used; hooks are a screen, not a sandbox (T15, T42).
 - The repository sits in a OneDrive-synced folder (Q1).
 - The gate can be satisfied with vacuous reasons (RK-014); branch protection and an approver registry are roadmap R4.

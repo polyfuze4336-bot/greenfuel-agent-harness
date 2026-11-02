@@ -23,7 +23,7 @@ Earlier stages also tested expired credentials, rate limits, webhook signature f
 ## What is not verified, and why it matters
 
 1. **Real GitHub behaviour** (App installation, JWT exchange, secondary rate limits, merge queue, required reviews). Needs the repository owner to register the App.
-2. **Branch protection.** Unavailable on this repository's plan. Until it exists, the only thing stopping a Contents-write credential from writing to `main` is the Studio's own code; there is no platform enforcement. This is the largest integration gap.
+2. **Branch protection.** *(Update 2026-11-02: a ruleset on `main` is now active, verified by refused direct, force and delete pushes; it requires pull requests and four checks but no approving review, because there is one approver. The text below describes the state when the acceptance run was made.)* Unavailable on this repository's plan. Until it exists, the only thing stopping a Contents-write credential from writing to `main` is the Studio's own code; there is no platform enforcement. This is the largest integration gap.
 3. **GitHub Actions on pull requests.** The workflows (SHA-pinned actions, `contents: read`, `pull_request` rather than `pull_request_target`) ran on push: `validate` and `architecture-gate` succeeded on GitHub for `cb5e84b`. A pull request created by the Studio, with Actions validating it and a required review gating the merge, has not been exercised on GitHub.
 4. **Webhook delivery** through a real public endpoint.
 

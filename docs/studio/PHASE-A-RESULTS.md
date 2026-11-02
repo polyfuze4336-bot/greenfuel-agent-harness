@@ -49,6 +49,24 @@ New workflow `.github/workflows/studio.yml`: `npm ci`, typecheck, unit tests, `n
 
 `jszip` is now declared (3.10.2, the version already installed). New test `checks/deps.check.ts` fails on any imported-but-undeclared package; shown to fail on a deliberately undeclared import and then pass. **Local paths:** redacting the six loop records was attempted and **reverted**: they are hash-sealed, and `validate-loop` failed after the edit. The path remains in those six files and in history.
 
+## A6: ruleset on `main`
+
+Approved by the owner. Applied 2026-11-02 as repository ruleset `main-protection` (id 26343459, enforcement active, no bypass actors):
+
+| Rule | Setting |
+|---|---|
+| Deletion | blocked |
+| Force push (non-fast-forward) | blocked |
+| Pull request | required; stale approvals dismissed on push; **required approving reviews: 0**; code-owner review: **not** required |
+| Required status checks | `validate`, `evaluate`, `studio`, `gate` (not required to be up to date with `main`) |
+
+**Verified, not assumed.** From a clean clone: `git push origin HEAD:main` was rejected ("push declined due to repository rule violations: 4 of 4 required status checks are expected"), `git push --force` was rejected, and deleting `main` was refused. `main` was unchanged afterwards. PR #1 itself went through the new flow: all five checks passed, then it was merged.
+
+**Deviation from the repository's own specification, stated plainly.** [`harness/policy/github-protection.json`](../../harness/policy/github-protection.json) asks for one approving review, code-owner review, up-to-date branches, linear history, conversation resolution and restricted pushes. With a single human approver (the owner's decision), nobody else can approve a pull request, so a required review would block every merge. The ruleset therefore enforces pull requests and checks but **not independent review**: the owner can still merge their own change, and separation of duties is enforced by the Studio's signed-approval model, not by GitHub. If a second approver is ever enrolled, raise required reviews to 1 and enable code-owner review (the rule `.github/CODEOWNERS` already exists).
+
+`npm run permissions:github` still prints `NOT-PROTECTED`: that script and the spec read classic branch protection, not rulesets. Both are control-plane files, so they were **not changed**; teaching the verifier about rulesets and rewriting the spec's stale status text is a follow-up that needs the owner's approval, and it must be checked against the evaluation run that records the current output (`EVAL-HRN-OBS-003`).
+
+Docs updated to say the ruleset exists: TODO T14, STATE, and dated notes in GITHUB-SYNC, GITHUB-INTEGRATION and SECURITY-REPORT. Older design documents and the generated inventory snapshot still describe the earlier state.
 ## Verification
 
 | Check | Result |
@@ -59,4 +77,4 @@ New workflow `.github/workflows/studio.yml`: `npm ci`, typecheck, unit tests, `n
 | Polish e2e (`e2e/polish.spec.ts`) | 2 / 2 |
 | Full Playwright suite (Windows, local) | **227 passed, 1 skipped (pre-existing), 0 failed**, 29.6 min; the second clean full pass |
 | `studio`, `validate`, `evaluate`, `gate`, `control-plane-guard` on PR #1 | all pass |
-| Ruleset on `main` (A6) | see below |
+| Ruleset on `main` (A6) | active; direct push, force push and deletion each refused (see A6) |

@@ -69,7 +69,7 @@ The scan is pattern-based and finds known token shapes only. It cannot find a lo
 **Remaining limitations** (none of these is hidden by the tests):
 
 1. No real Entra tenant, GitHub App, branch protection or deployed host was used. Everything above is **local evidence**. (`validate` and `architecture-gate` did succeed on GitHub for the pushed commit.)
-2. **No platform-enforced branch protection** (plan limitation). The only thing preventing a Contents-write credential from pushing to `main` is the Studio's own code.
+2. **No platform-enforced branch protection** (plan limitation). *Update 2026-11-02: a ruleset is now active on `main` (pull request and four required checks, no force push or deletion); it needs no approving review, so a single person can still merge their own change.* The only thing preventing a Contents-write credential from pushing to `main` is the Studio's own code.
 3. Slide approvals are unsigned local state.
 4. Single-instance, file-backed state; no shared store, so no multi-instance concurrency guarantees.
 5. Development sign-in and `localhost`-only reads are conveniences for local use and must be disabled (`STUDIO_REQUIRE_ENTRA=1`) in any deployment.

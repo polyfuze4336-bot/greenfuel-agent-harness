@@ -115,7 +115,7 @@ The audit log is local to the machine running the Studio. The durable, shared re
 
 - The browser never receives the key, a token or the webhook secret. A test scans the built client bundle for them.
 - The app cannot merge, approve, close, comment, delete or update. It can create a branch under two prefixes and add one record file. The code refuses anything else before a request is made.
-- **Branch protection is not available on this repository's plan** (T14: it needs GitHub Pro or a public repository). Until it is, the code-level limits above are the only control stopping a Contents-write credential from writing to `main`; the app is never granted a bypass, and the Studio contains no code path that targets `main`. Enable branch protection or a ruleset, with required review and the `validate` check, as soon as the plan allows. The Studio will then also be unable to bypass it, by design.
+- *(Update 2026-11-02: a ruleset on `main` is now active; see TODO T14. It requires pull requests and checks but no approving review.)* **Branch protection is not available on this repository's plan** (T14: it needs GitHub Pro or a public repository). Until it is, the code-level limits above are the only control stopping a Contents-write credential from writing to `main`; the app is never granted a bypass, and the Studio contains no code path that targets `main`. Enable branch protection or a ruleset, with required review and the `validate` check, as soon as the plan allows. The Studio will then also be unable to bypass it, by design.
 - The webhook route is the only route reachable by a non-loopback host, and only for a host in `STUDIO_WEBHOOK_HOSTS`.
 
 ## What has and has not been verified
