@@ -214,7 +214,7 @@ export function ExaminerPanel({ id }: { id: string }) {
         </div>
         <details className="mt-2 rounded-xl border border-hairline">
           <summary className="cursor-pointer px-3.5 py-2 text-[12.5px] font-medium">Show the prompt</summary>
-          <pre data-testid="critic-prompt" className="max-h-72 overflow-auto border-t border-hairline px-3.5 py-2.5 font-mono text-[11.5px] leading-5 whitespace-pre-wrap text-ink-2">{d.prompt}</pre>
+          <pre tabIndex={0} aria-label="Prompt for the critic" data-testid="critic-prompt" className="max-h-72 overflow-auto border-t border-hairline px-3.5 py-2.5 font-mono text-[11.5px] leading-5 whitespace-pre-wrap text-ink-2">{d.prompt}</pre>
         </details>
       </section>
 

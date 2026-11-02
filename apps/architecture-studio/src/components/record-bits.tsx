@@ -21,7 +21,7 @@ function CommitRef({ e }: { e: Entry }) {
   const { githubUrl } = useGitHub();
   if (githubUrl && e.onGitHub) {
     return (
-      <a href={`/commit/`} target="_blank" rel="noreferrer noopener" aria-label={`Commit  on GitHub (opens in a new tab)`} className="font-mono text-accent hover:underline">
+      <a href={`${githubUrl}/commit/${e.sha}`} target="_blank" rel="noreferrer noopener" aria-label={`Commit ${e.short} on GitHub (opens in a new tab)`} className="font-mono text-accent hover:underline">
         {e.short}
       </a>
     );

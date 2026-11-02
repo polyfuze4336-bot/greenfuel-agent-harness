@@ -36,21 +36,37 @@ interface Dossier {
 
 const impactOf = async (request: import('@playwright/test').APIRequestContext, id: string, action: string) => (await (await request.get(`/api/v1/decisions/${id}/impact?action=${action}`)).json()) as Impact;
 
+// The first impact request after a start also builds the Work Queue (about 5 s cold, under 1 s warm). Warm it once so the tests
+// below judge behaviour and not start-up time. The cold figure is recorded in docs/studio/IMPACT-AND-EXAMINER.md.
+test.beforeAll(async ({ playwright }) => {
+  test.setTimeout(120_000);
+  const ctx = await playwright.request.newContext({ baseURL: 'http://localhost:3100' });
+  await ctx.get('/api/v1/decisions/ADR-0016/impact?action=approve', { timeout: 100_000 });
+  await ctx.get('/api/v1/decisions/ADR-0016/examiner', { timeout: 100_000 });
+  await ctx.dispose();
+});
+
 async function openDetail(page: Page, id: string) {
   await ready(page, `/decisions/${id}`);
   await expect(page.getByTestId('decision-detail')).toBeVisible();
 }
 
 test.describe('impact analysis: dependency detection against the real repository', () => {
-  test('every directly affected decision really names the decision in its own source file', async ({ request }) => {
-    const r = await impactOf(request, 'ADR-0016', 'reject');
-    const decisions = r.direct.filter((x) => x.kind === 'decision');
-    expect(decisions.length).toBeGreaterThan(0);
-    for (const x of decisions) {
-      expect(x.src, x.id).not.toBeNull();
-      const text = show(x.src!.path);
-      expect(text, `${x.id} source ${x.src!.path}`).toMatch(/ADR[- ]?0016|ADR-0016/);
+  test('every directly affected decision really names, or is named by, the decision in its own source file', async ({ request }) => {
+    test.setTimeout(120_000);
+    const list = (await (await request.get('/api/v1/decisions')).json()) as { items: { id: string }[] };
+    const pattern = (id: string) => (id.startsWith('ADR-') ? new RegExp(`ADR[- ]?${id.slice(4)}`) : new RegExp(id));
+    let checked = 0;
+    for (const it of list.items) {
+      const r = await impactOf(request, it.id, 'reject');
+      for (const x of r.direct.filter((y) => y.kind === 'decision')) {
+        expect(x.src, `${it.id} -> ${x.id}`).not.toBeNull();
+        const text = show(x.src!.path);
+        expect(pattern(it.id).test(text) || pattern(x.id).test(text), `${it.id} -> ${x.id} in ${x.src!.path}`).toBe(true);
+        checked++;
+      }
     }
+    expect(checked, 'at least some real decision-to-decision references exist').toBeGreaterThan(10);
   });
 
   test('every directly affected item names a source line that exists', async ({ request }) => {
@@ -71,6 +87,7 @@ test.describe('impact analysis: dependency detection against the real repository
   });
 
   test('all four actions work for every record, summaries equal the lists, effort is never stated', async ({ request }) => {
+    test.setTimeout(240_000);
     const list = (await (await request.get('/api/v1/decisions')).json()) as { items: { id: string }[] };
     expect(list.items.length).toBeGreaterThanOrEqual(58);
     for (const it of list.items) {
@@ -170,11 +187,15 @@ test.describe('impact panel: compact, progressive, keyboard friendly', () => {
     }
   });
 
-  test('states that estimates are counts only, and that the Studio changes nothing', async ({ page }) => {
+  test('states that estimates are counts only, and that the Studio changes nothing', async ({ page, request }) => {
     await openDetail(page, 'ADR-0016');
     await page.getByTestId('tab-impact').click();
-    await expect(page.getByTestId('impact-estimate')).toContainText(/no effort|count/i);
-    await expect(page.getByTestId('impact-status')).toContainText(/Studio|GitHub|review record/i);
+    await expect(page.getByTestId('impact-estimate')).toContainText(/item\(s\)/);
+    await expect(page.getByText(/no effort, duration or cost is estimated/i)).toBeVisible();
+    const api = await impactOf(request, 'ADR-0016', 'approve');
+    await expect(page.getByText(api.statusNote, { exact: false }).first()).toBeVisible();
+    await expect(page.getByText(/Built only from explicit repository references/)).toBeVisible();
+    expect(api.statusNote).toMatch(/Studio|GitHub|review record/i);
   });
 
   test('tabs follow the arrow keys, Home and End, with one tab stop', async ({ page }) => {
@@ -417,8 +438,25 @@ test.describe('navigation, context and the review page', () => {
     await expect(page.getByTestId('decision-detail')).toBeVisible();
     await page.getByTestId('tab-challenge').click();
     await expect(page.getByTestId('examiner-position')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.getByTestId('detail-sheet')).toHaveCount(0);
     await page.getByTestId('decision-row').nth(2).click();
+    await expect(page.getByTestId('decision-detail')).toBeVisible();
     await expect(page.getByTestId('tab-record')).toHaveAttribute('aria-selected', 'true');
+    await page.getByTestId('tab-impact').click();
+    await expect(page.getByTestId('impact-summary')).toBeVisible();
+  });
+
+  test('every "on GitHub" commit link goes to a real commit URL on the repository', async ({ page }) => {
+    await openDetail(page, 'ADR-0016');
+    await expect(page.getByTestId('file-commit').first()).toBeVisible();
+    const links = page.locator('[data-testid="file-commit"] a[href*="/commit/"]');
+    expect(await links.count()).toBeGreaterThan(0);
+    for (const a of await links.all()) {
+      const href = (await a.getAttribute('href')) ?? '';
+      expect(href).toMatch(/^https:\/\/github\.com\/[^/]+\/[^/]+\/commit\/[0-9a-f]{40}$/);
+      expect(await a.getAttribute('aria-label')).toMatch(/^Commit [0-9a-f]{7} on GitHub/);
+    }
   });
 
   test('the review page offers both aids in a side panel, and the review actions are not behind them', async ({ page }) => {
