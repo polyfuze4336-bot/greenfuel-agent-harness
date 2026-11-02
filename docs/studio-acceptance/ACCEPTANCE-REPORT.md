@@ -11,6 +11,8 @@ The request says: *"Do not declare success until the complete workflow has been 
 
 What *is* established, with evidence: the complete 20-step workflow and 12 negative tests pass end to end against the production build of the Studio running locally, in a throw-away repository world with a bare git remote and a simulated pull-request service ([TEST-REPORT](TEST-REPORT.md)).
 
+> **Update 2026-11-02:** the Studio is now deployed on Azure (read-only, Entra sign-in only): see [AZURE-DEPLOYMENT](AZURE-DEPLOYMENT.md). The deployed URL answers correctly when signed out (sign-in screen, 401 on the API, redirect to the tenant's Entra with PKCE) and an API probe passes 89 of 90 (the one miss was the probe's own expectation, since corrected). **The signed-in workflow has not been tested on Azure** because it needs the owner's password and MFA; the verdict above therefore still stands until that is done, and approvals and GitHub synchronization remain untested on Azure.
+
 ## Summary of evidence
 
 | Area | Result | Where |

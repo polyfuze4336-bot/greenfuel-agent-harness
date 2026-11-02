@@ -84,7 +84,8 @@ record('headers', 'framing refused', /frame-ancestors 'none'|frame-ancestors 'se
 record('headers', 'Referrer-Policy set', !!h('referrer-policy'), { value: h('referrer-policy') });
 record('headers', 'X-Powered-By absent', !h('x-powered-by'), { value: h('x-powered-by') });
 const nf = await f('/api/v1/decisions/ADR-9999');
-record('errors', 'unknown decision is a 404 problem document without internals', nf.status === 404 && !leaks(nf.body), { status: nf.status });
+// Signed out, an Entra deployment answers 401 before it looks up anything; either answer is correct as long as nothing internal leaks.
+record('errors', 'unknown decision is a 404 (or 401 signed out) problem document without internals', (nf.status === 404 || nf.status === 401) && !leaks(nf.body), { status: nf.status });
 const np = await f('/no-such-page');
 record('errors', 'unknown page is a 404 without internals', np.status === 404 && !leaks(np.body), { status: np.status });
 const unauth = await f('/api/v1/auth/session');
@@ -112,8 +113,10 @@ for (const [name, url] of [
 ]) latency[name] = await sample(url, 30);
 
 const failed = results.filter((r) => !r.pass);
+const probeStatus = (await f('/api/v1/register')).status;
+const latencyNote = probeStatus === 200 ? 'read paths answered 200' : `read paths answered ${probeStatus} (signed out), so these latencies measure the refusal, not a page`;
 const summary = { base, probedAt: new Date().toISOString(), checks: results.length, failed: failed.length, routes: all.length, mutatingRoutes: mutating.length };
-const report = { summary, failed, latency, results };
+const report = { summary, latencyNote, failed, latency, results };
 if (out) fs.writeFileSync(out, `${JSON.stringify(report, null, 2)}\n`);
-console.log(JSON.stringify({ summary, failed, latency }, null, 2));
+console.log(JSON.stringify({ summary, latencyNote, failed, latency }, null, 2));
 process.exit(failed.length ? 1 : 0);

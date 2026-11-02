@@ -1,6 +1,5 @@
-# Review of control-plane paths. This file only takes effect when branch protection requires code-owner review, which this
-# repository's current plan does not offer (see harness/policy/github-protection.json). It is prepared so that turning
-# protection on is one setting, not a design task.
+# Review of control-plane paths. Since 2026-11-02 the ruleset main-owner-review requires code-owner review for pull requests;
+# the repository owner may bypass that rule (and only that rule) when merging. See docs/studio/PHASE-A-RESULTS.md.
 /.github/            @polyfuze4336-bot
 /harness/            @polyfuze4336-bot
 /docs/adr/           @polyfuze4336-bot
