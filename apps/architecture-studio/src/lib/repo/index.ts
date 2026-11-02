@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { GitRepositoryAdapter, GitError, validateRef } from './git.ts';
+import { GitRepositoryAdapter, GitError, repositoryFingerprint, validateRef } from './git.ts';
 import { buildModel } from './build.ts';
 import { FileStateStore, type FragmentCache } from '../intel/engine.ts';
 import { applyReviewOverlay } from '../workflow/overlay.ts';
@@ -10,13 +10,15 @@ import type { StudioModel } from './types.ts';
 
 export { GitError };
 
-const TTL_MS = 5_000;
+// How often the repository is asked whether anything changed. A check is three git calls; a rebuild is far more. The model itself
+// never expires on a clock: it is rebuilt only when the fingerprint of the repository (HEAD, every branch ref, uncommitted files,
+// last fetch) differs from the one it was built from.
+const CHECK_MS = 1_000;
 // Route handlers and pages are bundled separately, so a module-level variable would be a different copy in each.
-// The cache lives on globalThis so that invalidating it in one place is seen everywhere.
-const shared = globalThis as unknown as { __studioModel?: { key: string; at: number; model: StudioModel } | null };
+// The caches live on globalThis so that invalidating one in one place is seen everywhere.
+const shared = globalThis as unknown as { __studioModel?: { key: string; fp: string; checkedAt: number; model: StudioModel } | null; __studioFragments?: FragmentCache };
 // Parsed source files, keyed by path and git blob id. Surviving across requests is what makes re-reading incremental.
-const fragmentCache: FragmentCache = new Map();
-
+const fragmentCache: FragmentCache = (shared.__studioFragments ??= new Map());
 /** The ref the Studio reads. HEAD by default; STUDIO_REF reads another branch, tag or commit. */
 export function configuredRef(): string {
   // With the GitHub App configured, GitHub is the authority, so read the canonical branch unless told otherwise.
@@ -55,7 +57,7 @@ export function invalidateModel() {
   shared.__studioModel = null;
 }
 
-/** Build (or reuse, for a few seconds) the read model. `fresh` forces a re-read of the repository. */
+/** Build (or reuse) the read model. `fresh` forces a re-read of the repository. */
 export async function getModel(opts: { fresh?: boolean } = {}): Promise<StudioModel> {
   // In Entra mode the repository content is not produced for anyone who may not read it. Layouts and pages are rendered
   // independently of one another, so withholding it here is what stops it reaching the page payload.
@@ -65,8 +67,16 @@ export async function getModel(opts: { fresh?: boolean } = {}): Promise<StudioMo
   if (delay > 0) await new Promise((r) => setTimeout(r, delay));
   const key = `${repoRoot()}::${configuredRef()}`;
   const hit = shared.__studioModel;
-  if (!opts.fresh && hit && hit.key === key && Date.now() - hit.at < TTL_MS) return hit.model;
+  const now = Date.now();
+  if (!opts.fresh && hit && hit.key === key && now - hit.checkedAt < CHECK_MS) return hit.model;
+  const fp = await repositoryFingerprint(repoRoot());
+  // Re-read the cache after the await: another request may have rebuilt for this same fingerprint in the meantime.
+  const cur = shared.__studioModel;
+  if (!opts.fresh && cur && cur.key === key && cur.fp === fp) {
+    cur.checkedAt = Date.now();
+    return cur.model;
+  }
   const model = withReviews(buildModel(openAdapter(), fragmentCache));
-  shared.__studioModel = { key, at: Date.now(), model };
+  shared.__studioModel = { key, fp, checkedAt: Date.now(), model };
   return model;
 }

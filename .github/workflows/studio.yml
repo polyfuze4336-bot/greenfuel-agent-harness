@@ -1,0 +1,35 @@
+name: studio
+
+# Builds and tests the Architecture Decision Studio (apps/architecture-studio). The harness validators run in the `validate` workflow;
+# this one exists because nothing else in CI installs the Studio's dependencies, so a type error or a broken build in the Studio
+# would otherwise reach main unchecked. It never runs on a path filter: a required check that is skipped stays pending and blocks merging.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  studio:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: apps/architecture-studio
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0 # the unit tests clone this repository into throw-away worlds
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/architecture-studio/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run test:unit
+      - run: npm run build

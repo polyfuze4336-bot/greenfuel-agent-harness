@@ -1,10 +1,11 @@
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { describe, it, before } from 'node:test';
-import { GitRepositoryAdapter, validateRef } from '../src/lib/repo/git.ts';
+import { GitRepositoryAdapter, repositoryFingerprint, validateRef } from '../src/lib/repo/git.ts';
 import { buildModel } from '../src/lib/repo/build.ts';
 import { blockedReason, cells, parseAdr, parseRegister, parseTodo, tableRows } from '../src/lib/repo/parse.ts';
 import type { StudioModel } from '../src/lib/repo/types.ts';
@@ -160,5 +161,72 @@ describe('model integrity', () => {
     assert.ok(model.blockers.length > 0);
     assert.ok(model.blockers.every((b) => b.basis.length > 0 && b.title.length > 0));
     assert.ok(model.attention.every((a) => a.href.startsWith('/')));
+  });
+});
+
+describe('object caches and the repository fingerprint', () => {
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'studio-fp-'));
+  const g = (...a: string[]) => {
+    const r = spawnSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@example.invalid', '-c', 'commit.gpgsign=false', ...a], { cwd: tmp, encoding: 'utf8' });
+    assert.equal(r.status, 0, r.stderr);
+    return r.stdout.trim();
+  };
+  const commit = (file: string, text: string, msg: string) => {
+    fs.writeFileSync(path.join(tmp, file), text);
+    g('add', file);
+    g('commit', '-q', '-m', msg);
+  };
+
+  before(() => {
+    g('init', '-q', '-b', 'main');
+    commit('a.md', 'one\n', 'first');
+  });
+
+  it('is stable while nothing changes', async () => {
+    assert.equal(await repositoryFingerprint(tmp), await repositoryFingerprint(tmp));
+  });
+
+  it('changes with a commit, a new branch and an uncommitted file, and nothing else', async () => {
+    const f0 = await repositoryFingerprint(tmp);
+    commit('a.md', 'two\n', 'second');
+    const f1 = await repositoryFingerprint(tmp);
+    assert.notEqual(f1, f0, 'a commit changes it');
+    g('branch', 'side');
+    const f2 = await repositoryFingerprint(tmp);
+    assert.notEqual(f2, f1, 'a new branch ref changes it');
+    fs.writeFileSync(path.join(tmp, 'dirty.txt'), 'x');
+    const f3 = await repositoryFingerprint(tmp);
+    assert.notEqual(f3, f2, 'an uncommitted file changes it');
+    fs.rmSync(path.join(tmp, 'dirty.txt'));
+    assert.equal(await repositoryFingerprint(tmp), f2, 'removing it restores the earlier value');
+  });
+
+  it('never serves stale content: the cache is keyed by object id, so a changed file reads as changed', () => {
+    const a1 = new GitRepositoryAdapter(tmp, 'HEAD').open();
+    const before = a1.read('a.md');
+    commit('a.md', 'three\n', 'third');
+    const a2 = new GitRepositoryAdapter(tmp, 'HEAD').open();
+    assert.equal(a2.read('a.md'), 'three\n');
+    assert.notEqual(a2.read('a.md'), before);
+    // The earlier commit still reads as it was, from the same caches.
+    const old = new GitRepositoryAdapter(tmp, a1.commit).open();
+    assert.equal(old.read('a.md'), before);
+  });
+
+  it('lists the same files for the same commit when opened twice', () => {
+    const x = new GitRepositoryAdapter(tmp, 'HEAD').open();
+    const y = new GitRepositoryAdapter(tmp, 'HEAD').open();
+    assert.deepEqual(y.listAll(), x.listAll());
+    assert.equal(y.oid('a.md'), x.oid('a.md'));
+  });
+
+  it('fails clearly when the folder is not a repository', async () => {
+    const plain = fs.mkdtempSync(path.join(os.tmpdir(), 'studio-nogit-'));
+    await assert.rejects(() => repositoryFingerprint(plain), (e: unknown) => (e as { code?: string }).code === 'GIT_FAILED');
+    try {
+      fs.rmSync(plain, { recursive: true, force: true });
+    } catch {
+      // Windows can hold the folder for a moment after git exits; it is a temp folder.
+    }
   });
 });

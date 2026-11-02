@@ -7,6 +7,7 @@ import type { Lookup } from '@/lib/lookup.ts';
 import { SelectField } from '../explorer-kit.tsx';
 import { AiBadge, Card, NeutralPill, NormStatusPill, SourceLink, Tag, VerdictPill } from '../ui.tsx';
 import { SuggestionList } from './decision-detail.tsx';
+import { RichText } from '../rich-text.tsx';
 
 const th = 'border-b border-hairline px-4 py-3 text-left align-top font-medium';
 const td = 'border-b border-hairline px-4 py-3 align-top text-[13px] leading-5';
@@ -169,7 +170,7 @@ export function CompareView({ view, lookup }: { view: AlternativesView; lookup: 
                             <ul className="mb-2 list-disc space-y-1 pl-4 marker:text-[var(--s-accepted-fg)]">
                               {pros.map((c, i) => (
                                 <li key={i}>
-                                  {c.text} <SourceLink src={c.src} />
+                                  <RichText text={c.text} /> <SourceLink src={c.src} />
                                 </li>
                               ))}
                             </ul>
@@ -178,7 +179,7 @@ export function CompareView({ view, lookup }: { view: AlternativesView; lookup: 
                             <ul className="list-disc space-y-1 pl-4 marker:text-[var(--s-rejected-fg)]">
                               {cons.map((c, i) => (
                                 <li key={i}>
-                                  {c.text} <SourceLink src={c.src} />
+                                  <RichText text={c.text} /> <SourceLink src={c.src} />
                                 </li>
                               ))}
                             </ul>

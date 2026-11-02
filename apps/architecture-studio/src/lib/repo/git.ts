@@ -1,4 +1,4 @@
-import { spawnSync } from 'node:child_process';
+import { execFile, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -42,6 +42,69 @@ export function validateRef(ref: string): string {
   return ref;
 }
 
+/**
+ * Git objects are immutable: a tree is fully determined by its commit id and a blob by its object id. They can therefore be kept for
+ * the life of the process without ever going stale, which removes most of the git subprocesses from a rebuild. The caches live on
+ * globalThis because pages and route handlers are bundled separately and would otherwise each hold their own copy.
+ */
+interface ObjectCaches {
+  trees: Map<string, Map<string, string>>;
+  blobs: Map<string, string>;
+  blobBytes: number;
+}
+const g = globalThis as unknown as { __studioGitObjects?: ObjectCaches };
+const objects: ObjectCaches = (g.__studioGitObjects ??= { trees: new Map(), blobs: new Map(), blobBytes: 0 });
+const MAX_TREES = 8;
+const MAX_BLOB_BYTES = 64 * 1024 * 1024;
+
+function rememberBlob(oid: string, text: string) {
+  if (objects.blobs.has(oid)) return;
+  objects.blobs.set(oid, text);
+  objects.blobBytes += text.length;
+  // Oldest first (Map keeps insertion order). A blob is cheap to read again, so eviction is only a cost.
+  for (const k of objects.blobs.keys()) {
+    if (objects.blobBytes <= MAX_BLOB_BYTES) break;
+    objects.blobBytes -= objects.blobs.get(k)!.length;
+    objects.blobs.delete(k);
+  }
+}
+
+function spawnGit(root: string, args: string[], input?: Buffer | string): Buffer {
+  const sub = args[0];
+  if (!sub || !ALLOWED.has(sub)) throw new GitError('FORBIDDEN', `git ${sub ?? ''} is not on the read-only allowlist.`);
+  if (sub === 'config' && args[1] !== '--get') throw new GitError('FORBIDDEN', 'Only git config --get is allowed.');
+  if (sub === 'remote' && args[1] !== 'get-url') throw new GitError('FORBIDDEN', 'Only git remote get-url is allowed.');
+  const r = spawnSync('git', ['--no-optional-locks', ...args], { cwd: root, input, maxBuffer: MAX_BUFFER, env: { ...process.env, GIT_OPTIONAL_LOCKS: '0', GIT_TERMINAL_PROMPT: '0' } });
+  if (r.error) throw new GitError('GIT_UNAVAILABLE', `Could not run git: ${r.error.message}`);
+  if (r.status !== 0) throw new GitError('GIT_FAILED', `git ${sub} failed: ${r.stderr.toString().trim().slice(0, 200)}`);
+  return r.stdout;
+}
+
+/**
+ * A short string that changes whenever anything the read model depends on changes: where HEAD and every branch and remote-tracking
+ * ref point, how many files are uncommitted, and when the last fetch happened. Three git calls instead of a full rebuild.
+ */
+export async function repositoryFingerprint(root: string): Promise<string> {
+  // Fixed, read-only commands run concurrently and without blocking the event loop. Nothing here takes user input.
+  const run = (args: string[]) =>
+    new Promise<string>((resolve, reject) => {
+      execFile('git', ['--no-optional-locks', ...args], { cwd: root, maxBuffer: MAX_BUFFER, env: { ...process.env, GIT_OPTIONAL_LOCKS: '0', GIT_TERMINAL_PROMPT: '0' } }, (err, stdout) => (err ? reject(new GitError('GIT_FAILED', `git ${args[0]} failed: ${err.message.slice(0, 160)}`)) : resolve(stdout)));
+    });
+  const [head, refs, status, dir] = await Promise.all([
+    run(['rev-parse', '--verify', 'HEAD']),
+    run(['for-each-ref', '--format=%(objectname) %(refname)', 'refs/heads', 'refs/remotes']),
+    run(['status', '--porcelain']),
+    run(['rev-parse', '--git-common-dir']),
+  ]);
+  let fetch = 'none';
+  try {
+    fetch = String(fs.statSync(path.resolve(root, dir.trim(), 'FETCH_HEAD')).mtimeMs);
+  } catch {
+    // No fetch has happened yet.
+  }
+  return [head.trim(), refs, status, fetch].join('\n--\n');
+}
+
 export class GitRepositoryAdapter {
   readonly root: string;
   readonly ref: string;
@@ -62,14 +125,7 @@ export class GitRepositoryAdapter {
   }
 
   private run(args: string[], input?: Buffer | string): Buffer {
-    const sub = args[0];
-    if (!sub || !ALLOWED.has(sub)) throw new GitError('FORBIDDEN', `git ${sub ?? ''} is not on the read-only allowlist.`);
-    if (sub === 'config' && args[1] !== '--get') throw new GitError('FORBIDDEN', 'Only git config --get is allowed.');
-    if (sub === 'remote' && args[1] !== 'get-url') throw new GitError('FORBIDDEN', 'Only git remote get-url is allowed.');
-    const r = spawnSync('git', ['--no-optional-locks', ...args], { cwd: this.root, input, maxBuffer: MAX_BUFFER, env: { ...process.env, GIT_OPTIONAL_LOCKS: '0', GIT_TERMINAL_PROMPT: '0' } });
-    if (r.error) throw new GitError('GIT_UNAVAILABLE', `Could not run git: ${r.error.message}`);
-    if (r.status !== 0) throw new GitError('GIT_FAILED', `git ${sub} failed: ${r.stderr.toString().trim().slice(0, 200)}`);
-    return r.stdout;
+    return spawnGit(this.root, args, input);
   }
 
   private text(args: string[]): string {
@@ -97,11 +153,19 @@ export class GitRepositoryAdapter {
   }
 
   private parseTree(commit: string): Map<string, string> {
+    // A commit id fixes its tree for ever, so the listing is read from git once per commit.
+    const hit = objects.trees.get(commit);
+    if (hit) return hit;
     const out = this.run(['ls-tree', '-r', '-z', '--full-tree', commit]).toString('utf8');
     const map = new Map<string, string>();
     for (const rec of out.split('\0')) {
       const m = /^\d+ blob ([0-9a-f]{40,64})\t(.+)$/.exec(rec);
       if (m?.[1] && m[2]) map.set(m[2], m[1]);
+    }
+    objects.trees.set(commit, map);
+    for (const k of objects.trees.keys()) {
+      if (objects.trees.size <= MAX_TREES) break;
+      objects.trees.delete(k);
     }
     return map;
   }
@@ -125,6 +189,12 @@ export class GitRepositoryAdapter {
 
   /** Read many files with one git process. Content is normalised to LF. */
   preload(paths: string[]): void {
+    // Blobs already read in this process (by object id) are taken from memory, so only new content costs a git process.
+    for (const p of paths) {
+      const oid = this.tree.get(p);
+      const hit = oid ? objects.blobs.get(oid) : undefined;
+      if (hit !== undefined && !this.cache.has(p)) this.cache.set(p, hit);
+    }
     const want = paths.filter((p) => this.tree.has(p) && !this.cache.has(p));
     if (!want.length) return;
     const out = this.run(['cat-file', '--batch'], want.map((p) => this.tree.get(p)).join('\n') + '\n');
@@ -135,7 +205,9 @@ export class GitRepositoryAdapter {
       const header = out.subarray(pos, nl).toString('utf8').split(' ');
       const size = Number(header[2]);
       if (header[1] !== 'blob' || !Number.isFinite(size)) throw new GitError('GIT_FAILED', `Unexpected cat-file output for ${p}`);
-      this.cache.set(p, out.subarray(nl + 1, nl + 1 + size).toString('utf8').replace(/\r\n/g, '\n'));
+      const text = out.subarray(nl + 1, nl + 1 + size).toString('utf8').replace(/\r\n/g, '\n');
+      this.cache.set(p, text);
+      rememberBlob(this.tree.get(p)!, text);
       pos = nl + 1 + size + 1;
     }
   }

@@ -24,8 +24,14 @@ export function AccessReview() {
 
   const load = useCallback(async () => {
     setError(null);
-    const [s, r] = await Promise.all([call<{ csrf?: string }>('/api/v1/auth/session'), call<Report>('/api/v1/access/review')]);
+    // Ask who is signed in first: calling the review endpoint while signed out would only log a 401 in the browser console.
+    const s = await call<{ csrf?: string; authenticated?: boolean }>('/api/v1/auth/session');
     if (s.body?.csrf) setCsrf(s.body.csrf);
+    if (s.ok && s.body?.authenticated === false) {
+      setError({ status: 401, detail: 'You are not signed in.' });
+      return;
+    }
+    const r = await call<Report>('/api/v1/access/review');
     if (r.ok && r.body) setReport(r.body);
     else setError({ status: r.status, detail: r.body?.detail ?? `HTTP ${r.status}` });
   }, []);
