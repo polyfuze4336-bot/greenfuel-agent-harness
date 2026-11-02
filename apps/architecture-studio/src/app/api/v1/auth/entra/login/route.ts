@@ -8,7 +8,8 @@ import { runtime } from '@/lib/workflow/http.ts';
 export const dynamic = 'force-dynamic';
 
 /**
- * Starts Microsoft Entra ID sign-in. `?reauth=1` forces a fresh interactive login (needed to approve). The browser is sent to
+ * Starts Microsoft Entra ID sign-in. `?reauth=1` forces a fresh interactive login (needed to approve). `?login_hint=name@domain` asks Microsoft
+ * to offer that account when the browser is signed in as another one. The browser is sent to
  * Microsoft with a one-time state, nonce and PKCE challenge; a cookie ties the answer to this browser.
  */
 export function GET(req: NextRequest) {
@@ -20,7 +21,7 @@ export function GET(req: NextRequest) {
     const policy = rt.service.policy();
     let started;
     try {
-      started = await rt.entra.begin({ reauth, maxAgeSeconds: policy.session.approvalMaxAuthAgeMinutes * 60 });
+      started = await rt.entra.begin({ reauth, maxAgeSeconds: policy.session.approvalMaxAuthAgeMinutes * 60, loginHint: req.nextUrl.searchParams.get('login_hint') });
     } catch {
       return back('idp-unreachable');
     }

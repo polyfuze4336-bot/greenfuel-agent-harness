@@ -15,6 +15,11 @@ import fs from 'node:fs';
 import type { Principal } from './authorize.ts';
 import type { EntraConfig } from './config.ts';
 
+/** A sign-in name for Microsoft's login_hint: an email-shaped value of a sensible length, or nothing. Anything else is ignored, not rejected. */
+export function safeLoginHint(v: string | null | undefined): string | null {
+  if (!v || v.length > 200) return null;
+  return /^[A-Za-z0-9._%+'-]{1,80}@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)+$/.test(v) ? v : null;
+}
 export class EntraError extends Error {
   readonly code: string;
   constructor(code: string, message: string) {
@@ -113,7 +118,7 @@ export class EntraClient {
   }
 
   /** Starts a sign-in. `reauth` forces a fresh interactive login, for approvals. Returns where to send the browser, and the value to put in the binding cookie. */
-  async begin(opts: { reauth: boolean; maxAgeSeconds: number }): Promise<{ url: string; bindingCookie: string }> {
+  async begin(opts: { reauth: boolean; maxAgeSeconds: number; loginHint?: string | null }): Promise<{ url: string; bindingCookie: string }> {
     const d = await this.discovery();
     const state = b64u(crypto.randomBytes(24));
     const nonce = b64u(crypto.randomBytes(24));
@@ -133,6 +138,9 @@ export class EntraClient {
       code_challenge_method: 'S256',
       max_age: String(opts.maxAgeSeconds),
       ...(opts.reauth ? { prompt: 'login' } : {}),
+      // Only a hint: it chooses which account Microsoft offers when the browser is already signed in as someone else. It grants nothing;
+      // the person is still identified by the signed token and must be enrolled.
+      ...(safeLoginHint(opts.loginHint) ? { login_hint: safeLoginHint(opts.loginHint)! } : {}),
     });
     return { url: `${d.authorization_endpoint}?${q.toString()}`, bindingCookie };
   }
