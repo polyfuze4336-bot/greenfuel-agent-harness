@@ -134,7 +134,7 @@ export function SearchPalette({ totals }: { totals: number }) {
           </div>
           <div role="group" aria-label="Filter results by type" className="flex flex-wrap gap-1.5 border-b border-hairline px-4 py-2.5">
             {KINDS.map((k) => (
-              <button key={k.v} type="button" aria-pressed={kind === k.v} onClick={() => setKind(k.v)} className={`rounded-full px-2.5 py-1 text-[12.5px] font-medium transition-colors ${kind === k.v ? 'bg-navy text-white' : 'bg-surface-2 text-ink-2 hover:bg-hairline'}`}>
+              <button key={k.v} type="button" aria-pressed={kind === k.v} onClick={() => setKind(k.v)} className={`rounded-full px-2.5 py-1 text-[12.5px] font-medium transition-colors ${kind === k.v ? 'bg-selected text-selected-ink' : 'bg-surface-2 text-ink-2 hover:bg-hairline'}`}>
                 {k.label}
               </button>
             ))}

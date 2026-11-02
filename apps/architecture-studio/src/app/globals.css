@@ -16,6 +16,9 @@
   --focus: #0a84d6;
   --navy: #0c2236;
   --navy-2: #123350;
+  /* Selected controls and primary buttons: dark ink in light theme, the light accent in dark theme, so the state is visible in both. */
+  --selected: #0c2236;
+  --selected-ink: #ffffff;
 
   --s-open-fg: #8a5a00;
   --s-open-bg: #fdf3dc;
@@ -52,6 +55,8 @@
   --focus: #6cc0f2;
   --navy: #07121b;
   --navy-2: #0d2234;
+  --selected: #5db3e6;
+  --selected-ink: #08202f;
 
   --s-open-fg: #f0c261;
   --s-open-bg: #2f2512;
@@ -86,6 +91,8 @@
   --color-accent-soft: var(--accent-soft);
   --color-navy: var(--navy);
   --color-navy-2: var(--navy-2);
+  --color-selected: var(--selected);
+  --color-selected-ink: var(--selected-ink);
   --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI Variable Text', 'Segoe UI', system-ui, Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI Variable Display', 'Segoe UI', system-ui, sans-serif;
   --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', 'Cascadia Code', Consolas, Menlo, monospace;

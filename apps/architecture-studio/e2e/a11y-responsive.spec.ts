@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test';
-import { ROUTES, expectNoAxeViolations, ready } from './helpers.ts';
+import { ALL_PAGES, ROUTES, expectNoAxeViolations, ready } from './helpers.ts';
 
 test.describe('accessibility (axe, WCAG 2.1 A and AA)', () => {
-  for (const r of ROUTES) {
+  for (const r of ALL_PAGES) {
     test(`${r.heading}: no automatically detectable violations`, async ({ page }) => {
       await ready(page, r.path);
       await expectNoAxeViolations(page, r.heading);
@@ -11,7 +11,7 @@ test.describe('accessibility (axe, WCAG 2.1 A and AA)', () => {
 
   test('dark theme has no violations on the densest pages', async ({ page }) => {
     await page.addInitScript(() => localStorage.setItem('studio:theme', 'dark'));
-    for (const p of ['/', '/decisions', '/approvals']) {
+    for (const p of ['/', '/decisions', '/changes', '/approvals']) {
       await ready(page, p);
       await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
       await expectNoAxeViolations(page, `dark ${p}`);
@@ -96,7 +96,7 @@ test.describe('responsive layout', () => {
   for (const s of SIZES) {
     test(`${s.name}: no horizontal page overflow on any page, correct navigation pattern`, async ({ page }) => {
       await page.setViewportSize({ width: s.width, height: s.height });
-      for (const r of ROUTES) {
+      for (const r of ALL_PAGES) {
         await ready(page, r.path);
         const over = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
         expect(over, `${r.path} overflows by ${over}px at ${s.width}`).toBeLessThanOrEqual(1);
@@ -109,9 +109,9 @@ test.describe('responsive layout', () => {
         await expect(side).toBeHidden();
         await page.getByRole('button', { name: 'Open navigation' }).click();
         const nav = page.getByRole('dialog').getByRole('navigation', { name: 'Primary' });
-        await expect(nav.getByRole('link')).toHaveCount(6);
-        await nav.getByRole('link', { name: /^Work Queue/ }).click();
-        await expect(page).toHaveURL(/\/queue/);
+        await expect(nav.getByRole('link')).toHaveCount(ROUTES.length);
+        await nav.getByRole('link', { name: /^Changes/ }).click();
+        await expect(page).toHaveURL(/\/changes/);
         await expect(page.getByRole('dialog')).toBeHidden();
       }
     });

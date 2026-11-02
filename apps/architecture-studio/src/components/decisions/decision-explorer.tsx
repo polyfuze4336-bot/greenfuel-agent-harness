@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ArrowUpRight, FilterX, Inbox } from 'lucide-react';
+import { ArrowUpRight, ChevronDown, FilterX, Inbox, SlidersHorizontal } from 'lucide-react';
 import { useQueryState } from '@/lib/use-query-state.ts';
 import { adrTypeLabel } from '@/lib/format.ts';
 import { rowMatches, type DecisionRow } from '@/lib/intel/row.ts';
@@ -117,19 +117,34 @@ export function DecisionExplorer({ rows: records, duplicates, suggestionIds }: {
   const onSort = (f: string) => qs.set(sort === f ? { dir: dir === 'asc' ? 'desc' : 'asc' } : { sort: f === 'id' ? null : f, dir: null });
   const selected = selectedId ? records.find((d) => d.id === selectedId) : undefined;
 
+  const advancedActive = !!(type || category || milestone || scope || group !== 'none');
+  const [moreOpen, setMoreOpen] = useState(advancedActive);
+  useEffect(() => {
+    if (advancedActive) setMoreOpen(true);
+  }, [advancedActive]);
+
   return (
     <div>
-      <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-3">
+      <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-3">
         <SearchField value={qs.get('q')} onChange={(v) => qs.set({ q: v })} label="Search decisions" placeholder="Search id, title, owner, text" />
-        <SelectField label="Type" value={type} onChange={(v) => qs.set({ type: v })} options={[{ value: '', label: 'All types' }, { value: 'adr', label: 'ADRs' }, { value: 'register-entry', label: 'Open register entries' }]} />
         <SelectField label="Priority" value={priority} onChange={(v) => qs.set({ priority: v })} options={[{ value: '', label: 'Any priority' }, { value: 'Must', label: 'Must' }, { value: 'Should', label: 'Should' }, { value: 'Could', label: 'Could' }, { value: 'none', label: 'None traced' }]} />
-        <SelectField label="Category" value={category} onChange={(v) => qs.set({ category: v })} options={[{ value: '', label: 'Any category' }, ...categories.map((c) => ({ value: c, label: c.length > 42 ? `${c.slice(0, 41)}…` : c }))]} />
-        <SelectField label="Needed by" value={milestone} onChange={(v) => qs.set({ milestone: v })} options={[{ value: '', label: 'Any milestone' }, { value: 'M1', label: 'M1' }, { value: 'M2', label: 'M2' }]} />
-        <SelectField label="Group by" value={group} onChange={(v) => qs.set({ group: v === 'none' ? null : v })} options={[{ value: 'none', label: 'No grouping' }, { value: 'status', label: 'Status' }, { value: 'type', label: 'Type' }, { value: 'category', label: 'Category' }, { value: 'priority', label: 'Priority' }, { value: 'milestone', label: 'Milestone' }, { value: 'owner', label: 'Owner or decider' }]} />
+        <button type="button" aria-expanded={moreOpen} aria-controls="more-filters" onClick={() => setMoreOpen((o) => !o)} className={`${btn} h-9`} data-testid="more-filters">
+          <SlidersHorizontal aria-hidden className="size-4" />
+          More filters
+          <ChevronDown aria-hidden className={`size-4 transition-transform ${moreOpen ? 'rotate-180' : ''}`} />
+        </button>
       </div>
-      <div className="mb-5 flex flex-wrap items-center gap-x-6 gap-y-2.5">
+      <div className="mb-4">
         <ChipGroup label="Status" selected={statuses} onToggle={toggleStatus} options={STATUSES.map((s) => ({ value: s, label: s, count: counts[s] }))} />
-        <div role="group" aria-label="Scope" className="flex flex-wrap items-center gap-1.5">
+      </div>
+      <div id="more-filters" hidden={!moreOpen} className="mb-5 rounded-xl border border-hairline bg-surface-2 p-4">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
+          <SelectField label="Type" value={type} onChange={(v) => qs.set({ type: v })} options={[{ value: '', label: 'All types' }, { value: 'adr', label: 'ADRs' }, { value: 'register-entry', label: 'Open register entries' }]} />
+          <SelectField label="Category" value={category} onChange={(v) => qs.set({ category: v })} options={[{ value: '', label: 'Any category' }, ...categories.map((c) => ({ value: c, label: c.length > 42 ? `${c.slice(0, 41)}…` : c }))]} />
+          <SelectField label="Needed by" value={milestone} onChange={(v) => qs.set({ milestone: v })} options={[{ value: '', label: 'Any milestone' }, { value: 'M1', label: 'M1' }, { value: 'M2', label: 'M2' }]} />
+          <SelectField label="Group by" value={group} onChange={(v) => qs.set({ group: v === 'none' ? null : v })} options={[{ value: 'none', label: 'No grouping' }, { value: 'status', label: 'Status' }, { value: 'type', label: 'Type' }, { value: 'category', label: 'Category' }, { value: 'priority', label: 'Priority' }, { value: 'milestone', label: 'Milestone' }, { value: 'owner', label: 'Owner or decider' }]} />
+        </div>
+        <div role="group" aria-label="Scope" className="mt-3 flex flex-wrap items-center gap-1.5">
           <ToggleChip label="Gates a design review" pressed={scope === 'gate'} onToggle={() => toggleScope('gate')} />
           <ToggleChip label="Flagged for review" pressed={scope === 'review'} onToggle={() => toggleScope('review')} />
           <ToggleChip label="Duplicate or overlap candidate" pressed={scope === 'duplicate'} onToggle={() => toggleScope('duplicate')} />
@@ -137,7 +152,6 @@ export function DecisionExplorer({ rows: records, duplicates, suggestionIds }: {
           <ToggleChip label="Has fields not stated" pressed={scope === 'missing'} onToggle={() => toggleScope('missing')} />
         </div>
       </div>
-
       <div className="mb-2 flex items-center justify-between text-[13px] text-ink-3">
         <p role="status" aria-live="polite" data-testid="result-count">
           Showing <span className="font-medium text-ink tnum">{filtered.length}</span> of <span className="tnum">{records.length}</span> decisions

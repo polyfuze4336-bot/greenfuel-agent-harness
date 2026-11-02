@@ -75,7 +75,7 @@ export function IdentityMenu({ repo, approvers }: { repo: RepoMeta; approvers: n
     <>
       <Menu.Root modal={false} onOpenChange={(o) => o && void loadWho()}>
         <Menu.Trigger asChild>
-          <button type="button" aria-label={`${initials(user?.name)} account menu${user?.name ? ` for ${user.name}` : ''}`} className="grid size-9 place-items-center rounded-full bg-navy text-[12.5px] font-semibold text-white ring-1 ring-white/20 transition-opacity hover:opacity-90">
+          <button type="button" aria-label={`${initials(user?.name)} account menu${user?.name ? ` for ${user.name}` : ''}`} className="grid size-9 place-items-center rounded-full bg-selected text-[12.5px] font-semibold text-selected-ink ring-1 ring-hairline-strong transition-opacity hover:opacity-90">
             {initials(user?.name)}
           </button>
         </Menu.Trigger>

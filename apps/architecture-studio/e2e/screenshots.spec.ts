@@ -11,12 +11,13 @@ const shot = async (page: Page, name: string, fullPage = false) => {
 
 test.describe.configure({ mode: 'serial' });
 
-test('desktop 1440: the six destinations', async ({ page }) => {
+test('desktop 1440: the four destinations and their pages', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await ready(page, '/');
   await shot(page, '01-overview', true);
   await ready(page, '/decisions');
   await shot(page, '02-decision-register');
+  await page.getByTestId('more-filters').click();
   await page.getByLabel('Group by').selectOption('status');
   await shot(page, '03-decision-register-grouped');
   await ready(page, '/decisions?id=ADR-0016');
@@ -70,7 +71,7 @@ test('states: empty, error, loading, dark', async ({ page }) => {
   await shot(page, '17-error-state');
   await page.goto('http://localhost:3102/');
   await expect(page.getByRole('heading', { level: 1, name: 'Overview' })).toBeVisible({ timeout: 20_000 });
-  await page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: /^Decision Register/ }).click();
+  await page.getByRole('navigation', { name: 'Primary' }).getByRole('link', { name: /^Decisions/ }).click();
   await expect(page.getByTestId('page-skeleton')).toBeVisible();
   await shot(page, '18-loading-skeleton');
   await page.addInitScript(() => localStorage.setItem('studio:theme', 'dark'));

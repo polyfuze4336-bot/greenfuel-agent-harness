@@ -154,7 +154,7 @@ export function DecisionDetail({ d, lookup, duplicates = [], suggestions = [], t
           <Title className="text-[22px] leading-[1.25] font-semibold">{d.title}</Title>
 
           <div className="mt-4 flex flex-wrap items-center gap-2">
-            <Link href={`/decisions/${d.id}/review`} className="inline-flex items-center gap-1.5 rounded-lg bg-navy px-3 py-1.5 text-[13px] font-medium text-white hover:opacity-90">
+            <Link href={`/decisions/${d.id}/review`} className="inline-flex items-center gap-1.5 rounded-lg bg-selected px-3 py-1.5 text-[13px] font-medium text-selected-ink hover:opacity-90">
               <Gavel aria-hidden className="size-3.5" />
               Review and decide
             </Link>

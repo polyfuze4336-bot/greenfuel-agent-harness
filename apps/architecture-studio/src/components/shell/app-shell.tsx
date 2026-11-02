@@ -9,9 +9,11 @@ import type { Attention, RepoMeta } from '@/lib/repo/types.ts';
 import { GitHubProvider } from '../ui.tsx';
 import type { GitHubCtx } from '@/lib/links.ts';
 import { IdentityMenu } from './identity-menu.tsx';
+import { GoToShortcuts } from './go-to-shortcuts.tsx';
 import { NAV, isActive } from './nav.ts';
 import { Notifications } from './notifications.tsx';
 import { SearchPalette } from './search-palette.tsx';
+import { SectionTabs } from './section-tabs.tsx';
 import { SyncStatus } from './sync-status.tsx';
 
 export interface ShellData {
@@ -43,12 +45,12 @@ function NavList({ shell, onNavigate }: { shell: ShellData; onNavigate?: () => v
     <nav aria-label="Primary" className="flex-1 px-3">
       <ul className="space-y-0.5">
         {NAV.map((n) => {
-          const active = isActive(pathname, n.href);
+          const active = isActive(pathname, n);
           const count = n.count ? shell.counts[n.count] : undefined;
           const I = n.icon;
           return (
             <li key={n.href}>
-              <Link href={n.href} onClick={onNavigate} aria-current={active ? 'page' : undefined} className={`group relative flex items-center gap-3 rounded-lg px-3 py-2 text-[14px] transition-colors ${active ? 'bg-white/12 font-medium text-white' : 'text-white/70 hover:bg-white/6 hover:text-white'}`}>
+              <Link href={n.href} onClick={onNavigate} aria-current={active ? 'page' : undefined} title={`${n.label} (press g, then ${n.key})`} className={`group relative flex items-center gap-3 rounded-lg px-3 py-2 text-[14px] transition-colors ${active ? 'bg-white/12 font-medium text-white' : 'text-white/70 hover:bg-white/6 hover:text-white'}`}>
                 {active ? <span aria-hidden className="absolute top-2 bottom-2 -left-3 w-[3px] rounded-r bg-[#7cc4ee]" /> : null}
                 <I aria-hidden className="size-[18px] shrink-0" strokeWidth={active ? 2 : 1.75} />
                 <span className="flex-1">{n.label}</span>
@@ -83,6 +85,7 @@ export function AppShell({ shell, children }: { shell: ShellData; children: Reac
   const [navOpen, setNavOpen] = useState(false);
   return (
     <GitHubProvider value={shell.gh}>
+      <GoToShortcuts />
       <a href="#main" className="skip-link">
         Skip to content
       </a>
@@ -130,6 +133,7 @@ export function AppShell({ shell, children }: { shell: ShellData; children: Reac
           </header>
 
           <main id="main" tabIndex={-1} className="mx-auto w-full max-w-[1280px] px-4 py-8 outline-none sm:px-6 lg:px-8 lg:py-10">
+            <SectionTabs />
             {children}
           </main>
         </div>

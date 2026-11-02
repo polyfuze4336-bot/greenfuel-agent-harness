@@ -8,12 +8,21 @@ export const gitOut = (...a: string[]) => spawnSync('git', a, { cwd: repoRoot, e
 
 export const ROUTES = [
   { path: '/', heading: 'Overview', nav: 'Overview' },
-  { path: '/decisions', heading: 'Decision Register', nav: 'Decision Register' },
-  { path: '/queue', heading: 'Work Queue', nav: 'Work Queue' },
-  { path: '/approvals', heading: 'Approvals', nav: 'Approvals' },
-  { path: '/architecture', heading: 'Architecture & Evidence', nav: 'Architecture & Evidence' },
-  { path: '/presentation', heading: 'Presentation Studio', nav: 'Presentation Studio' },
+  { path: '/decisions', heading: 'Decisions', nav: 'Decisions' },
+  { path: '/changes', heading: 'Changes', nav: 'Changes' },
+  { path: '/presentation', heading: 'Presentation', nav: 'Presentation' },
 ] as const;
+
+/** Pages inside a destination. They keep their own addresses and are reached from a section tab, not from the primary navigation. */
+export const SECTION_PAGES = [
+  { path: '/queue', heading: 'Work Queue', tab: 'Work queue', nav: 'Decisions' },
+  { path: '/architecture', heading: 'Architecture & Evidence', tab: 'Architecture & evidence', nav: 'Decisions' },
+  { path: '/approvals', heading: 'Approvals', tab: 'Approvals', nav: 'Changes' },
+  { path: '/baseline', heading: 'Architecture baseline', tab: 'Readiness', nav: 'Changes' },
+] as const;
+
+/** Every page that is a destination or part of one. */
+export const ALL_PAGES = [...ROUTES, ...SECTION_PAGES] as const;
 
 /** Fails on any WCAG 2.x A or AA violation axe can detect automatically. */
 export async function expectNoAxeViolations(page: Page, label: string) {

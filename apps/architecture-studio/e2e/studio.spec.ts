@@ -1,11 +1,11 @@
 import { expect, test } from '@playwright/test';
-import { ROUTES, ready } from './helpers.ts';
+import { ROUTES, SECTION_PAGES, ready } from './helpers.ts';
 
 test.describe('navigation', () => {
   test('every primary destination loads, is marked current, and has one h1', async ({ page }) => {
     await ready(page, '/');
     const nav = page.getByRole('navigation', { name: 'Primary' });
-    await expect(nav.getByRole('link')).toHaveCount(6);
+    await expect(nav.getByRole('link')).toHaveCount(4);
     for (const r of ROUTES) {
       await nav.getByRole('link', { name: new RegExp(`^${r.nav.replace('&', '\\&')}`) }).click();
       await expect(page).toHaveURL(new RegExp(`${r.path === '/' ? '/$' : r.path}`));
@@ -14,6 +14,30 @@ test.describe('navigation', () => {
       await expect(nav.locator('a[aria-current="page"]')).toContainText(r.nav.split(' ')[0]!);
       await expect(page.locator('h1')).toHaveCount(1);
     }
+  });
+
+  test('pages inside a destination are reached from its section tabs and keep the destination current', async ({ page }) => {
+    const nav = page.getByRole('navigation', { name: 'Primary' });
+    for (const s of SECTION_PAGES) {
+      await ready(page, s.path);
+      await expect(page.getByRole('heading', { level: 1, name: s.heading })).toBeVisible();
+      await expect(nav.locator('a[aria-current="page"]')).toHaveText(new RegExp(`^${s.nav}`));
+      const tabs = page.getByRole('navigation', { name: 'Section' });
+      await expect(tabs).toBeVisible();
+      await expect(tabs.locator('a[aria-current="page"]')).toHaveText(s.tab);
+    }
+    await ready(page, '/decisions');
+    await page.getByRole('navigation', { name: 'Section' }).getByRole('link', { name: 'Work queue' }).click();
+    await expect(page).toHaveURL(/\/queue$/);
+    await page.getByRole('navigation', { name: 'Section' }).getByRole('link', { name: 'Register' }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Decisions' })).toBeVisible();
+  });
+
+  test('a single record shows no section tabs, and the home page has none', async ({ page }) => {
+    await ready(page, '/decisions/ADR-0016');
+    await expect(page.getByRole('navigation', { name: 'Section' })).toHaveCount(0);
+    await ready(page, '/');
+    await expect(page.getByRole('navigation', { name: 'Section' })).toHaveCount(0);
   });
 
   test('skip link moves focus to main content', async ({ page }) => {
@@ -41,25 +65,21 @@ test.describe('overview shows repository-derived figures only', () => {
     await ready(page, '/');
     const m = api.metrics;
     const expectations: [RegExp, string][] = [
-      [/Total decisions/, String(m.decisions.total)],
       [/Pending decisions/, String(m.decisions.pending)],
       [/Approved decisions/, String(m.decisions.accepted)],
-      [/Rejected decisions/, String(m.decisions.rejected)],
-      [/Deferred decisions/, String(m.decisions.deferred)],
       [/Blocked tasks/, String(m.tasks.blocked)],
       [/Outstanding approvals/, String(m.approvals.outstanding)],
-    ];
-    for (const [label, value] of expectations) {
+    ];    for (const [label, value] of expectations) {
       const card = page.getByRole('link', { name: label });
       await expect(card).toBeVisible();
       await expect(card.locator('span.tnum').first()).toHaveText(value);
     }
-    await expect(page.getByRole('link', { name: /Architecture readiness/ }).locator('span.tnum').first()).toHaveText('Not ready');
     await expect(page.getByTestId('readiness-label')).toHaveText('Not ready for approval');
     expect(snap.count).toBe(m.decisions.register);
     await expect(page.getByText(api.repo.commitShort, { exact: false }).first()).toBeVisible();
     // The independent discovery snapshot recorded these counts; the figures must agree.
     expect(m.decisions).toMatchObject({ total: 58, pending: 45, accepted: 13, rejected: 0, deferred: 0 });
+    await expect(page.getByText('All 58 decisions by status')).toBeVisible();
   });
 
   test('each key figure links to the records behind it', async ({ page, request }) => {
@@ -99,6 +119,7 @@ test.describe('Decision Register', () => {
     await page.getByRole('button', { name: /^Proposed\b/ }).click();
     await expect(rows).toHaveCount(58);
 
+    await page.getByTestId('more-filters').click();
     await page.getByLabel('Type').selectOption('register-entry');
     await expect(rows).toHaveCount(37);
     await page.getByLabel('Needed by').selectOption('M1');

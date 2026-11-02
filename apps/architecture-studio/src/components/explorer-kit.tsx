@@ -53,9 +53,9 @@ export function ChipGroup({ label, options, selected, onToggle }: { label: strin
       {options.map((o) => {
         const on = selected.includes(o.value);
         return (
-          <button key={o.value} type="button" aria-pressed={on} onClick={() => onToggle(o.value)} className={`inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-[13px] font-medium transition-colors ${on ? 'border-navy bg-navy text-white' : 'border-hairline-strong bg-surface text-ink-2 hover:bg-surface-2'}`}>
+          <button key={o.value} type="button" aria-pressed={on} onClick={() => onToggle(o.value)} className={`inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-[13px] font-medium transition-colors ${on ? 'border-selected bg-selected text-selected-ink' : 'border-hairline-strong bg-surface text-ink-2 hover:bg-surface-2'}`}>
             {o.label}
-            {o.count !== undefined ? <span className={`tnum text-[12px] ${on ? 'text-white/70' : 'text-ink-3'}`}>{o.count}</span> : null}
+            {o.count !== undefined ? <span className={`tnum text-[12px] ${on ? 'text-selected-ink/75' : 'text-ink-3'}`}>{o.count}</span> : null}
           </button>
         );
       })}
@@ -65,9 +65,9 @@ export function ChipGroup({ label, options, selected, onToggle }: { label: strin
 
 export function ToggleChip({ label, pressed, onToggle, count }: { label: string; pressed: boolean; onToggle: () => void; count?: number }) {
   return (
-    <button type="button" aria-pressed={pressed} onClick={onToggle} className={`inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-[13px] font-medium transition-colors ${pressed ? 'border-navy bg-navy text-white' : 'border-hairline-strong bg-surface text-ink-2 hover:bg-surface-2'}`}>
+    <button type="button" aria-pressed={pressed} onClick={onToggle} className={`inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-[13px] font-medium transition-colors ${pressed ? 'border-selected bg-selected text-selected-ink' : 'border-hairline-strong bg-surface text-ink-2 hover:bg-surface-2'}`}>
       {label}
-      {count !== undefined ? <span className={`tnum text-[12px] ${pressed ? 'text-white/70' : 'text-ink-3'}`}>{count}</span> : null}
+      {count !== undefined ? <span className={`tnum text-[12px] ${pressed ? 'text-selected-ink/75' : 'text-ink-3'}`}>{count}</span> : null}
     </button>
   );
 }
