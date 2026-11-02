@@ -10,7 +10,7 @@ Records what was deployed under [ADR-0021](../adr/0021-deploy-studio-to-azure-ne
 | Status | **Running and healthy, read-only, Entra sign-in only.** Signed-in behaviour is **not yet verified** (see below) |
 | Subscription | `870b491d-74bb-4aa7-95ab-647f262444d5` (the owner's sandbox) |
 | Resource group | `rg-greenfuel-studio-sea`, `southeastasia`, created for this; no other group touched |
-| Image | `greenfuel-studio:m2-dbbf889`, digest `sha256:fd8230518d5c407912b0954d5b82c9f29fdb56e2d3d8074cffefcd11a711bc66`; built from the Studio at repository commit `dbbf889` |
+| Image | `greenfuel-studio:m3-3ae0777`, digest `sha256:8e56429917257582017f8563362badfdcd4f8ba455b8dd79e09f7cb4cc501247`; built from the Studio at repository commit `3ae0777` (Phase A and B). Replaced `m2-dbbf889` the same day (revision `ca-gfstudio--0000002`, healthy) |
 | Repository the Studio reads | this repository, cloned inside the container from `origin/main`, re-fetched every 60 s |
 | Phase | unchanged (0). No bunkering application, no production or certification data |
 
@@ -47,8 +47,10 @@ The container secret is encrypted by the platform and not readable through the A
 | `GET /api/v1/register` signed out | 401 `Sign in required` |
 | `GET /api/v1/auth/entra/login` | 307 to `login.microsoftonline.com` for tenant `08cef5cb-…` with the right client id and redirect URI; PKCE `S256`, `state`, `nonce`, `max_age=900`; the state cookie is `Secure; HttpOnly; SameSite=Lax` |
 | Browser | The Microsoft sign-in page loaded from the Studio's sign-in link |
-| API probe against the URL | 90 checks, 89 passed. The one failure was my probe expecting 404 for an unknown decision where a signed-out Entra deployment correctly answers 401; the probe was corrected. Headers: strict CSP (still with `unsafe-inline`), `nosniff`, framing denied, no-referrer, no `X-Powered-By` |
+| API probe against the URL | First run on the first image: 90 checks, 89 passed; the one failure was my probe expecting 404 for an unknown decision where a signed-out Entra deployment correctly answers 401, so the probe was corrected. **On the current image: 91 of 91 passed.** Headers: strict CSP (still with `unsafe-inline`), `nosniff`, framing denied, no-referrer, no `X-Powered-By` |
 | Policy pin | The server's pinned hash `66bbb1e7…19e1` equals the hash of `harness/policy/access-policy.json` on `main` |
+
+> **Signed-out only.** Every probe above ran without a session. The probe's latency table on this deployment measures the 401 refusal, not a page, and is not evidence of signed-in performance.
 
 ## What was NOT verified
 
