@@ -271,7 +271,7 @@ export function parseAccessPolicy(text: string | undefined, source: AccessPolicy
     const r = obj(raw);
     const sc = obj(r.scope);
     const owners = strings(r.owners).map((x) => x.toLowerCase()).filter((x) => SUBJECT_RE.test(x));
-    if (!isDomain(r.domain) || r.domain === 'regulatory' || r.domain === 'unclassified') {
+    if (!isDomain(r.domain) || r.domain === 'regulatory' || r.domain === 'clarification' || r.domain === 'unclassified') {
       p.problems.push('An ownership entry names a domain the Studio cannot approve for, and was ignored.');
       continue;
     }
@@ -300,6 +300,8 @@ export interface Classifiable {
   id: string;
   kind: string;
   approverText: string | null;
+  /** What the record asks for, from the register's Kind column. When present it takes precedence over the approver's role text. */
+  natures?: readonly string[];
 }
 
 export interface Classification {
@@ -317,6 +319,13 @@ export function classify(policy: AccessPolicy, rec: Classifiable): Classificatio
   if (override) return { domain: override, basis: `The policy classifies ${rec.id} explicitly as ${override}.` };
   const text = (rec.approverText ?? '').toLowerCase();
   const hits = new Map<Domain, string>();
+  // The nature of a record is stated by the register, not guessed from who owns it. A stakeholder clarification owned by the
+  // programme owner is still a clarification, and a regulatory verification is never an architecture approval.
+  if (rec.natures) {
+    if (rec.kind === 'register-entry' && rec.natures.length === 0) return { domain: 'unclassified', basis: 'The register states no recognised Kind for this entry, so the Studio cannot tell what it asks for and does not guess.' };
+    if (rec.natures.includes('regulatory-verification')) hits.set('regulatory', 'its register Kind includes D, a regulatory or certification claim that a qualified person must verify');
+    if (rec.natures.includes('stakeholder-clarification')) hits.set('clarification', 'its register Kind includes C, a stakeholder clarification: a fact only the business can supply');
+  }
   for (const r of policy.classification.rules) {
     let why: string | null = null;
     if (r.kinds.includes(rec.kind)) why = `its kind is ${rec.kind}`;

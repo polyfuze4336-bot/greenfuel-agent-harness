@@ -79,7 +79,7 @@ test.describe('the register is populated from repository data', () => {
     await expect(health.getByTestId('health-overlap')).toHaveText(String(reg.duplicates.length));
     await expect(health.getByTestId('health-ai')).toHaveText(String(reg.suggestions.count));
     await health.getByText('How complete is the register?').click();
-    await expect(health.getByTestId('completeness-table').locator('tr')).toHaveCount(17);
+    await expect(health.getByTestId('completeness-table').locator('tr')).toHaveCount(18);
     await expect(health.getByTestId('completeness-table')).toContainText('Description');
     await expect(health.getByTestId('completeness-table')).toContainText('of 58');
   });

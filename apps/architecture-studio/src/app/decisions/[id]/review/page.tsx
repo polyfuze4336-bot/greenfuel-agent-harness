@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ArrowRightLeft, ChevronLeft } from 'lucide-react';
-import { DecisionDetail } from '@/components/decisions/decision-detail.tsx';
+import { DecisionDetail, LaneNotice } from '@/components/decisions/decision-detail.tsx';
 import { ReviewRail } from '@/components/review/review-rail.tsx';
 import { ConsequencesBlock, DiagramsBlock, PacketBlock, Required, RequirementsRisks, VersionsBlock } from '@/components/review/review-packet.tsx';
 import { Card, NormStatusPill, Tag } from '@/components/ui.tsx';
@@ -45,6 +45,9 @@ export default async function ReviewPage({ params }: { params: Promise<{ id: str
           <span className="text-[12.5px] text-ink-3">{d.kind === 'adr' ? 'Architecture decision record' : 'Open register entry'}</span>
         </div>
         <h1 className="text-[26px] leading-[1.2] font-semibold tracking-[-0.01em]">{d.title}</h1>
+        <div className="max-w-3xl">
+          <LaneNotice natures={d.natures} />
+        </div>
         {d.review ? (
           <p className="mt-2 max-w-3xl text-[13.5px] leading-5 text-ink-2">
             Status comes from a review record on the canonical branch. The source file says &ldquo;{d.statusRaw}&rdquo;.

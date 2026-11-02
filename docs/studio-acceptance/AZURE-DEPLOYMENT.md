@@ -68,6 +68,18 @@ The owner first tried their corporate Microsoft account and got `AADSTS90072`: t
 
 **Result and public read-only mode.** With `openid` only, the tenant still asked for administrator approval, and consent could not be granted from the available account (Global Reader; the narrow `openid` grant for this app was refused with `Insufficient privileges`). At the owner's request the deployment therefore runs with `STUDIO_AUTH_MODE=public-readonly` instead of Entra sign-in. In that mode: anyone who can reach the URL can read; there is no sign-in route (`/api/v1/auth/signin` answers 404), so no session, and therefore no approval, proposal, signature, deck build or access change, can exist; development approvals and development signing keys are off; `refresh` no longer forces a rebuild; and a banner says so on every page. The content is the contents of a public repository, so reading it exposes nothing that GitHub does not already. **Limits:** this is *no* authentication, not weak authentication, and it gives no audit identity for readers; the Azure deployment cannot be used to approve anything. Approvals still happen through the repository (signed approval records via pull request) or the local Studio. `STUDIO_REQUIRE_ENTRA=1` always overrides it. To go back, set `STUDIO_REQUIRE_ENTRA=1` (and remove `STUDIO_AUTH_MODE`); the Entra settings and secret remain in place.
 
+## Keeping Azure and the local Studio consistent
+
+Two things can differ between the copies: the **code** (the image on Azure, the build on this computer) and the **data** (the repository commit each one shows).
+
+- **Data.** Both follow `origin/main` and fetch it about once a minute: the container through `deploy/entrypoint.sh`, the local app through `npm run start:synced`. Both set `STUDIO_REF=origin/main`, so they read the same ref. A repository change appears in both within about a minute, with no redeploy.
+- **Code.** Every build records the commit it was made from. A local build asks git (and appends `+dirty` if the tree differed). The container build receives it as the `STUDIO_BUILD_ID` build argument, and `build-image.ps1` refuses to build from a working tree that differs from `HEAD`, so an image is always exactly one commit.
+- **Proof.** `GET /api/v1/version` returns the build id, the repository ref and commit, and the record counts. `studio-azure-deploy/check-consistency.ps1` reads it from both and compares code build, data commit, data ref and every count. It waits up to two minutes for the two fetch loops to converge and exits non-zero if anything differs.
+
+The one intended difference is the authentication mode: Azure runs `public-readonly`, local runs the development sign-in.
+
+Checked 2026-11-02 at build `81dea1a` (image `m7-81dea1a`, revision `ca-gfstudio--0000006`): same build, same data commit, same ref and identical counts (58 decisions, 21 ADRs, 37 register entries, 75 tasks, 99 requirements, 14 risks, 26 assumptions).
+
 ## GitHub App (registered 2026-11-02, not yet connected to the deployment)
 
 | | |

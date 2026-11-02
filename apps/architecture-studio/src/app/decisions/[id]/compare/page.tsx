@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { ChevronLeft } from 'lucide-react';
 import { CompareView } from '@/components/decisions/compare-view.tsx';
+import { LaneNotice } from '@/components/decisions/decision-detail.tsx';
 import { PageHeader, Tag } from '@/components/ui.tsx';
 import { compareAlternatives } from '@/lib/intel/compare.ts';
 import { buildLookup } from '@/lib/lookup.ts';
@@ -34,6 +35,9 @@ export default async function ComparePage({ params }: { params: Promise<{ id: st
           </>
         }
       />
+      <div className="mb-6 max-w-3xl">
+        <LaneNotice natures={d.natures} />
+      </div>
       <CompareView view={view} lookup={buildLookup(m)} />
     </>
   );

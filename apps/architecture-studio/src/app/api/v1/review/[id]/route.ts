@@ -20,7 +20,7 @@ export function GET(req: NextRequest, ctx: { params: Promise<{ id: string }> }) 
     const view = service.view(d, session?.user ?? null);
     const proposals = service.deps.store.forDecision(id);
     const commits = openAdapter().log(8, [d.source.path]);
-    const order = pendingOrder(m.register.records, (x) => !!service.deps.store.openFor(x));
+    const order = pendingOrder(m.register.records, (x) => !!service.deps.store.openFor(x), service.policy());
     const at = order.findIndex((r) => r.id === id);
     const pick = (r: (typeof order)[number] | undefined) => (r ? { id: r.id, title: r.title } : null);
     const next = at >= 0 ? order[at + 1] : order[0];

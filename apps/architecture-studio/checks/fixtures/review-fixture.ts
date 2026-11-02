@@ -126,6 +126,21 @@ export interface Fixture {
   cleanup(): void;
 }
 
+/**
+ * The register entries that stay what the real register says in a test world. D-005 is a stakeholder clarification and is kept as one, so
+ * the tests can prove the Studio refuses to approve it. Every other stakeholder-only entry (Kind "C") is relabelled an architecture
+ * choice ("X") in the throw-away clone only, because the review-workflow tests need many register entries that can be approved and the
+ * real register has few. The real repository is never changed, and the real-repository tests do not use this.
+ */
+export const KEPT_AS_CLARIFICATION = ['D-005'];
+
+export function relabelClarificationsForWorkflowTests(work: string) {
+  const file = path.join(work, 'docs', 'context', 'DECISION-REGISTER.md');
+  if (!fs.existsSync(file)) return;
+  const text = fs.readFileSync(file, 'utf8').replace(/^\| (D-\d{3}) \| C \|/gm, (m, id: string) => (KEPT_AS_CLARIFICATION.includes(id) ? m : `| ${id} | X |`));
+  fs.writeFileSync(file, text);
+}
+
 export interface FixtureOptions {
   /** Clone this repository (at its HEAD) as the working copy instead of starting from a tiny one. */
   cloneFrom?: string;
@@ -149,6 +164,7 @@ export function makeFixture(opts: FixtureOptions = {}): Fixture {
   }
   for (const [k, v] of [['user.email', 'fixture@example.invalid'], ['user.name', 'Fixture'], ['core.autocrlf', 'false'], ['commit.gpgsign', 'false']] as const) git(work, 'config', k, v);
   if (!opts.cloneFrom) fs.writeFileSync(path.join(work, 'README.md'), '# fixture\n');
+  else relabelClarificationsForWorkflowTests(work);
   if (opts.policy !== null) {
     fs.mkdirSync(path.join(work, 'harness', 'policy'), { recursive: true });
     fs.writeFileSync(path.join(work, 'harness', 'policy', 'access-policy.json'), opts.policy ?? policyJson());
@@ -245,12 +261,15 @@ export function makeDecision(over: Partial<NormalizedDecision> & { id: string })
     recommendedOption: options[1]!,
     options,
     comparison: null,
+    natures: ['architecture-choice'],
     implications: { cost: null, security: null, reliability: null, dataSovereignty: null, operational: null },
     dependsOn: [],
     dependedOnBy: [],
     supersedes: [],
     supersededBy: [],
     blockingRequirements: [],
+    relatedRequirements: [],
+    invalidReferences: [],
     relatedAdrs: [],
     relatedRisks: [],
     relatedTasks: [],

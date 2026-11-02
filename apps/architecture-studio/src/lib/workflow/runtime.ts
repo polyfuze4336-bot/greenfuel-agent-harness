@@ -18,7 +18,8 @@ import { EntraClient } from '../auth/entra.ts';
 import { authConfig } from '../auth/config.ts';
 import type { GitHubPort } from './github.ts';
 import type { Publisher } from './publish.ts';
-import type { NormalizedDecision } from '../intel/schema.ts';
+import { classify, type AccessPolicy } from '../auth/access-policy.ts';
+import { reviewLane, type NormalizedDecision } from '../intel/schema.ts';
 
 export const canonicalRefName = () => process.env.STUDIO_CANONICAL_REF?.trim() || 'origin/main';
 export const isTestMode = () => process.env.STUDIO_TEST_MODE === '1';
@@ -89,9 +90,21 @@ export function reviewRuntime(root: string, readRef: string): Runtime {
 
 const PRIORITY_RANK: Record<string, number> = { Must: 0, Should: 1, Could: 2 };
 
-/** Decisions waiting for a person, in the order to review them: Must first, then ADRs before register entries, Blocked last. */
-export function pendingOrder(records: NormalizedDecision[], hasOpenProposal: (id: string) => boolean): NormalizedDecision[] {
-  const waiting = records.filter((r) => (r.status === 'Proposed' || r.status === 'Pending Review' || r.status === 'Blocked') && !hasOpenProposal(r.id));
+/**
+ * Whether a record is an architecture decision the Studio can take a review action on. A stakeholder clarification is answered, not approved,
+ * and a regulatory verification is never approved here, so neither belongs in the review queue. The classification is the one the server
+ * applies when an action is submitted, so the queue never offers something the server would refuse.
+ */
+export function reviewableInStudio(d: NormalizedDecision, policy?: AccessPolicy): boolean {
+  if (reviewLane(d.natures) !== 'architecture') return false;
+  if (!policy) return true;
+  const domain = classify(policy, { id: d.id, kind: d.kind, approverText: d.requiredApproverRole?.text ?? null, natures: d.natures }).domain;
+  return domain === 'architecture' || domain === 'security' || domain === 'deployment';
+}
+
+/** Decisions waiting for a person to review, in the order to review them: Must first, then ADRs before register entries, Blocked last. */
+export function pendingOrder(records: NormalizedDecision[], hasOpenProposal: (id: string) => boolean, policy?: AccessPolicy): NormalizedDecision[] {
+  const waiting = records.filter((r) => (r.status === 'Proposed' || r.status === 'Pending Review' || r.status === 'Blocked') && !hasOpenProposal(r.id) && reviewableInStudio(r, policy));
   return waiting.sort((a, b) => {
     const blocked = Number(a.status === 'Blocked') - Number(b.status === 'Blocked');
     if (blocked) return blocked;

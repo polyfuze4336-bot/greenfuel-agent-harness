@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 import type { Decision, Risk, Task } from '../repo/types.ts';
 import type { Fragment, ParsedOption, ReqRow, SectionAt, TraceRow } from './extract.ts';
-import { STATUSES, type ApprovalEvent, type Claim, type Comparison, type EvidenceRef, type FieldSource, type Flag, type Implication, type NormStatus, type NormalizedDecision, type OptionInfo, type PriorityValue, type RubricRef, type Src, type Verdict } from './schema.ts';
+import { NATURES, STATUSES, type ApprovalEvent, type Claim, type Comparison, type DecisionNature, type EvidenceRef, type FieldSource, type Flag, type Implication, type NormStatus, type NormalizedDecision, type OptionInfo, type PriorityValue, type RelatedRequirement, type RubricRef, type Src, type Verdict } from './schema.ts';
 
 // Turns cached per-file fragments into normalized decision records. Deterministic: no model, no network, no guessing.
 // A value is copied from a source, or derived by a rule written down here, or left null and listed in `missing`.
@@ -48,6 +48,9 @@ interface AdrFrag {
   requirements: string[];
   cites: string[];
 }
+
+/** The register legend: which nature each Kind letter means. */
+const KIND_LETTER: Record<string, DecisionNature> = { C: 'stakeholder-clarification', D: 'regulatory-verification', X: 'architecture-choice' };
 
 const REGISTER_KIND: Record<string, string> = {
   C: 'Stakeholder clarification',
@@ -123,6 +126,8 @@ export function assemble(input: AssembleInput): { records: NormalizedDecision[];
   const t2 = tasks.find((t) => t.id === 'T2');
 
   const records: NormalizedDecision[] = [];
+  /** Requirement ids a record names itself, kept apart until the ids can be checked against the requirements that exist. */
+  const citedReq = new Map<string, string[]>();
 
   const base = (id: string, kind: NormalizedDecision['kind'], title: string, srcPath: string, srcLine: number, statusRaw: string): NormalizedDecision => ({
     id,
@@ -141,12 +146,15 @@ export function assemble(input: AssembleInput): { records: NormalizedDecision[];
     recommendedOption: null,
     options: [],
     comparison: null,
+    natures: [],
     implications: { cost: null, security: null, reliability: null, dataSovereignty: null, operational: null },
     dependsOn: [],
     dependedOnBy: [],
     supersedes: [],
     supersededBy: [],
     blockingRequirements: [],
+    relatedRequirements: [],
+    invalidReferences: [],
     relatedAdrs: [],
     relatedRisks: [],
     relatedTasks: [],
@@ -275,6 +283,10 @@ export function assemble(input: AssembleInput): { records: NormalizedDecision[];
     rec.supersedes = a.supersedes && !/^none/i.test(a.supersedes) ? uniq([...a.supersedes.matchAll(/(?:ADR[ -]?)?(\d{4})/g)].map((m) => `ADR-${m[1]}`)) : [];
     rec.relatedTasks = uniq(tasks.filter((t) => t.refs.adrs.includes(number)).map((t) => t.id));
 
+    rec.natures = ['architecture-choice'];
+    fs('natures', { path: a.path, line: 1 }, 'An ADR is an architecture decision record');
+    citedReq.set(l.id, a.requirements);
+
     // blocking requirements: requirements the ADR addresses that still name an open clarification
     rec.blockingRequirements = a.requirements
       .map((id) => ({ id, row: traceRows.find((t) => t.id === id) }))
@@ -340,6 +352,11 @@ export function assemble(input: AssembleInput): { records: NormalizedDecision[];
     if (d.kind) {
       rec.category = d.kind.split('+').map((k) => REGISTER_KIND[k.trim()] ?? k.trim()).join('; ');
       fs('category', 'Register "Kind" column, expanded with the legend at the top of the register');
+      const letters = d.kind.split('+').map((k) => k.trim().toUpperCase()).filter(Boolean);
+      rec.natures = NATURES.filter((n) => letters.some((k) => KIND_LETTER[k] === n));
+      const unknown = letters.filter((k) => !KIND_LETTER[k]);
+      if (unknown.length) rec.flags.push({ code: 'kind-unrecognised', text: `The register Kind "${d.kind}" contains ${unknown.join(', ')}, which the register legend does not define. That part is not interpreted.` });
+      if (rec.natures.length) fs('natures', 'Register "Kind" column: C is a stakeholder clarification, D a regulatory verification, X an architecture decision (the legend at the top of the register)');
     }
     rec.milestone = d.milestone ?? null;
     if (d.milestone) rec.tags = [`Needed by ${d.milestone}`];
@@ -353,6 +370,7 @@ export function assemble(input: AssembleInput): { records: NormalizedDecision[];
     }
     const traced = traceRows.filter((t) => [...t.decisions, ...t.open, ...t.verify].includes(d.id));
     rec.blockingRequirements = traced.map((t) => ({ id: t.id, priority: priority.get(t.id) ?? null })).sort((a, b) => a.id.localeCompare(b.id));
+    citedReq.set(d.id, traced.map((t) => t.id));
     rec.priority = highest(traced.map((t) => t.id), priority);
     if (rec.priority) fs('priority', 'requirements whose traceability row cites this decision');
     rec.dependsOn = d.refs.decisions;
@@ -366,7 +384,14 @@ export function assemble(input: AssembleInput): { records: NormalizedDecision[];
 
   // ---- reverse edges, citations, ADR relations
   const byId = new Map(records.map((r) => [r.id, r]));
-  for (const r of records) for (const dep of r.dependsOn) byId.get(dep)?.dependedOnBy.push(r.id);
+  const reqIds = new Set(reqRows.map((q) => q.id));
+  // A table or a task that cites a decision that does not exist is reported once, with where it was found.
+  const cite = (from: string, ids: string[]) => {
+    for (const id of ids) if (/^D-\d{3}$/.test(id) && !byId.has(id)) warnings.push(`${from} cites ${id}, which does not exist at this commit.`);
+  };
+  for (const t of traceRows) cite(`${t.path}: traceability row ${t.id}`, uniq([...t.decisions, ...t.open, ...t.verify]));
+  for (const f of fragments.filter((x) => x.kind === 'risks')) for (const rk of (f.data as { rows: Risk[] }).rows) cite(`${f.path}: risk ${rk.id}`, rk.decisions);
+  for (const t of tasks) cite(`${t.src.path}: task ${t.id}`, t.refs.decisions);  for (const r of records) for (const dep of r.dependsOn) byId.get(dep)?.dependedOnBy.push(r.id);
   for (const r of records) for (const s of r.supersedes) byId.get(s)?.supersededBy.push(r.id);
   for (const r of records) {
     r.dependedOnBy = uniq(r.dependedOnBy).sort();
@@ -375,8 +400,20 @@ export function assemble(input: AssembleInput): { records: NormalizedDecision[];
     r.relatedAdrs = uniq([...r.dependsOn.filter((x) => x.startsWith('ADR-')), ...r.dependedOnBy.filter((x) => x.startsWith('ADR-')), ...citing.map((c) => c.path).flatMap((p) => { const m = /^docs\/adr\/(\d{4})-/.exec(p); return m ? [`ADR-${m[1]}`] : []; }), ...(r.kind === 'register-entry' ? [] : [])]).filter((x) => x !== r.id).sort();
     r.relatedTasks = uniq(r.relatedTasks).sort();
     r.relatedRisks = uniq(r.relatedRisks).sort();
-    // missing fields: listed, never filled
+    // requirements a source ties to this decision, and citations that point at nothing
+    const rel = new Map<string, RelatedRequirement>();
+    for (const b of r.blockingRequirements) rel.set(b.id, { id: b.id, priority: b.priority, relation: 'blocked-until-decided' });
+    for (const id of citedReq.get(r.id) ?? []) if (!rel.has(id)) rel.set(id, { id, priority: priority.get(id) ?? null, relation: 'addressed-by-this-adr' });
+    for (const t of traceRows) if (t.decisions.includes(r.id) && !rel.has(t.id)) rel.set(t.id, { id: t.id, priority: priority.get(t.id) ?? null, relation: 'cites-this-decision' });
+    for (const x of [...rel.values()].sort((p, q) => p.id.localeCompare(q.id))) {
+      if (reqIds.has(x.id)) r.relatedRequirements.push(x);
+      else r.invalidReferences.push({ kind: 'requirement', id: x.id, via: 'a requirement this record is tied to', src: { path: r.source.path, line: r.source.line } });
+    }
+    r.blockingRequirements = r.blockingRequirements.filter((b) => reqIds.has(b.id));
+    for (const id of uniq([...r.dependsOn, ...r.supersedes])) if (!byId.has(id)) r.invalidReferences.push({ kind: 'decision', id, via: r.supersedes.includes(id) ? 'its "Supersedes" header' : 'a decision this record cites', src: { path: r.source.path, line: r.source.line } });
+    for (const ref of r.invalidReferences) r.flags.push({ code: 'invalid-reference', text: `${ref.kind === 'decision' ? 'Decision' : 'Requirement'} ${ref.id} is cited (${ref.via}) but does not exist at this commit.` });    // missing fields: listed, never filled
     const miss: string[] = [];
+    if (!r.natures.length) miss.push('natures');
     if (!r.description) miss.push('description');
     if (!r.businessJustification) miss.push('businessJustification');
     if (!r.category) miss.push('category');

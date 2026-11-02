@@ -103,6 +103,58 @@ export interface Flag {
   text: string;
 }
 
+/**
+ * What kind of thing a record asks for. These are not interchangeable and are never inferred: they come from the register's own "Kind"
+ * column (C, D, X, or a combination) and, for an ADR, from the fact that it is an architecture decision record.
+ *   architecture-choice      the options are known and choosing needs analysis and approval.
+ *   stakeholder-clarification a fact only the business can supply. It is answered, not approved, and its "options" are possible answers.
+ *   regulatory-verification  a regulatory or certification claim that a qualified person must verify. It is never approved on a recommendation.
+ */
+export const NATURES = ['architecture-choice', 'stakeholder-clarification', 'regulatory-verification'] as const;
+export type DecisionNature = (typeof NATURES)[number];
+
+export const NATURE_LABEL: Record<DecisionNature, string> = {
+  'architecture-choice': 'Architecture choice',
+  'stakeholder-clarification': 'Stakeholder clarification',
+  'regulatory-verification': 'Regulatory verification',
+};
+
+export const NATURE_SHORT: Record<DecisionNature, string> = { 'architecture-choice': 'Architecture', 'stakeholder-clarification': 'Stakeholder', 'regulatory-verification': 'Verification' };
+
+/** Which review queue a record belongs in. Only "architecture" can be approved as an architecture decision in the Studio. */
+export type ReviewLane = 'architecture' | 'stakeholder' | 'verification' | 'unclassified';
+
+export const LANE_LABEL: Record<ReviewLane, string> = {
+  architecture: 'Architecture decisions to review',
+  stakeholder: 'Stakeholder answers needed',
+  verification: 'Needs qualified verification',
+  unclassified: 'Kind not stated',
+};
+
+/** The most restrictive nature decides: a record that needs a regulatory verification is never an architecture approval, whatever else it also is. */
+export function reviewLane(natures: readonly DecisionNature[] | undefined): ReviewLane {
+  if (!natures) return 'unclassified';
+  if (natures.includes('regulatory-verification')) return 'verification';
+  if (natures.includes('stakeholder-clarification')) return 'stakeholder';
+  if (natures.includes('architecture-choice')) return 'architecture';
+  return 'unclassified';
+}
+
+/** A record cites an id that does not exist at the commit being read. It is reported, never dropped and never guessed at. */
+export interface InvalidReference {
+  kind: 'decision' | 'requirement';
+  id: string;
+  /** What cites it, in words: for example "traceability row FR-004" or "this record's Depends on". */
+  via: string;
+  src: Src | null;
+}
+
+export interface RelatedRequirement {
+  id: string;
+  priority: string | null;
+  relation: 'blocked-until-decided' | 'addressed-by-this-adr' | 'cites-this-decision';
+}
+
 export interface NormalizedDecision {
   id: string;
   kind: 'adr' | 'register-entry';
@@ -121,6 +173,8 @@ export interface NormalizedDecision {
   statusRule: string;
   /** How the approval stands: signed record, owner instruction without a signature, or none. */
   approvalBasis: 'signed' | 'owner-instruction-unsigned' | 'delegated-unsigned' | 'review-record' | 'none';
+  /** What the record asks for. Empty when the source states no kind, which is then shown as unknown. */
+  natures: DecisionNature[];
   recommendedOption: OptionInfo | null;
   options: OptionInfo[];
   comparison: Comparison | null;
@@ -141,6 +195,10 @@ export interface NormalizedDecision {
   supersededBy: string[];
   /** Requirements that cannot be fully accepted until this decision is made, from the traceability table. */
   blockingRequirements: { id: string; priority: string | null }[];
+  /** Every requirement that a source ties to this decision, with how. Empty means none was found, not that none exists. */
+  relatedRequirements: RelatedRequirement[];
+  /** Citations of ids that do not exist at this commit. */
+  invalidReferences: InvalidReference[];
   relatedAdrs: string[];
   relatedRisks: string[];
   relatedTasks: string[];

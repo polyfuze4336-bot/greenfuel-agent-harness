@@ -73,7 +73,7 @@ export function loadReadinessInput(root: string, ref: string, o: LoadOptions): L
   const queue = buildQueue(withReviews, adapter, { work, roleAliases: accessPolicy.roleAliases, completionRoles: ['architecture-owner'], canonicalRef: reviews.ref });
 
   const domains: Record<string, string> = {};
-  for (const d of register.records) domains[d.id] = classify(accessPolicy, { id: d.id, kind: d.kind, approverText: d.requiredApproverRole?.text ?? null }).domain;
+  for (const d of register.records) domains[d.id] = classify(accessPolicy, { id: d.id, kind: d.kind, approverText: d.requiredApproverRole?.text ?? null, natures: d.natures }).domain;
   const assumptionRefs: Record<string, string[]> = {};
   for (const d of model.decisions) assumptionRefs[d.id] = d.refs.assumptions;
   const t14 = model.tasks.find((t) => t.id === 'T14');

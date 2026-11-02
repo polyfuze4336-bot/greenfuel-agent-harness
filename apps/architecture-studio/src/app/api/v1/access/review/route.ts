@@ -21,7 +21,7 @@ export function GET(req: NextRequest) {
     const model = await getModel();
     const by: Record<string, { total: number; noDesignatedApprover: number }> = {};
     for (const d of model.register.records) {
-      const rec = { id: d.id, kind: d.kind, approverText: d.requiredApproverRole?.text ?? null };
+      const rec = { id: d.id, kind: d.kind, approverText: d.requiredApproverRole?.text ?? null, natures: d.natures };
       const c = classify(policy, rec);
       const row = (by[c.domain] ??= { total: 0, noDesignatedApprover: 0 });
       row.total++;

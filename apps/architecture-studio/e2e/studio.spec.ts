@@ -162,7 +162,7 @@ test.describe('Decision Register', () => {
     await expect(dialog.getByText('Status, verbatim from the source')).toBeVisible();
     await expect(dialog.getByText('No approval is recorded for this decision.')).toBeVisible();
     await expect(dialog.getByText('Source in the repository')).toBeVisible();
-    await expect(dialog.getByText('Recent commits touching this file')).toBeVisible();
+    await expect(dialog.getByText('Change history of this file, newest first')).toBeVisible();
     await expect(dialog.locator('ol li').first()).toBeVisible({ timeout: 10_000 });
     await page.keyboard.press('Escape');
     await expect(dialog).toBeHidden();
@@ -184,6 +184,7 @@ test.describe('Decision Register', () => {
 
   test('keyboard: arrow keys move between rows and Enter opens one', async ({ page }) => {
     await ready(page, '/decisions');
+    await page.waitForLoadState('networkidle'); // the row handlers are attached when the page hydrates
     const btns = page.locator('[data-row-btn]');
     await btns.first().focus();
     await page.keyboard.press('ArrowDown');
@@ -329,6 +330,7 @@ test.describe('Approvals', () => {
     await page.getByRole('button', { name: /^Design reviews/ }).click();
     await expect(pending).toHaveCount(3);
     await page.getByRole('button', { name: /^Design reviews/ }).click();
+    await expect(pending).toHaveCount(11); // wait for the filter to clear before taking the first row
     await page.getByRole('button', { name: /Copy request command/ }).first().click();
     await expect(page.getByText('Copied').first()).toBeVisible();
     const clip = await page.evaluate(() => navigator.clipboard.readText());

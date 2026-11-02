@@ -14,6 +14,7 @@ function watch(page: Page) {
 
 test.describe('polish', () => {
   test('no browser console errors or warnings, and no hydration errors, on any page', async ({ page }) => {
+    test.setTimeout(150_000); // fourteen pages, each loaded to network idle
     const problems = watch(page);
     for (const p of PAGES) {
       await page.goto(p, { waitUntil: 'networkidle' });
