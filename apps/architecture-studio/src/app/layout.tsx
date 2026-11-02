@@ -59,7 +59,14 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>
-      <body>{shell ? <AppShell shell={shell}>{children}</AppShell> : <RepoUnavailable message={failure?.message ?? ''} code={failure?.code} />}</body>
+      <body>
+        {authConfig().mode === 'public-readonly' && (
+          <div role="note" data-testid="public-readonly-banner" style={{ padding: '6px 12px', fontSize: 13, textAlign: 'center', background: 'var(--banner-bg, #fff4ce)', color: 'var(--banner-fg, #3b2f00)' }}>
+            Public read-only view of the repository. There is no sign-in on this deployment, so nothing can be approved, proposed or changed here.
+          </div>
+        )}
+        {shell ? <AppShell shell={shell}>{children}</AppShell> : <RepoUnavailable message={failure?.message ?? ''} code={failure?.code} />}
+      </body>
     </html>
   );
 }

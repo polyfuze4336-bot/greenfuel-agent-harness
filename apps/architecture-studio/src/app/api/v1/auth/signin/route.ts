@@ -15,6 +15,7 @@ export const dynamic = 'force-dynamic';
 export function POST(req: NextRequest) {
   return guard(async () => {
     if (authConfig().mode === 'entra') return problem(404, 'Not available', 'This server signs people in with Microsoft Entra ID.', 'use-entra');
+    if (authConfig().mode === 'public-readonly') return problem(404, 'Not available', 'This server is a public read-only view. There is no sign-in.', 'public-readonly');
     if (!sameOrigin(req)) return problem(403, 'Cross-origin request refused', 'Sign in from this application, in this browser.', 'bad-origin');
     const { service } = runtime();
     let user;

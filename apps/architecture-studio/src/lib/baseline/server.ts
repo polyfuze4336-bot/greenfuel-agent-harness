@@ -42,7 +42,7 @@ export function getBaselineView(): BaselineView {
   if (hit?.key === key) return hit.view;
 
   const cfg = authConfig();
-  const lo = { codeRoot: root, trust: getTrust(), allowDevKeys: cfg.mode !== 'entra', reviewsRef: canonicalCommit ? ref : undefined };
+  const lo = { codeRoot: root, trust: getTrust(), allowDevKeys: cfg.mode === 'github-dev', reviewsRef: canonicalCommit ? ref : undefined };
   const cur = loadReadinessInput(root, adapter.ref, lo);
   const readiness = computeReadiness(cur.input);
   // The live page does not re-make every baseline from its source commit; the gate and the verify command do.

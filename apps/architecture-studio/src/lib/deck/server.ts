@@ -54,7 +54,7 @@ export function getContext(): DeckContext {
   const key = [adapter.commit, adapter.uncommittedCount(), canonicalCommit ?? 'none', authConfig().mode].join('|');
   if (g.__studioDeck?.key === key) return g.__studioDeck.ctx;
   const cfg = authConfig();
-  const ctx = openDeckContext(root, adapter.ref, { codeRoot: root, trust: getTrust(), allowDevKeys: cfg.mode !== 'entra', reviewsRef: canonicalCommit ? ref : undefined });
+  const ctx = openDeckContext(root, adapter.ref, { codeRoot: root, trust: getTrust(), allowDevKeys: cfg.mode === 'github-dev', reviewsRef: canonicalCommit ? ref : undefined });
   g.__studioDeck = { key, ctx };
   return ctx;
 }
