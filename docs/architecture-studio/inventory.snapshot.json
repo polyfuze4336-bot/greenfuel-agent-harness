@@ -1,11 +1,11 @@
 {
   "generatedBy": "harness/scripts/studio-inventory.mjs",
   "git": {
-    "head": "b5b614b99302c98231cedfaa77444255e8543392",
-    "branch": "studio/ui-readonly",
-    "originMain": "140c39866d64a2246de0a4a2fb4aa8cc9c5ba75a",
-    "commitsAheadOfOriginMain": 7,
-    "dirty": 4
+    "head": "c2a2089a891ec98a9795fd8b42be82057dc3a3d4",
+    "branch": "studio/deploy-azure",
+    "originMain": "dbbf889aeff0404f3a20f9eea4ea06dfb40e27bc",
+    "commitsAheadOfOriginMain": 1,
+    "dirty": 0
   },
   "sources": {},
   "counts": {
@@ -51,8 +51,8 @@
     "adrOptions": {
       "source": "docs/adr/*.md, section \"## Options considered\"",
       "rule": "numbered list items; \"rejected-worded\" = the item text contains the word rejected (any case). Approximate: it is not a structured field",
-      "options": 71,
-      "rejectedWorded": 26
+      "options": 76,
+      "rejectedWorded": 28
     },
     "businessModelInputs": {
       "source": "docs/business/model/inputs.csv",
@@ -67,10 +67,10 @@
     "adr": {
       "source": "docs/adr/NNNN-*.md (excluding 0000-template.md)",
       "rule": "\"- **Status:** <word>\" line; first word decides the class",
-      "total": 20,
+      "total": 21,
       "byClass": {
         "Accepted": 13,
-        "Proposed": 7
+        "Proposed": 8
       },
       "acceptedByChatInstruction": 13,
       "acceptedWithPartialScope": [
@@ -83,7 +83,7 @@
       "superseded": 0,
       "byType": {
         "(none: pre-Type)": 2,
-        "Governance": 12,
+        "Governance": 13,
         "Design": 6
       }
     },
@@ -246,8 +246,8 @@
     },
     "assumptionBullets": {
       "rule": "lines starting \"- ASSUMPTION:\" in docs/**/*.md",
-      "total": 28,
-      "files": 20,
+      "total": 29,
+      "files": 21,
       "byFile": {
         "docs/adr/0001-native-first-harness.md": 1,
         "docs/adr/0002-phase-gating-and-approval-enforcement.md": 1,
@@ -268,6 +268,7 @@
         "docs/adr/0017-deterministic-core-and-bounded-agents.md": 1,
         "docs/adr/0018-evidence-integrity-and-certificate-mechanism-options.md": 1,
         "docs/adr/0020-phase-1a-local-synthetic-vertical-slice.md": 1,
+        "docs/adr/0021-deploy-studio-to-azure-new-resource-group.md": 1,
         "docs/design/system/EVIDENCE-STORE-PROPOSAL.md": 8
       }
     },
@@ -350,7 +351,8 @@
         "0017",
         "0018",
         "0019",
-        "0020"
+        "0020",
+        "0021"
       ]
     },
     "evidenceRecords": {
@@ -515,6 +517,11 @@
     },
     {
       "id": "ADR-0020",
+      "why": "ADR exists but has no derived memory record: the memory store lags the ADR set",
+      "where": "memory/decisions"
+    },
+    {
+      "id": "ADR-0021",
       "why": "ADR exists but has no derived memory record: the memory store lags the ADR set",
       "where": "memory/decisions"
     }
@@ -1023,6 +1030,27 @@
         "D-010",
         "D-011",
         "D-012"
+      ],
+      "revisit": true
+    },
+    {
+      "id": "0021",
+      "file": "docs/adr/0021-deploy-studio-to-azure-new-resource-group.md",
+      "title": "ADR 0021: Deploy the Architecture Decision Studio to Azure, in a new resource group",
+      "status": "Proposed",
+      "cls": "Proposed",
+      "type": "Governance",
+      "date": "2026-11-02",
+      "deciders": "Programme owner (to accept with a signed approval once an approver key is enrolled, TODO T13)",
+      "supersedes": "none. It narrows the deferral in TODO T36 for the Studio only.",
+      "hasSupersedes": false,
+      "chatAcceptance": false,
+      "delegated": false,
+      "partial": false,
+      "factBullets": 6,
+      "assumptionBullets": 1,
+      "openRefs": [
+        "D-009"
       ],
       "revisit": true
     }
@@ -1709,7 +1737,7 @@
         "docs/capstone/RUBRIC-TRACEABILITY.md",
         "docs/context/AGENT-AUTONOMY-MATRIX.md"
       ],
-      "fileCount": 6
+      "fileCount": 7
     },
     "AC": {
       "distinctIds": 29,
@@ -1750,12 +1778,14 @@
       "fileCount": 1
     },
     "B": {
-      "distinctIds": 7,
+      "distinctIds": 13,
       "files": [
         "docs/acceptance/NEXT-PHASE-IMPLEMENTATION-PLAN.md",
-        "docs/capstone/RUBRIC-TRACEABILITY.md"
+        "docs/capstone/RUBRIC-TRACEABILITY.md",
+        "docs/studio/CURRENT-STATE-AUDIT.md",
+        "docs/studio/SIMPLIFICATION-PLAN.md"
       ],
-      "fileCount": 2
+      "fileCount": 4
     },
     "BL": {
       "distinctIds": 5,
@@ -1782,7 +1812,7 @@
         "docs/design/ai/AGENTIC-AUTONOMY-DESIGN-RECORD.md",
         "docs/harness/CAPABILITY-MATRIX.md"
       ],
-      "fileCount": 4
+      "fileCount": 5
     },
     "CB": {
       "distinctIds": 4,
@@ -1881,6 +1911,13 @@
       ],
       "fileCount": 1
     },
+    "DOC": {
+      "distinctIds": 4,
+      "files": [
+        "docs/studio/PRODUCT-ACCEPTANCE-CRITERIA.md"
+      ],
+      "fileCount": 1
+    },
     "E": {
       "distinctIds": 3,
       "files": [
@@ -1905,14 +1942,14 @@
       "fileCount": 3
     },
     "F": {
-      "distinctIds": 24,
+      "distinctIds": 30,
       "files": [
         "docs/acceptance/HARNESS-ACCEPTANCE-REPORT.md",
         "docs/context/SOVEREIGNTY-MATRIX.md",
-        "docs/studio-acceptance/ACCEPTANCE-REPORT.md",
-        "docs/target-architecture/12-DATA-MOVEMENT-AND-RESIDENCY-VALIDATION.md"
+        "docs/studio/CURRENT-STATE-AUDIT.md",
+        "docs/studio-acceptance/ACCEPTANCE-REPORT.md"
       ],
-      "fileCount": 4
+      "fileCount": 5
     },
     "FR": {
       "distinctIds": 33,
@@ -1923,6 +1960,13 @@
         "docs/architecture/designs/DES-0003-target-system-architecture.md"
       ],
       "fileCount": 9
+    },
+    "FUN": {
+      "distinctIds": 8,
+      "files": [
+        "docs/studio/PRODUCT-ACCEPTANCE-CRITERIA.md"
+      ],
+      "fileCount": 1
     },
     "G": {
       "distinctIds": 39,
@@ -2049,6 +2093,13 @@
       ],
       "fileCount": 5
     },
+    "PERF": {
+      "distinctIds": 8,
+      "files": [
+        "docs/studio/PRODUCT-ACCEPTANCE-CRITERIA.md"
+      ],
+      "fileCount": 1
+    },
     "PV": {
       "distinctIds": 10,
       "files": [
@@ -2066,6 +2117,13 @@
         "docs/harness/OPEN-QUESTIONS.md"
       ],
       "fileCount": 2
+    },
+    "QA": {
+      "distinctIds": 6,
+      "files": [
+        "docs/studio/PRODUCT-ACCEPTANCE-CRITERIA.md"
+      ],
+      "fileCount": 1
     },
     "R": {
       "distinctIds": 18,
@@ -2100,22 +2158,23 @@
       "fileCount": 4
     },
     "S": {
-      "distinctIds": 16,
+      "distinctIds": 26,
       "files": [
         "docs/design/ai/AGENT-EVALUATION-PLAN.md",
-        "docs/harness/REFERENCE-ASSESSMENT.md"
+        "docs/harness/REFERENCE-ASSESSMENT.md",
+        "docs/studio/CURRENT-STATE-AUDIT.md"
       ],
-      "fileCount": 2
+      "fileCount": 3
     },
     "SEC": {
-      "distinctIds": 15,
+      "distinctIds": 24,
       "files": [
         "docs/acceptance/REQUIREMENTS-COVERAGE.md",
         "docs/architecture/designs/DES-0001-delivery-measurement-storage-topology.md",
         "docs/architecture/designs/DES-0002-evidence-ingestion-subsystem.md",
         "docs/architecture/designs/DES-0003-target-system-architecture.md"
       ],
-      "fileCount": 9
+      "fileCount": 10
     },
     "ST": {
       "distinctIds": 12,
@@ -2158,6 +2217,20 @@
       ],
       "fileCount": 1
     },
+    "U": {
+      "distinctIds": 10,
+      "files": [
+        "docs/studio/CURRENT-STATE-AUDIT.md"
+      ],
+      "fileCount": 1
+    },
+    "UX": {
+      "distinctIds": 13,
+      "files": [
+        "docs/studio/PRODUCT-ACCEPTANCE-CRITERIA.md"
+      ],
+      "fileCount": 1
+    },
     "V": {
       "distinctIds": 39,
       "files": [
@@ -2195,6 +2268,15 @@
       "usesPinnedSha": true
     },
     {
+      "file": ".github/workflows/studio.yml",
+      "name": "studio",
+      "onPush": true,
+      "onPullRequest": true,
+      "branches": "main",
+      "permissions": "contents: read",
+      "usesPinnedSha": true
+    },
+    {
       "file": ".github/workflows/validate.yml",
       "name": "validate",
       "onPush": true,
@@ -2209,7 +2291,7 @@
     ".github": 3,
     ".mcp.json": 1,
     ".vscode": 2,
-    "apps": 279,
+    "apps": 382,
     "docs/architecture-studio": 2,
     "docs/azure": 2,
     "docs/business": 3,

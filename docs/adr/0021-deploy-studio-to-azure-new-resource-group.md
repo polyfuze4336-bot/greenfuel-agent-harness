@@ -13,7 +13,7 @@
 - FACT: The repository is public, so the content the Studio shows is already public. The deployed Studio holds no secret that is not in Key Vault.
 - FACT: Real Entra sign-in, a real GitHub App and a real deployment have never been exercised ([ACCEPTANCE-REPORT](../studio-acceptance/ACCEPTANCE-REPORT.md)). Deployment is how that gap is closed, so some behaviour will be observed for the first time.
 - FACT: The deck builder needs Windows PowerPoint. A Linux container can outline and build a SAMPLE deck but cannot render a final deck.
-- ASSUMPTION: The subscription `ME-MngEnvMCAP682563-mkhalib-1` is the owner's sandbox and the owner may create billable resources in it. Existing resource groups belong to other projects and are not reused or changed.
+- ASSUMPTION: The subscription with id `870b491d-74bb-4aa7-95ab-647f262444d5` is the owner's sandbox and the owner may create billable resources in it. Existing resource groups belong to other projects and are not reused or changed.
 
 ## Options considered
 1. **Azure Container Apps, one replica, in a new resource group (proposed).** Linux container with Node 22 and git; Azure Container Registry (Basic) built with `az acr build`; Key Vault (RBAC) for the Entra client secret; Log Analytics; a user-assigned managed identity; HTTPS only; Bicep, with a what-if reviewed before the deploy. Cheapest managed option that gives a real git binary and a managed identity.
