@@ -11,6 +11,7 @@
     "dev": "next dev --hostname localhost --port 3100",
     "build": "next build",
     "start": "next start --hostname localhost --port 3100",
+    "start:synced": "node scripts/start-synced.mjs",
     "typecheck": "tsc --noEmit",
     "test:unit": "node --test \"checks/*.check.ts\"",
     "test:e2e": "playwright test",

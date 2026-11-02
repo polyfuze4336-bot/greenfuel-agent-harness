@@ -18,6 +18,8 @@ npm start          # http://localhost:3100, loopback only
 
 `npm run dev` runs the development server on the same address. Open `http://localhost:3100`.
 
+**Always on the latest GitHub `main`.** `npm start` shows whatever this checkout has: its current branch, as last fetched. To serve GitHub's `main` regardless of the checked-out branch, run `npm run start:synced`. It fetches `origin/main` every 60 seconds (`STUDIO_SYNC_SECONDS`, minimum 15) and serves that ref. It only fetches: nothing is pushed, merged or checked out. If a fetch fails it logs the failure and keeps serving the last copy. The Azure container does the same (`deploy/entrypoint.sh`, also every 60 seconds). Uncommitted local edits are not shown in this mode.
+
 | Variable | Default | Meaning |
 |---|---|---|
 | `STUDIO_REPO_ROOT` | the git repository containing the working directory | Repository to read |
