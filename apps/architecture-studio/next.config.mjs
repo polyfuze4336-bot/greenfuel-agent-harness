@@ -1,3 +1,16 @@
+import { spawnSync } from 'node:child_process';
+
+// Which code this build is. A container build has no git, so it receives STUDIO_BUILD_ID as a build argument; a local build asks git.
+// "+dirty" means the working tree differed from the commit, so the build is not exactly that commit.
+function buildId() {
+  if (process.env.STUDIO_BUILD_ID?.trim()) return process.env.STUDIO_BUILD_ID.trim();
+  const git = (...a) => spawnSync('git', a, { encoding: 'utf8' });
+  const head = git('rev-parse', '--short=7', 'HEAD');
+  if (head.status !== 0) return 'unknown';
+  const dirty = git('status', '--porcelain', '--', '.').stdout.trim() !== '';
+  return head.stdout.trim() + (dirty ? '+dirty' : '');
+}
+
 /** @type {import('next').NextConfig} */
 const isProd = process.env.NODE_ENV === 'production';
 
@@ -26,6 +39,7 @@ const securityHeaders = [
 
 const nextConfig = {
   reactStrictMode: true,
+  env: { STUDIO_BUILD_ID: buildId() },
   poweredByHeader: false,
   // pptxgenjs and jszip are plain Node packages; they are loaded as they are rather than bundled.
   serverExternalPackages: ['pptxgenjs', 'jszip'],
