@@ -126,7 +126,7 @@ Estimated from the 37 register entries in `docs/context/DECISION-REGISTER.md` us
 
 The shipped policy enrolls **one** person (`github:225331490`, the account the owner named on 2026-10-30) as Architecture Owner, `basis: bootstrap`, with no second administrator. Consequences:
 
-- Segregation of duties is enforced, so that person **cannot approve work they submitted** and cannot decide a decision they requested a revision on. This reverses the earlier `requireIndependentCompletionApproval: false` setting (T63).
+- **Segregation of duties is switched off** (`segregation.enforce: false` in the access policy), by the programme owner's instruction in chat on 2026-11-03: the owner is the only approver and may approve work they submitted or a decision they requested a revision on. This is a decision to run without a second pair of eyes, and the Studio says so: its policy review lists *Segregation of duties is switched off in the policy* as an attention finding. The control is still implemented and tested. Setting `enforce` back to `true` restores it (and the earlier `requireIndependentCompletionApproval: false` setting, T63, is no longer relevant).
 - There is **no Administrator**, so `/access` is unavailable and nobody can suspend anyone from the Studio.
 - That GitHub identity is accepted for approvals only on a development server with `STUDIO_ALLOW_DEV_APPROVALS=1`. In Entra mode no approval is possible until an Entra tenant exists and real people are enrolled.
 
