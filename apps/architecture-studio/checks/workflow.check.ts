@@ -644,7 +644,7 @@ describe('ordering and availability', () => {
     assert.deepEqual(p.problems, [], `unexpected policy problems: ${p.problems.join('; ')}`);
     assert.ok(p.people.length >= 1 && p.people.every((x) => /^(github:[1-9]\d*|entra:[0-9a-f-]{36}:[0-9a-f-]{36})$/.test(x.subject) && !/\[bot\]$/i.test(x.login)));
     assert.deepEqual(p.authentication.approvalProviders, ['entra']);
-    assert.equal(p.segregation.enforce, true);
+    assert.equal(p.segregation.enforce, false, 'the programme owner switched segregation of duties off on 2026-11-03; changing it back is a deliberate policy change');
     assert.ok(p.roleAliases['programme-owner']);
     assert.ok(!p.people.some((x) => x.roles.includes('administrator') && x.roles.some((r) => ['architecture-owner', 'security-reviewer', 'deployment-approver'].includes(r))), 'no one holds administrator together with an approver role');
   });
