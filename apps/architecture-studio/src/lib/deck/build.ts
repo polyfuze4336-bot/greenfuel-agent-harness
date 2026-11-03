@@ -2,7 +2,7 @@
 // drawn by its visual, a band for review placeholders and decision status, and a footer that names its sources. Speaker notes carry the
 // script, the evidence, the honest limit and the timing.
 import path from 'node:path';
-import PptxGenJS from 'pptxgenjs';
+import type PptxGenJS from 'pptxgenjs';
 import type { Assets } from './assets.ts';
 import type { DeckContext } from './context.ts';
 import { Canvas, drawVessel, type LedgerItem } from './draw.ts';
@@ -118,7 +118,9 @@ function body(cv: Canvas, s: Slide) {
 }
 
 export async function buildPptx(inp: BuildInput): Promise<BuildResult> {
-  const pptx = new PptxGenJS();
+  // Loaded here, not at the top of the module: viewing, editing and reviewing the deck never pay for the PowerPoint writer.
+  const { default: PptxGenJSLib } = await import('pptxgenjs');
+  const pptx = new PptxGenJSLib();
   pptx.layout = 'LAYOUT_WIDE';
   pptx.title = inp.title;
   pptx.subject = `Generated from commit ${inp.ctx.commit}`;

@@ -28,6 +28,9 @@ export type DeckAction =
   | { action: 'reject'; slideId: string; contentHash: string; reason: string }
   | { action: 'reset'; slideId: string }
   | { action: 'retitle'; slideId: string; title: string }
+  | { action: 'edit-notes'; slideId: string; notes: string }
+  | { action: 'move'; slideId: string; direction: 'up' | 'down' }
+  | { action: 'reset-order'; slideId?: string }
   | { action: 'choose-visual'; slideId: string; visual: VisualKind }
   | { action: 'regenerate'; slideId: string };
 
@@ -37,6 +40,8 @@ export interface SlideFacts {
   contentHash: string;
   placeholders: number;
   visual: Visual;
+  /** The register's status for each decision the slide leans on, as of now. */
+  decisions: Record<string, string>;
 }
 
 export type EffectiveStatus = 'draft' | 'approved' | 'rejected' | 'stale-approved' | 'stale-rejected';
@@ -51,12 +56,21 @@ export function statusOf(st: SlideState | undefined, currentHash: string): Effec
 export const emptyDeckState = (): DeckState => ({ version: 1, slides: {}, revision: 0 });
 
 const clean = (s: string, max: number) => s.replace(/[\u0000-\u001f\u007f]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, max);
+/** Spoken script: keeps line breaks, drops every other control character. */
+const cleanNotes = (s: string, max: number) => s.replace(/\r\n?/g, '\n').replace(/[\u0000-\u0009\u000b-\u001f\u007f]/g, ' ').replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim().slice(0, max);
+export const NOTES_MAX = 4000;
+const undecided = { status: 'draft' as const, decidedHash: null, decidedBy: null, reason: null, decidedDecisions: null };
 
 export function applyAction(state: DeckState, a: DeckAction, slides: Map<string, SlideFacts>, actor: string, now: Date, nextHash: (slideId: string, st: SlideState) => string): void {
-  const facts = slides.get(a.slideId);
-  if (!facts) throw new DeckError('unknown-slide', 404, `There is no slide ${a.slideId}.`);
   if (!actor.trim()) throw new DeckError('no-actor', 401, 'Every change needs a named person.');
-  const st = (state.slides[a.slideId] ??= emptySlideState());
+  if (a.action === 'reset-order') {
+    delete state.order;
+    return;
+  }
+  const facts = slides.get(a.slideId!);
+  if (!facts) throw new DeckError('unknown-slide', 404, `There is no slide ${a.slideId}.`);
+  const slideId = a.slideId!;
+  const st = (state.slides[slideId] ??= emptySlideState());
   const log = (action: SlideState['events'][number]['action'], hash: string, detail?: string) => st.events.push({ at: now.toISOString(), actor, action, contentHash: hash, detail });
 
   switch (a.action) {
@@ -64,7 +78,7 @@ export function applyAction(state: DeckState, a: DeckAction, slides: Map<string,
       if (a.contentHash !== facts.contentHash) throw new DeckError('stale', 409, 'The slide changed after you opened it. Reload and review the current version.');
       const reason = clean(a.reason ?? '', 500);
       if (facts.placeholders > 0 && reason.length < 10) throw new DeckError('acknowledge-placeholder', 422, 'This slide shows a review placeholder. Approving it means presenting the gap; say so in a written acknowledgement.');
-      Object.assign(st, { status: 'approved', decidedHash: facts.contentHash, decidedBy: actor, reason: reason || null });
+      Object.assign(st, { status: 'approved', decidedHash: facts.contentHash, decidedBy: actor, reason: reason || null, decidedDecisions: { ...facts.decisions } });
       log('approve', facts.contentHash, reason || undefined);
       return;
     }
@@ -72,12 +86,12 @@ export function applyAction(state: DeckState, a: DeckAction, slides: Map<string,
       if (a.contentHash !== facts.contentHash) throw new DeckError('stale', 409, 'The slide changed after you opened it. Reload and review the current version.');
       const reason = clean(a.reason, 500);
       if (reason.length < 5) throw new DeckError('reason-required', 422, 'A rejection needs a reason.');
-      Object.assign(st, { status: 'rejected', decidedHash: facts.contentHash, decidedBy: actor, reason });
+      Object.assign(st, { status: 'rejected', decidedHash: facts.contentHash, decidedBy: actor, reason, decidedDecisions: { ...facts.decisions } });
       log('reject', facts.contentHash, reason);
       return;
     }
     case 'reset': {
-      Object.assign(st, { status: 'draft', decidedHash: null, decidedBy: null, reason: null });
+      Object.assign(st, undecided);
       log('reset', facts.contentHash);
       return;
     }
@@ -85,21 +99,42 @@ export function applyAction(state: DeckState, a: DeckAction, slides: Map<string,
       const title = clean(a.title, 160);
       if (title.length < 3) throw new DeckError('bad-title', 422, 'A title needs at least three characters.');
       st.titleOverride = title;
-      Object.assign(st, { status: 'draft', decidedHash: null, decidedBy: null, reason: null });
-      log('retitle', nextHash(a.slideId, st), title);
+      Object.assign(st, undecided);
+      log('retitle', nextHash(slideId, st), title);
+      return;
+    }
+    case 'edit-notes': {
+      const notes = cleanNotes(typeof a.notes === 'string' ? a.notes : '', NOTES_MAX);
+      if (notes.length < 10) throw new DeckError('bad-notes', 422, 'Speaker notes need at least ten characters. To go back to the generated script, regenerate the slide.');
+      st.notesOverride = notes;
+      Object.assign(st, undecided);
+      log('edit-notes', nextHash(slideId, st), `${notes.length} characters`);
+      return;
+    }
+    case 'move': {
+      if (a.direction !== 'up' && a.direction !== 'down') throw new DeckError('bad-move', 422, 'Move a slide up or down.');
+      const order = [...slides.keys()];
+      const i = order.indexOf(slideId);
+      const j = a.direction === 'up' ? i - 1 : i + 1;
+      if (i === 0 || j === 0) throw new DeckError('title-fixed', 422, 'The title slide stays first.');
+      if (j >= order.length) throw new DeckError('bad-move', 422, 'This slide is already last.');
+      [order[i], order[j]] = [order[j]!, order[i]!];
+      state.order = order;
+      // Its content is unchanged, so an approval stays valid: only the place in the story moves.
+      log('move', facts.contentHash, `${a.direction} to position ${j + 1}`);
       return;
     }
     case 'choose-visual': {
       if (!variantsOf(facts.visual).includes(a.visual)) throw new DeckError('bad-visual', 422, `This slide cannot be shown as ${a.visual}; it would lose information.`);
       st.visualKind = a.visual;
-      Object.assign(st, { status: 'draft', decidedHash: null, decidedBy: null, reason: null });
-      log('choose-visual', nextHash(a.slideId, st), a.visual);
+      Object.assign(st, undecided);
+      log('choose-visual', nextHash(slideId, st), a.visual);
       return;
     }
     case 'regenerate': {
-      // Discard edits and take the slide as the current repository sources produce it.
-      Object.assign(st, { status: 'draft', decidedHash: null, decidedBy: null, reason: null, titleOverride: null, visualKind: null });
-      log('regenerate', nextHash(a.slideId, st));
+      // Discard edits and take the slide as the current repository sources produce it. Its place in the order is kept.
+      Object.assign(st, undecided, { titleOverride: null, visualKind: null, notesOverride: null });
+      log('regenerate', nextHash(slideId, st));
       return;
     }
   }

@@ -104,7 +104,7 @@ export type SlideStatus = 'draft' | 'approved' | 'rejected';
 export interface SlideEvent {
   at: string;
   actor: string;
-  action: 'approve' | 'reject' | 'reset' | 'retitle' | 'choose-visual' | 'regenerate' | 'comment';
+  action: 'approve' | 'reject' | 'reset' | 'retitle' | 'choose-visual' | 'regenerate' | 'edit-notes' | 'move' | 'comment';
   /** The content hash the action applied to. */
   contentHash: string;
   detail?: string;
@@ -117,6 +117,10 @@ export interface SlideState {
   decidedBy: string | null;
   titleOverride: string | null;
   visualKind: VisualKind | null;
+  /** A person's replacement for the spoken script. Not claim-checked: the person who wrote it answers for it. */
+  notesOverride?: string | null;
+  /** The status of every decision the slide leans on when it was approved or rejected, so a later change can be named, not just detected. */
+  decidedDecisions?: Record<string, string> | null;
   reason: string | null;
   events: SlideEvent[];
 }
@@ -124,8 +128,10 @@ export interface SlideState {
 export interface DeckState {
   version: 1;
   slides: Record<string, SlideState>;
+  /** The order of the slides when a person has moved any. Absent means the generated order. The title slide always stays first. */
+  order?: string[];
   /** Bumped on every change, so two people editing at once cannot silently overwrite each other. */
   revision: number;
 }
 
-export const emptySlideState = (): SlideState => ({ status: 'draft', decidedHash: null, decidedBy: null, titleOverride: null, visualKind: null, reason: null, events: [] });
+export const emptySlideState = (): SlideState => ({ status: 'draft', decidedHash: null, decidedBy: null, titleOverride: null, visualKind: null, notesOverride: null, decidedDecisions: null, reason: null, events: [] });

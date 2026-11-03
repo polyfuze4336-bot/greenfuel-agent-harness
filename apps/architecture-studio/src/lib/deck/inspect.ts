@@ -1,7 +1,5 @@
 // Reads a finished .pptx and reports what is in it, so editability and completeness can be shown from the file and not from the generator's
 // intentions: native slides, speaker notes, native charts, tables and live text, and how many pictures there are.
-import JSZip from 'jszip';
-
 export interface PptxInspection {
   slides: number;
   notesSlides: number;
@@ -16,6 +14,7 @@ export interface PptxInspection {
 const count = (s: string, re: RegExp) => (s.match(re) ?? []).length;
 
 export async function inspectPptx(buf: Buffer): Promise<PptxInspection> {
+  const { default: JSZip } = await import('jszip');
   const zip = await JSZip.loadAsync(buf);
   const names = Object.keys(zip.files);
   const slideFiles = names.filter((n) => /^ppt\/slides\/slide\d+\.xml$/.test(n)).sort((a, b) => Number(a.match(/\d+/)![0]) - Number(b.match(/\d+/)![0]));

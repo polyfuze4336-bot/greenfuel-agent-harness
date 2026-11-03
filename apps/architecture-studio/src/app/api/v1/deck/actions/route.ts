@@ -7,7 +7,7 @@ import { currentSession, requireSession } from '@/lib/workflow/http.ts';
 
 export const dynamic = 'force-dynamic';
 
-const ACTIONS = new Set(['approve', 'reject', 'reset', 'retitle', 'choose-visual', 'regenerate']);
+const ACTIONS = new Set(['approve', 'reject', 'reset', 'retitle', 'choose-visual', 'regenerate', 'edit-notes', 'move', 'reset-order']);
 const str = (v: unknown) => (typeof v === 'string' ? v : '');
 
 /**
@@ -18,7 +18,7 @@ export function POST(req: NextRequest) {
   return guard(async () => {
     const s = requireSession(req);
     if (s instanceof Response) return s;
-    if (Number(req.headers.get('content-length') ?? 0) > 20_000) return problem(413, 'Request too large', 'The request is too large.');
+    if (Number(req.headers.get('content-length') ?? 0) > 30_000) return problem(413, 'Request too large', 'The request is too large.');
     const body = (await req.json().catch(() => null)) as Record<string, unknown> | null;
     if (!body || typeof body !== 'object' || Array.isArray(body)) return problem(400, 'Invalid body', 'Send one JSON object describing one action.');
     const action = str(body.action);
@@ -28,7 +28,7 @@ export function POST(req: NextRequest) {
     if (why) return problem(403, 'Not permitted', why, 'forbidden');
     if (typeof body.expectedRevision !== 'number' || !Number.isInteger(body.expectedRevision)) return problem(400, 'Revision required', 'Send the revision of the deck you were looking at.');
     const slideId = str(body.slideId);
-    const input = { action, slideId, contentHash: str(body.contentHash), reason: str(body.reason), title: str(body.title), visual: str(body.visual) } as unknown as DeckAction;
+    const input = { action, slideId, contentHash: str(body.contentHash), reason: str(body.reason), title: str(body.title), visual: str(body.visual), notes: str(body.notes), direction: str(body.direction) } as unknown as DeckAction;
     try {
       const actor = `${currentSession(req)!.user.login}`;
       const state = act({ ...input, expectedRevision: body.expectedRevision }, actor);

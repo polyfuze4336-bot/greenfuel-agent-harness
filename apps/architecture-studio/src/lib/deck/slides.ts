@@ -37,18 +37,53 @@ export function asVariant(v: Visual, kind: VisualKind): Visual {
   return v;
 }
 
-/** The slide as it will be built: the generated slide with a person's title and visual choice applied. */
+/** The slide as it will be built: the generated slide with a person's title, visual and spoken-script choices applied. */
 export function effective(s: Slide, st?: SlideState): Slide {
   if (!st) return s;
-  return { ...s, title: st.titleOverride?.trim() || s.title, visual: st.visualKind ? asVariant(s.visual, st.visualKind) : s.visual };
+  return {
+    ...s,
+    title: st.titleOverride?.trim() || s.title,
+    visual: st.visualKind ? asVariant(s.visual, st.visualKind) : s.visual,
+    notes: st.notesOverride?.trim() ? { ...s.notes, say: st.notesOverride.trim() } : s.notes,
+  };
+}
+
+/**
+ * The generated slides in the order a person chose. Slides the order does not name keep their generated place after the named ones, names that
+ * are not slides are ignored, and the first slide always stays first, so a stored order can never drop, duplicate or lose a slide.
+ */
+export function inOrder<T extends { id: string }>(slides: T[], order: string[] | undefined): T[] {
+  if (!order?.length || slides.length < 2) return slides;
+  const rank = new Map<string, number>();
+  for (const id of order) if (!rank.has(id)) rank.set(id, rank.size);
+  const [first, ...rest] = slides;
+  const named = rest.filter((s) => rank.has(s.id)).sort((a, b) => rank.get(a.id)! - rank.get(b.id)!);
+  return [first!, ...named, ...rest.filter((s) => !rank.has(s.id))];
+}
+
+export interface DecisionChange {
+  id: string;
+  was: string;
+  now: string;
+}
+
+/** The decisions a slide leans on whose status differs from the one it was approved or rejected against. Empty when nothing is recorded to compare. */
+export function changedDecisions(st: SlideState | undefined, now: Record<string, string>): DecisionChange[] {
+  const was = st?.decidedDecisions;
+  if (!was) return [];
+  return Object.keys({ ...was, ...now }).sort().filter((id) => (was[id] ?? 'not recorded') !== (now[id] ?? 'not in register')).map((id) => ({ id, was: was[id] ?? 'not recorded', now: now[id] ?? 'not in register' }));
 }
 
 const canon = (o: unknown): string =>
   JSON.stringify(o, (_k, val) => (val && typeof val === 'object' && !Array.isArray(val) ? Object.fromEntries(Object.entries(val).sort(([a], [b]) => a.localeCompare(b))) : val));
 
-/** Hash of everything an audience or a reviewer sees on, or hears about, a slide. A change to any of it invalidates an earlier approval. */
-export function contentHash(s: Slide, sourceHashes: Record<string, string>): string {
+/**
+ * Hash of everything an audience or a reviewer sees on, or hears about, a slide, including the status the register gives each decision the
+ * slide leans on. A change to any of it invalidates an earlier approval; its position in the deck is not part of it.
+ */
+export function contentHash(s: Slide, sourceHashes: Record<string, string>, decisionStatus: Record<string, string>): string {
   const srcs = [...new Set([...s.sources.map((x) => x.path), ...s.claims.flatMap((c) => c.sources)])].sort().map((p) => [p, sourceHashes[p] ?? 'missing']);
-  const body = { id: s.id, title: s.title, message: s.message, visual: s.visual, notes: s.notes, decisions: s.decisions, placeholders: s.placeholders, srcs };
+  const decisions = s.decisions.map((id) => [id, decisionStatus[id] ?? 'not in register']);
+  const body = { id: s.id, title: s.title, message: s.message, visual: s.visual, notes: s.notes, decisions, placeholders: s.placeholders, srcs };
   return crypto.createHash('sha256').update(canon(body)).digest('hex');
 }

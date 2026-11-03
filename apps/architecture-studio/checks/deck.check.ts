@@ -8,6 +8,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { before, describe, it } from 'node:test';
 import PptxGenJS from 'pptxgenjs';
+import JSZip from 'jszip';
 import { Assets } from '../src/lib/deck/assets.ts';
 import { applyFailures, checkClaims } from '../src/lib/deck/claims.ts';
 import { buildSlides } from '../src/lib/deck/content.ts';
@@ -18,10 +19,10 @@ import { clip, parseTables, plain, verdictOf } from '../src/lib/deck/mdtable.ts'
 import { TEXT_PAIRS, contrast, renderedChecks, staticChecks, summarize, visibleWords } from '../src/lib/deck/qa.ts';
 import { powerpointAvailable, renderDeck } from '../src/lib/deck/render.ts';
 import { emptyDeckState, generate, openDeckContext, prepare } from '../src/lib/deck/service.ts';
-import { asVariant, contentHash, effective, variantsOf } from '../src/lib/deck/slides.ts';
+import { asVariant, changedDecisions, contentHash, effective, inOrder, variantsOf } from '../src/lib/deck/slides.ts';
 import { DeckError, DeckStore, applyAction, statusOf, type DeckAction, type SlideFacts } from '../src/lib/deck/store.ts';
 import { CHIP, COLOR, TONE, estimate } from '../src/lib/deck/theme.ts';
-import type { Slide, Visual } from '../src/lib/deck/types.ts';
+import { emptySlideState, type Slide, type Visual } from '../src/lib/deck/types.ts';
 
 const repo = path.resolve(import.meta.dirname, '..', '..', '..');
 const appDir = path.resolve(import.meta.dirname, '..');
@@ -147,19 +148,55 @@ describe('alternative visuals and edits', () => {
   });
   it('applies a title and a visual, and the content hash follows both and the source hashes', () => {
     const s = slide({ visual: { kind: 'bars', title: 't', items: [{ label: 'a', value: 1, text: '1', chip: 'SCENARIO' }] } });
-    const base = contentHash(s, { 'a.md': '1' });
+    const base = contentHash(s, { 'a.md': '1' }, {});
     const st = { ...emptyDeckState().slides, X01: { ...{ status: 'draft' as const, decidedHash: null, decidedBy: null, reason: null, events: [] }, titleOverride: 'New title', visualKind: 'table' as const } };
     const e = effective(s, st.X01);
     assert.equal(e.title, 'New title');
     assert.equal(e.visual.kind, 'table');
-    assert.notEqual(contentHash(e, { 'a.md': '1' }), base);
-    assert.notEqual(contentHash(s, { 'a.md': '2' }), base, 'changed evidence changes the hash');
-    assert.equal(contentHash(s, { 'a.md': '1' }), base, 'and the hash is stable');
+    assert.notEqual(contentHash(e, { 'a.md': '1' }, {}), base);
+    assert.notEqual(contentHash(s, { 'a.md': '2' }, {}), base, 'changed evidence changes the hash');
+    assert.equal(contentHash(s, { 'a.md': '1' }, {}), base, 'and the hash is stable');
   });
 });
 
+describe('a decision that changes makes the slides that lean on it stale', () => {
+  const s = slide({ decisions: ['ADR-0016', 'ADR-0017'] });
+  const src = { 'a.md': '1' };
+  it('binds the status of every decision the slide cites into its hash', () => {
+    const blocked = contentHash(s, src, { 'ADR-0016': 'Blocked', 'ADR-0017': 'Approved' });
+    assert.notEqual(contentHash(s, src, { 'ADR-0016': 'Approved', 'ADR-0017': 'Approved' }), blocked);
+    assert.notEqual(contentHash(s, src, { 'ADR-0016': 'Blocked' }), blocked, 'a decision that leaves the register is a change too');
+    assert.equal(contentHash(s, src, { 'ADR-0016': 'Blocked', 'ADR-0017': 'Approved', 'ADR-0099': 'Approved' }), blocked, 'a decision the slide does not cite is not a change to it');
+  });
+  it('names what changed, and a slide is stale until a person reviews it again', () => {
+    const facts = (status: string, hash: string): Map<string, SlideFacts> => new Map([['X01', { id: 'X01', contentHash: hash, placeholders: 0, visual: s.visual, decisions: { 'ADR-0016': status, 'ADR-0017': 'Approved' } }]]);
+    const st = emptyDeckState();
+    applyAction(st, { action: 'approve', slideId: 'X01', contentHash: 'h-blocked' }, facts('Blocked', 'h-blocked'), 'person', new Date(), () => 'x');
+    assert.equal(statusOf(st.slides.X01, 'h-blocked'), 'approved');
+    assert.equal(statusOf(st.slides.X01, 'h-approved'), 'stale-approved', 'the hash moved when ADR-0016 moved');
+    assert.deepEqual(changedDecisions(st.slides.X01, { 'ADR-0016': 'Approved', 'ADR-0017': 'Approved' }), [{ id: 'ADR-0016', was: 'Blocked', now: 'Approved' }]);
+    assert.deepEqual(changedDecisions(st.slides.X01, { 'ADR-0016': 'Blocked', 'ADR-0017': 'Approved' }), []);
+    assert.deepEqual(changedDecisions(undefined, { 'ADR-0016': 'Approved' }), [], 'nothing to compare means nothing is claimed');
+    assert.equal(st.slides.X01!.status, 'approved', 'the stored approval is not rewritten, only shown as out of date');
+  });
+  it('end to end on this repository: an approval stops counting when the register moves', () => {
+    const a = prepare(ctx, emptyDeckState());
+    const target = a.effective.find((x) => x.decisions.length > 0)!;
+    const state = emptyDeckState();
+    state.slides[target.id] = { ...emptySlide(), status: 'approved', decidedHash: a.hashes[target.id]!, decidedBy: 'person', decidedDecisions: Object.fromEntries(target.decisions.map((d) => [d, a.decisionStatus[d]!])) };
+    assert.equal(prepare(ctx, state).statuses.get(target.id), 'approved');
+    const moved = { ...ctx, decisions: ctx.decisions.map((d) => (d.id === target.decisions[0] ? { ...d, status: d.status === 'Approved' ? 'Rejected' : 'Approved' } : d)) } as unknown as DeckContext;
+    const b = prepare(moved, state);
+    assert.equal(b.statuses.get(target.id), 'stale-approved');
+    const others = b.effective.filter((x) => x.id !== target.id && !x.decisions.includes(target.decisions[0]!));
+    assert.ok(others.every((x) => b.hashes[x.id] === a.hashes[x.id]), 'slides that do not lean on it are untouched');
+  });
+});
+
+const emptySlide = emptySlideState;
+
 describe('review decisions on slides', () => {
-  const facts = (hash = 'h1', placeholders = 0): Map<string, SlideFacts> => new Map([['X01', { id: 'X01', contentHash: hash, placeholders, visual: { kind: 'bars', title: 't', items: [{ label: 'a', value: 1, chip: 'SCENARIO' }] } }]]);
+  const facts = (hash = 'h1', placeholders = 0): Map<string, SlideFacts> => new Map([['X01', { id: 'X01', contentHash: hash, placeholders, decisions: {}, visual: { kind: 'bars', title: 't', items: [{ label: 'a', value: 1, chip: 'SCENARIO' }] } }]]);
   const run = (s: ReturnType<typeof emptyDeckState>, a: DeckAction, f = facts(), actor = 'person') => applyAction(s, a, f, actor, new Date('2026-10-30T10:00:00Z'), () => 'h2');
   const code = (fn: () => void) => {
     try {
@@ -236,6 +273,122 @@ describe('review decisions on slides', () => {
     assert.deepEqual(new DeckStore(f).read(), emptyDeckState());
     fs.writeFileSync(f, 'not json');
     assert.deepEqual(new DeckStore(f).read(), emptyDeckState());
+  });
+});
+
+describe('moving slides and editing the spoken script', () => {
+  const ids = ['T00', 'A', 'B', 'C'];
+  const facts = (): Map<string, SlideFacts> => new Map(ids.map((id) => [id, { id, contentHash: `h-${id}`, placeholders: 0, decisions: {}, visual: { kind: 'cells' } as Visual }]));
+  const run = (s: ReturnType<typeof emptyDeckState>, a: DeckAction, f = facts()) => applyAction(s, a, f, 'person', new Date('2026-10-30T10:00:00Z'), () => 'h2');
+  const code = (fn: () => void) => {
+    try {
+      fn();
+    } catch (e) {
+      return (e as DeckError).code;
+    }
+    return null;
+  };
+
+  it('moves one slide one place and records who moved it', () => {
+    const s = emptyDeckState();
+    run(s, { action: 'move', slideId: 'C', direction: 'up' });
+    assert.deepEqual(s.order, ['T00', 'A', 'C', 'B']);
+    assert.equal(s.slides.C!.events.at(-1)!.action, 'move');
+    assert.equal(s.slides.C!.events.at(-1)!.actor, 'person');
+  });
+  it('keeps the title slide first, and refuses to move past either end', () => {
+    assert.equal(code(() => run(emptyDeckState(), { action: 'move', slideId: 'T00', direction: 'down' })), 'title-fixed');
+    assert.equal(code(() => run(emptyDeckState(), { action: 'move', slideId: 'A', direction: 'up' })), 'title-fixed');
+    assert.equal(code(() => run(emptyDeckState(), { action: 'move', slideId: 'C', direction: 'down' })), 'bad-move');
+    assert.equal(code(() => run(emptyDeckState(), { action: 'move', slideId: 'B', direction: 'sideways' as never })), 'bad-move');
+    assert.equal(code(() => run(emptyDeckState(), { action: 'move', slideId: 'NOPE', direction: 'up' })), 'unknown-slide');
+  });
+  it('moving does not withdraw an approval: the content is the same, only its place changed', () => {
+    const s = emptyDeckState();
+    run(s, { action: 'approve', slideId: 'B', contentHash: 'h-B' });
+    run(s, { action: 'move', slideId: 'B', direction: 'up' });
+    assert.equal(statusOf(s.slides.B, 'h-B'), 'approved');
+  });
+  it('a stored order can never drop, duplicate or invent a slide, and the first slide stays first', () => {
+    const gen = ids.map((id) => ({ id }));
+    assert.deepEqual(inOrder(gen, undefined).map((x) => x.id), ids);
+    assert.deepEqual(inOrder(gen, ['T00', 'C', 'A', 'B']).map((x) => x.id), ['T00', 'C', 'A', 'B']);
+    assert.deepEqual(inOrder(gen, ['C', 'NOPE', 'C', 'T00']).map((x) => x.id), ['T00', 'C', 'A', 'B'], 'unknown names are ignored, a repeat counts once, the first slide cannot be displaced');
+    assert.deepEqual(inOrder(gen, ['B']).map((x) => x.id), ['T00', 'B', 'A', 'C'], 'slides the order does not name follow, in their generated order');
+    assert.equal(inOrder(gen, ['C', 'A', 'B', 'T00']).length, gen.length);
+  });
+  it('the order can be reset to the generated one', () => {
+    const s = emptyDeckState();
+    run(s, { action: 'move', slideId: 'C', direction: 'up' });
+    run(s, { action: 'reset-order' });
+    assert.equal(s.order, undefined);
+  });
+
+  it('replaces the spoken script, withdraws the approval, and the hash follows', () => {
+    const base = slide({ notes: { say: 'The generated script. '.repeat(10), next: 'Next', honesty: 'The limit' } });
+    const s = emptyDeckState();
+    run(s, { action: 'approve', slideId: 'A', contentHash: 'h-A' });
+    run(s, { action: 'edit-notes', slideId: 'A', notes: 'My own words,\nsecond line.' });
+    assert.equal(s.slides.A!.status, 'draft');
+    const e = effective(base, s.slides.A);
+    assert.equal(e.notes.say, 'My own words,\nsecond line.');
+    assert.equal(e.notes.honesty, 'The limit', 'the stated limit is not something an edit can remove');
+    assert.notEqual(contentHash(e, { 'a.md': '1' }, {}), contentHash(base, { 'a.md': '1' }, {}));
+  });
+  it('refuses empty notes, strips control characters, and bounds the length', () => {
+    assert.equal(code(() => run(emptyDeckState(), { action: 'edit-notes', slideId: 'A', notes: 'short' })), 'bad-notes');
+    const s = emptyDeckState();
+    run(s, { action: 'edit-notes', slideId: 'A', notes: `Line one\u0007\u0000\n\n\n\nLine two ${'x'.repeat(9000)}` });
+    const n = s.slides.A!.notesOverride!;
+    assert.ok(!/[\u0000-\u0008\u000b-\u001f]/.test(n));
+    assert.ok(n.length <= 4000);
+    assert.ok(!/\n{3,}/.test(n));
+  });
+  it('regenerate discards edited notes, and keeps the slide where the person put it', () => {
+    const s = emptyDeckState();
+    run(s, { action: 'edit-notes', slideId: 'A', notes: 'My own words here.' });
+    run(s, { action: 'move', slideId: 'B', direction: 'up' });
+    run(s, { action: 'regenerate', slideId: 'A' });
+    assert.equal(s.slides.A!.notesOverride, null);
+    assert.deepEqual(s.order, ['T00', 'B', 'A', 'C']);
+  });
+});
+
+describe('the requested slide topics, and loading only when needed', () => {
+  const topics: [string, RegExp][] = [
+    ['business problem', /problem/i], ['commercial stakes', /premium|value/i], ['stakeholders', /stakeholder/i], ['architecture alternatives', /options|alternatives/i],
+    ['recommended solution', /recommend/i], ['Azure architecture', /azure/i], ['five business agents', /five .*agents|agents/i], ['edge-to-shore flow', /edge-to-shore|data flows/i],
+    ['data sovereignty', /sovereign|residency/i], ['evidence integrity', /evidence integrity|signed chain/i], ['agent autonomy', /autonomy|L4|may reach/i],
+    ['security', /security/i], ['reliability and recovery', /recovery|availability/i], ['cost and ROI', /cost/i], ['operational metrics', /observability|performance/i],
+    ['evaluation results', /evaluation/i], ['risks', /risks|gaps/i], ['recommendation', /decision|recommend/i], ['technical appendix', /appendix/i],
+  ];
+  it('has a slide for every topic the brief lists, found by its title or section and not by hand', () => {
+    const slides = buildSlides(ctx);
+    for (const [topic, re] of topics) {
+      if (topic === 'technical appendix') assert.ok(slides.some((s) => s.tier === 'appendix'), topic);
+      else assert.ok(slides.some((s) => re.test(`${s.title} ${s.section}`)), `no slide for: ${topic}`);
+    }
+  });
+  it('builds the stakeholder slide from the stakeholder analysis, with the basis of each row', () => {
+    const s = buildSlides(ctx).find((x) => x.id === 'E02B')!;
+    assert.equal(s.visual.kind, 'table');
+    if (s.visual.kind !== 'table') return;
+    assert.ok(s.visual.rows.length >= 8, `${s.visual.rows.length} stakeholders`);
+    assert.ok(s.visual.rows.some((r) => /stated/i.test(r[1]!)) && s.visual.rows.some((r) => /candidate/i.test(r[1]!)), 'stated and candidate stay apart');
+    assert.ok(/no stakeholder has been interviewed/i.test(s.notes.honesty ?? ''));
+    assert.deepEqual(s.claims[0]!.sources, ['docs/business/STAKEHOLDERS.md']);
+  });
+  it('does not load the PowerPoint writer or the zip reader until a deck is built or a file is inspected', () => {
+    const lib = path.join(appDir, 'src', 'lib', 'deck');
+    for (const f of fs.readdirSync(lib).filter((x) => x.endsWith('.ts'))) {
+      const text = fs.readFileSync(path.join(lib, f), 'utf8');
+      assert.ok(!/^import\s+(?!type\b)[^;]*from\s+'(pptxgenjs|jszip)'/m.test(text), `${f} imports a heavy library at load time`);
+    }
+    assert.match(fs.readFileSync(path.join(lib, 'build.ts'), 'utf8'), /await import\('pptxgenjs'\)/);
+  });
+  it('the pages that edit and review the deck do not pull the writer into the browser bundle', () => {
+    const client = fs.readFileSync(path.join(appDir, 'src', 'components', 'deck', 'deck-studio.tsx'), 'utf8');
+    assert.ok(!/pptxgenjs|jszip/.test(client));
   });
 });
 
@@ -393,6 +546,22 @@ describe('the sample deck, built from this repository', () => {
       assert.ok(s.claims.every((c: { ok: boolean }) => c.ok), s.id);
     }
     assert.deepEqual(rec.decisions.filter((d: { id: string; status: string }) => d.id === 'ADR-0016').map((d: { status: string }) => d.status), [ctx.decisions.find((d) => d.id === 'ADR-0016')!.status]);
+  });
+  it('follows a person\'s order and edited notes in the file itself, and records both', async () => {
+    const base = prepare(ctx, emptyDeckState());
+    const [first, a, b, c] = base.effective.map((s) => s.id);
+    const state = emptyDeckState();
+    state.order = [first!, c!, a!, b!];
+    state.slides[a!] = { ...emptySlideState(), notesOverride: 'A spoken script written by the presenter, with its own words.' };
+    const dir = tmp();
+    const r = await generate(ctx, { mode: 'sample', outDir: dir, render: false, assetsDir: path.join(appDir, 'deck-assets'), state });
+    const made = JSON.parse(fs.readFileSync(path.join(r.dir, 'generation.json'), 'utf8')) as { order: string[]; slides: { id: string }[] };
+    assert.deepEqual(made.slides.slice(0, 4).map((s) => s.id), [first, c, a, b]);
+    assert.deepEqual(made.order, [first, c, a, b]);
+    assert.equal(made.slides.length, base.effective.length, 'no slide was dropped or repeated');
+    const zip = await JSZip.loadAsync(fs.readFileSync(path.join(r.dir, 'deck.pptx')));
+    const notes = await Promise.all(Object.keys(zip.files).filter((n) => /^ppt\/notesSlides\/notesSlide\d+\.xml$/.test(n)).sort((x, y) => Number(x.match(/\d+/)![0]) - Number(y.match(/\d+/)![0])).map((n) => zip.files[n]!.async('string')));
+    assert.ok(notes[2]!.includes('A spoken script written by the presenter'), 'the edited script is on the third slide, where the person put it');
   });
   it('a final deck is refused, with the reasons, and leaves nothing behind', async () => {
     const dir = tmp();

@@ -26,6 +26,8 @@ export interface LatestBuild {
   pdfBytes: number | null;
   /** The content hash of each slide when it was built, so a preview of a slide that has changed since can be labelled stale. */
   slideHashes: Record<string, string>;
+  /** The order of the slides in that build. A preview is the nth slide of the build, which is not the nth slide of the deck once a person moves slides. */
+  slideOrder?: string[];
 }
 
 export const deckDir = (): string => process.env.STUDIO_DECK_DIR?.trim() || path.join(process.env.STUDIO_CACHE_DIR?.trim() || path.resolve(process.cwd(), '.studio-cache'), 'deck');
@@ -88,7 +90,7 @@ export function act(a: DeckAction & { expectedRevision: number }, actor: string)
   const st = store();
   const current = st.read();
   const prep = prepare(ctx, current);
-  const facts = new Map(prep.effective.map((s, i) => [s.id, { id: s.id, contentHash: prep.hashes[s.id]!, placeholders: s.placeholders.length, visual: prep.generated[i]!.visual }]));
+  const facts = new Map(prep.effective.map((s, i) => [s.id, { id: s.id, contentHash: prep.hashes[s.id]!, placeholders: s.placeholders.length, visual: prep.generated[i]!.visual, decisions: Object.fromEntries(s.decisions.map((d) => [d, prep.decisionStatus[d]!])) }]));
   return st.mutate(a.expectedRevision, (s) => {
     // After an edit the slide's hash changes; recompute it from the edited state so the event records the new content.
     const rehash = (slideId: string, one: DeckState['slides'][string]) => prepare(ctx, { ...s, slides: { ...s.slides, [slideId]: one } }).hashes[slideId]!;
@@ -106,7 +108,7 @@ export async function build(mode: DeckMode, actor: string): Promise<LatestBuild>
     const out = await generate(ctx, { mode, outDir: buildsDir(), assetsDir: assetsDir(), state });
     const latest: LatestBuild = {
       id: out.id, mode, generatedAt: out.generatedAt, commit: out.commit, builtBy: actor, rendered: out.rendered, previews: out.previews,
-      qa: out.qa, findings: out.findings, pptxBytes: out.pptx.bytes, pdfBytes: out.pdf?.bytes ?? null, slideHashes: prep.hashes,
+      qa: out.qa, findings: out.findings, pptxBytes: out.pptx.bytes, pdfBytes: out.pdf?.bytes ?? null, slideHashes: prep.hashes, slideOrder: prep.effective.map((s) => s.id),
     };
     fs.mkdirSync(deckDir(), { recursive: true });
     fs.writeFileSync(latestFile(), JSON.stringify(latest, null, 2));

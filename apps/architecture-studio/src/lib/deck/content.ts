@@ -114,6 +114,18 @@ export function buildSlides(c: DeckContext): Slide[] {
     claims: [claim('E02-c1', 'The case study states the commercial problem and constraints.', [P.problem])],
   }));
 
+  const stakeTable = c.table(P.stakeholders, ['Stakeholder', 'Basis', 'Decider for']);
+  const stakeRows = stakeTable?.rows ?? [];
+  const stated = stakeRows.filter((r) => /^\**stated/i.test(plain(r[1] ?? '')) || /stated/i.test(r[1] ?? '')).length;
+  add(mk({
+    id: 'E02B', tier: 'executive', section: '1 The stakeholders', title: `${stakeRows.length} stakeholders decide this, and the case names only ${stated}`,
+    message: 'Whoever can fund it, approve a filing, open a meter or accept the evidence. None has been interviewed.',
+    visual: { kind: 'table', head: ['Stakeholder', 'Basis', 'Decides'], widths: [4.2, 2, 5.8], rows: stakeRows.map((r) => [clip(plain(r[0] ?? '').replace(/\s*\(.*$/, ''), 30), clip(plain(r[1] ?? '').replace(/\s*\(.*$/, ''), 12), clip(plain(r[2] ?? ''), 46)]), foot: 'Stated: the case study says so. Candidate: a hypothesis to confirm with that stakeholder.' },
+    sources: [src(P.stakeholders, 'CANDIDATE'), src(P.problem, 'CASE STUDY')], seconds: 45, rubric: ['B1', 'C1'],
+    notes: { say: 'These are the people and groups whose decisions shape the design. The case study names two of them directly: the quality manager, who approves every certification filing, and the shipowner, whose data must stay isolated. The others are my reading of who must agree for this to work in a port. Each one decides something different: funding, filing approval, access to meters, or what counts as acceptable evidence. I have not interviewed any of them, so every success measure on this slide is a question I still owe an answer to.', next: 'Why does reliability decide the premium?', honesty: 'Only two stakeholders are stated by the case study. The rest are hypotheses, and no stakeholder has been interviewed.' },
+    claims: [claim('E02B-c1', 'The stakeholder analysis marks the quality manager and the shipowner as stated by the case study.', [P.stakeholders], ['Stated'])],
+  }));
+
   add(mk({
     id: 'E03', tier: 'executive', section: '2 Why it matters', title: 'Reliability decides how much of the premium is kept',
     message: 'The premium pool is the prize and trusted certificates protect it. How much is unknown: the business has supplied no figure.',
@@ -424,7 +436,7 @@ export function buildSlides(c: DeckContext): Slide[] {
   add(mk({
     id: 'A01', tier: 'appendix', section: 'ADR references', title: 'The target architecture is Blocked in the register, not approved',
     message: 'Status is read from the decision register at this commit, never written into the deck.',
-    visual: { kind: 'table', head: ['ADR', 'Decision', 'Status', 'Approval basis'], widths: [1.4, 6, 1.8, 2.8], tone: [2, 3], rows: adrs.map((d) => [d.id, clip(d.title, 70), d.status, d.approvalBasis]), foot: `${c.readiness.global.approved} of ${c.readiness.global.decisions} register decisions are approved; ${c.readiness.global.pending} are not yet decided.` },
+    visual: { kind: 'table', head: ['ADR', 'Decision', 'Status', 'Approval basis'], widths: [1.4, 6, 1.8, 2.8], tone: [2, 3], rows: adrs.map((d) => [d.id, clip(d.title, 70), d.status, d.approvalBasis]), foot: `${c.decisions.filter((d) => d.status === 'Approved').length} of ${c.readiness.global.decisions} register decisions have the status Approved; ${c.readiness.global.approved} hold an approval basis the policy accepts. ${c.readiness.global.pending} are not yet decided.` },
     sources: [src('docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md', 'DESIGN'), src('docs/adr/0020-phase-1a-local-synthetic-vertical-slice.md', 'DESIGN')], seconds: 30, rubric: ['B6'], decisions: adrs.map((d) => d.id),
     notes: { say: 'The recommended architecture is recorded as ADR 0016 to 0019. They are Blocked because the design review RV-0003 is unresolved. ADR 0020, the Phase 1a scope, is Proposed. I do not present any of them as approved.', honesty: 'Approval of these decisions is the owner\'s.' },
     claims: [claim('A01-c1', 'ADR 0016 to 0019 are not approved.', ['docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md'], ['Proposed'])],
