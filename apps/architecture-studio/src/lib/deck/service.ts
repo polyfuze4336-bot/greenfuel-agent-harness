@@ -33,7 +33,7 @@ function provenanceSlide(ctx: DeckContext, claimChecks: ClaimCheck[], slideCount
         ['Branch', ctx.branch ?? 'detached'],
         ['Slides', String(slideCount)],
         ['Sources read', `${used.length} files, digest ${digest}`],
-        ['Claims checked', `${claimChecks.length}; ${claimChecks.filter((c) => !c.ok).length} unsupported`],
+        ['Claims checked', `${claimChecks.length} on the other slides; ${claimChecks.filter((c) => !c.ok).length} unsupported`],
         ['Rubric', 'derived traceability; the official PDF is not in the repository'],
       ],
     },
