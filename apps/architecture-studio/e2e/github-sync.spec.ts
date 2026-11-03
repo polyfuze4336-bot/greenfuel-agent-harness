@@ -120,13 +120,14 @@ test.describe('approval and rejection pull requests', () => {
   test('approve: a pull request is opened by the app, checks and review are reported, and it is Approved only after the merge', async ({ page, request }) => {
     await open(page, 'ADR-0020');
     await signIn(page);
+    const writesBefore = (await fake(request)).refWrites.length; // other specs may have used this stand-in first
     await act(page, 'approve', undefined, 'Submit approval');
     await expect(tracker(page)).toHaveAttribute('data-state', 'pull-request-created');
     await expect(status(page)).toContainText('Proposed');
     const pr = await prFor(request, 'ADR-0020');
     expect(pr).toBeTruthy();
     const s = await fake(request);
-    expect(s.refWrites).toEqual([`refs/heads/${pr.head}`]);
+    expect(s.refWrites.slice(writesBefore)).toEqual([`refs/heads/${pr.head}`]);
     expect(bare('rev-parse', 'refs/heads/main')).not.toBe(pr.headSha);
     expect(bare('diff-tree', '--no-commit-id', '--name-only', '-r', pr.headSha)).toBe('docs/decision-reviews/ADR-0020/0001-approve.json');
 

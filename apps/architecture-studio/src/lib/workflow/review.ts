@@ -24,6 +24,7 @@ import { APPROVAL_CLASS } from '../auth/model.ts';
 import { effectiveRoles } from '../auth/authorize.ts';
 import { designatedOwners, subjectKeyOf, type SubjectKey } from '../auth/access-policy.ts';
 import { ReviewStore, isOpen, withLock, type AuditFacts, type Proposal } from './store.ts';
+import { mergePolicyMode, type MergePolicy } from '../github/merge-policy.ts';
 import { factsOf, syncProposal, type SyncDeps, type SyncFamily } from './sync-core.ts';
 
 export class ServiceError extends Error {
@@ -52,6 +53,8 @@ export interface ServiceDeps {
   now?: () => Date;
   /** How long a read policy is reused. 0 reads it every time. */
   policyTtlMs?: number;
+  /** What GitHub says protects the canonical branch. Present only when the Studio can ask (the GitHub App). */
+  mergePolicy?: () => Promise<MergePolicy>;
 }
 
 export interface CanonicalReviews {
@@ -332,6 +335,13 @@ export class ReviewService {
       if (open) return this.refuse(current, d, a, 'stale', new ServiceError(409, 'proposal-open', `A change to ${d.id} is already in flight (${open.id}, ${open.state}). One change at a time.`, { proposalId: open.id }));
       const av = availability(d, state).find((x) => x.action === a);
       if (!av?.allowed) return this.refuse(current, d, a, 'denied', new ServiceError(409, 'not-allowed', av?.reason ?? 'This action is not allowed now.'));
+
+      // A status-changing request opens a pull request that a person will merge. If the repository does not require pull requests, that merge
+      // is not governed, so nothing is opened. What the person typed is not lost: the dialog keeps it, and nothing was recorded.
+      if (a !== 'comment' && this.deps.mergePolicy && mergePolicyMode() === 'require') {
+        const mp = await this.deps.mergePolicy();
+        if (mp.state === 'absent') return this.refuse(current, d, a, 'denied', new ServiceError(409, 'merge-policy-absent', `Not sent to GitHub. ${mp.detail} Add a ruleset that requires pull requests on ${mp.branch}, or set STUDIO_MERGE_POLICY=warn after confirming the branch is protected another way. Comments are still allowed.`, { mergePolicy: mp }));
+      }
 
       const seq = state.events.length + 1;
       const body = {

@@ -135,7 +135,7 @@ Run 2026-10-30: 38 workflow unit tests (85 unit tests in the Studio), 26 review-
 - **Real GitHub has not been exercised.** The `gh` paths (`GhCliIdentity`, `GhCliGitHub`) are small, but only identity (`gh api user`) was checked against the real account; no real pull request was created. The simulated service merges by `git` fast-forward on a local bare remote, the way a real merge does.
 - **Not proof of a human.** See section 4.
 - **Approved here is not signed.** A decision approved through this workflow is a recorded decision. Signed approval under ADR 0008 still needs an enrolled approver and `approval.mjs`.
-- **Branch protection is assumed**, not checked by the Studio.
+- **Branch protection**: when the Studio is a GitHub App it now reads the canonical branch's rulesets and refuses to send a status-changing pull request unless a rule requires pull requests (see [APPROVAL-WRITEBACK](../studio/APPROVAL-WRITEBACK.md)). Classic branch protection cannot be read with the app's permissions. In CLI and test modes the policy is not checked.
 - **One in-flight change per decision**, comments included.
 - **Diagrams are shown as source**, not drawn.
 - **Source text is shown as written**, so Markdown markers such as `**` appear in descriptions.

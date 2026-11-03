@@ -13,6 +13,7 @@ import { WorkService } from './work.ts';
 import { GitHubApi } from '../github/api.ts';
 import { AppAuth, appConfigFromEnv, type AppConfig } from '../github/app-auth.ts';
 import { AppGitHub, AppPublisher } from '../github/app-github.ts';
+import { MergePolicyReader, mergePolicyMode } from '../github/merge-policy.ts';
 import { DeliveryLog } from '../github/webhook.ts';
 import { EntraClient } from '../auth/entra.ts';
 import { authConfig } from '../auth/config.ts';
@@ -35,6 +36,8 @@ interface Runtime {
   mode: GitHubMode;
   github: GitHubPort;
   app: { config: AppConfig; auth: AppAuth; api: GitHubApi } | null;
+  /** What GitHub says protects the canonical branch. Null unless the Studio is a GitHub App. */
+  mergePolicy: MergePolicyReader | null;
   deliveries: DeliveryLog;
   /** Microsoft Entra ID sign-in. Present only in entra mode, and only when it is fully configured. */
   entra: EntraClient | null;
@@ -55,12 +58,14 @@ export function reviewRuntime(root: string, readRef: string): Runtime {
   let app: Runtime['app'] = null;
   let github: GitHubPort;
   let publisher: Publisher;
+  let mergePolicy: MergePolicyReader | null = null;
   if (appCfg) {
     const auth = AppAuth.fromConfig(appCfg);
     const api = new GitHubApi({ baseUrl: appCfg.apiUrl, tokens: auth });
     app = { config: appCfg, auth, api };
     github = new AppGitHub(api, appCfg.repo);
     publisher = new AppPublisher({ api, tokens: auth, repo: appCfg.repo, root, gitUrl: appCfg.gitUrl });
+    if (mergePolicyMode() !== 'off') mergePolicy = new MergePolicyReader(api, appCfg.repo, canonicalRefName().replace(/^[^/]+\//, ''), Number(process.env.STUDIO_MERGE_POLICY_TTL_MS ?? 60_000));
   } else {
     github = test ? new LocalGitHub(path.join(fixtures, 'prs.json'), process.env.STUDIO_TEST_REMOTE_GIT_DIR ?? '') : new GhCliGitHub(root);
     publisher = new GitPublisher(root);
@@ -73,6 +78,7 @@ export function reviewRuntime(root: string, readRef: string): Runtime {
     github,
     publisher,
     identity: test ? new FixtureIdentity(path.join(fixtures, 'identity.json')) : new GhCliIdentity(),
+    ...(mergePolicy ? { mergePolicy: () => mergePolicy.read() } : {}),
   });
   g.__studioReview = {
     key,
@@ -82,6 +88,7 @@ export function reviewRuntime(root: string, readRef: string): Runtime {
     mode: app ? 'app' : test ? 'test' : 'cli',
     github,
     app,
+    mergePolicy,
     deliveries: new DeliveryLog(path.join(cache, 'webhook-deliveries.json')),
     entra: auth.entra ? new EntraClient(auth.entra) : null,
   };

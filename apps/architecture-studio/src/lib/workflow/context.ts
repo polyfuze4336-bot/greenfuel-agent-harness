@@ -97,14 +97,20 @@ export interface TimelineEntry {
   tone: 'accepted' | 'blocked' | 'open' | 'neutral';
   ref: { path: string; line?: number } | null;
   sha?: string;
+  /** For a review record: the commit on the canonical branch that carries it, and the pull request that brought it, where this Studio opened one. */
+  carriedBy?: { sha: string; date: string; subject: string; pullRequest: { number: number; url: string | null } | null };
 }
 
 const TONE: Record<string, TimelineEntry['tone']> = { approve: 'accepted', 'approve-alternative': 'accepted', 'approve-with-conditions': 'accepted', reject: 'blocked', 'request-revision': 'open', defer: 'neutral', comment: 'neutral', reopen: 'open' };
 
-export function timelineOf(d: NormalizedDecision, state: ReviewState, proposals: Proposal[], commits: { sha: string; date: string; author: string; subject: string }[]): TimelineEntry[] {
+export function timelineOf(d: NormalizedDecision, state: ReviewState, proposals: Proposal[], commits: { sha: string; date: string; author: string; subject: string }[], eventCommits: Record<string, { sha: string; date: string; subject: string }> = {}): TimelineEntry[] {
   const out: TimelineEntry[] = [];
   for (const e of state.events) {
-    out.push({ at: e.createdAt, kind: 'review-event', title: ACTION_LABEL[e.action] + (e.option ? ` (option ${e.option.key})` : ''), detail: [e.rationale, e.comment, ...e.conditions.map((c) => `Condition: ${c}`)].filter(Boolean).join('\n') || null, actor: `@${e.actor.login}`, tone: TONE[e.action] ?? 'neutral', ref: { path: eventPath(e.decisionId, e.seq, e.action) } });
+    const path = eventPath(e.decisionId, e.seq, e.action);
+    const c = eventCommits[path];
+    const prop = proposals.find((p) => p.state === 'applied' && (p.event as { eventHash?: string }).eventHash === e.eventHash);
+    out.push({
+      carriedBy: c ? { sha: c.sha, date: c.date, subject: c.subject, pullRequest: prop?.prNumber ? { number: prop.prNumber, url: prop.prUrl } : null } : undefined, at: e.createdAt, kind: 'review-event', title: ACTION_LABEL[e.action] + (e.option ? ` (option ${e.option.key})` : ''), detail: [e.rationale, e.comment, ...e.conditions.map((c) => `Condition: ${c}`)].filter(Boolean).join('\n') || null, actor: `@${e.actor.login}`, tone: TONE[e.action] ?? 'neutral', ref: { path } });
   }
   for (const p of proposals) {
     if (p.state === 'applied') continue;

@@ -10,7 +10,7 @@ import type { AuditEntry, Proposal } from '@/lib/workflow/store.ts';
 import type { NormStatus } from '@/lib/intel/schema.ts';
 import { utcDate } from '@/lib/format.ts';
 import { SourcePreviewButton } from '../source-preview.tsx';
-import { Card, NormStatusPill, Skeleton, Tag, btn } from '../ui.tsx';
+import { Card, NormStatusPill, Skeleton, Tag, btn, useGitHub } from '../ui.tsx';
 import { ActionDialog, type OptionChoice, type SubmitResult } from './action-dialog.tsx';
 import type { Conflict } from './conflict-panel.tsx';
 
@@ -50,6 +50,34 @@ const PRIMARY: ActionKind[] = ['approve', 'approve-alternative', 'approve-with-c
 const SECONDARY: ActionKind[] = ['recommend', 'request-revision', 'defer', 'reject', 'comment', 'reopen'];
 const HOTKEY: Partial<Record<ActionKind, string>> = { approve: 'A', reject: 'R', defer: 'D', 'request-revision': 'V', comment: 'C', reopen: 'O', recommend: 'M' };
 
+/** The GitHub commit, and pull request, that carry a review record. Linked only when GitHub is known to have them. */
+function CarriedBy({ c }: { c: NonNullable<TimelineEntry['carriedBy']> }) {
+  const { githubUrl } = useGitHub();
+  return (
+    <p className="mt-0.5 text-[12px] text-ink-3" data-testid="carried-by">
+      Commit{' '}
+      {githubUrl ? (
+        <a href={`${githubUrl}/commit/${c.sha}`} target="_blank" rel="noreferrer noopener" aria-label={`Commit ${c.sha.slice(0, 7)} on GitHub (opens in a new tab)`} className="font-mono text-accent hover:underline">
+          {c.sha.slice(0, 7)}
+        </a>
+      ) : (
+        <span className="font-mono">{c.sha.slice(0, 7)}</span>
+      )}
+      {c.pullRequest ? (
+        <>
+          {' · '}
+          {c.pullRequest.url ? (
+            <a href={c.pullRequest.url} target="_blank" rel="noreferrer noopener" className="text-accent hover:underline">
+              pull request #{c.pullRequest.number}
+            </a>
+          ) : (
+            <>pull request #{c.pullRequest.number}</>
+          )}
+        </>
+      ) : null}
+    </p>
+  );
+}
 export function Tracker({ p, onCheck, busy, subject = 'decision' }: { p: Proposal; onCheck: () => void; busy: boolean; subject?: string }) {
   const failed = p.state === 'failed' || p.state === 'conflicted';
   const at = PROPOSAL_STEPS.indexOf(p.state);
@@ -474,6 +502,7 @@ export function ReviewRail({ id, options }: { id: string; options: OptionChoice[
               </p>
               <p className="font-medium text-ink">{t.title}</p>
               {t.actor ? <p className="text-[12px] text-ink-3">{t.actor}</p> : null}
+              {t.carriedBy ? <CarriedBy c={t.carriedBy} /> : null}
               {t.detail ? <p className="mt-0.5 text-ink-2 whitespace-pre-line">{t.detail.slice(0, 300)}</p> : null}
               {t.kind === 'source-commit' && t.sha && t.ref ? (
                 <div className="mt-1.5">
