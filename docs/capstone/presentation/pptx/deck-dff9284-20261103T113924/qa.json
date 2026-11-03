@@ -1,0 +1,57 @@
+{
+  "summary": {
+    "errors": 0,
+    "warnings": 0,
+    "info": 8
+  },
+  "findings": [
+    {
+      "slide": "E03",
+      "severity": "info",
+      "rule": "placeholder",
+      "message": "1 review placeholder(s): PH-VOLUME."
+    },
+    {
+      "slide": "E11",
+      "severity": "info",
+      "rule": "placeholder",
+      "message": "1 review placeholder(s): PH-TIME."
+    },
+    {
+      "slide": "T07",
+      "severity": "info",
+      "rule": "placeholder",
+      "message": "1 review placeholder(s): PH-PERF."
+    },
+    {
+      "slide": "T08",
+      "severity": "info",
+      "rule": "placeholder",
+      "message": "1 review placeholder(s): PH-DR."
+    },
+    {
+      "slide": "T09",
+      "severity": "info",
+      "rule": "placeholder",
+      "message": "1 review placeholder(s): PH-OBS."
+    },
+    {
+      "slide": "A04",
+      "severity": "info",
+      "rule": "placeholder",
+      "message": "1 review placeholder(s): PH-PERF-A."
+    },
+    {
+      "slide": "A11",
+      "severity": "info",
+      "rule": "placeholder",
+      "message": "1 review placeholder(s): PH-REHEARSAL."
+    },
+    {
+      "slide": "deck",
+      "severity": "info",
+      "rule": "rubric",
+      "message": "No slide serves B5; it is assessed live and cannot be evidenced by the deck."
+    }
+  ]
+}

@@ -1,11 +1,11 @@
 {
   "generatedBy": "harness/scripts/studio-inventory.mjs",
   "git": {
-    "head": "0a4a7d069e9c7dcdb3f4f05d12a9d48cf71397f5",
-    "branch": "studio/next-best-action",
-    "originMain": "0a4a7d069e9c7dcdb3f4f05d12a9d48cf71397f5",
-    "commitsAheadOfOriginMain": 0,
-    "dirty": 33
+    "head": "dff92840d64e628bb2ce33fe97f40d72f2bce9dd",
+    "branch": "studio/presentation-studio",
+    "originMain": "870410b9de6716ea6b2f54c4b946382c8c689cfe",
+    "commitsAheadOfOriginMain": 4,
+    "dirty": 2
   },
   "sources": {},
   "counts": {
@@ -2305,7 +2305,7 @@
     "docs/architecture-studio": 5,
     "docs/azure": 2,
     "docs/business": 3,
-    "docs/capstone": 12,
+    "docs/capstone": 15,
     "docs/context": 1,
     "docs/evidence": 1,
     "docs/orchestration": 1,
