@@ -111,7 +111,11 @@ export function DeckStudio() {
   const { model, latest, me } = data;
   const t = model.totals;
   const built = !!latest;
-  const previewFresh = (s: SlideView) => !!latest && latest.slideHashes[s.id] === s.contentHash;
+  // A preview is the nth slide of the build, so look the slide up in the build's own order.
+  const previewPos = (s: SlideView) => (latest?.slideOrder ? latest.slideOrder.indexOf(s.id) + 1 : model.reordered ? 0 : model.slides.indexOf(s) + 1);
+  const previewFresh = (s: SlideView) => !!latest && previewPos(s) > 0 && latest.slideHashes[s.id] === s.contentHash;
+  const orderStale = !!latest?.slideOrder && latest.slideOrder.join('|') !== model.slides.map((s) => s.id).join('|');
+  const changedBy = model.slides.filter((s) => s.changedDecisions.length > 0);
   const signedIn = !!me.login;
 
   return (
@@ -130,6 +134,22 @@ export function DeckStudio() {
           <span data-testid="count-placeholders"><b className="tnum text-ink">{t.placeholders}</b> review placeholders</span>
         </div>
         {model.uncommitted > 0 ? <p className="mt-2 text-[12.5px] text-[var(--s-open-fg)]">{model.uncommitted} tracked files differ from this commit, so figures may not match it. A final deck needs a clean tree.</p> : null}
+        {changedBy.length > 0 ? (
+          <div role="status" data-testid="decision-changed-banner" className="mt-3 rounded-lg border border-[var(--s-open-fg)]/40 bg-[var(--s-open-bg)] p-3 text-[13px]">
+            <p className="font-semibold text-[var(--s-open-fg)]">{changedBy.length} reviewed slide{changedBy.length === 1 ? '' : 's'} lean on a decision that has changed since the review</p>
+            <p className="mt-0.5 text-ink-2">Nothing was rewritten. Each slide is shown as needing review again, and its review no longer counts until a person looks at the current version.</p>
+            <ul className="mt-1.5 space-y-1">
+              {changedBy.map((s) => (
+                <li key={s.id} data-testid="decision-changed-row">
+                  <button type="button" className="font-mono text-[12.5px] text-accent hover:underline" onClick={() => qs.set({ slide: s.id, tier: null, status: null, q: null }, 'replace')}>{s.id}</button>{' '}
+                  {s.changedDecisions.map((c) => `${c.id}: ${c.was} → ${c.now}`).join('; ')}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+        {model.reordered ? <p className="mt-2 text-[12.5px] text-ink-3" data-testid="reordered-note">The slide order differs from the generated one. The speaker notes still say what comes next as they were written, so read them again after moving slides.</p> : null}
+        {orderStale ? <p className="mt-2 text-[12.5px] text-[var(--s-open-fg)]" data-testid="order-stale">The slide order changed after the latest build, so the exported file has the old order. Build again before exporting.</p> : null}
         <div className="mt-4 flex flex-wrap items-center gap-2.5">
           <button type="button" className={btn} disabled={!!busy} onClick={() => void load()} data-testid="regenerate-outline">
             <ListRestart aria-hidden className="size-4" />
@@ -240,6 +260,7 @@ export function DeckStudio() {
                           <TonePill name={STATUS[s.status].tone}>{STATUS[s.status].label}</TonePill>
                           {s.placeholders.length ? <Tag title="This slide shows a review placeholder">placeholder</Tag> : null}
                           {s.edited ? <Tag title="Edited by a person">edited</Tag> : null}
+                          {s.changedDecisions.length ? <Tag title="A decision this slide leans on changed after it was reviewed">decision changed</Tag> : null}
                         </span>
                       </span>
                       <span className="sr-only">{i + 1} of {shown.length}</span>
@@ -248,7 +269,7 @@ export function DeckStudio() {
                 ))}
               </ul>
             </Card>
-            {selected ? <SlideDetail key={selected.id} s={selected} model={model} me={me} busy={!!busy} fresh={previewFresh(selected)} hasBuild={built} index={slides.indexOf(selected) + 1} post={post} onPrev={() => move(-1)} onNext={() => move(1)} /> : null}
+            {selected ? <SlideDetail key={selected.id} s={selected} model={model} me={me} busy={!!busy} fresh={previewFresh(selected)} previewPos={previewPos(selected)} hasBuild={built} index={slides.indexOf(selected) + 1} post={post} onPrev={() => move(-1)} onNext={() => move(1)} /> : null}
           </div>
         )}
       </Section>
@@ -281,13 +302,19 @@ export function DeckStudio() {
   );
 }
 
-function SlideDetail({ s, model, me, busy, fresh, hasBuild, index, post, onPrev, onNext }: { s: SlideView; model: DeckView['model']; me: Me; busy: boolean; fresh: boolean; hasBuild: boolean; index: number; post: (u: string, b: Record<string, unknown>, l: string) => Promise<boolean>; onPrev: () => void; onNext: () => void }) {
+function SlideDetail({ s, model, me, busy, fresh, previewPos, hasBuild, index, post, onPrev, onNext }: { s: SlideView; model: DeckView['model']; me: Me; busy: boolean; fresh: boolean; previewPos: number; hasBuild: boolean; index: number; post: (u: string, b: Record<string, unknown>, l: string) => Promise<boolean>; onPrev: () => void; onNext: () => void }) {
   const [title, setTitle] = useState(s.title);
+  const [notes, setNotes] = useState(s.notes.say);
   const [reason, setReason] = useState('');
   const [rejecting, setRejecting] = useState(false);
+  // The script shown follows the server: after a regenerate or another person's edit it is the current one.
+  useEffect(() => setNotes(s.notes.say), [s.notes.say]);
   const act = (body: Record<string, unknown>, label: string) => post('/api/v1/deck/actions', { slideId: s.id, expectedRevision: model.revision, contentHash: s.contentHash, ...body }, label);
   const signedIn = !!me.login;
   const needsAck = s.placeholders.length > 0;
+  // The title slide stays first, so no slide moves into its place and it moves nowhere.
+  const canEarlier = index >= 3;
+  const canLater = index >= 2 && index < model.slides.length;
 
   return (
     <div className="min-w-0 space-y-5" data-testid="slide-detail" data-slide-id={s.id}>
@@ -295,6 +322,10 @@ function SlideDetail({ s, model, me, busy, fresh, hasBuild, index, post, onPrev,
         <div className="flex flex-wrap items-center gap-2.5 text-[12.5px] text-ink-3">
           <span className="font-mono text-ink-2">{s.id}</span>
           <span>Slide {index} of {model.slides.length}</span>
+          <span className="inline-flex gap-1.5" role="group" aria-label="Move this slide">
+            <button type="button" className={btn} data-testid="move-up" disabled={busy || !me.canEdit || !canEarlier} title={index === 1 ? 'The title slide stays first' : canEarlier ? 'Move this slide one place earlier' : 'The title slide stays first'} onClick={() => void act({ action: 'move', direction: 'up' }, 'Moving the slide')}>Move earlier</button>
+            <button type="button" className={btn} data-testid="move-down" disabled={busy || !me.canEdit || !canLater} title={index === 1 ? 'The title slide stays first' : canLater ? 'Move this slide one place later' : 'This is the last slide'} onClick={() => void act({ action: 'move', direction: 'down' }, 'Moving the slide')}>Move later</button>
+          </span>
           <span>{TIER[s.tier]}</span>
           <span>{s.section}</span>
           <span>about {s.seconds} s</span>
@@ -316,7 +347,7 @@ function SlideDetail({ s, model, me, busy, fresh, hasBuild, index, post, onPrev,
         {hasBuild && fresh ? (
           // The preview is a rendered image of this slide in the latest build; the slide itself is built from native, editable objects.
           // eslint-disable-next-line @next/next/no-img-element
-          <img data-testid="slide-preview" src={`/api/v1/deck/preview/${index}?v=${s.contentHash.slice(0, 8)}`} alt={`Rendered preview of slide ${index}: ${s.title}`} className="mt-3 w-full rounded-lg border border-hairline" />
+          <img data-testid="slide-preview" src={`/api/v1/deck/preview/${previewPos}?v=${s.contentHash.slice(0, 8)}`} alt={`Rendered preview of slide ${index}: ${s.title}`} className="mt-3 w-full rounded-lg border border-hairline" />
         ) : (
           <p data-testid="preview-missing" className="mt-2 text-[13px] text-ink-2">{hasBuild ? 'This slide changed after the latest build, so its preview is out of date. Build again.' : 'No preview yet. Build the sample deck to render one.'}</p>
         )}
@@ -383,7 +414,14 @@ function SlideDetail({ s, model, me, busy, fresh, hasBuild, index, post, onPrev,
         <details className="mt-4">
           <summary className="cursor-pointer text-[13px] font-medium text-accent">Speaker notes, timing and rubric</summary>
           <div className="mt-2 space-y-2 text-[13px] leading-6 text-ink-2" data-testid="slide-notes">
-            <p className="whitespace-pre-wrap">{s.notes.say}</p>
+            <label className="block text-[12.5px] text-ink-2">
+              <span className="block">Spoken script {s.notesEdited ? <Tag title="Written by a person. The claim checks do not read it.">edited, not claim-checked</Tag> : null}</span>
+              <textarea data-testid="notes-input" rows={7} maxLength={4000} className="mt-1 w-full rounded-lg border border-hairline-strong bg-surface px-3 py-2 text-[13.5px] leading-6" value={notes} onChange={(e) => setNotes(e.target.value)} />
+            </label>
+            <div className="flex flex-wrap items-center gap-2.5">
+              <button type="button" className={btn} data-testid="notes-save" disabled={busy || !me.canEdit || notes.trim() === s.notes.say.trim() || notes.trim().length < 10} onClick={() => void act({ action: 'edit-notes', notes }, 'Saving the speaker notes')}>Save notes</button>
+              <span className="text-[12px] text-ink-3">Saving withdraws any review of this slide. Regenerate the slide to go back to the generated script.</span>
+            </div>
             {s.notes.honesty ? <p><b className="text-ink">Say plainly:</b> {s.notes.honesty}</p> : null}
             {s.notes.next ? <p><b className="text-ink">Next:</b> {s.notes.next}</p> : null}
             <p className="text-ink-3">About {s.seconds} seconds. Serves: {s.rubric.join(', ') || 'no criterion'}.</p>
@@ -396,7 +434,7 @@ function SlideDetail({ s, model, me, busy, fresh, hasBuild, index, post, onPrev,
         <p className="mt-1 text-[13px] text-ink-2">
           {s.status === 'approved' ? <>Approved by <b>{s.decidedBy}</b> at this content.{s.reason ? ` Note: ${s.reason}` : ''}</> : null}
           {s.status === 'rejected' ? <>Rejected by <b>{s.decidedBy}</b>: {s.reason}</> : null}
-          {s.status.startsWith('stale') ? <>A decision was recorded for an earlier version of this slide. It no longer applies; review the current version.</> : null}
+          {s.status.startsWith('stale') ? <>A decision was recorded for an earlier version of this slide. It no longer applies; review the current version.{s.changedDecisions.length ? <span data-testid="stale-because"> Reason: {s.changedDecisions.map((c) => `${c.id} was ${c.was} and is now ${c.now}`).join('; ')}.</span> : null}</> : null}
           {s.status === 'draft' ? 'Not reviewed. This is a slide-level editorial decision, not an architecture approval; it authorizes nothing outside the deck.' : null}
         </p>
         {!signedIn ? <p className="mt-2 text-[13px] text-ink-2">Sign in above to edit or review.</p> : !me.canApprove ? <p className="mt-2 text-[13px] text-ink-2" data-testid="cannot-approve">Your role can{me.canEdit ? '' : 'not'} edit but cannot approve or reject slides.</p> : null}

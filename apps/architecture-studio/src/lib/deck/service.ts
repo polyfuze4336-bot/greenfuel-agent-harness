@@ -11,7 +11,7 @@ import { GENERATOR, buildPptx } from './build.ts';
 import { deckGate, rehearsalOf, type DeckGate } from './gate.ts';
 import { refineLedger, renderedChecks, rubricChecks, staticChecks, summarize, type Finding } from './qa.ts';
 import { powerpointAvailable, renderDeck } from './render.ts';
-import { contentHash, effective, variantsOf } from './slides.ts';
+import { changedDecisions, contentHash, effective, inOrder, variantsOf, type DecisionChange } from './slides.ts';
 import { DeckError, emptyDeckState, statusOf, type EffectiveStatus } from './store.ts';
 import type { ClaimCheck, DeckState, Slide, Visual, VisualKind } from './types.ts';
 
@@ -53,6 +53,8 @@ export interface Prepared {
   statuses: Map<string, EffectiveStatus>;
   claimChecks: ClaimCheck[];
   sourceHashes: Record<string, string>;
+  /** The register's status for every decision any slide leans on, as of this commit. */
+  decisionStatus: Record<string, string>;
   /** The sources read to produce these slides, fixed once preparation ends, so the record and the provenance slide agree. */
   used: UsedSource[];
 }
@@ -64,13 +66,15 @@ export function prepare(ctx: DeckContext, state: DeckState): Prepared {
   let checks = checkClaims(ctx, gen0);
   const gen1 = applyFailures(gen0, checks);
   const prov = provenanceSlide(ctx, checks, gen1.length + 1);
-  const generated = [...gen1, prov];
+  // The person's order applies to both lists, so `generated[i]` and `effective[i]` are always the same slide.
+  const generated = inOrder([...gen1, prov], state.order);
   checks = [...checks, ...checkClaims(ctx, [prov])];
   const sourceHashes = Object.fromEntries(ctx.used().map((u) => [u.path, u.sha256]));
+  const decisionStatus = Object.fromEntries([...new Set(generated.flatMap((s) => s.decisions))].map((d) => [d, ctx.decisions.find((x) => x.id === d)?.status ?? 'not in register']));
   const eff = generated.map((s) => effective(s, state.slides[s.id]));
-  const hashes = Object.fromEntries(eff.map((s) => [s.id, contentHash(s, sourceHashes)]));
+  const hashes = Object.fromEntries(eff.map((s) => [s.id, contentHash(s, sourceHashes, decisionStatus)]));
   const statuses = new Map(eff.map((s) => [s.id, statusOf(state.slides[s.id], hashes[s.id]!)]));
-  return { ctx, generated, effective: eff, hashes, statuses, claimChecks: checks, sourceHashes, used: ctx.used() };
+  return { ctx, generated, effective: eff, hashes, statuses, claimChecks: checks, sourceHashes, decisionStatus, used: ctx.used() };
 }
 
 export interface BuildOutput {
@@ -145,6 +149,7 @@ export async function generate(ctx: DeckContext, o: GenerateOptions): Promise<Bu
       slides: prep.effective.map((s) => ({ id: s.id, tier: s.tier, title: s.title, visual: s.visual.kind, contentHash: prep.hashes[s.id], review: prep.statuses.get(s.id), decidedBy: o.state.slides[s.id]?.decidedBy ?? null, placeholders: s.placeholders.map((p) => p.id), claims: s.claims.map((c) => ({ id: c.id, ok: prep.claimChecks.find((k) => k.claimId === c.id)?.ok ?? false })), seconds: s.seconds })),
       claims: { checked: prep.claimChecks.length, unsupported: prep.claimChecks.filter((c) => !c.ok).length },
       reviewStateRevision: o.state.revision,
+      order: o.state.order ?? null,
       assets: assets.report as AssetReport[],
       outputs: { pptx: { file: 'deck.pptx', sha256: sha256(built.buffer), bytes: built.buffer.length }, pdf },
       render: { performed: rendered, tool: rendered ? 'Microsoft PowerPoint (COM automation)' : null, slidePreviews: previews },
@@ -186,6 +191,10 @@ export interface SlideView {
   decidedBy: string | null;
   reason: string | null;
   edited: boolean;
+  /** The speaker script is a person's, not the generated one. It is not claim-checked. */
+  notesEdited: boolean;
+  /** Decisions this slide leans on whose status differs from the one it was reviewed against. A reason the review is stale, named. */
+  changedDecisions: DecisionChange[];
   events: DeckState['slides'][string]['events'];
 }
 
@@ -195,6 +204,8 @@ export interface DeckModel {
   uncommitted: number;
   generatedAt: string;
   revision: number;
+  /** A person has moved slides, so the order differs from the generated one. */
+  reordered: boolean;
   slides: SlideView[];
   totals: { slides: number; approved: number; rejected: number; draft: number; stale: number; placeholders: number; unsupportedClaims: number; secondsByTier: Record<string, number> };
   rubricCoverage: { id: string; title: string; mode: string; slides: string[] }[];
@@ -214,14 +225,15 @@ export function viewOf(prep: Prepared, state: DeckState, qa: Finding[] | null, r
       claims: s.claims.map((c) => { const k = prep.claimChecks.find((x) => x.claimId === c.id); return { id: c.id, text: c.text, sources: c.sources, ok: k?.ok ?? false, problems: k?.problems ?? [] }; }),
       decisions: s.decisions.map((d) => ({ id: d, status: ctx.decisions.find((x) => x.id === d)?.status ?? 'not in register' })),
       placeholders: s.placeholders, contentHash: prep.hashes[s.id]!, status: prep.statuses.get(s.id)!,
-      decidedBy: st?.decidedBy ?? null, reason: st?.reason ?? null, edited: !!(st?.titleOverride || st?.visualKind), events: st?.events ?? [],
+      decidedBy: st?.decidedBy ?? null, reason: st?.reason ?? null, edited: !!(st?.titleOverride || st?.visualKind || st?.notesOverride), notesEdited: !!st?.notesOverride,
+      changedDecisions: /^stale/.test(prep.statuses.get(s.id)!) ? changedDecisions(st, prep.decisionStatus) : [], events: st?.events ?? [],
     };
   });
   const by = (f: (s: SlideView) => boolean) => slides.filter(f).length;
   const tiers: Record<string, number> = {};
   for (const s of slides) tiers[s.tier] = (tiers[s.tier] ?? 0) + s.seconds;
   return {
-    commit: ctx.commit, branch: ctx.branch, uncommitted: ctx.uncommitted, generatedAt: ctx.generatedAt, revision: state.revision, slides,
+    commit: ctx.commit, branch: ctx.branch, uncommitted: ctx.uncommitted, generatedAt: ctx.generatedAt, revision: state.revision, reordered: !!state.order?.length, slides,
     totals: { slides: slides.length, approved: by((s) => s.status === 'approved'), rejected: by((s) => s.status === 'rejected'), draft: by((s) => s.status === 'draft'), stale: by((s) => /^stale/.test(s.status)), placeholders: slides.reduce((n, s) => n + s.placeholders.length, 0), unsupportedClaims: prep.claimChecks.filter((c) => !c.ok).length, secondsByTier: tiers },
     rubricCoverage: ctx.rubric.filter((r) => /^[BC]/.test(r.id)).map((r) => ({ id: r.id, title: r.title, mode: r.mode, slides: slides.filter((s) => s.rubric.includes(r.id)).map((s) => s.id) })),
     gate: deckGate({ ctx, slides: prep.effective, statuses: prep.statuses, claimChecks: prep.claimChecks, qa, rendered, rehearsal: rehearsalOf(ctx.read('docs/capstone/presentation/REHEARSAL-PLAN-AND-SCORECARD.md')) }),

@@ -114,6 +114,18 @@ export function buildSlides(c: DeckContext): Slide[] {
     claims: [claim('E02-c1', 'The case study states the commercial problem and constraints.', [P.problem])],
   }));
 
+  const stakeTable = c.table(P.stakeholders, ['Stakeholder', 'Basis', 'Decider for']);
+  const stakeRows = stakeTable?.rows ?? [];
+  const stated = stakeRows.filter((r) => /^\**stated/i.test(plain(r[1] ?? '')) || /stated/i.test(r[1] ?? '')).length;
+  add(mk({
+    id: 'E02B', tier: 'executive', section: '1 The stakeholders', title: `Eight stakeholders decide this: the case names ${stated}, and the rest are candidates`,
+    message: 'Whoever can fund it, approve a filing, open a meter or accept the evidence is on this slide. None has been interviewed.',
+    visual: { kind: 'table', head: ['Stakeholder', 'Basis', 'Decides'], widths: [4.2, 2.2, 5.6], compact: true, rows: stakeRows.map((r) => [clip(plain(r[0] ?? '').replace(/\s*\(.*$/, ''), 34), clip(plain(r[1] ?? ''), 22), clip(plain(r[2] ?? ''), 74)]), foot: 'Stated means the case study says so. Candidate means it is a hypothesis from the analysis and needs a stakeholder to confirm it.' },
+    sources: [src(P.stakeholders, 'CANDIDATE'), src(P.problem, 'CASE STUDY')], seconds: 45, rubric: ['B1', 'C1'],
+    notes: { say: 'These are the people and groups whose decisions shape the design. The case study names two of them directly: the quality manager, who approves every certification filing, and the shipowner, whose data must stay isolated. The others are my reading of who must agree for this to work in a port. Each one decides something different: funding, filing approval, access to meters, or what counts as acceptable evidence. I have not interviewed any of them, so every success measure on this slide is a question I still owe an answer to.', next: 'Why does reliability decide the premium?', honesty: 'Only two stakeholders are stated by the case study. The rest are hypotheses, and no stakeholder has been interviewed.' },
+    claims: [claim('E02B-c1', 'The stakeholder analysis marks the quality manager and the shipowner as stated by the case study.', [P.stakeholders], ['Stated'])],
+  }));
+
   add(mk({
     id: 'E03', tier: 'executive', section: '2 Why it matters', title: 'Reliability decides how much of the premium is kept',
     message: 'The premium pool is the prize and trusted certificates protect it. How much is unknown: the business has supplied no figure.',
