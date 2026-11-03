@@ -116,7 +116,7 @@ What this did **not** cover on real GitHub: merging, because that is a person's 
 - The stand-in is not GitHub. It proves how the Studio behaves, not how GitHub behaves. The one real-GitHub run, above, is narrow.
 - Classic branch protection is not readable with the app's permissions. A repository that uses it reports *Not enforced* until you set `STUDIO_MERGE_POLICY=warn`.
 - A merge-policy check that cannot be read does not stop a decision. It is shown, and the pull request creation would fail anyway if GitHub were down.
-- Segregation of duties means the owner cannot approve a decision they asked to have revised. A second enrolled approver is needed. In the real policy only one person is enrolled, so a revision requested by the owner can only be approved by someone else once a second approver is enrolled.
+- Segregation of duties is **switched off in the real policy** at the owner's instruction (2 November 2026 entry above predates this), so the sole owner can approve a decision they asked to have revised. The control is implemented and tested (the reconciliation spec uses its own policy with it on); switching it back on is one line in harness/policy/access-policy.json. The Studio lists the switch as an attention finding.
 - The Azure deployment is read-only and not connected to the GitHub App, so no approval can be made from it. Entra sign-in is still blocked by tenant consent.
 - No signed approval under ADR 0008 exists yet (B1): no approver key is enrolled.
 - The browser tests are not part of CI.

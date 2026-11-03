@@ -49,7 +49,7 @@
     { "domain": "architecture", "scope": { "all": true }, "owners": ["github:225331490", "entra:08cef5cb-15fe-4756-9dd1-598a659ff06a:eb96b05f-f6a6-48f4-9348-d37b3abad1a8"] }
   ],
   "segregation": {
-    "enforce": true,
+    "enforce": false,
     "requireIndependentRecommendation": false,
     "authorBindings": []
   },
