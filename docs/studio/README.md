@@ -13,6 +13,7 @@ The Studio is a web application in [`apps/architecture-studio/`](../../apps/arch
 | Judge "done" | [PRODUCT-ACCEPTANCE-CRITERIA](PRODUCT-ACCEPTANCE-CRITERIA.md) |
 | See the four-destination interface, its performance numbers and screenshots | [FRONTEND-ACCEPTANCE](FRONTEND-ACCEPTANCE.md) |
 | Understand how each kind of decision is read and treated (architecture choice, stakeholder clarification, regulatory verification) | [DECISION-WORKSPACE](DECISION-WORKSPACE.md) |
+| See what a decision would affect, and challenge it as a review panel would | [IMPACT-AND-EXAMINER](IMPACT-AND-EXAMINER.md) |
 | Approve a decision | [APPROVAL-WORKFLOW-GUIDE](../studio-acceptance/APPROVAL-WORKFLOW-GUIDE.md) |
 
 ## Reference, by topic

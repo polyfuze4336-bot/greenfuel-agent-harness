@@ -1,0 +1,32 @@
+{
+  "notice": "AI-generated relationship suggestions. They are unverified. Each proposes that a decision may affect, or be affected by, another record. They are not counted in any impact analysis and change nothing until a repository record states the link itself (for example a Depends-on line or a traceability row), at which point the Studio shows the suggestion as now explicit. They are not evidence and grant no approval.",
+  "schema": "Same schema as ai-suggestions-2026-10-30.json. kind \"relationship\" also carries targetId, the record the AI suggests is related.",
+  "suggestions": [
+    {
+      "id": "S-101",
+      "decisionId": "D-010",
+      "optionKey": null,
+      "kind": "relationship",
+      "targetId": "D-031",
+      "text": "The hosting model per port may determine what recovery and availability targets are achievable, so D-010 may be related to D-031 (availability, recovery and latency targets).",
+      "rationale": "ADR 0016 forbids production data in a cell until its recovery path is inside its jurisdiction, and the targets that would judge a hosting choice are the ones D-031 sets. No record states this link between the two decisions.",
+      "basedOn": ["D-010", "D-031", "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md"],
+      "label": "AI SUGGESTION",
+      "reviewState": "unreviewed",
+      "generatedBy": { "kind": "ai", "tool": "GitHub Copilot", "date": "2026-11-02" }
+    },
+    {
+      "id": "S-102",
+      "decisionId": "ADR-0016",
+      "optionKey": null,
+      "kind": "relationship",
+      "targetId": "D-018",
+      "text": "ADR 0016 assumes the edge sits inside the originating jurisdiction (AS-005), so it may depend on D-018 (edge platform and topology), which it does not currently cite.",
+      "rationale": "The cell boundary argument relies on where the edge runs and who owns its hardware, which is what D-018 decides. ADR 0016's Depends-on list does not include D-018.",
+      "basedOn": ["ADR-0016", "D-018", "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md"],
+      "label": "AI SUGGESTION",
+      "reviewState": "unreviewed",
+      "generatedBy": { "kind": "ai", "tool": "GitHub Copilot", "date": "2026-11-02" }
+    }
+  ]
+}

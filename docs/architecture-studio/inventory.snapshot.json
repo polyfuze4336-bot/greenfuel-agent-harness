@@ -1,11 +1,11 @@
 {
   "generatedBy": "harness/scripts/studio-inventory.mjs",
   "git": {
-    "head": "81dea1a7ce9241464e46c8d7f5dc65617e603e13",
-    "branch": "studio/decision-workspace",
-    "originMain": "81dea1a7ce9241464e46c8d7f5dc65617e603e13",
-    "commitsAheadOfOriginMain": 0,
-    "dirty": 33
+    "head": "653ca8aff004a8f351b0816bd5ef41ce9c99699e",
+    "branch": "studio/impact-and-examiner",
+    "originMain": "62b0d87db66ef70e83f205a6e85b7a48804f20e3",
+    "commitsAheadOfOriginMain": 2,
+    "dirty": 11
   },
   "sources": {},
   "counts": {
@@ -2301,8 +2301,8 @@
     ".github": 3,
     ".mcp.json": 1,
     ".vscode": 2,
-    "apps": 395,
-    "docs/architecture-studio": 2,
+    "apps": 404,
+    "docs/architecture-studio": 5,
     "docs/azure": 2,
     "docs/business": 3,
     "docs/capstone": 12,

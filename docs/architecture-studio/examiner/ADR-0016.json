@@ -1,0 +1,126 @@
+{
+  "decisionId": "ADR-0016",
+  "label": "AI CHALLENGE",
+  "reviewState": "unreviewed",
+  "generatedBy": { "kind": "ai", "agent": "architecture-critic (rules applied in a Copilot session)", "tool": "GitHub Copilot", "date": "2026-11-02" },
+  "entries": [
+    {
+      "section": "against",
+      "text": "The selection depends on a premise the ADR itself marks as an assumption: that the group operates in more than one port jurisdiction. D-003 is still open. The ADR says that if only one jurisdiction is in scope, option A becomes eligible, and its own justification (\"the only option that can satisfy HC-01 ... together\") would then fail. The decision is stronger than the evidence under it.",
+      "evidence": [
+        { "path": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md", "line": 14, "quote": "If only one jurisdiction is in scope, option A below becomes eligible." },
+        { "path": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md", "line": 54, "quote": "It is the only option that can satisfy HC-01, HC-02, HC-03, HC-07 and HC-08 together" }
+      ]
+    },
+    {
+      "section": "against",
+      "text": "The main benefit claimed, that residency, isolation and recovery are testable properties of a cell, is a plan and not a result. The ADR records that nothing has been built or verified.",
+      "evidence": [
+        { "path": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md", "line": 57, "quote": "residency, isolation and recovery are properties of a cell that can be tested" },
+        { "path": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md", "line": 77, "quote": "None yet: no cell, region or host has been built or verified." }
+      ]
+    },
+    {
+      "section": "alternatives",
+      "text": "Option B (jurisdiction-local edge plus one Azure shore platform) is rejected because it makes the edge the system of record and leaves agents without a lawful place to read raw evidence. That rejection depends on D-009. If D-009 shows residency covers storage only, B's main weakness shrinks. A principal architect should re-score B against D-009's answer before it is treated as closed.",
+      "evidence": [
+        { "path": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md", "line": 40, "quote": "makes the edge the system of record, leaves agents without a lawful place to read raw evidence" },
+        { "path": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md", "line": 83, "quote": "D-009 shows residency covers storage only" }
+      ]
+    },
+    {
+      "section": "alternatives",
+      "text": "A staged form of option C: prove the cell contract in the first jurisdiction only, and add further cells when D-003, D-009 and D-010 are answered. The ADR's own reversibility section says the cheapest point to change course is before any production data exists, which argues for not committing the whole topology first.",
+      "evidence": [
+        { "path": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md", "line": 74, "quote": "the cheapest point to change course is before any production data exists" }
+      ]
+    },
+    {
+      "section": "pros-cons",
+      "text": "Pro (recorded): failure domains are per cell, so one cell's outage does not stop other ports. Con (recorded): fixed costs repeat per cell, so cost does not fall with scale, and group-level visibility is poorer than a central design.",
+      "evidence": [
+        { "path": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md", "line": 62, "quote": "A cell outage does not stop other ports" },
+        { "path": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md", "line": 58, "quote": "cost does not fall with scale because fixed costs repeat (RK-003)" }
+      ]
+    },
+    {
+      "section": "assumptions",
+      "text": "Hidden assumption: that the edge sits inside the originating jurisdiction (AS-005). If a port's edge hardware is hosted or managed elsewhere, the cell boundary and the residency argument move with it. The ADR lists this as an assumption, and the edge platform decision (D-018) is also open.",
+      "evidence": [
+        { "path": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md", "line": 15, "quote": "The edge is inside the originating jurisdiction (AS-005)" }
+      ]
+    },
+    {
+      "section": "reliability",
+      "text": "The ADR says cells run independently, yet it names the identity provider as a global dependency. If identity is unavailable, a cell's independence claim is weaker than stated. A second weak point is recovery for a jurisdiction with no second location. Rule 5 forbids production data in a cell until its recovery path is inside its jurisdiction, so such a jurisdiction may be unable to go live, which conflicts with any availability target (D-031 is open).",
+      "evidence": [
+        { "path": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md", "line": 62, "quote": "the identity provider as a global dependency" },
+        { "path": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md", "line": 50, "quote": "A cell is not allowed to hold production data until its recovery path is inside its jurisdiction" }
+      ]
+    },
+    {
+      "section": "security-compliance",
+      "text": "The group plane's approved list is empty until D-011 and D-009 fill it, so the thin group plane has no defined content yet. The ADR also records that which jurisdiction's rule defines within per port, and whether the edge counts, are open. Compliance claims here are therefore unverified, and per the register D-009 needs a qualified person. The security cost is stated: more places to protect and more identities and key ceremonies.",
+      "evidence": [
+        { "path": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md", "line": 49, "quote": "The list is empty until D-011 and D-009 fill it." },
+        { "path": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md", "line": 68, "quote": "whether the edge counts, are open (D-009)" },
+        { "path": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md", "line": 65, "quote": "more places to protect and more identities and key ceremonies" }
+      ]
+    },
+    {
+      "section": "cost-operations",
+      "text": "No amount is stated: the ADR gives cost drivers only, and the sponsor not funding the cost of sovereignty is one of its own conditions for revisiting the decision. Operating a cell needs local or approved-inside operators, so staffing is an operational dependency per jurisdiction. Any cost figure put to the panel would be unsupported by this repository.",
+      "evidence": [
+        { "path": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md", "line": 71, "quote": "Drivers, not amounts: fixed costs per cell" },
+        { "path": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md", "line": 71, "quote": "Operating a cell needs local or approved-inside operators" },
+        { "path": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md", "line": 83, "quote": "the sponsor will not fund the cost of sovereignty" }
+      ]
+    },
+    {
+      "section": "questions",
+      "text": "If D-003 shows a single jurisdiction, why is option C still right rather than option A?",
+      "evidence": [{ "path": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md", "line": 83, "quote": "D-003 shows a single jurisdiction" }]
+    },
+    {
+      "section": "questions",
+      "text": "What is on the group plane's approved list on day one, given it is empty until D-011 and D-009 fill it, and what does group reporting show until then?",
+      "evidence": [{ "path": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md", "line": 49, "quote": "The list is empty until D-011 and D-009 fill it." }]
+    },
+    {
+      "section": "questions",
+      "text": "Which identity provider serves a cell when its link to the global tenant is lost, and does the cell still work?",
+      "evidence": [{ "path": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md", "line": 62, "quote": "the identity provider as a global dependency" }]
+    },
+    {
+      "section": "questions",
+      "text": "What evidence exists today that residency is a property of a cell, and which of the five planned tests would you run first?",
+      "evidence": [{ "path": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md", "line": 77, "quote": "None yet: no cell, region or host has been built or verified." }]
+    },
+    {
+      "section": "questions",
+      "text": "Group-level visibility is poorer than a central design. Who in the business accepted that loss, and on what basis?",
+      "evidence": [{ "path": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md", "line": 58, "quote": "group-level visibility is poorer than a central design (RK-004)" }]
+    },
+    {
+      "section": "evidence",
+      "text": "The ADR plans per-port placement review, per-flow negative tests, edge-simulator disconnection tests, an in-jurisdiction recovery exercise and isolation tests per shipowner. None exists, and it records no evidence for production behaviour. To defend the decision, at least the placement review and one negative flow test would need to exist and be cited by evidence id.",
+      "evidence": [
+        { "path": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md", "line": 77, "quote": "Planned: per-port placement review, per-flow negative tests, edge-simulator disconnection tests, in-jurisdiction recovery exercise, and isolation tests per shipowner." },
+        { "path": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md", "line": 87, "quote": "No evidence records for production behaviour exist." }
+      ]
+    },
+    {
+      "section": "recommendation",
+      "text": "On the current record this decision is not defensible as an unconditional approval. Three open decisions condition its hard-constraint verdicts, the design review gate computes Blocked, and no evidence exists. If it goes to a panel, defend it on the hard constraints and say plainly that it is conditional. Do not defend it on cost or simplicity. This challenge does not assess law, Azure regional availability or cost: the repository supplies no verified source for them.",
+      "evidence": [
+        { "path": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md", "line": 31, "quote": "Conditional on D-009, D-010 and D-011" },
+        { "path": "docs/adr/0016-sovereign-evidence-cells-with-federated-coordination.md", "line": 80, "quote": "the gate computes Blocked" }
+      ]
+    }
+  ],
+  "notAssessed": [
+    "Whether any Azure region qualifies in any jurisdiction: the repository holds no verified source",
+    "The legal meaning of residency: D-009 awaits a qualified person",
+    "Cost amounts: the ADR states drivers only"
+  ]
+}
