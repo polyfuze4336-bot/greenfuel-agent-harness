@@ -5,22 +5,23 @@ import { gitOut, ready } from './helpers.ts';
 // a register that opens records without losing its place, and honest empty states on Changes.
 
 test.describe('Overview answers three questions with real records', () => {
-  test('attention, blockers and recent changes are present, linked, and equal to the repository', async ({ page, request }) => {
+  test('what to do next, what blocks, and what is approved are present, and equal to the repository', async ({ page, request }) => {
     await ready(page, '/');
-    for (const name of ['Needs your attention', 'What is blocking progress', 'What changed recently']) {
+    await expect(page.getByTestId('next-action')).toBeVisible();
+    for (const name of ['Decisions awaiting review', 'Critical blockers', 'Recently approved']) {
       await expect(page.getByRole('heading', { level: 2, name })).toBeVisible();
     }
-    const api = (await (await request.get('/api/v1/repository')).json()) as { blockers: { id: string; href?: string }[]; metrics: { approvals: { outstanding: number } } };
-    await expect(page.locator('#blockers').getByRole('listitem').filter({ has: page.locator('a') })).toHaveCount(api.blockers.length);
-    await expect(page.locator('#attention')).toContainText(String(api.metrics.approvals.outstanding));
-    // The newest commit in the list is the commit being read.
-    const head = gitOut('rev-parse', 'HEAD').slice(0, 7);
-    await expect(page.getByTestId('recent-changes').getByRole('listitem').first()).toContainText(head);
+    const api = (await (await request.get('/api/v1/overview')).json()) as { overview: { blockers: { count: number }; awaiting: { count: number }; next: { title: string } | null } };
+    await expect(page.getByTestId('blockers-count')).toHaveText(String(api.overview.blockers.count));
+    await expect(page.getByTestId('attention-count')).toHaveText(String(api.overview.awaiting.count));
+    await expect(page.getByTestId('next-title')).toHaveText(api.overview.next!.title);
+    // The page says which commit it was rendered from, and that is the commit being read.
+    await expect(page.getByTestId('freshness-commit')).toHaveText(gitOut('rev-parse', 'HEAD').slice(0, 7));
   });
 
-  test('every link in the three panels leads to a page that loads', async ({ page, request }) => {
+  test('every link on the Overview leads to a page that loads', async ({ page, request }) => {
     await ready(page, '/');
-    const hrefs = await page.locator('#attention a, #blockers a, [data-testid="recent-changes"] a').evaluateAll((els) => [...new Set(els.map((e) => (e as HTMLAnchorElement).getAttribute('href')!).filter((h) => h.startsWith('/')))]);
+    const hrefs = await page.locator('main a').evaluateAll((els) => [...new Set(els.map((e) => (e as HTMLAnchorElement).getAttribute('href')!).filter((h) => h.startsWith('/')))]);
     expect(hrefs.length).toBeGreaterThan(3);
     for (const h of hrefs) {
       const r = await request.get(h.split('#')[0]!);
@@ -119,24 +120,22 @@ test.describe('Decisions register: focused by default', () => {
 });
 
 test.describe('Changes', () => {
-  test('shows readiness, pending updates, approval history and repository changes from real records', async ({ page, request }) => {
-    const api = (await (await request.get('/api/v1/repository')).json()) as { metrics: { approvals: { signedRecords: number; enrolledApprovers: number } } };
+  test('shows sync failures, pending pull requests, decision history, readiness and repository changes from real records', async ({ page }) => {
     await ready(page, '/changes');
-    for (const name of ['Pending GitHub updates', 'Approval history', 'Repository changes']) {
+    for (const name of ['Sync failures', 'Pending GitHub pull requests', 'Decision history', 'Repository changes']) {
       await expect(page.getByRole('heading', { level: 2, name })).toBeVisible();
     }
-    await expect(page.getByText('Architecture readiness')).toBeVisible();
-    const history = page.locator('#approvals');
-    await expect(history).toContainText('Signed approval records');
-    await expect(history.locator('dd.tnum').first()).toHaveText(String(api.metrics.approvals.signedRecords));
-    await expect(page.getByTestId('recent-changes').getByRole('listitem').first()).toContainText(gitOut('rev-parse', 'HEAD').slice(0, 7));
+    await expect(page.getByTestId('readiness-card')).toBeVisible();
+    await expect(page.getByTestId('decision-history').getByRole('listitem').first()).toBeVisible();
+    await expect(page.getByTestId('recent-changes').locator('li').first()).toContainText(gitOut('rev-parse', 'HEAD').slice(0, 7));
   });
 
   test('with nothing in flight it says so plainly, and does not invent activity', async ({ page }) => {
     await ready(page, '/changes');
     await expect(page.getByText('Nothing is waiting on GitHub')).toBeVisible();
     await expect(page.getByTestId('proposal-row')).toHaveCount(0);
-    await expect(page.locator('#conflicts')).toHaveCount(0);
+    await expect(page.getByTestId('no-failures')).toBeVisible();
+    await expect(page.getByTestId('reconcile-failures')).toHaveCount(0);
   });
 
   test('the section tabs reach Approvals and Readiness and keep Changes current', async ({ page }) => {

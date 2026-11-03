@@ -16,6 +16,7 @@ The Studio is a web application in [`apps/architecture-studio/`](../../apps/arch
 | See what a decision would affect, and challenge it as a review panel would | [IMPACT-AND-EXAMINER](IMPACT-AND-EXAMINER.md) |
 | Approve a decision | [APPROVAL-WORKFLOW-GUIDE](../studio-acceptance/APPROVAL-WORKFLOW-GUIDE.md) |
 | See how an approval reaches GitHub, how it is checked against GitHub, and what proves it | [APPROVAL-WRITEBACK](APPROVAL-WRITEBACK.md) |
+| See how the next best action, work queue, readiness and freshness are decided | [NEXT-BEST-ACTION](NEXT-BEST-ACTION.md) |
 
 ## Reference, by topic
 

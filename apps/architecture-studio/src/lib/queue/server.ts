@@ -67,6 +67,8 @@ export async function getQueue(): Promise<QueueRead> {
   return read;
 }
 
+/** Called when a webhook, a reconcile or an action says GitHub moved. The Overview's short-lived answer is dropped with it. */
 export function invalidateQueue() {
   shared.__studioQueue = null;
+  (globalThis as unknown as { __studioNext?: unknown }).__studioNext = null;
 }

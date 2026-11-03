@@ -1,11 +1,11 @@
 {
   "generatedBy": "harness/scripts/studio-inventory.mjs",
   "git": {
-    "head": "4f4dd902f350a3511eb85648d6264fba71fef0df",
-    "branch": "studio/approval-writeback",
-    "originMain": "4f4dd902f350a3511eb85648d6264fba71fef0df",
+    "head": "0a4a7d069e9c7dcdb3f4f05d12a9d48cf71397f5",
+    "branch": "studio/next-best-action",
+    "originMain": "0a4a7d069e9c7dcdb3f4f05d12a9d48cf71397f5",
     "commitsAheadOfOriginMain": 0,
-    "dirty": 37
+    "dirty": 33
   },
   "sources": {},
   "counts": {
@@ -2301,7 +2301,7 @@
     ".github": 3,
     ".mcp.json": 1,
     ".vscode": 2,
-    "apps": 404,
+    "apps": 415,
     "docs/architecture-studio": 5,
     "docs/azure": 2,
     "docs/business": 3,

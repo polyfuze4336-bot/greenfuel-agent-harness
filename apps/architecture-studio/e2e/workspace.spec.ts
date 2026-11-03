@@ -186,10 +186,9 @@ test.describe('a stakeholder question or a regulatory claim is never presented a
     const f = fromFiles();
     await ready(page, '/');
     const attention = page.locator('#attention');
-    await expect(attention).toContainText('Stakeholder answers needed');
-    await expect(attention).toContainText('Needs qualified verification');
-    await expect(attention.getByRole('link', { name: /Stakeholder answers needed/ })).toContainText(String(f.lanes.stakeholder));
-    await expect(attention.getByRole('link', { name: /Needs qualified verification/ })).toContainText(String(f.lanes.verification));
+    await expect(attention).toContainText(`${f.lanes.stakeholder} answers needed`);
+    await expect(attention).toContainText(`${f.lanes.verification} to verify`);
+    await expect(attention).toContainText('to decide');
   });
 });
 

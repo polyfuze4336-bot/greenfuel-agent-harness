@@ -9,6 +9,8 @@ export interface QueueData extends QueueSnapshot {
   canonical: { ref: string; commit: string | null; available: boolean };
   policy: { source: string; completionRoles: string[]; independent: boolean; people: { login: string; holder: string; roles: string[] }[] };
   me: (Me & { listed: boolean }) | null;
+  /** Each ranked item's score from the Next Best Action rules. The queue is ordered by it unless a column is chosen. */
+  next: Record<string, number>;
 }
 
 export interface SessionInfo {

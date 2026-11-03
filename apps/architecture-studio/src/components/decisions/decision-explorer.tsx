@@ -272,7 +272,7 @@ function DecisionSheetBody({ id }: { id: string }) {
 
   if (state.id !== id || (!state.data && !state.error))
     return (
-      <div aria-busy="true" aria-label="Loading decision" data-testid="decision-loading">
+      <div role="status" aria-busy="true" aria-label="Loading decision" data-testid="decision-loading">
         <Skeleton className="h-6 w-2/3" />
         <Skeleton className="mt-4 h-4 w-full" />
         <Skeleton className="mt-2 h-4 w-5/6" />

@@ -28,6 +28,15 @@ if (!fs.existsSync(path.join(appDir, 'work'))) {
 }
 export const APP_WEBHOOK_SECRET = 'whsec-e2e-secret';
 
+// A fifth world for the review-to-readiness journey (e2e/journey.spec.ts): a Studio configured as a GitHub App (3109) against its own
+// stand-in for the GitHub API (3110), so the journey can approve, merge, push new commits and cause outages without disturbing the others.
+const journeyDir = (process.env.STUDIO_E2E_JOURNEY_DIR ??= fs.mkdtempSync(path.join(os.tmpdir(), 'studio-e2e-journey-')));
+if (!fs.existsSync(path.join(journeyDir, 'work'))) {
+  makeFixture({ dir: journeyDir, cloneFrom: path.resolve(process.cwd(), '..', '..'), policy: policyJson() });
+  makeAppKeys(journeyDir);
+}
+export const JOURNEY_WEBHOOK_SECRET = 'whsec-journey-secret';
+
 // A third world for Microsoft Entra sign-in: a clone with the Entra access policy, a signing key and client secret on disk (as an
 // operator would provide them), and a stand-in identity provider on 3107. Studio on 3106 runs in Entra mode against it.
 const entraDir = (process.env.STUDIO_E2E_ENTRA_DIR ??= fs.mkdtempSync(path.join(os.tmpdir(), 'studio-e2e-entra-')));
@@ -72,6 +81,22 @@ export default defineConfig({
       STUDIO_TEST_FIXTURE_DIR: path.join(entraDir, 'state'),
       STUDIO_TEST_REMOTE_GIT_DIR: path.join(entraDir, 'origin.git'),
       STUDIO_CACHE_DIR: path.join(entraDir, 'cache'),
+    }),
+    { command: 'node checks/fixtures/fake-github-server.ts', port: 3110, reuseExistingServer: false, timeout: 60_000, env: { FAKE_GITHUB_DIR: journeyDir, FAKE_GITHUB_PORT: '3110' }, gracefulShutdown: { signal: 'SIGTERM' as const, timeout: 3000 } },
+    serve(3109, {
+      STUDIO_REPO_ROOT: path.join(journeyDir, 'work'),
+      STUDIO_TEST_MODE: '1',
+      STUDIO_TEST_FIXTURE_DIR: path.join(journeyDir, 'state'),
+      STUDIO_CACHE_DIR: path.join(journeyDir, 'cache'),
+      STUDIO_ALLOW_DEV_APPROVALS: '1',
+      STUDIO_MERGE_POLICY_TTL_MS: '0',
+      STUDIO_GITHUB_APP_ID: '12345',
+      STUDIO_GITHUB_APP_INSTALLATION_ID: '678',
+      STUDIO_GITHUB_REPO: 'acme/greenfuel',
+      STUDIO_GITHUB_APP_PRIVATE_KEY_FILE: path.join(journeyDir, 'app-private-key.pem'),
+      STUDIO_GITHUB_API_URL: 'http://127.0.0.1:3110',
+      STUDIO_GITHUB_GIT_URL: path.join(journeyDir, 'origin.git'),
+      STUDIO_GITHUB_WEBHOOK_SECRET: JOURNEY_WEBHOOK_SECRET,
     }),
     serve(3104, {
       STUDIO_REPO_ROOT: path.join(appDir, 'work'),

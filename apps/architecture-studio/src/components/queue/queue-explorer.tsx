@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { FilterX, Inbox, LogIn } from 'lucide-react';
 import { useQueryState } from '@/lib/use-query-state.ts';
 import { PRIORITIES, PRIORITY_RANK, KIND_LABEL, WORK_STATUSES, type Priority, type WorkItem } from '@/lib/queue/types.ts';
-import { VIEWS, VIEW_RULE, countViews, inView, mineReason, type View } from '@/lib/queue/views.ts';
+import { PRIMARY_VIEWS, VIEWS, VIEW_RULE, countViews, inView, mineReason, type View } from '@/lib/queue/views.ts';
 import { ChipGroup, SearchField, SelectField, Sheet, SortHeader, ToggleChip, rowNav } from '../explorer-kit.tsx';
 import { Card, EmptyState, SourceLink, Tag, btn } from '../ui.tsx';
 import { ItemSheet } from './item-sheet.tsx';
@@ -15,11 +15,12 @@ import { PriorityTag, WorkStatusPill } from './work-bits.tsx';
 const PAGE = 100;
 
 const VIEW_SHORT: Record<View, string> = {
-  all: 'All tasks',
-  mine: 'My tasks',
+  all: 'All',
+  mine: 'My attention',
   approvals: 'Pending approvals',
   blocked: 'Blocked',
-  critical: 'Critical risks',
+  critical: 'Critical',
+  pending: 'Pending',
   gaps: 'Architecture gaps',
   completed: 'Completed',
   rejected: 'Rejected or cancelled',
@@ -31,8 +32,11 @@ const num = (id: string) => Number(id.replace(/\D/g, '')) || 0;
 const idCmp = (a: WorkItem, b: WorkItem) => a.id.replace(/[\d-]+$/, '').localeCompare(b.id.replace(/[\d-]+$/, '')) || num(a.id) - num(b.id) || a.id.localeCompare(b.id);
 const pr = (i: WorkItem) => (i.priority ? PRIORITY_RANK[i.priority] : 9);
 
-const cmp = (a: WorkItem, b: WorkItem, sort: string): number => {
+const cmp = (a: WorkItem, b: WorkItem, sort: string, next: Record<string, number>): number => {
   switch (sort) {
+    case 'next':
+      // Best first. Work with no ranked action (closed, or not actionable) comes after everything that has one.
+      return (next[b.id] ?? -1e9) - (next[a.id] ?? -1e9);
     case 'title':
       return a.title.localeCompare(b.title);
     case 'status':
@@ -56,7 +60,7 @@ export function QueueExplorer() {
   const buildOnly = qs.get('build') === '1';
   const prereqOnly = qs.get('prereq') === '1';
   const group = (qs.get('group') || 'none') as GroupKey;
-  const sort = qs.get('sort') || 'priority';
+  const sort = qs.get('sort') || 'next';
   const dir: 'asc' | 'desc' = qs.get('dir') === 'desc' ? 'desc' : 'asc';
   const selectedId = qs.get('id');
 
@@ -86,9 +90,10 @@ export function QueueExplorer() {
 
   const filtered = useMemo(() => {
     const out = inScope.filter((i) => base(i) && (statuses.length === 0 || statuses.includes(i.status)) && (priorities.length === 0 || (i.priority && priorities.includes(i.priority))));
-    out.sort((a, b) => (cmp(a, b, sort) || idCmp(a, b)) * (dir === 'asc' ? 1 : -1));
+    const next = data?.next ?? {};
+    out.sort((a, b) => (cmp(a, b, sort, next) || idCmp(a, b)) * (dir === 'asc' ? 1 : -1));
     return out;
-  }, [inScope, base, statuses, priorities, sort, dir]);
+  }, [inScope, base, statuses, priorities, sort, dir, data]);
 
   const groups = useMemo(() => {
     if (group === 'none') return [{ name: '', items: filtered }];
@@ -123,7 +128,7 @@ export function QueueExplorer() {
   const filtersActive = !!(text || statuses.length || priorities.length || kind || buildOnly || prereqOnly);
   const clear = () => qs.set({ q: null, status: null, priority: null, kind: null, build: null, prereq: null });
   const toggle = (k: 'status' | 'priority', cur: string[], v: string) => qs.set({ [k]: (cur.includes(v) ? cur.filter((x) => x !== v) : [...cur, v]).join(',') || null });
-  const onSort = (f: string) => qs.set(sort === f ? { dir: dir === 'asc' ? 'desc' : 'asc' } : { sort: f === 'priority' ? null : f, dir: null });
+  const onSort = (f: string) => qs.set(sort === f ? { dir: dir === 'asc' ? 'desc' : 'asc' } : { sort: f === 'next' ? null : f, dir: null });
   const setView = (v: View) => qs.set({ view: v === 'all' ? null : v, blocked: null, status: null, priority: null });
   const kinds = [...new Set(inScope.map((i) => i.kind))].sort();
   const statusOptions = WORK_STATUSES.filter((s) => inScope.some((i) => i.status === s));
@@ -136,12 +141,21 @@ export function QueueExplorer() {
       <SourceStrip data={data} />
 
       <div role="group" aria-label="Queue views" className="mb-1 flex flex-wrap gap-1.5">
-        {VIEWS.map((v) => (
+        {PRIMARY_VIEWS.map((v) => (
           <button key={v} type="button" data-testid={`view-${v}`} aria-pressed={v === view} onClick={() => setView(v)} className={`inline-flex h-9 items-center gap-2 rounded-lg border px-3 text-[13.5px] font-medium transition-colors ${v === view ? 'border-selected bg-selected text-selected-ink' : 'border-hairline-strong bg-surface text-ink-2 hover:bg-surface-2'}`}>
             {VIEW_SHORT[v]}
             <span className={`tnum text-[12px] ${v === view ? 'text-white/70' : 'text-ink-3'}`} data-testid={`count-${v}`}>
               {v === 'mine' && !me ? '–' : counts[v]}
             </span>
+          </button>
+        ))}
+      </div>
+      <div role="group" aria-label="Narrower views" className="mb-1 flex flex-wrap items-center gap-x-1 gap-y-1 text-[12.5px]">
+        <span className="mr-1 text-ink-3">Narrower:</span>
+        {VIEWS.filter((v) => !PRIMARY_VIEWS.includes(v)).map((v) => (
+          <button key={v} type="button" data-testid={`view-${v}`} aria-pressed={v === view} onClick={() => setView(v)} className={`inline-flex items-center gap-1.5 rounded-md px-2 py-1 font-medium transition-colors ${v === view ? 'bg-selected text-selected-ink' : 'text-ink-2 hover:bg-surface-2'}`}>
+            {VIEW_SHORT[v]}
+            <span className={`tnum text-[11.5px] ${v === view ? 'text-white/70' : 'text-ink-3'}`} data-testid={`count-${v}`}>{counts[v]}</span>
           </button>
         ))}
       </div>
@@ -164,7 +178,13 @@ export function QueueExplorer() {
       <div className="mb-2 flex items-center justify-between text-[13px] text-ink-3">
         <p role="status" aria-live="polite" data-testid="result-count">
           Showing <span className="font-medium text-ink tnum">{filtered.length}</span> of <span className="tnum">{inScope.length}</span> in {VIEW_SHORT[view]}
+          {sort === 'next' ? <span data-testid="order-note"> · in next-best-action order</span> : null}
         </p>
+        {sort !== 'next' ? (
+          <button type="button" data-testid="order-next" onClick={() => qs.set({ sort: null, dir: null })} className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 font-medium text-accent hover:bg-accent-soft">
+            Back to next-best-action order
+          </button>
+        ) : null}
         {filtersActive ? (
           <button type="button" onClick={clear} className="inline-flex items-center gap-1.5 rounded-md px-2 py-1 font-medium text-accent hover:bg-accent-soft">
             <FilterX aria-hidden className="size-3.5" />

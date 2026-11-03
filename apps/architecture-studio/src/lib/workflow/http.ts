@@ -27,6 +27,12 @@ export function runtime() {
   return reviewRuntime(repoRoot(), configuredRef());
 }
 
+/** The session of the person viewing a server-rendered page, if any. Pages read it from the cookie; routes read it from the request. */
+export async function pageSession(): Promise<Session | null> {
+  const { cookies } = await import('next/headers');
+  return runtime().sessions.get((await cookies()).get(COOKIE)?.value);
+}
+
 export function currentSession(req: NextRequest): Session | null {
   return runtime().sessions.get(req.cookies.get(COOKIE)?.value);
 }
