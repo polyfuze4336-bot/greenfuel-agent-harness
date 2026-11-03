@@ -1,0 +1,58 @@
+{
+  "schema": "greenfuel.decision-review-event/v2",
+  "id": "DR-D-036-0001",
+  "decisionId": "D-036",
+  "seq": 1,
+  "action": "comment",
+  "actor": {
+    "login": "polyfuze4336-bot",
+    "githubId": 225331490,
+    "name": null,
+    "verifiedBy": "github-api",
+    "provider": "github",
+    "subject": "225331490",
+    "tenantId": null
+  },
+  "createdAt": "2026-11-03T04:19:54.154Z",
+  "basis": {
+    "recordHash": "5a995be562a9aedddf76612a28066709cf9f14ef662ecb4517d7c7e87e9074ef",
+    "sourceStatus": "Pending Review",
+    "sourceCommit": "4f4dd902f350a3511eb85648d6264fba71fef0df"
+  },
+  "prevHash": null,
+  "option": null,
+  "conditions": [],
+  "rationale": null,
+  "comment": "Integration test of the GitHub App write path. This pull request will be closed unmerged.",
+  "recommendation": null,
+  "roleCheck": {
+    "critical": false,
+    "required": [
+      "comment"
+    ],
+    "held": [
+      "architecture-owner",
+      "viewer"
+    ],
+    "namedRoles": [
+      "security-architect",
+      "sovereignty-lead"
+    ],
+    "outstanding": [],
+    "policySource": "canonical",
+    "domain": "security",
+    "policyHash": "66bbb1e742c5e0d3b0f6c75ba4549a22954123c3c9fa2de67a707d3ed23019e1",
+    "checks": [
+      "has a role",
+      "permission comment"
+    ],
+    "authAgeSeconds": 17,
+    "mfa": false
+  },
+  "eventHash": "78448f18c16718ef49b5a2d641de1b2ed60cf8b3a1b5e83fd501488df9e1c7e6",
+  "signature": {
+    "keyId": "712b7abde2a611a1",
+    "alg": "Ed25519",
+    "value": "FOkQejBn2IUt2koGV5wuNolgZjD586JI1YmxM3t6DOB0/jjKpL48AF+9D7W8uXf3/mBXcVPlheb/QPEELSHoAA=="
+  }
+}
