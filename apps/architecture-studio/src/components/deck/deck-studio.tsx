@@ -148,7 +148,14 @@ export function DeckStudio() {
             </ul>
           </div>
         ) : null}
-        {model.reordered ? <p className="mt-2 text-[12.5px] text-ink-3" data-testid="reordered-note">The slide order differs from the generated one. The speaker notes still say what comes next as they were written, so read them again after moving slides.</p> : null}
+        {model.reordered ? (
+          <p className="mt-2 text-[12.5px] text-ink-3" data-testid="reordered-note">
+            The slide order differs from the generated one. The speaker notes still say what comes next as they were written, so read them again after moving slides.{' '}
+            <button type="button" className="font-medium text-accent hover:underline disabled:opacity-50" data-testid="reset-order" disabled={!!busy || !signedIn || !me.canEdit} onClick={() => void post('/api/v1/deck/actions', { action: 'reset-order', expectedRevision: model.revision }, 'Restoring the generated order')}>
+              Restore the generated order
+            </button>
+          </p>
+        ) : null}
         {orderStale ? <p className="mt-2 text-[12.5px] text-[var(--s-open-fg)]" data-testid="order-stale">The slide order changed after the latest build, so the exported file has the old order. Build again before exporting.</p> : null}
         <div className="mt-4 flex flex-wrap items-center gap-2.5">
           <button type="button" className={btn} disabled={!!busy} onClick={() => void load()} data-testid="regenerate-outline">

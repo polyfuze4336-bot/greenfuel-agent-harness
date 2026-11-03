@@ -1,6 +1,6 @@
 # Presentation Studio: generating the capstone deck
 
-Status: built and tested locally on this computer. **Not pushed, not approved, not reviewed by a person, never rehearsed.** The deck it produces today is a **sample**. A final deck cannot be generated yet, and the reasons are on the page and in [Gate](#the-gate-for-a-final-deck).
+Status: built and tested. The deck it produces today is a **sample**: not approved for presentation, not reviewed by a person, never rehearsed. A final deck cannot be generated yet, and the reasons are on the page and in [Gate](#the-gate-for-a-final-deck). It is not a claim that the deck is VCDX-quality: how it looks says nothing about whether the architecture would survive a panel, and the gate and the limitations below say what is still missing.
 
 ## What it does
 
@@ -31,9 +31,9 @@ It reads this repository at one commit and builds an **editable PowerPoint** wit
 
 ## The deck
 
-40 slides in three parts, adapted from the requested structure to what the repository can evidence. The panel's time allocation is not known (see [OQ-DECK-1](#decisions-for-the-owner)), so each slide carries a time and the page totals them.
+41 slides in three parts, adapted from the requested structure to what the repository can evidence. The panel's time allocation is not known (see [OQ-DECK-1](#decisions-for-the-owner)), so each slide carries a time and the page totals them.
 
-* **Executive story (E01 to E14):** thesis; the problem; value at stake; benefit and cost of inaction; why today's process is not enough; four options on eleven criteria; the recommendation; why it wins; the agentic workflow; evidence and sovereignty; the live-demo narrative; measured results; cost; the decision.
+* **Executive story (E01 to E14, with E02B):** thesis; the problem; the stakeholders; value at stake; benefit and cost of inaction; why today's process is not enough; four options on eleven criteria; the recommendation; why it wins; the agentic workflow; evidence and sovereignty; the live-demo narrative; measured results; cost; the decision.
 * **Technical defence (T01 to T13):** context and requirements; Azure service selection; edge-to-shore flows; the five agents and their autonomy ceilings; security, identity and isolation; evidence integrity; scalability; availability and recovery; observability; AI evaluation; trade-offs and rejected alternatives; risks; roadmap.
 * **Appendix (A01 to A13):** ADR status; requirement traceability; Azure topology; data-flow register; performance evidence; cost assumptions; threat model; agent evaluation; test coverage; known gaps; panel Q&A; rubric coverage; provenance.
 
@@ -71,6 +71,66 @@ No photograph is used. There is no approved image generator and no licensed phot
 
 An AI agent has no session, so it cannot approve a slide. The slide decision is an **editorial** decision recorded with the person's identity in the Studio's own state; it is not an architecture approval and authorizes nothing outside the deck.
 
+## The brief, mapped to what exists
+
+### The twelve pipeline steps
+
+| # | Step | Where it happens | State |
+|---|---|---|---|
+| 1 | Read the approved architecture baseline | `context.ts` reads baseline readiness and the policy gates | Done. **No baseline is authorized**, so the deck is a sample and a final deck is refused |
+| 2 | Collect supporting evidence | `context.ts` (every source read is hashed), `harness/demo/facts.mjs` | Done |
+| 3 | Identify unsupported claims | `claims.ts`; an unsupported claim becomes a visible placeholder | Done (41 of 41 supported) |
+| 4 | Create an executive narrative | `content.ts`, executive tier E01 to E14 | Done |
+| 5 | Propose a slide outline | "Generate outline" in the builder, and `deck.ts outline` | Done |
+| 6 | Approve slides individually | `store.ts`: one slide at a time, no bulk, bound to the content hash | Done |
+| 7 | Select the visual type | Alternative visuals, offered only when they lose no information | Done |
+| 8 | Editable diagrams and charts | `draw.ts`, `visuals.ts`: native shapes, charts and tables | Done |
+| 9 | Add approved imagery | `assets.ts`: needs source, licence, a named approver and a matching hash | **No image is approved.** Original vector artwork is used (OQ-DECK-2) |
+| 10 | Render previews | PowerPoint, 41 previews | Done on a Windows computer with PowerPoint |
+| 11 | Detect overflow and layout defects | `qa.ts`, reading PowerPoint's own measured layout | Done: 0 errors, 0 warnings on the sample |
+| 12 | Export PPTX and PDF | `/api/v1/deck/export/*`, served only if the file matches its recorded hash | Done |
+
+### The requested slide topics
+
+Each topic below has a slide. The test `the requested slide topics` finds them by title and section.
+
+| Topic | Slide |
+|---|---|
+| Business problem | E02 |
+| Commercial stakes | E03, E04 |
+| Stakeholders | E02B (built from `docs/business/STAKEHOLDERS.md`; the case names two, the rest are candidates) |
+| Architecture alternatives | E06, T11 |
+| Recommended solution | E07, E08 |
+| Azure architecture | T02, A03 |
+| Five business agents | T04, with the workflow on E09 |
+| Edge-to-shore flow | T03, A12 |
+| Data sovereignty | E10 |
+| Evidence integrity | T06 |
+| Agent autonomy | T04 (the five agents and their autonomy ceilings share one slide) |
+| Security | T05, A06 |
+| Reliability and recovery | T08 |
+| Cost and ROI | E04, E13, A05 |
+| Operational metrics | T07, T09, A04 (placeholders: nothing is instrumented) |
+| Evaluation results | E12, T10, A07 |
+| Risks | T12, A09 |
+| Recommendation | E14 |
+| Technical appendix | A01 to A13 |
+
+### Editing
+
+Slide title, visual choice, speaker notes, order, approval, rejection and regeneration are each one action on one slide, checked on the server. Source inspection is the evidence list on each slide, linking every file at the exact commit.
+
+* **Speaker notes** replace the spoken script only. The "say plainly" limit, timing and rubric stay. An edited script is labelled "edited, not claim-checked", because the claim checks do not read it. Saving withdraws any review of the slide. Regenerating the slide restores the generated script.
+* **Order** moves one slide one place. The title slide stays first, and nothing can move into its place. A stored order can never drop, repeat or invent a slide. Moving does not withdraw an approval, because the slide itself did not change. A build records its own order, so a preview is always the right slide, and the page says when the order changed after the latest build.
+
+### When an approved decision changes
+
+A slide's content hash includes the **status the register gives each decision the slide leans on**. An approval is stored with the status of each of those decisions at the time. If a decision changes (for example ADR-0016 from Blocked to Approved), every slide that cites it stops counting as reviewed, the page names the slides and says which decision moved, and nothing is rewritten. A person reviews the current version again. A decision a slide does not cite changes nothing on it. (This was a gap: the hash covered decision ids but not their status.)
+
+### Loading only when needed
+
+`pptxgenjs` and `jszip` are imported inside the functions that build or inspect a file. Checked three ways: no browser chunk of the production build contains either, preparing and reviewing all 41 slides loads neither (module cache checked at run time), and a build loads them. The editor does not import them.
+
 ## The gate for a final deck
 
 A sample is always buildable and is marked on every slide and in the file name. A final deck needs every blocking item:
@@ -79,8 +139,8 @@ A sample is always buildable and is marked on every slide and in the file name. 
 |---|---|
 | An authorized, current architecture baseline exists | **Unmet.** No baseline; none can be authorized yet ([BASELINE](BASELINE.md)) |
 | Every decision the deck presents is approved | **Unmet.** 7 of 7 are not (ADR-0016 to 0019 Blocked, ADR-0004 and 0015 Blocked, ADR-0020 Proposed) |
-| Every claim is supported by a cited source | Met (40 of 40) |
-| A person approved every slide at its current content | **Unmet.** 0 of 40 |
+| Every claim is supported by a cited source | Met (41 of 41) |
+| A person approved every slide at its current content | **Unmet.** 0 of 41 |
 | Rendered, measured by PowerPoint, no layout error | Met when built on this computer |
 | Sources are exactly the committed commit | Met on a clean tree |
 | Placeholders; rehearsal | Informational. 7 placeholders; 0 of 10 rehearsal criteria recorded |
@@ -95,8 +155,8 @@ Each build writes `generation.json` next to the file: the commit and branch, the
 
 | Check | What it covers | Result |
 |---|---|---|
-| `checks/deck.check.ts` | table parsing and clipping; contrast (29 text and background pairs); claim checks including negative cases; content at HEAD (structure, notes, placeholders, numbers from sources); alternative visuals; slide decisions (stale, reason, acknowledgement, concurrency, control characters); the gate (each item flips it); asset licensing (7 failure modes); quality detectors against deliberately bad input; the built file (native, no pictures, notes on every slide, audit record, final refused); a real PowerPoint render and an overflow detector proven against deliberately overflowing text | 93 of 93 |
-| `e2e/deck.spec.ts` | the page, gate reasons, filters, keyboard, axe, tablet width, loading and error states, real roles (viewer, contributor, owner), stale and cross-origin and CSRF refusals, a real build with preview and PowerPoint and PDF export, a refused final deck | 16 of 16 |
+| `checks/deck.check.ts` | table parsing and clipping; contrast (29 text and background pairs); claim checks including negative cases; content at HEAD (structure, notes, placeholders, numbers from sources); alternative visuals; slide decisions (stale, reason, acknowledgement, concurrency, control characters); the gate (each item flips it); asset licensing (7 failure modes); quality detectors against deliberately bad input; the built file (native, no pictures, notes on every slide, audit record, final refused); a real PowerPoint render and an overflow detector proven against deliberately overflowing text; a decision change making exactly the citing slides stale (against the real register); moving and note editing, with their limits; the built file following a chosen order and edited notes; every requested topic having a slide; the stakeholder slide; lazy loading | 109 of 109 |
+| `e2e/deck.spec.ts` | the page, gate reasons, filters, keyboard, axe, tablet width, loading and error states, real roles (viewer, contributor, owner), stale and cross-origin and CSRF refusals, moving slides and editing notes (including the server refusing a moved title slide, a viewer, a stale revision and a cross-origin call), a preview staying correct after a reorder, a real build with preview and PowerPoint and PDF export, a refused final deck | 17 of 17 |
 | CLI on this repository | `check`, refused `final`, `build`, `verify` | as expected, exit 2 for the refusals |
 
 The sample deck was built and rendered by Microsoft PowerPoint: 0 errors, 0 warnings, 8 notes (placeholders and live-only criteria). I inspected the rendered slides myself at contact-sheet resolution and fixed what I saw (a text-width estimator that was too conservative, a cell diagram that clipped, a table that overran, truncated table cells, ambiguous icon monograms).
@@ -115,6 +175,10 @@ The sample deck was built and rendered by Microsoft PowerPoint: 0 errors, 0 warn
 10. **Font.** Segoe UI; PowerPoint on another system will substitute and layout may change.
 11. **Not tested in a pull request or CI**; PowerPoint rendering cannot run on a hosted runner.
 12. **Single-owner reality:** one person can edit and approve their own slides. Segregation of duties is not applied to slides.
+13. **Moving a slide does not rewrite the "next" line in its notes**, which was written for the generated order. The page says so; the presenter rereads the notes after reordering.
+14. **A decision change is shown in the browser only as far as the data allows.** The unit tests prove it against the real register and a moved decision. The browser fixture has no way to change a decision in its clone, so the banner and the "decision changed" tag are not driven end to end in a browser.
+15. **No generated or licensed maritime photograph is in the deck.** No image generator or licensed image has been approved, and an AI agent cannot approve an asset. The title vessel and diagrams are original vector artwork; a hero image enters only through the asset manifest (OQ-DECK-2).
+16. **The stakeholder slide shows a clipped "Decides" text** (shortened with an ellipsis to keep the slide light). The full text is in the cited source.
 
 ## Decisions for the owner
 

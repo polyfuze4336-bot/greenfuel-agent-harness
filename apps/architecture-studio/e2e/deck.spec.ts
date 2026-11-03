@@ -92,7 +92,7 @@ test.describe('deck builder: reading', () => {
     await expect(page).toHaveURL(/slide=E02/);
     await page.getByTestId('slide-E02').focus();
     await page.keyboard.press('ArrowDown');
-    await expect(page.getByTestId('slide-detail')).toHaveAttribute('data-slide-id', 'E03');
+    await expect(page.getByTestId('slide-detail')).toHaveAttribute('data-slide-id', 'E02B');
     await page.keyboard.press('ArrowUp');
     await expect(page.getByTestId('slide-detail')).toHaveAttribute('data-slide-id', 'E02');
   });
@@ -233,6 +233,66 @@ test.describe('deck builder: acting, with real roles', () => {
     expect((await page.request.post(`${WRITE}/api/v1/deck/actions`, { headers: { 'content-type': 'application/json', origin: WRITE }, data: { action: 'reset', slideId: 'E08', expectedRevision: view.model.revision } })).status(), 'missing CSRF token').toBe(403);
   });
 
+  test('an owner moves a slide and rewrites its notes; the title slide stays first; the server enforces both', async ({ page }) => {
+    await signInAs(page, USERS.owner);
+    const order = () => page.locator('[data-slide]').evaluateAll((els) => els.map((e) => e.getAttribute('data-slide')));
+    const before = await order();
+    expect(before.slice(0, 3)).toEqual(['E01', 'E02', 'E02B']);
+    // The title slide cannot move, and nothing can move into its place.
+    await slide(page, 'E01');
+    await expect(page.getByTestId('move-up')).toBeDisabled();
+    await expect(page.getByTestId('move-down')).toBeDisabled();
+    await slide(page, 'E02');
+    await expect(page.getByTestId('move-up')).toBeDisabled();
+
+    await slide(page, 'E06');
+    await page.getByTestId('move-up').click();
+    await expect.poll(order).toEqual([...before.slice(0, 5), 'E06', 'E05', ...before.slice(7)]);
+    await expect(page.getByTestId('reordered-note')).toBeVisible();
+    await expect(page.getByTestId('slide-detail')).toContainText('Slide 6 of');
+
+    // The spoken script: edited, labelled as not claim-checked, and it withdraws a review.
+    await page.getByTestId('approve').click();
+    await expect(page.getByTestId('slide-E06')).toContainText('Approved');
+    await page.getByText('Speaker notes, timing and rubric').click();
+    await page.getByTestId('notes-input').fill('Here is my own script for this slide, in my own words.');
+    await page.getByTestId('notes-save').click();
+    await expect(page.getByTestId('slide-E06')).toContainText('Draft');
+    await expect(page.getByTestId('slide-notes')).toContainText('edited, not claim-checked');
+    await expect(page.getByTestId('slide-notes')).toContainText('Say plainly');
+    await expect(page.getByTestId('notes-input')).toHaveValue('Here is my own script for this slide, in my own words.');
+    // Regenerating returns the generated script and keeps the slide where the person put it.
+    await page.getByTestId('regenerate').click();
+    await expect(page.getByTestId('notes-input')).not.toHaveValue(/my own script/);
+    expect((await order()).indexOf('E06')).toBe(5);
+
+    // The server, not the screen, enforces the rules.
+    const csrf = (await (await page.request.get(`${WRITE}/api/v1/auth/session`)).json()).csrf as string;
+    const rev = async () => (await (await page.request.get(`${WRITE}/api/v1/deck`)).json()).model.revision as number;
+    const post = async (data: object, headers: Record<string, string> = {}) => page.request.post(`${WRITE}/api/v1/deck/actions`, { headers: { 'content-type': 'application/json', origin: WRITE, 'x-studio-csrf': csrf, ...headers }, data });
+    expect((await post({ action: 'move', slideId: 'E01', direction: 'down', expectedRevision: await rev() })).status(), 'title slide fixed').toBe(422);
+    expect((await post({ action: 'move', slideId: 'E02', direction: 'up', expectedRevision: await rev() })).status(), 'nothing enters the title place').toBe(422);
+    expect((await post({ action: 'move', slideId: 'E05', direction: 'sideways', expectedRevision: await rev() })).status(), 'only up or down').toBe(422);
+    expect((await post({ action: 'move', slideId: 'NOPE', direction: 'up', expectedRevision: await rev() })).status(), 'unknown slide').toBe(404);
+    expect((await post({ action: 'edit-notes', slideId: 'E05', notes: 'short', expectedRevision: await rev() })).status(), 'empty notes').toBe(422);
+    expect((await post({ action: 'move', slideId: 'E05', direction: 'up', expectedRevision: (await rev()) - 1 })).status(), 'old revision').toBe(409);
+    expect((await post({ action: 'move', slideId: 'E05', direction: 'up', expectedRevision: await rev() }, { origin: 'http://evil.example' })).status(), 'cross-origin').toBe(403);
+
+    // The person can put the generated order back.
+    await page.getByTestId('reset-order').click();
+    await expect(page.getByTestId('reordered-note')).toHaveCount(0);
+    await expect.poll(order).toEqual(before);
+
+    // A viewer cannot move slides, even by calling the API.
+    await signInAs(page, USERS.outsider);
+    await slide(page, 'E06');
+    await expect(page.getByTestId('move-up')).toBeDisabled();
+    await expect(page.getByTestId('notes-save')).toBeDisabled();
+    const vcsrf = (await (await page.request.get(`${WRITE}/api/v1/auth/session`)).json()).csrf as string;
+    const vr = await page.request.post(`${WRITE}/api/v1/deck/actions`, { headers: { 'content-type': 'application/json', origin: WRITE, 'x-studio-csrf': vcsrf }, data: { action: 'move', slideId: 'E06', direction: 'up', expectedRevision: await rev() } });
+    expect(vr.status()).toBe(403);
+  });
+
   test('builds a sample deck, previews its slides, and exports it as PowerPoint and PDF', async ({ page }) => {
     await signInAs(page, USERS.owner);
     await slide(page, 'E07');
@@ -255,6 +315,13 @@ test.describe('deck builder: acting, with real roles', () => {
       expect(res.headers()['content-disposition']).toContain('SAMPLE');
       expect((await res.body()).subarray(0, magic.length).toString()).toBe(magic);
     }
+    // Moving a slide after the build must not make its preview show a different slide: previews are looked up in the build's own order.
+    const built = (await (await page.request.get(`${WRITE}/api/v1/deck`)).json()).latest.slideOrder as string[];
+    await page.getByTestId('move-up').click();
+    await expect(page.getByTestId('order-stale')).toContainText('Build again before exporting');
+    await expect(page.getByTestId('slide-preview')).toHaveAttribute('src', new RegExp(`/preview/${built.indexOf('E07') + 1}\\?`));
+    await page.getByTestId('reset-order').click();
+    await expect(page.getByTestId('order-stale')).toHaveCount(0);
     // a change after the build makes that slide's preview out of date, and it says so
     await page.getByTestId('title-input').fill('Recommend sovereign cells and bounded agents');
     await page.getByTestId('title-save').click();
