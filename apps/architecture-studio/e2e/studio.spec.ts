@@ -62,43 +62,38 @@ test.describe('overview shows repository-derived figures only', () => {
   test('numbers equal the API model, which equals the independent discovery snapshot', async ({ page, request }) => {
     const api = (await (await request.get('/api/v1/repository')).json()) as { metrics: any; repo: { commitShort: string } };
     const snap = JSON.parse(await (await request.get('/api/v1/decisions?type=register')).text()) as { count: number };
+    const o = (await (await request.get('/api/v1/overview')).json()) as { overview: { progress: { done: number; total: number }[]; readiness: { ready: boolean; blockingDecisions: unknown[] } } };
     await ready(page, '/');
     const m = api.metrics;
-    const expectations: [RegExp, string][] = [
-      [/Pending decisions/, String(m.decisions.pending)],
-      [/Approved decisions/, String(m.decisions.accepted)],
-      [/Blocked tasks/, String(m.tasks.blocked)],
-      [/Outstanding approvals/, String(m.approvals.outstanding)],
-    ];    for (const [label, value] of expectations) {
-      const card = page.getByRole('link', { name: label });
-      await expect(card).toBeVisible();
-      await expect(card.locator('span.tnum').first()).toHaveText(value);
-    }
-    await expect(page.getByTestId('readiness-label')).toHaveText('Not ready for approval');
+    // Progress is counts of records, and each count on the page is the API's.
+    expect(await page.getByTestId('progress-count').allTextContents()).toEqual(o.overview.progress.map((p) => `${p.done} of ${p.total}`));
+    if (!o.overview.readiness.ready) await expect(page.getByTestId('readiness-label')).toContainText(`${o.overview.readiness.blockingDecisions.length} mandatory decision`);
     expect(snap.count).toBe(m.decisions.register);
-    await expect(page.getByText(api.repo.commitShort, { exact: false }).first()).toBeVisible();
+    await expect(page.getByTestId('freshness-commit')).toHaveText(api.repo.commitShort);
     // The independent discovery snapshot recorded these counts; the figures must agree.
     expect(m.decisions).toMatchObject({ total: 58, pending: 45, accepted: 13, rejected: 0, deferred: 0 });
-    await expect(page.getByText('All 58 decisions by status')).toBeVisible();
   });
 
-  test('each key figure links to the records behind it', async ({ page, request }) => {
-    const t = ((await (await request.get('/api/v1/repository')).json()) as { metrics: { tasks: { blocked: number; total: number } } }).metrics.tasks;
+  test('each list links to the records behind it', async ({ page }) => {
     await ready(page, '/');
-    await page.getByRole('link', { name: /Pending decisions/ }).click();
+    await page.locator('#attention a[href^="/decisions?status="]').click();
     await expect(page).toHaveURL(/\/decisions\?status=Proposed,Pending(%20| )Review,Blocked/);
     await expect(page.getByTestId('result-count')).toContainText('45 of 58');
-    await page.goto('/');
-    await page.getByRole('link', { name: /Blocked tasks/ }).click();
-    await expect(page.getByTestId('result-count')).toContainText(`Showing ${t.blocked} of`);
+    await ready(page, '/');
+    await page.locator('#tasks a[href^="/queue"]').click();
+    await expect(page).toHaveURL(/\/queue\?view=pending/);
+    await expect(page.getByTestId('queue-table')).toBeVisible();
   });
 
-  test('blockers are listed with their basis and link to detail', async ({ page }) => {
+  test('blockers are listed with the rules behind their place and link to detail', async ({ page, request }) => {
+    const o = (await (await request.get('/api/v1/overview')).json()) as { overview: { blockers: { count: number } } };
     await ready(page, '/');
     const section = page.locator('#blockers');
-    await expect(section.getByRole('listitem')).toHaveCount(6);
-    await expect(section).toContainText('No approver is enrolled');
-    await expect(section).toContainText('Basis:');
+    await expect(page.getByTestId('blockers-count')).toHaveText(String(o.overview.blockers.count));
+    await expect(section).toContainText('Enroll an architecture-class approver');
+    await section.getByTestId('action-row').first().click();
+    await expect(page.getByTestId('action-drawer')).toBeVisible();
+    await expect(page.getByTestId('action-drawer').getByTestId('why-total')).toBeVisible();
   });
 });
 
@@ -252,6 +247,7 @@ test.describe('Work Queue', () => {
 
   test('actions need a signed-in, registered person: signed out they explain why', async ({ page }) => {
     await ready(page, '/queue?id=T14');
+    await expect(page.getByTestId('item-detail')).toBeVisible();
     const assign = page.getByTestId('work-assign');
     await expect(assign).toHaveAttribute('aria-disabled', 'true');
     await expect(assign).toHaveAttribute('title', /Sign in/);

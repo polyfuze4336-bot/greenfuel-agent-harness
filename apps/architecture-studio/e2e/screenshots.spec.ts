@@ -12,6 +12,7 @@ const shot = async (page: Page, name: string, fullPage = false) => {
 test.describe.configure({ mode: 'serial' });
 
 test('desktop 1440: the four destinations and their pages', async ({ page }) => {
+  test.setTimeout(180_000); // twenty cold page loads in one tour; this produces evidence, it does not measure speed
   await page.setViewportSize({ width: 1440, height: 900 });
   await ready(page, '/');
   await shot(page, '01-overview', true);

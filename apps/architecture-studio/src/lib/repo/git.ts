@@ -278,11 +278,21 @@ export class GitRepositoryAdapter {
     return new Set(out.split('\n').filter(Boolean));
   }
 
+  /** The shared git directory, found once: asking git for it costs a process each time. */
+  private gitDirMemo: string | null | undefined;
+  gitCommonDir(): string | null {
+    if (this.gitDirMemo === undefined) {
+      const d = this.tryText(['rev-parse', '--git-common-dir']);
+      this.gitDirMemo = d ? path.resolve(this.root, d) : null;
+    }
+    return this.gitDirMemo;
+  }
+
   lastFetchAt(): string | null {
-    const gitDir = this.tryText(['rev-parse', '--git-common-dir']);
+    const gitDir = this.gitCommonDir();
     if (!gitDir) return null;
     try {
-      return fs.statSync(path.resolve(this.root, gitDir, 'FETCH_HEAD')).mtime.toISOString();
+      return fs.statSync(path.join(gitDir, 'FETCH_HEAD')).mtime.toISOString();
     } catch {
       return null;
     }
@@ -295,6 +305,18 @@ export class GitRepositoryAdapter {
 
   userConfig(key: 'user.name' | 'user.email'): string | null {
     return this.tryText(['config', '--get', key]);
+  }
+
+  /** For each file under a folder, the date of the last commit that touched it. One git call, newest first, so the first sighting of a path is its last change. */
+  lastTouched(prefix: string, limit = 1500): Map<string, string> {
+    const out = this.tryText(['log', `-n${Math.min(Math.max(limit, 1), 5000)}`, '--format=%x1e%cI', '--name-only', this.commit, '--', prefix]) ?? '';
+    const map = new Map<string, string>();
+    for (const block of out.split('\x1e')) {
+      const [date, ...files] = block.split('\n').map((s) => s.trim()).filter(Boolean);
+      if (!date) continue;
+      for (const f of files) if (!map.has(f)) map.set(f, date);
+    }
+    return map;
   }
 
   describeCommit(sha: string): LogEntry | null {
