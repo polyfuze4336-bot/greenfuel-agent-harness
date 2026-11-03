@@ -17,6 +17,7 @@ export function GET() {
       repo: rt.app?.config.repo ?? null,
       app: rt.app ? { appId: rt.app.config.appId, installationId: rt.app.config.installationId, tokenExpiresAt: rt.app.auth.tokenExpiresAt(), webhookConfigured: !!rt.app.config.webhookSecret } : null,
       rateLimit: rt.app?.api.rate ?? null,
+      mergePolicy: rt.mergePolicy ? await rt.mergePolicy.read() : null,
       canonicalRef: rt.service.deps.canonicalRef,
       openProposals: { total: open.length, byState },
       lastReconcile: lastReconcile(),

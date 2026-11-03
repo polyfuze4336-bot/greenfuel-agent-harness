@@ -79,6 +79,7 @@ export default defineConfig({
       STUDIO_TEST_FIXTURE_DIR: path.join(appDir, 'state'),
       STUDIO_CACHE_DIR: path.join(appDir, 'cache'),
       STUDIO_ALLOW_DEV_APPROVALS: '1',
+      STUDIO_MERGE_POLICY_TTL_MS: '0',
       STUDIO_GITHUB_APP_ID: '12345',
       STUDIO_GITHUB_APP_INSTALLATION_ID: '678',
       STUDIO_GITHUB_REPO: 'acme/greenfuel',

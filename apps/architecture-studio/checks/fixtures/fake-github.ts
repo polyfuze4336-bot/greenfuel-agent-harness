@@ -56,6 +56,8 @@ export class FakeGitHub {
   private drops = 0;
   private limit: { n: number; status: number; headers: Record<string, string>; message: string } | null = null;
   private authBroken = false;
+  /** The active rules on the base branch, as GitHub's rules API reports them. Defaults to what this repository's rulesets require. */
+  private rules: { type: string; parameters?: unknown }[] | 'error' = [{ type: 'pull_request', parameters: {} }, { type: 'non_fast_forward' }, { type: 'required_status_checks', parameters: { required_status_checks: [{ context: 'validate' }, { context: 'gate' }] } }];
   private clockSkewMs = 0;
 
   constructor(o: FakeOptions) {
@@ -87,6 +89,12 @@ export class FakeGitHub {
   dropNext(n: number) {
     this.drops += n;
   }
+  /** Forget every injected fault: drops, server errors and rate limits. */
+  clearFaults() {
+    this.drops = 0;
+    this.failures = [];
+    this.limit = null;
+  }
   /** The next n requests are rate limited. */
   rateLimitNext(n: number, opts: { status?: 403 | 429; retryAfter?: number; resetInSeconds?: number; message?: string } = {}) {
     const headers: Record<string, string> = {};
@@ -100,6 +108,10 @@ export class FakeGitHub {
   /** The app is uninstalled or its key revoked: new installation tokens are refused. */
   breakAuth(on = true) {
     this.authBroken = on;
+  }
+  /** What the rules API says protects the branch. Pass 'error' to make that call fail. */
+  setRules(rules: { type: string; parameters?: unknown }[] | 'error') {
+    this.rules = rules;
   }
   setChecks(sha: string, checks: { name: string; status: string; conclusion: string | null }[]) {
     this.checks.set(sha, checks);
@@ -187,7 +199,7 @@ export class FakeGitHub {
       if (name === 'state') {
         return send(200, { pulls: this.pulls.map((p) => ({ number: p.number, head: p.head, headSha: p.headSha, merged: this.merged(p), closed: p.closed })), refWrites: this.refWrites().map((l) => (l.body as { ref: string }).ref), tokensIssued: this.tokensIssued, requests: this.log.length, nonGetMethods: [...new Set(this.log.map((l) => l.method))] });
       }
-      const allowed = ['expireTokens', 'failNext', 'dropNext', 'rateLimitNext', 'breakAuth', 'setChecks', 'setReviews', 'merge', 'close'] as const;
+      const allowed = ['expireTokens', 'failNext', 'dropNext', 'rateLimitNext', 'breakAuth', 'clearFaults', 'setRules', 'setChecks', 'setReviews', 'merge', 'close'] as const;
       if (!(allowed as readonly string[]).includes(name)) return send(404, { message: 'no such control' });
       try {
         (this as any)[name](...(Array.isArray(body.args) ? body.args : []));
@@ -238,6 +250,7 @@ export class FakeGitHub {
     const p = url.pathname.slice(base.length);
 
     let r: RegExpExecArray | null;
+    if (method === 'GET' && /^\/rules\/branches\/[^/]+$/.test(p)) return this.rules === 'error' ? send(500, { message: 'Server Error' }) : send(200, this.rules);
     if (method === 'GET' && (r = /^\/git\/ref\/(heads\/.+)$/.exec(p))) {
       const sha = this.git(['rev-parse', '--verify', `refs/${r[1]}`]);
       return sha.status === 0 ? send(200, { ref: `refs/${r[1]}`, object: { sha: sha.out, type: 'commit' } }) : send(404, { message: 'Not Found' });

@@ -1,11 +1,11 @@
 {
   "generatedBy": "harness/scripts/studio-inventory.mjs",
   "git": {
-    "head": "653ca8aff004a8f351b0816bd5ef41ce9c99699e",
-    "branch": "studio/impact-and-examiner",
-    "originMain": "62b0d87db66ef70e83f205a6e85b7a48804f20e3",
-    "commitsAheadOfOriginMain": 2,
-    "dirty": 11
+    "head": "4f4dd902f350a3511eb85648d6264fba71fef0df",
+    "branch": "studio/approval-writeback",
+    "originMain": "4f4dd902f350a3511eb85648d6264fba71fef0df",
+    "commitsAheadOfOriginMain": 0,
+    "dirty": 37
   },
   "sources": {},
   "counts": {

@@ -696,6 +696,69 @@ describe('ordering and availability', () => {
   });
 });
 /** Build a valid, signed event the way the service does, for tests that put events on the canonical branch directly. */
+describe('the merge policy of the canonical branch', () => {
+  const policy = (state: 'enforced' | 'partial' | 'absent' | 'unknown') => async () => ({ state, requiresPullRequest: state === 'absent' ? false : state === 'unknown' ? null : true, requiresStatusChecks: state === 'enforced', requiredChecks: [], blocksForcePush: null, branch: 'main', checkedAt: 'x', detail: `main is ${state}` });
+  const withPolicy = (state: Parameters<typeof policy>[0]) => {
+    const w = world();
+    w.svc.deps.mergePolicy = policy(state);
+    return w;
+  };
+  const was = process.env.STUDIO_MERGE_POLICY;
+  after(() => {
+    if (was === undefined) delete process.env.STUDIO_MERGE_POLICY;
+    else process.env.STUDIO_MERGE_POLICY = was;
+  });
+
+  it('refuses to send an approval when no rule requires a pull request, records the refusal, and writes nothing', async () => {
+    delete process.env.STUDIO_MERGE_POLICY;
+    const w = withPolicy('absent');
+    const d = makeDecision({ id: 'ADR-0110' });
+    const owner = await w.as(USERS.owner);
+    const remoteBefore = git(w.fx.remote, 'for-each-ref');
+    for (const action of ['approve', 'reject', 'defer', 'request-revision'] as const) {
+      await assert.rejects(w.submit(d, owner, action, { rationale: REASON }), code('merge-policy-absent'), action);
+    }
+    assert.equal(git(w.fx.remote, 'for-each-ref'), remoteBefore, 'nothing reached GitHub');
+    assert.equal(w.store.list().length, 0, 'no proposal was created');
+    assert.ok(w.store.readAudit({ decisionId: 'ADR-0110', limit: 10 }).some((a) => a.code === 'merge-policy-absent' && a.outcome === 'denied'));
+  });
+
+  it('still allows a comment, which changes no status', async () => {
+    delete process.env.STUDIO_MERGE_POLICY;
+    const w = withPolicy('absent');
+    const d = makeDecision({ id: 'ADR-0111' });
+    const owner = await w.as(USERS.owner);
+    const { proposal } = await w.submit(d, owner, 'comment', { comment: 'A note while the branch is unprotected.' });
+    assert.equal(proposal.state, 'locally-submitted');
+  });
+
+  it('lets an approval through when the policy is enforced, partial or could not be read', async () => {
+    delete process.env.STUDIO_MERGE_POLICY;
+    for (const s of ['enforced', 'partial', 'unknown'] as const) {
+      const w = withPolicy(s);
+      const owner = await w.as(USERS.owner);
+      const { proposal } = await w.submit(makeDecision({ id: 'ADR-0112' }), owner, 'approve');
+      assert.equal(proposal.state, 'locally-submitted', s);
+    }
+  });
+
+  it('warn mode shows the problem elsewhere but does not refuse, and the default is to refuse', async () => {
+    process.env.STUDIO_MERGE_POLICY = 'warn';
+    const w = withPolicy('absent');
+    const owner = await w.as(USERS.owner);
+    assert.equal((await w.submit(makeDecision({ id: 'ADR-0113' }), owner, 'approve')).proposal.state, 'locally-submitted');
+    delete process.env.STUDIO_MERGE_POLICY;
+    const w2 = withPolicy('absent');
+    await assert.rejects(w2.submit(makeDecision({ id: 'ADR-0113' }), await w2.as(USERS.owner), 'approve'), code('merge-policy-absent'));
+  });
+
+  it('is checked after who may act: an unauthorised person is told they may not, not that the branch is open', async () => {
+    delete process.env.STUDIO_MERGE_POLICY;
+    const w = withPolicy('absent');
+    const viewer = await w.as(USERS.outsider);
+    await assert.rejects(w.submit(makeDecision({ id: 'ADR-0114' }), viewer, 'approve'), (e: unknown) => e instanceof ServiceError && e.code !== 'merge-policy-absent');
+  });
+});
 function event(d: NormalizedDecision, seq: number, action: ActionKind, prevHash: string | null, extra: { rationale?: string; comment?: string; signed?: boolean; actor?: { login: string; id: number } } = {}): ReviewEvent {
   const who = extra.actor ?? { login: 'test-owner', id: 1001 };
   const body = {

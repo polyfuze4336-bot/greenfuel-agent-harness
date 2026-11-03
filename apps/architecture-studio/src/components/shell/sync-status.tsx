@@ -29,6 +29,7 @@ interface GitHubSync {
   repo: string | null;
   app: { appId: string; installationId: string; tokenExpiresAt: string | null; webhookConfigured: boolean } | null;
   rateLimit: { remaining: number | null; resetAt: string | null; limited: boolean } | null;
+  mergePolicy: { state: 'enforced' | 'partial' | 'absent' | 'unknown'; detail: string; checkedAt: string } | null;
   openProposals: { total: number; byState: Record<string, number> };
   lastReconcile: { at: string; trigger: string; checked: number; advanced: unknown[]; failures: { message: string }[]; orphans: { number: number; head: string }[]; orphanCheck: unknown } | null;
 }
@@ -98,6 +99,14 @@ function GitHubSyncPanel() {
             <Row k="Credential">
               App {s.app.appId}, installation {s.app.installationId}
               <span className="block text-ink-3">{s.app.tokenExpiresAt ? `Token renews before ${utcDateTime(s.app.tokenExpiresAt)}` : 'No token requested yet'} · webhook {s.app.webhookConfigured ? 'configured' : 'not configured'}</span>
+            </Row>
+          ) : null}
+          {s.mergePolicy ? (
+            <Row k="Merge policy">
+              <span data-testid="merge-policy" data-state={s.mergePolicy.state} className={s.mergePolicy.state === 'enforced' ? '' : 'font-medium text-[var(--s-open-fg)]'}>
+                {{ enforced: 'Enforced by GitHub', partial: 'Partly enforced', absent: 'Not enforced: approvals are not sent', unknown: 'Could not be read' }[s.mergePolicy.state]}
+              </span>
+              <span className="block text-ink-3">{s.mergePolicy.detail}</span>
             </Row>
           ) : null}
           {s.rateLimit ? <Row k="Rate limit">{s.rateLimit.limited ? 'Limited' : `${s.rateLimit.remaining ?? '?'} requests left`}{s.rateLimit.resetAt ? `, resets ${utcDateTime(s.rateLimit.resetAt)}` : ''}</Row> : null}
