@@ -1,0 +1,381 @@
+{
+  "when": "2026-11-04T06:03:19.323Z",
+  "base": "https://ca-gfstudio.redgrass-c48c30d5.southeastasia.azurecontainerapps.io",
+  "build": "2a65ef9",
+  "data": "2a65ef9",
+  "machine": {
+    "os": "Windows_NT 10.0.26300",
+    "cpus": 8,
+    "cpu": "Intel(R) Core(TM) Ultra 7 268V",
+    "memGB": 32
+  },
+  "browser": "Microsoft Edge (Chromium) 155.0.4283.62",
+  "network": "not throttled",
+  "runs": 3,
+  "pages": [
+    {
+      "url": "/",
+      "first": {
+        "url": "/",
+        "cold": true,
+        "wallMs": 1599,
+        "ttfbMs": 386,
+        "fcpMs": 764,
+        "lcpMs": 764,
+        "cls": 0,
+        "longTasks": 1,
+        "longTaskMs": 75,
+        "jsKB": 194,
+        "scripts": 12,
+        "totalKB": 222,
+        "consoleErrors": 0
+      },
+      "median": {
+        "wallMs": 1149,
+        "ttfbMs": 183,
+        "fcpMs": 424,
+        "lcpMs": 424,
+        "cls": 0,
+        "longTaskMs": 117,
+        "jsKB": 194,
+        "scripts": 12,
+        "totalKB": 226,
+        "consoleErrors": 0
+      }
+    },
+    {
+      "url": "/decisions",
+      "first": {
+        "url": "/decisions",
+        "cold": true,
+        "wallMs": 1458,
+        "ttfbMs": 217,
+        "fcpMs": 660,
+        "lcpMs": 660,
+        "cls": 0,
+        "longTasks": 1,
+        "longTaskMs": 76,
+        "jsKB": 213,
+        "scripts": 13,
+        "totalKB": 268,
+        "consoleErrors": 0
+      },
+      "median": {
+        "wallMs": 1210,
+        "ttfbMs": 158,
+        "fcpMs": 392,
+        "lcpMs": 668,
+        "cls": 0,
+        "longTaskMs": 128,
+        "jsKB": 213,
+        "scripts": 13,
+        "totalKB": 268,
+        "consoleErrors": 0
+      }
+    },
+    {
+      "url": "/decisions?id=ADR-0020",
+      "first": {
+        "url": "/decisions?id=ADR-0020",
+        "cold": true,
+        "wallMs": 1341,
+        "ttfbMs": 130,
+        "fcpMs": 360,
+        "lcpMs": 744,
+        "cls": 0.004,
+        "longTasks": 1,
+        "longTaskMs": 81,
+        "jsKB": 213,
+        "scripts": 13,
+        "totalKB": 285,
+        "consoleErrors": 0
+      },
+      "median": {
+        "wallMs": 1301,
+        "ttfbMs": 148,
+        "fcpMs": 320,
+        "lcpMs": 656,
+        "cls": 0.004,
+        "longTaskMs": 71,
+        "jsKB": 213,
+        "scripts": 13,
+        "totalKB": 285,
+        "consoleErrors": 0
+      }
+    },
+    {
+      "url": "/changes",
+      "first": {
+        "url": "/changes",
+        "cold": true,
+        "wallMs": 992,
+        "ttfbMs": 123,
+        "fcpMs": 312,
+        "lcpMs": 312,
+        "cls": 0,
+        "longTasks": 1,
+        "longTaskMs": 114,
+        "jsKB": 190,
+        "scripts": 12,
+        "totalKB": 228,
+        "consoleErrors": 0
+      },
+      "median": {
+        "wallMs": 1036,
+        "ttfbMs": 170,
+        "fcpMs": 376,
+        "lcpMs": 376,
+        "cls": 0,
+        "longTaskMs": 124,
+        "jsKB": 190,
+        "scripts": 12,
+        "totalKB": 224,
+        "consoleErrors": 0
+      }
+    },
+    {
+      "url": "/queue",
+      "first": {
+        "url": "/queue",
+        "cold": true,
+        "wallMs": 1082,
+        "ttfbMs": 91,
+        "fcpMs": 244,
+        "lcpMs": 244,
+        "cls": 0,
+        "longTasks": 1,
+        "longTaskMs": 87,
+        "jsKB": 218,
+        "scripts": 14,
+        "totalKB": 334,
+        "consoleErrors": 0
+      },
+      "median": {
+        "wallMs": 1076,
+        "ttfbMs": 80,
+        "fcpMs": 236,
+        "lcpMs": 236,
+        "cls": 0,
+        "longTaskMs": 131,
+        "jsKB": 218,
+        "scripts": 14,
+        "totalKB": 337,
+        "consoleErrors": 0
+      }
+    },
+    {
+      "url": "/presentation",
+      "first": {
+        "url": "/presentation",
+        "cold": true,
+        "wallMs": 1222,
+        "ttfbMs": 163,
+        "fcpMs": 380,
+        "lcpMs": 680,
+        "cls": 0,
+        "longTasks": 2,
+        "longTaskMs": 143,
+        "jsKB": 192,
+        "scripts": 12,
+        "totalKB": 232,
+        "consoleErrors": 0
+      },
+      "median": {
+        "wallMs": 1117,
+        "ttfbMs": 89,
+        "fcpMs": 284,
+        "lcpMs": 576,
+        "cls": 0,
+        "longTaskMs": 65,
+        "jsKB": 192,
+        "scripts": 12,
+        "totalKB": 233,
+        "consoleErrors": 0
+      }
+    },
+    {
+      "url": "/presentation/deck",
+      "first": {
+        "url": "/presentation/deck",
+        "cold": true,
+        "wallMs": 2228,
+        "ttfbMs": 179,
+        "fcpMs": 320,
+        "lcpMs": 320,
+        "cls": 0,
+        "longTasks": 0,
+        "longTaskMs": 0,
+        "jsKB": 198,
+        "scripts": 12,
+        "totalKB": 248,
+        "consoleErrors": 0
+      },
+      "median": {
+        "wallMs": 1255,
+        "ttfbMs": 152,
+        "fcpMs": 300,
+        "lcpMs": 300,
+        "cls": 0,
+        "longTaskMs": 0,
+        "jsKB": 198,
+        "scripts": 12,
+        "totalKB": 248,
+        "consoleErrors": 0
+      }
+    },
+    {
+      "url": "/baseline",
+      "first": {
+        "url": "/baseline",
+        "cold": true,
+        "wallMs": 1065,
+        "ttfbMs": 78,
+        "fcpMs": 200,
+        "lcpMs": 200,
+        "cls": 0,
+        "longTasks": 1,
+        "longTaskMs": 56,
+        "jsKB": 193,
+        "scripts": 12,
+        "totalKB": 229,
+        "consoleErrors": 0
+      },
+      "median": {
+        "wallMs": 962,
+        "ttfbMs": 76,
+        "fcpMs": 240,
+        "lcpMs": 240,
+        "cls": 0,
+        "longTaskMs": 0,
+        "jsKB": 193,
+        "scripts": 12,
+        "totalKB": 231,
+        "consoleErrors": 0
+      }
+    }
+  ],
+  "api": [
+    {
+      "path": "/api/v1/version",
+      "status": 200,
+      "kb": 0,
+      "firstMs": 80,
+      "medianMs": 19,
+      "maxMs": 58
+    },
+    {
+      "path": "/api/v1/freshness",
+      "status": 200,
+      "kb": 0,
+      "firstMs": 21,
+      "medianMs": 18,
+      "maxMs": 29
+    },
+    {
+      "path": "/api/v1/overview",
+      "status": 200,
+      "kb": 59,
+      "firstMs": 28,
+      "medianMs": 21,
+      "maxMs": 24
+    },
+    {
+      "path": "/api/v1/decisions",
+      "status": 200,
+      "kb": 433,
+      "firstMs": 55,
+      "medianMs": 41,
+      "maxMs": 204
+    },
+    {
+      "path": "/api/v1/decisions/ADR-0020",
+      "status": 200,
+      "kb": 11,
+      "firstMs": 27,
+      "medianMs": 20,
+      "maxMs": 22
+    },
+    {
+      "path": "/api/v1/decisions/ADR-0020/impact",
+      "status": 200,
+      "kb": 9,
+      "firstMs": 37,
+      "medianMs": 32,
+      "maxMs": 70
+    },
+    {
+      "path": "/api/v1/queue",
+      "status": 200,
+      "kb": 618,
+      "firstMs": 55,
+      "medianMs": 50,
+      "maxMs": 96
+    },
+    {
+      "path": "/api/v1/changes",
+      "status": 200,
+      "kb": 9,
+      "firstMs": 25,
+      "medianMs": 20,
+      "maxMs": 118
+    },
+    {
+      "path": "/api/v1/baseline",
+      "status": 200,
+      "kb": 88,
+      "firstMs": 32,
+      "medianMs": 36,
+      "maxMs": 45
+    },
+    {
+      "path": "/api/v1/search?q=residency",
+      "status": 200,
+      "kb": 5,
+      "firstMs": 37,
+      "medianMs": 23,
+      "maxMs": 55
+    },
+    {
+      "path": "/api/v1/deck",
+      "status": 200,
+      "kb": 94,
+      "firstMs": 62,
+      "medianMs": 99,
+      "maxMs": 105
+    }
+  ],
+  "interactions": [
+    {
+      "label": "search narrows the register (58 rows)",
+      "ms": 178
+    },
+    {
+      "label": "open a decision from the register",
+      "ms": 186
+    },
+    {
+      "label": "client navigation Decisions to Changes (no reload)",
+      "ms": 471
+    },
+    {
+      "label": "client navigation Changes to Overview",
+      "ms": 855
+    },
+    {
+      "label": "same document after navigating (no full reload)",
+      "ms": 0
+    },
+    {
+      "label": "open the \"why this is here\" drawer",
+      "ms": 46
+    }
+  ],
+  "links": {
+    "checked": 70,
+    "broken": []
+  },
+  "refresh": {
+    "status": 200,
+    "ms": 29
+  }
+}

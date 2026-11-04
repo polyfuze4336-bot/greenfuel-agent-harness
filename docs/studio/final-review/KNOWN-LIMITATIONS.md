@@ -1,6 +1,6 @@
 # Known limitations and remaining issues
 
-Honest list as of the final review, build `cc98446` plus the review fixes. Ordered by how much each one matters to getting the architecture to an approved build.
+Honest list as of the final review, deployed build `2a65ef9` (the review fixes are live on Azure and local). Ordered by how much each one matters to getting the architecture to an approved build.
 
 ## Blocks the end-to-end journey (needs the owner)
 
@@ -19,7 +19,7 @@ Until L1 is cleared, treat the review-to-readiness journey as **verified in a fa
 | L4 | **Medium.** An ADR edited after it was approved still shows *Approved* on the decision. Only an authorized baseline catches the edit. The fix changes the signed approval record, so it needs a decision |
 | L5 | Segregation of duties is off by owner decision, and one approver is enrolled, so one person can propose, approve and merge. The access policy pin is optional in Entra mode, and the GitHub merge-policy check does not block when the answer is `unknown` or `partial` |
 | L6 | The audit log accepts unauthenticated denial entries without a rate limit and is hash-chained, not signed or anchored |
-| L7 | The infrastructure template is outside the repository (owner decision), so it is not version-controlled and its fix is not in a commit. It was corrected to match the live app but **not applied**. No alert rules exist; monitoring is logs only |
+| L7 | The infrastructure templates (`main.bicep`, `alerts.bicep`, `build-image.ps1`) are outside the repository (owner decision), so they are not version-controlled. `main.bicep` was corrected to match the live app but **not applied**. One availability alert (`alert-gfstudio-no-replica`, owner-approved 2026-11-04, emails the owner when the single replica is gone for 5 minutes) is deployed; there is no webhook, no latency or error-rate alert, and no Key Vault |
 
 ## Performance (see [PERFORMANCE-REPORT](PERFORMANCE-REPORT.md))
 
@@ -29,7 +29,7 @@ Until L1 is cleared, treat the review-to-readiness journey as **verified in a fa
 | L9 | A dirty working tree makes the laptop rebuild on every edit, because the repository fingerprint includes it. The Azure container has none. Measure on a clean tree |
 | L10 | The queue response is about 635 KB of JSON (93 KB gzipped) because the whole queue is sent at once. It is not paged |
 | L11 | Browser tests are not part of CI, and PowerPoint rendering cannot run on a hosted runner |
-| L12 | **Lighthouse mobile misses the 90 target on Azure (80–87)**; desktop scores 100. The cost is JavaScript execution time under a 4× CPU slowdown. Scores on another network, device or region will differ |
+| L12 | **Lighthouse mobile misses the 90 target on Azure (79–93, five of six pages below 90)**, measured again after the fixes were deployed; desktop scores 100. The cost is JavaScript execution time under a 4× CPU slowdown. Scores on another network, device or region will differ |
 
 ## Product
 
@@ -44,4 +44,19 @@ Until L1 is cleared, treat the review-to-readiness journey as **verified in a fa
 
 ## Not done in this review, on purpose
 
-No new features were added. Nothing was added to the Azure subscription. An alert rule or a Key Vault would be a new billable resource and needs approval.
+No new features were added. The only Azure change after the review was the owner-approved availability alert (one metric alert rule and one email action group). A Key Vault would be a new billable resource and needs approval.
+
+## Security findings: committed summary
+
+| # | Severity | File | Lines | Vulnerability | Confidence | State |
+|---|----------|------|-------|---------------|------------|-------|
+| 1 | 🟡 MEDIUM | workflow/review.ts, workflow/overlay.ts | 355; 19-35 | Approval not re-bound to later ADR text edits | 8/10 | Open (L4) |
+| 2 | ⚪ LOW | api/v1/register/sync/route.ts | 19 | Anonymous write to the shared baseline | 9/10 | Fixed, live on Azure (403) |
+| 3 | ⚪ LOW | api/v1/sync/reconcile/route.ts; review/proposals/[pid]/sync/route.ts | 13; 12 | Missing role check on GitHub write-back | 9/10 | Fixed, live on Azure (401 anonymous) |
+
+## For the owner to complete L1 (a real approval)
+
+1. Grant administrator consent for the Entra app registration `greenfuel-architecture-studio` (or sign in with an administrator account on the consent prompt).
+2. Provide an Ed25519 signing key and the GitHub App credentials to a **local** Studio (see [USER-GUIDE](USER-GUIDE.md) and `docs/architecture-studio/`); the Azure site stays read-only.
+3. Sign in, open ADR-0020, compare the options, and approve or reject it yourself. I will not do this for you.
+4. Then ask for the baseline authorization and the deck from the approved baseline.
