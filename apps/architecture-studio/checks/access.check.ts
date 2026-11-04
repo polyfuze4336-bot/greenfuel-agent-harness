@@ -459,6 +459,18 @@ describe('who may approve, and how recently they proved it', () => {
     assert.equal(pub.devApprovals, false, 'no development approvals without a sign-in');
     assert.equal(pub.secureCookies, false);
   });
+  it('a server told to answer on other hosts never falls back to the development sign-in', async () => {
+    const { readAuthConfig } = await import('../src/lib/auth/config.ts');
+    for (const asked of [undefined, '', 'public', 'github-dev']) {
+      const c = readAuthConfig({ STUDIO_ALLOWED_HOSTS: 'studio.example.com', ...(asked === undefined ? {} : { STUDIO_AUTH_MODE: asked }), STUDIO_ALLOW_DEV_APPROVALS: '1' });
+      assert.equal(c.mode, 'public-readonly', `mode ${JSON.stringify(asked)} with an allowed host`);
+      assert.equal(c.devApprovals, false);
+    }
+    assert.equal(readAuthConfig({ STUDIO_ALLOWED_HOSTS: ' , ' }).mode, 'github-dev', 'blank entries are not a host');
+    assert.equal(readAuthConfig({}).mode, 'github-dev', 'on a laptop the default is unchanged');
+    const entra = readAuthConfig({ STUDIO_ALLOWED_HOSTS: 'studio.example.com', STUDIO_AUTH_MODE: 'entra', STUDIO_ENTRA_TENANT_ID: TID, STUDIO_ENTRA_CLIENT_ID: 'c', STUDIO_ENTRA_CLIENT_SECRET_FILE: 'f', STUDIO_ENTRA_REDIRECT_URI: REDIRECT });
+    assert.equal(entra.mode, 'entra', 'an explicit Entra setting is kept');
+  });
   it('the sign-in scope is configurable but limited to openid, profile and email, and must include openid', async () => {
     const { readAuthConfig } = await import('../src/lib/auth/config.ts');
     const base = { STUDIO_AUTH_MODE: 'entra', STUDIO_ENTRA_TENANT_ID: TID, STUDIO_ENTRA_CLIENT_ID: 'c', STUDIO_ENTRA_CLIENT_SECRET_FILE: 'f', STUDIO_ENTRA_REDIRECT_URI: REDIRECT };

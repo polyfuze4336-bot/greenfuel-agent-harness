@@ -14,7 +14,7 @@ import { makeAcceptanceWorld } from './checks/fixtures/acceptance-world.ts';
 //   3102  adds a 700 ms delay to repository reads (test-only), to prove the loading skeletons
 //   3103  TEST MODE against a throw-away clone with a local bare "GitHub" remote, a simulated pull-request service and test
 //         identities, to exercise the whole decision-review workflow without touching the real repository or GitHub
-const serve = (port: number, env: Record<string, string> = {}) => ({ command: `npx next start --hostname localhost --port ${port}`, port, reuseExistingServer: false, timeout: 120_000, env: { STUDIO_CACHE_DIR: path.join(os.tmpdir(), `studio-e2e-cache-${process.pid}-${port}`), ...env }, gracefulShutdown: { signal: 'SIGTERM' as const, timeout: 3000 } });
+const serve = (port: number, env: Record<string, string> = {}) => ({ command: `npx next start --hostname localhost --port ${port}`, port, reuseExistingServer: false, timeout: 120_000, env: { STUDIO_CACHE_DIR: path.join(os.tmpdir(), `studio-e2e-cache-${process.pid}-${port}`), STUDIO_WARM: '0', ...env }, gracefulShutdown: { signal: 'SIGTERM' as const, timeout: 3000 } });
 
 // The fixture is created once, by the process that loads this file first; workers inherit the folder through the environment.
 const reviewDir = (process.env.STUDIO_E2E_REVIEW_DIR ??= fs.mkdtempSync(path.join(os.tmpdir(), 'studio-e2e-review-')));
@@ -61,6 +61,8 @@ export default defineConfig({
   projects: [{ name: 'desktop', use: { ...devices['Desktop Edge'], channel: 'msedge', viewport: { width: 1440, height: 900 } } }],
   webServer: [
     serve(3100),
+    // The read-only deployment, as it runs on Azure: no sign-in is possible and nothing shared may be written.
+    serve(3111, { STUDIO_AUTH_MODE: 'public-readonly' }),
     serve(3108, { STUDIO_REPO_ROOT: path.join(accDir, 'work'), STUDIO_TEST_MODE: '1', STUDIO_TEST_FIXTURE_DIR: path.join(accDir, 'state'), STUDIO_TEST_REMOTE_GIT_DIR: path.join(accDir, 'origin.git'), STUDIO_CACHE_DIR: path.join(accDir, 'cache'), STUDIO_ALLOW_DEV_APPROVALS: '1' }),
     serve(3101, { STUDIO_REF: 'no-such-ref-for-error-test' }),
     serve(3102, { STUDIO_E2E_DELAY_MS: '700' }),

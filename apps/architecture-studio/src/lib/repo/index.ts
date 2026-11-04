@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { GitRepositoryAdapter, GitError, repositoryFingerprint, validateRef } from './git.ts';
+import { GitRepositoryAdapter, GitError, repositoryState, validateRef } from './git.ts';
 import { buildModel } from './build.ts';
 import { FileStateStore, type FragmentCache } from '../intel/engine.ts';
 import { applyReviewOverlay } from '../workflow/overlay.ts';
@@ -69,14 +69,17 @@ export async function getModel(opts: { fresh?: boolean } = {}): Promise<StudioMo
   const hit = shared.__studioModel;
   const now = Date.now();
   if (!opts.fresh && hit && hit.key === key && now - hit.checkedAt < CHECK_MS) return hit.model;
-  const fp = await repositoryFingerprint(repoRoot());
+  const st = await repositoryState(repoRoot());
+  const fetchedAt = st.fetchMtimeMs === null ? null : new Date(st.fetchMtimeMs).toISOString();
   // Re-read the cache after the await: another request may have rebuilt for this same fingerprint in the meantime.
   const cur = shared.__studioModel;
-  if (!opts.fresh && cur && cur.key === key && cur.fp === fp) {
+  if (!opts.fresh && cur && cur.key === key && cur.fp === st.fp) {
     cur.checkedAt = Date.now();
+    // The clone fetches on a timer, so "last fetch" moves even when GitHub had nothing new. That is one field, not a reason to rebuild.
+    if (cur.model.repo.lastFetchAt !== fetchedAt) cur.model.repo.lastFetchAt = fetchedAt;
     return cur.model;
   }
   const model = withReviews(buildModel(openAdapter(), fragmentCache));
-  shared.__studioModel = { key, fp, checkedAt: Date.now(), model };
+  shared.__studioModel = { key, fp: st.fp, checkedAt: Date.now(), model };
   return model;
 }

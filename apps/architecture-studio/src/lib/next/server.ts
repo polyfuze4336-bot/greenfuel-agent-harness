@@ -100,18 +100,31 @@ export interface NextView {
   freshness: Freshness;
 }
 
-const memo = globalThis as unknown as { __studioNext?: { key: string; at: number; view: NextView } };
-const MEMO_MS = 2000;
+const memo = globalThis as unknown as { __studioNext?: { key: string; at: number; view: Promise<NextView> } };
+/** A safety bound only. The key, not the clock, decides whether the answer is still right. */
+const MEMO_MS = 60_000;
 
-/** The same facts give the same answer, so a burst of requests (the page, its drawer, the API) shares one run. */
+/**
+ * The same facts give the same answer. The facts are the commit being read, who is asking, and the state of every change in flight, so a
+ * visit costs a lookup until one of them moves; a webhook or a refresh also clears it. Requests that arrive while one is being computed
+ * share that run. The freshness line is not part of the answer, because it changes with the clock, and is read each time.
+ */
 export async function getNextView(session: Session | null): Promise<NextView> {
+  const m = await getModel();
   const proposals = runtime().service.deps.store.list().map((p) => `${p.id}:${p.state}:${p.updatedAt}`).join(',');
-  const key = `${session?.user.provider ?? ''}:${session?.user.subject ?? ''}|${proposals}`;
+  const key = `${m.repo.commit}|${session?.user.provider ?? ''}:${session?.user.subject ?? ''}|${proposals}`;
   const hit = memo.__studioNext;
-  if (hit && hit.key === key && Date.now() - hit.at < MEMO_MS) return { ...hit.view, freshness: await freshness() };
-  const view = await buildNextView(session);
-  memo.__studioNext = { key, at: Date.now(), view };
-  return view;
+  let pending: Promise<NextView>;
+  if (hit && hit.key === key && Date.now() - hit.at < MEMO_MS) pending = hit.view;
+  else {
+    pending = buildNextView(session);
+    const entry = { key, at: Date.now(), view: pending };
+    memo.__studioNext = entry;
+    // A failed run must not be served again.
+    pending.catch(() => memo.__studioNext === entry && (memo.__studioNext = undefined));
+  }
+  const view = await pending;
+  return { ...view, freshness: await freshness() };
 }
 
 async function buildNextView(session: Session | null): Promise<NextView> {  const rt = runtime();

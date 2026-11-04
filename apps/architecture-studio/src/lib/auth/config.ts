@@ -43,7 +43,11 @@ export function readAuthConfig(env: Record<string, string | undefined> = process
   const requireEntra = env.STUDIO_REQUIRE_ENTRA?.trim() === '1';
   const asked = env.STUDIO_AUTH_MODE?.trim().toLowerCase();
   // Entra wins over everything else, so STUDIO_REQUIRE_ENTRA=1 can never be weakened by a second setting.
-  const mode: AuthMode = requireEntra || asked === 'entra' ? 'entra' : asked === 'public-readonly' ? 'public-readonly' : 'github-dev';
+  const asked_mode: AuthMode = requireEntra || asked === 'entra' ? 'entra' : asked === 'public-readonly' ? 'public-readonly' : 'github-dev';
+  // The dev sign-in signs a caller in as whoever runs the server. That is right on a laptop and wrong anywhere else, so a server that has been
+  // told to answer on other hosts never uses it: an unset or mistyped mode there means read-only, not open.
+  const answersElsewhere = (env.STUDIO_ALLOWED_HOSTS ?? '').split(',').some((h) => h.trim() !== '');
+  const mode: AuthMode = asked_mode === 'github-dev' && answersElsewhere ? 'public-readonly' : asked_mode;
   const cacheDir = env.STUDIO_CACHE_DIR?.trim() || path.resolve(process.cwd(), '.studio-cache');
   const problems: string[] = [];
   let entra: EntraConfig | null = null;
@@ -78,7 +82,7 @@ export function readAuthConfig(env: Record<string, string | undefined> = process
 
 const g = globalThis as unknown as { __studioAuthConfig?: { key: string; cfg: AuthConfig }; __studioTrust?: { key: string; trust: Trust }; __studioAuthOverride?: Partial<AuthConfig> | null; __studioTrustOverride?: Trust | null };
 
-const ENV_KEYS = ['STUDIO_AUTH_MODE', 'STUDIO_REQUIRE_ENTRA', 'STUDIO_ENTRA_SCOPE', 'STUDIO_ENTRA_TENANT_ID', 'STUDIO_ENTRA_CLIENT_ID', 'STUDIO_ENTRA_CLIENT_SECRET_FILE', 'STUDIO_ENTRA_REDIRECT_URI', 'STUDIO_ENTRA_AUTHORITY', 'STUDIO_ACCESS_POLICY_SHA256', 'STUDIO_ALLOW_DEV_APPROVALS', 'STUDIO_CACHE_DIR', 'STUDIO_SIGNING_KEY_FILE', 'STUDIO_TRUSTED_SIGNING_KEYS_FILE'];
+const ENV_KEYS = ['STUDIO_AUTH_MODE', 'STUDIO_REQUIRE_ENTRA', 'STUDIO_ALLOWED_HOSTS', 'STUDIO_ENTRA_SCOPE', 'STUDIO_ENTRA_TENANT_ID', 'STUDIO_ENTRA_CLIENT_ID', 'STUDIO_ENTRA_CLIENT_SECRET_FILE', 'STUDIO_ENTRA_REDIRECT_URI', 'STUDIO_ENTRA_AUTHORITY', 'STUDIO_ACCESS_POLICY_SHA256', 'STUDIO_ALLOW_DEV_APPROVALS', 'STUDIO_CACHE_DIR', 'STUDIO_SIGNING_KEY_FILE', 'STUDIO_TRUSTED_SIGNING_KEYS_FILE'];
 const envKey = () => ENV_KEYS.map((k) => process.env[k] ?? '').join('|');
 
 export function authConfig(): AuthConfig {

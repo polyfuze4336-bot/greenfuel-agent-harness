@@ -260,8 +260,9 @@ export function DecisionDetail({ d, lookup, duplicates = [], suggestions = [], t
         </Block>
       ) : null}
 
-      <Block title={FIELD_LABEL.description!}>{d.description ? <p className="text-[14px] leading-6 whitespace-pre-line text-ink"><RichText text={d.description} /></p> : <Missing />}</Block>
-      <Block title={FIELD_LABEL.businessJustification!}>{d.businessJustification ? <p className="text-[14px] leading-6 whitespace-pre-line text-ink"><RichText text={d.businessJustification} /></p> : <Missing />}</Block>
+      {/* On the review page the packet above already states these, so the embedded record leaves them out rather than repeat them. */}
+      {bare ? null : <Block title={FIELD_LABEL.description!}>{d.description ? <p className="text-[14px] leading-6 whitespace-pre-line text-ink"><RichText text={d.description} /></p> : <Missing />}</Block>}
+      {bare ? null : <Block title={FIELD_LABEL.businessJustification!}>{d.businessJustification ? <p className="text-[14px] leading-6 whitespace-pre-line text-ink"><RichText text={d.businessJustification} /></p> : <Missing />}</Block>}
 
       <Block title={FIELD_LABEL.recommendedOption!}>
         {d.recommendedOption ? (
@@ -310,12 +311,15 @@ export function DecisionDetail({ d, lookup, duplicates = [], suggestions = [], t
         </dl>
       </Block>
 
-      <Block title="Dependencies">
-        <p className="mb-1.5 text-[12.5px] text-ink-3">Cites</p>
-        <RefChips ids={d.dependsOn} lookup={lookup} empty="Cites no other decision." />
-        <p className="mt-3 mb-1.5 text-[12.5px] text-ink-3">Cited by</p>
-        <RefChips ids={d.dependedOnBy} lookup={lookup} empty="No decision cites this one." />
-      </Block>
+      {bare ? null : (
+        <Block title="Dependencies">
+          <p className="mb-1.5 text-[12.5px] text-ink-3">Cites</p>
+          <RefChips ids={d.dependsOn} lookup={lookup} empty="Cites no other decision." />
+          <p className="mt-3 mb-1.5 text-[12.5px] text-ink-3">Cited by</p>
+          <RefChips ids={d.dependedOnBy} lookup={lookup} empty="No decision cites this one." />
+        </Block>
+      )}
+      {bare ? null : (
       <Block title={`Blocking requirements (${d.blockingRequirements.length})`}>
         {d.blockingRequirements.length ? (
           <>
@@ -335,6 +339,8 @@ export function DecisionDetail({ d, lookup, duplicates = [], suggestions = [], t
           <Missing>No requirement is recorded as blocked by this decision.</Missing>
         )}
       </Block>
+      )}
+      {bare ? null : (
       <Block title={`Related requirements (${d.relatedRequirements.length})`} id="related-requirements">
         {d.relatedRequirements.length ? (
           <ul className="space-y-1.5" data-testid="related-requirements">
@@ -352,6 +358,7 @@ export function DecisionDetail({ d, lookup, duplicates = [], suggestions = [], t
           <Missing>No requirement is tied to this decision in any source.</Missing>
         )}
       </Block>
+      )}
       {d.invalidReferences.length ? (
         <Block title={`Invalid references (${d.invalidReferences.length})`} id="invalid-references">
           <ul className="space-y-2" data-testid="invalid-references">
@@ -575,7 +582,7 @@ export function DecisionDetail({ d, lookup, duplicates = [], suggestions = [], t
             </ul>
           </details>
         ) : null}
-        <SourceBlock src={d.source} label="Source link and history" />
+        {bare ? null : <SourceBlock src={d.source} label="Source link and history" />}
       </div>
         </div>
       ) : null}

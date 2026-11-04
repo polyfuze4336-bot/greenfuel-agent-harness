@@ -1,16 +1,19 @@
 import type { NextRequest } from 'next/server';
-import { guard, ok } from '@/lib/api.ts';
+import { guard, ok, problem } from '@/lib/api.ts';
+import { denial } from '@/lib/deck/auth.ts';
 import { invalidateModel } from '@/lib/repo/index.ts';
 import { invalidateQueue } from '@/lib/queue/server.ts';
 import { requireSession, runtime, serviceProblem } from '@/lib/workflow/http.ts';
 
 export const dynamic = 'force-dynamic';
 
-/** Move a proposal forward and report where it stands: push, open the pull request, or check whether it was merged. */
+/** Move a proposal forward and report where it stands: push, open the pull request, or check whether it was merged. Needs the permission to propose, because it writes to GitHub. */
 export function POST(req: NextRequest, ctx: { params: Promise<{ pid: string }> }) {
   return guard(async () => {
     const s = requireSession(req);
     if (s instanceof Response) return s;
+    const why = denial(req, 'propose');
+    if (why) return problem(403, 'Not permitted', why, 'forbidden');
     const { pid } = await ctx.params;
     try {
       const { service, work } = runtime();

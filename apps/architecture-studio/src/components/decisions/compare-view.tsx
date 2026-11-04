@@ -82,7 +82,8 @@ export function CompareView({ view, lookup }: { view: AlternativesView; lookup: 
           <p className="text-[12.5px] text-ink-3">Every cell is text from a source file. Nothing here is generated.</p>
         </div>
         <Card className="overflow-x-auto">
-          <table className="w-full min-w-[720px] border-collapse text-left" data-testid="compare-table">
+          {/* Equal columns, so every option is visible at once on a desktop; a narrower screen scrolls rather than squeezing a column to nothing. */}
+          <table className="w-full table-fixed border-collapse text-left" style={{ minWidth: 170 + shown.length * 210 }} data-testid="compare-table">
             <caption className="sr-only">Options side by side. The first column is the row label.</caption>
             <thead>
               <tr>
