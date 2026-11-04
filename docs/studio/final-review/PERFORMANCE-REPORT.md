@@ -13,7 +13,7 @@ Final review, 2026-11-04. Reproduce with `apps/architecture-studio/scripts/audit
 | Cache state | "cold" = new browser profile and cold HTTP cache; "warm" = median of 5 further loads with a warm server. A cold *server* is stated where it matters | |
 | Working tree | clean. A dirty tree makes the laptop rebuild on every edit, so earlier "after" numbers taken while editing were discarded | none |
 | Lighthouse | 12.8.2, desktop preset, simulated throttling as Lighthouse applies it for that preset, one run per page | |
-| Not measured | Mobile Lighthouse, other regions, concurrent users, a long soak | |
+| Not measured | Concurrent users, a long soak, a region other than Southeast Asia. Mobile Lighthouse was run on Azure only |
 
 **The laptop is the slow case.** Starting a git process on Windows costs far more than on Linux, and the Studio starts several per rebuild, so every laptop number below overstates what Azure does. The Azure numbers are the ones that matter for the deployed site, and the laptop numbers matter for the owner who decides on their own computer. The laptop also varied by a factor of 8 for the identical request during this review (a 6 s refresh took 48 s once while OneDrive and the browser were busy), so treat single figures as ±50 %.
 
@@ -64,6 +64,26 @@ Budgets were set before the final run, from what a person doing the review-to-ap
 
 The approval figures were measured against a GitHub stand-in on the same computer, so real GitHub adds network time and the check runs that must pass before a merge. They show the Studio's own work, not GitHub's.
 
+## Azure (measured on the site as deployed: build `cc98446`, **before** this review's fixes)
+
+Same script, browser and conditions as above, run from the laptop against the public URL (Southeast Asia, so about 20–60 ms of network). Raw data: [measurements](measurements/). Because this build has none of the fixes, it does not compress JSON and it has no start-up warm-up; the numbers are the baseline, and the fixes can only help (they are not deployed until the owner authorizes it).
+
+| Budget | Result | Verdict |
+|---|---|---|
+| Lighthouse Performance ≥ 90 (desktop preset) | **100** on all six pages; Accessibility 100; Best practices 100 | Pass |
+| **Lighthouse Performance ≥ 90 (mobile preset: slow 4G, 4× CPU)** | **80, 81, 82, 85, 86, 87**. Cause: script execution (total blocking time 485–755 ms under the 4× CPU slowdown) with about 200 KB of JavaScript. LCP 1.1–2.3 s | **Fail** |
+| JavaScript per page ≤ 250 KB | **190–218 KB** | Pass |
+| Time to first byte (warm) ≤ 1.0 s | **86–172 ms** (Lighthouse saw up to 0.9 s once on `/changes`) | Pass |
+| LCP ≤ 2.5 s | **0.22–0.76 s** warm | Pass |
+| CLS ≤ 0.1 | 0 to 0.019 | Pass |
+| API ≤ 1.0 s | **18–97 ms** median, every endpoint including the queue (51 ms) | Pass |
+| Search ≤ 300 ms / open a decision ≤ 1.5 s / client navigation ≤ 1.5 s | **166 ms** / **959 ms** / **0.36–0.43 s** | Pass |
+| First request after a replica start ≤ 5 s | **4.9 s** measured after a restart of this revision (no warm-up in this build) | Pass, barely; the warm-up removes it |
+| Payload on the wire | `/queue` page **865 KB**, because this build does not gzip JSON. With the fix about 350 KB | Pass (≤ 1 MB), improved by the fix |
+| Console errors / broken links | **0** / **0 of 74 checked** | Pass |
+
+**Reading the two sets together.** The deployed site is fast (desktop 100). On a phone-class device the JavaScript bundle (about 200 KB, React plus Next plus Radix) is the cost, and the budget is missed. Reducing it means splitting or deferring client code, which is a change in shape and was not made. The laptop's own slowness (process spawning on Windows) does not affect the deployed site.
+
 ## What this review changed, and the measured effect
 
 | Problem found | Change | Effect |
@@ -80,4 +100,4 @@ The approval figures were measured against a GitHub stand-in on the same compute
 * After a **new commit on GitHub** the first request pays a rebuild (about 5 s on Azure). A webhook rebuilds ahead of time but the 60-second fetch loop does not.
 * A refresh takes several seconds on the laptop because rebuilding the model starts many git processes. On Azure it is much faster (see below).
 * The presentation build is dominated by PowerPoint's render: 20 s without it, 32 s with it on an idle machine, and 170 s when the machine was busy.
-* Lighthouse mobile and a throttled run were not made.
+* Lighthouse mobile was run on Azure only (it misses the 90 target there: 80–87), and no throttled run was made on the laptop.

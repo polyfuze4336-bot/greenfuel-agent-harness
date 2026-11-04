@@ -48,7 +48,8 @@ Everything up to that human step was rehearsed on the real decision (ADR-0020), 
 | Finding | Why not |
 |---|---|
 | **Medium:** an ADR edited after approval still shows *Approved* on the decision | The fix changes the signed approval record. Needs a decision ([SECURITY-REVIEW](SECURITY-REVIEW.md) #1) |
-| The queue API takes 1.4 s warm on the laptop; client navigation 1.4–1.6 s | A change in shape (paging or caching the serialized form), not a defect |
+| The queue API takes 1.4 s warm on the laptop; client navigation 1.4–1.6 s there | A change in shape (paging or caching the serialized form), not a defect. On Azure both are fast (queue 51 ms, navigation 0.4 s) |
+| **Lighthouse mobile preset scores 80–87 on Azure (target 90)** because of about 200 KB of JavaScript executing under a 4× CPU slowdown (desktop scores 100) | Reducing it means splitting or deferring client code, a change in shape. Reported as a miss |
 | Global search can rank an assumption above the decision for a topic word ("residency" returns assumption AS-009 first) | Ranking tuning is a feature decision |
 | *Challenge this decision* is both a button and a tab in the decision dialog | Deliberate shortcut requested earlier; harmless |
 | No alert rules on Azure | A billable resource; needs approval |
@@ -65,7 +66,8 @@ No redundant primary navigation (four destinations), no unnecessary modals (the 
 | Unit and type check (`npm run check`) | **563 of 563** |
 | Journey, review to readiness, in a stand-in world (`journey.spec.ts`) | **30 of 30** |
 | Final-code browser run: hardening, journey, deck builder, destinations, accessibility and responsive, states, shell, polish, impact and examiner (168 tests, 30 min) | **167 passed, 1 failed.** The failure is a build-identity test rejecting the label `f86ef67+model` that I put on my local build; the test is right, the deployed build id is the plain commit hash |
-| Lighthouse (desktop) | Performance **92–100**, Accessibility **100**, Best practices **100** on six pages |
+| Lighthouse (desktop, local laptop) | Performance **92–100**, Accessibility **100**, Best practices **100** on six pages |
+| Lighthouse (Azure, as deployed) | desktop **100 / 100 / 100**; **mobile preset 80–87 for Performance (misses 90)**, Accessibility and Best practices 100 |
 | axe on ten journeys | **0 violations**; 0 console errors; 0 horizontal overflow at 390 px |
 
 The wider browser suite (332 tests) is long and was disturbed by the laptop sleeping overnight and by machine load. In the first full run of this review code 291 passed and 5 failed, of which two were network-socket resets, two were timing assertions and one was the read-only tour. Later, two tests failed repeatedly: `readonly.spec.ts` ("Repository re-read") and one in `work-queue.spec.ts`. **Both fail identically on the code from before this review's changes**, run side by side on the same machine at the same time, so they are environmental, not regressions. They passed earlier on a quieter machine. The first is an 8 s assertion against a refresh that took 6–48 s that day. Browser tests are not part of CI.

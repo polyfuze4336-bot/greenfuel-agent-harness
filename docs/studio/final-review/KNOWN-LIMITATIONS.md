@@ -29,7 +29,7 @@ Until L1 is cleared, treat the review-to-readiness journey as **verified in a fa
 | L9 | A dirty working tree makes the laptop rebuild on every edit, because the repository fingerprint includes it. The Azure container has none. Measure on a clean tree |
 | L10 | The queue response is about 635 KB of JSON (93 KB gzipped) because the whole queue is sent at once. It is not paged |
 | L11 | Browser tests are not part of CI, and PowerPoint rendering cannot run on a hosted runner |
-| L12 | Lighthouse was run with the test conditions stated in the report. Scores on another network, device or region will differ |
+| L12 | **Lighthouse mobile misses the 90 target on Azure (80–87)**; desktop scores 100. The cost is JavaScript execution time under a 4× CPU slowdown. Scores on another network, device or region will differ |
 
 ## Product
 
