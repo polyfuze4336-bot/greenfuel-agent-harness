@@ -64,7 +64,7 @@ Budgets were set before the final run, from what a person doing the review-to-ap
 
 The approval figures were measured against a GitHub stand-in on the same computer, so real GitHub adds network time and the check runs that must pass before a merge. They show the Studio's own work, not GitHub's.
 
-## Azure (measured on the site as deployed: build `cc98446`, **before** this review's fixes)
+## Azure before the fixes (build `cc98446`)
 
 Same script, browser and conditions as above, run from the laptop against the public URL (Southeast Asia, so about 20–60 ms of network). Raw data: [measurements](measurements/). Because this build has none of the fixes, it does not compress JSON and it has no start-up warm-up; the numbers are the baseline, and the fixes can only help (they are not deployed until the owner authorizes it).
 
@@ -83,6 +83,23 @@ Same script, browser and conditions as above, run from the laptop against the pu
 | Console errors / broken links | **0** / **0 of 74 checked** | Pass |
 
 **Reading the two sets together.** The deployed site is fast (desktop 100). On a phone-class device the JavaScript bundle (about 200 KB, React plus Next plus Radix) is the cost, and the budget is missed. Reducing it means splitting or deferring client code, which is a change in shape and was not made. The laptop's own slowness (process spawning on Windows) does not affect the deployed site.
+
+## Azure after deploying the fixes (build `2a65ef9`, revision `ca-gfstudio--0000013`)
+
+Same script and conditions. Raw data: `measurements/audit-azure-2a65ef9.json` and `measurements/lh-azure-2a65ef9/`.
+
+| Budget | Result | Verdict |
+|---|---|---|
+| Lighthouse Performance ≥ 90 (desktop) | **100** on all six pages; Accessibility 100; Best practices 100 | Pass |
+| **Lighthouse Performance ≥ 90 (mobile)** | **79, 80, 82, 83, 84, 93** (Overview 93, the rest below 90). Total blocking time 303–862 ms. Not changed by the fixes, as expected: they address the server, not client script | **Fail** (L12 stays open) |
+| JavaScript per page ≤ 250 KB | 190–218 KB | Pass |
+| API ≤ 1.0 s | 18–99 ms median; queue 50 ms | Pass |
+| Payload on the wire | `/api/v1/queue` **92.6 KB** gzipped (was 618 KB) | Pass, improved |
+| Search / open a decision / client navigation | 178 ms / 186 ms / 0.47–0.86 s | Pass |
+| Console errors / broken links | 0 / 0 of 70 | Pass |
+| Fixes live | `POST /register/sync` → 403 `read-only`; `POST /sync/reconcile` anonymous → 401 | Verified |
+
+Mobile is therefore the one performance budget still missed on the deployed site.
 
 ## What this review changed, and the measured effect
 
