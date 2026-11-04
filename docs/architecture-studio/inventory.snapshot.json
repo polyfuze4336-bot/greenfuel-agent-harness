@@ -1,11 +1,11 @@
 {
   "generatedBy": "harness/scripts/studio-inventory.mjs",
   "git": {
-    "head": "dff92840d64e628bb2ce33fe97f40d72f2bce9dd",
-    "branch": "studio/presentation-studio",
-    "originMain": "870410b9de6716ea6b2f54c4b946382c8c689cfe",
-    "commitsAheadOfOriginMain": 4,
-    "dirty": 2
+    "head": "c987a792be51f189c3068bb61b31d6388ac64bc2",
+    "branch": "studio/final-review",
+    "originMain": "cc9844681987016b058596a7c82fc55ac604179f",
+    "commitsAheadOfOriginMain": 3,
+    "dirty": 3
   },
   "sources": {},
   "counts": {
@@ -2028,14 +2028,14 @@
       "fileCount": 1
     },
     "L": {
-      "distinctIds": 26,
+      "distinctIds": 39,
       "files": [
         "docs/acceptance/HARNESS-ACCEPTANCE-REPORT.md",
         "docs/architecture-studio/ACCESS-CONTROL.md",
         "docs/context/AGENT-AUTONOMY-MATRIX.md",
         "docs/design/ai/AGENTIC-AUTONOMY-DESIGN-RECORD.md"
       ],
-      "fileCount": 4
+      "fileCount": 5
     },
     "LV": {
       "distinctIds": 8,
@@ -2301,7 +2301,7 @@
     ".github": 3,
     ".mcp.json": 1,
     ".vscode": 2,
-    "apps": 415,
+    "apps": 417,
     "docs/architecture-studio": 5,
     "docs/azure": 2,
     "docs/business": 3,
@@ -2309,6 +2309,7 @@
     "docs/context": 1,
     "docs/evidence": 1,
     "docs/orchestration": 1,
+    "docs/studio": 5,
     "docs/studio-acceptance": 2,
     "evaluation": 2,
     "harness": 37,
