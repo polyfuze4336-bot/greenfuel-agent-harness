@@ -111,6 +111,7 @@ async function open(page: Page, url = '/') {
 }
 
 let csrf = '';
+const timing: { submitToPullRequestMs?: number; webhookToApprovedMs?: number } = {};
 let proposalId = '';
 let prNumber = 0;
 let mandatory = '';
@@ -251,8 +252,11 @@ test.describe('3. review, merge and the page follows GitHub', () => {
   test('submitting the approval changes nothing on the page except what is now waiting for a merge', async ({ page, request }) => {
     const before = await overview(request);
     const rv = ((await (await request.get(`/api/v1/review/${mandatory}`)).json()) as { view: { revision: string } }).view.revision;
+    const t0 = performance.now();
     const r = await request.post(`/api/v1/review/${mandatory}/actions`, { headers: { ...H, 'x-studio-csrf': csrf }, data: { action: 'approve', rationale: 'The phase 1a scope is a local synthetic-data slice.', expectedRevision: rv, idempotencyKey: `journey-${Date.now().toString(36)}-abcdef` } });
+    timing.submitToPullRequestMs = Math.round(performance.now() - t0);
     expect(r.status(), await r.text()).toBe(200);
+    expect(timing.submitToPullRequestMs, 'approval to an open pull request, against the stand-in').toBeLessThan(15_000);
     const p = ((await r.json()) as { proposal: { id: string; state: string; prNumber: number } }).proposal;
     expect(p.state).toBe('pull-request-created');
     proposalId = p.id;
@@ -287,9 +291,13 @@ test.describe('3. review, merge and the page follows GitHub', () => {
     const bad = await request.post('/api/v1/github/webhook', { headers: { 'content-type': 'application/json', 'x-github-event': 'pull_request', 'x-github-delivery': 'journey-bad-0001', 'x-hub-signature-256': signBody('wrong', raw) }, data: raw });
     expect(bad.status(), 'an unsigned delivery changes nothing').toBe(401);
     expect(await decisionStatus(request, mandatory)).not.toBe('Approved');
+    const t1 = performance.now();
     const good = await request.post('/api/v1/github/webhook', { headers: { 'content-type': 'application/json', 'x-github-event': 'pull_request', 'x-github-delivery': 'journey-good-0001', 'x-hub-signature-256': signBody(SECRET, raw) }, data: raw });
     expect(good.status()).toBe(200);
     expect(await decisionStatus(request, mandatory)).toBe('Approved');
+    timing.webhookToApprovedMs = Math.round(performance.now() - t1);
+    expect(timing.webhookToApprovedMs, 'a signed merge notification to the decision showing Approved').toBeLessThan(15_000);
+    fs.writeFileSync(process.env.STUDIO_E2E_TIMING_FILE ?? path.join(os.tmpdir(), 'studio-approval-timing.json'), JSON.stringify({ ...timing, note: 'against a GitHub stand-in on one computer; real GitHub adds network time' }, null, 2));
   });
 
   test('dependencies update: what was waiting on the decision is ready, the queue moves on, and readiness counts it', async ({ page, request }) => {

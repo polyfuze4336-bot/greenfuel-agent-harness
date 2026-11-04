@@ -85,7 +85,7 @@ An AI agent has no session, so it cannot approve a slide. The slide decision is 
 | 6 | Approve slides individually | `store.ts`: one slide at a time, no bulk, bound to the content hash | Done |
 | 7 | Select the visual type | Alternative visuals, offered only when they lose no information | Done |
 | 8 | Editable diagrams and charts | `draw.ts`, `visuals.ts`: native shapes, charts and tables | Done |
-| 9 | Add approved imagery | `assets.ts`: needs source, licence, a named approver and a matching hash | **No image is approved.** Original vector artwork is used (OQ-DECK-2) |
+| 9 | Add approved imagery | `assets.ts`: needs source, licence, a named approver and a matching hash | **No photograph is approved.** Original vector artwork is used, by the owner's decision of 2026-11-03 (OQ-DECK-2) |
 | 10 | Render previews | PowerPoint, 41 previews | Done on a Windows computer with PowerPoint |
 | 11 | Detect overflow and layout defects | `qa.ts`, reading PowerPoint's own measured layout | Done: 0 errors, 0 warnings on the sample |
 | 12 | Export PPTX and PDF | `/api/v1/deck/export/*`, served only if the file matches its recorded hash | Done |
@@ -183,7 +183,7 @@ The sample deck was built and rendered by Microsoft PowerPoint: 0 errors, 0 warn
 ## Decisions for the owner
 
 * **OQ-DECK-1:** the panel's time allocation, so slides can be cut to fit (the full deck is about 35 minutes if every slide is shown).
-* **OQ-DECK-2:** supply or approve a hero photograph and the official Azure icon set (with licence), or accept the vector artwork.
+* **OQ-DECK-2: decided by the owner, 2026-11-03 (instruction in chat).** *Accept the original vector artwork* for the capstone deck. This is a recorded decision, not an asset approval: nothing was added to `deck-assets/manifest.json`, because the vector artwork is built from shapes in the code and is not a licensed or supplied file. **For future change:** a licensed hero photograph and the official Azure icon set remain wanted. To adopt either, the owner supplies the file with its source and licence, a named person approves it in the manifest with the file's SHA-256, and the `hero` or `azure-*` slot in the deck starts using it with no code change (the manifest checks and their failure fallbacks are tested: 7 cases). Until then the title vessel, diagrams and labelled monogram tiles stay.
 * **OQ-DECK-3:** whether slide approvals should become signed records like the architecture approvals.
 * **OQ-DECK-4:** review the wording of slides E05, E08 and T11, where source text is shortened to fit.
 * Whether to push this work.

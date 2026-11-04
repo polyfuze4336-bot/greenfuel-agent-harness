@@ -27,7 +27,7 @@ export interface QueueRead {
   canonicalAvailable: boolean;
 }
 
-const shared = globalThis as unknown as { __studioQueue?: { key: string; read: QueueRead } | null };
+const shared = globalThis as unknown as { __studioQueue?: { key: string; read: QueueRead } | null; __studioQueuePending?: { key: string; p: Promise<QueueRead> } | null };
 
 export async function getQueue(): Promise<QueueRead> {
   const rt = runtime();
@@ -43,8 +43,20 @@ export async function getQueue(): Promise<QueueRead> {
   const key = [head, adapter?.commit ?? 'none', policy.source, policy.hash].join('|');
   const hit = shared.__studioQueue;
   if (hit?.key === key) return hit.read;
+  // One run per key. A request that arrives while the same snapshot is being built (a page, the API, a background rebuild after an
+  // invalidation) waits for that run instead of repeating several seconds of work.
+  const pending = shared.__studioQueuePending;
+  if (pending?.key === key) return pending.p;
+  const p = buildRead(key, head, adapter, ref, policy);
+  shared.__studioQueuePending = { key, p };
+  try {
+    return await p;
+  } finally {
+    if (shared.__studioQueuePending?.p === p) shared.__studioQueuePending = null;
+  }
+}
 
-  // The model also folds in merged review records from the canonical ref, so it is re-read whenever either commit changed.
+async function buildRead(key: string, head: string, adapter: GitRepositoryAdapter | null, ref: string, policy: ReturnType<ReturnType<typeof runtime>['service']['policy']>): Promise<QueueRead> {
   const model = await getModel({ fresh: true });
   const canonical: CanonicalWork = adapter
     ? { available: true, ref, commit: adapter.commit, error: null, states: loadWorkStates(adapter), adapter }
@@ -71,4 +83,8 @@ export async function getQueue(): Promise<QueueRead> {
 export function invalidateQueue() {
   shared.__studioQueue = null;
   (globalThis as unknown as { __studioNext?: unknown }).__studioNext = null;
+  // Rebuild in the background, so the person who acts next does not wait for it. It shares the work with any request that arrives meanwhile.
+  // STUDIO_WARM=0 turns it off (the test servers, which start many at once and would all rebuild together).
+  if (process.env.STUDIO_WARM === '0') return;
+  setTimeout(() => void import('../next/server.ts').then((m) => m.getNextView(null)).catch(() => undefined), 50).unref();
 }

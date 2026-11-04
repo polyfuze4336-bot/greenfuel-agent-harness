@@ -1,0 +1,221 @@
+{
+  "when": "2026-11-03T12:36:38.495Z",
+  "base": "http://localhost:3100",
+  "consoleErrors": [],
+  "results": [
+    {
+      "q": 1,
+      "answer": "Open the application and see what requires attention",
+      "ready": true,
+      "ms": 16610,
+      "nextAction": "Review ADR-0020",
+      "awaitingReview": "45",
+      "blockers": "14",
+      "firstScreenHasAction": true
+    },
+    {
+      "axe": "overview",
+      "violations": []
+    },
+    {
+      "q": 2,
+      "answer": "Find any decision within seconds",
+      "searches": [
+        {
+          "q": "tamper",
+          "ms": 913,
+          "results": 18,
+          "first": "ADR-0015 Jurisdiction-local, tamper-evident evidence ingestion by an edge hash-chained log"
+        },
+        {
+          "q": "residency",
+          "ms": 345,
+          "results": 22,
+          "first": "AS-009 Azure is the primary cloud platform, with edge or hybrid components where needed; a"
+        },
+        {
+          "q": "ADR-0016",
+          "ms": 334,
+          "results": 2,
+          "first": "ADR-0016 Sovereign evidence cells per jurisdiction with federated coordination ADR · Block"
+        },
+        {
+          "q": "D-009",
+          "ms": 840,
+          "results": 15,
+          "first": "D-009 Residency interpretation per port: legal source, and whether \"within jurisdiction\" c"
+        },
+        {
+          "q": "quality manager",
+          "ms": 342,
+          "results": 22,
+          "first": "AS-013 A quality manager exists for each port or entity with at least one deputy Assumptio"
+        }
+      ],
+      "openedUrl": "/decisions?id=ADR-0016"
+    },
+    {
+      "q": 3,
+      "answer": "Understand business and technical context",
+      "ms": 2860,
+      "sections": [
+        "Decision",
+        "Sovereign evidence cells per jurisdiction with federated coordination",
+        "Status, verbatim from the source",
+        "Description",
+        "Business justification",
+        "Recommended option",
+        "Alternative options (4)",
+        "Implications",
+        "Dependencies",
+        "Blocking requirements (10)",
+        "Related requirements (10)",
+        "Related ADRs, risks, tasks and reviews",
+        "People and dates",
+        "Approval history",
+        "Evidence references (2)",
+        "Rubric mapping (0)",
+        "Possible duplicates and overlaps",
+        "AI suggestions (2)",
+        "Not stated in any source",
+        "Source in the repository",
+        "Source link and history",
+        "Change history of this file, newest first"
+      ],
+      "wordsInPanel": 1722
+    },
+    {
+      "axe": "decision detail",
+      "violations": []
+    },
+    {
+      "q": 5,
+      "answer": "Challenge the proposed architecture",
+      "available": true,
+      "ms": 928,
+      "headline": "Proposed interpretation The comparison table records that the chosen option C does not meet \"Operational complexity\": Does not meet: one deployment and operatin",
+      "sections": [
+        "Viable alternatives 4 + 2 AI",
+        "Pros and cons 13 + 1 AI",
+        "Hidden assumptions 10 + 1 AI",
+        "Reliability and failure implications 6 + 1 AI",
+        "Security and compliance implications 7 + 1 AI",
+        "Cost and operational implications 2 + 1 AI",
+        "Five difficult panel questions 5 + 5 AI",
+        "Evidence needed to defend it 8 + 1 AI",
+        "Recommendation and its limits 3 + 1 AI"
+      ]
+    },
+    {
+      "q": 6,
+      "answer": "Understand the impact of approval or rejection",
+      "present": false
+    },
+    {
+      "q": 4,
+      "answer": "Compare alternatives without excessive reading",
+      "ms": 907,
+      "wordsOnPage": 996,
+      "columns": 20
+    },
+    {
+      "axe": "compare",
+      "violations": []
+    },
+    {
+      "q": 7,
+      "answer": "Approve or reject with minimal effort",
+      "ms": 1010,
+      "signedIn": false,
+      "mode": "github-dev",
+      "visibleControls": 3,
+      "buttons": [
+        "View this version",
+        "See the impact",
+        "Challenge this decision"
+      ]
+    },
+    {
+      "axe": "review",
+      "violations": []
+    },
+    {
+      "q": 8,
+      "answer": "Confirm GitHub was actually updated",
+      "ms": 1380,
+      "sections": [
+        "Sync failures",
+        "Pending GitHub pull requests",
+        "Decision history 10",
+        "Architecture baseline changes 0",
+        "Stale evidence 6",
+        "Affected tasks 0",
+        "Repository changes 10"
+      ],
+      "freshness": "From GitHub commit cc98446 · synced just now\nRefresh",
+      "pendingEmptyState": true
+    },
+    {
+      "axe": "changes",
+      "violations": []
+    },
+    {
+      "q": 9,
+      "answer": "Understand what blocks the build",
+      "ms": 724,
+      "headings": [
+        "What is blocking the build?"
+      ]
+    },
+    {
+      "axe": "blocking",
+      "violations": []
+    },
+    {
+      "q": 10,
+      "answer": "Generate an evidence-linked presentation",
+      "ms": 8171,
+      "slides": 41,
+      "gate": [
+        "An authorized, current architecture baseline exists",
+        "Every decision the deck presents is approved",
+        "Every claim is supported by a cited source",
+        "A person has approved every slide at its current content",
+        "The deck was rendered, measured by PowerPoint, and has no layout error",
+        "The sources are exactly the committed commit",
+        "Review placeholdersinformational",
+        "Delivery rehearsed by a personinformational"
+      ],
+      "buildButtonEnabled": false
+    },
+    {
+      "axe": "deck",
+      "violations": []
+    },
+    {
+      "responsive": "overview",
+      "horizontalOverflowPx": 0,
+      "controlsUnder24px": 6
+    },
+    {
+      "responsive": "decisions",
+      "horizontalOverflowPx": 0,
+      "controlsUnder24px": 13
+    },
+    {
+      "responsive": "changes",
+      "horizontalOverflowPx": 0,
+      "controlsUnder24px": 10
+    },
+    {
+      "responsive": "presentation",
+      "horizontalOverflowPx": 0,
+      "controlsUnder24px": 22
+    },
+    {
+      "responsive": "queue",
+      "horizontalOverflowPx": 0,
+      "controlsUnder24px": 4
+    }
+  ]
+}
