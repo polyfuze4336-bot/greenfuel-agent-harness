@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { describe, it, before } from 'node:test';
-import { GitRepositoryAdapter, repositoryFingerprint, validateRef } from '../src/lib/repo/git.ts';
+import { GitRepositoryAdapter, repositoryFingerprint, repositoryState, validateRef } from '../src/lib/repo/git.ts';
 import { buildModel } from '../src/lib/repo/build.ts';
 import { blockedReason, cells, parseAdr, parseRegister, parseTodo, tableRows } from '../src/lib/repo/parse.ts';
 import type { StudioModel } from '../src/lib/repo/types.ts';
@@ -199,6 +199,24 @@ describe('object caches and the repository fingerprint', () => {
     assert.notEqual(f3, f2, 'an uncommitted file changes it');
     fs.rmSync(path.join(tmp, 'dirty.txt'));
     assert.equal(await repositoryFingerprint(tmp), f2, 'removing it restores the earlier value');
+  });
+
+  it('keeps the fetch time apart: a fetch that brings nothing new moves the time, not the content fingerprint', async () => {
+    const before = await repositoryState(tmp);
+    const fh = path.join(tmp, '.git', 'FETCH_HEAD');
+    fs.writeFileSync(fh, '');
+    fs.utimesSync(fh, new Date(Date.now() - 120_000), new Date(Date.now() - 120_000));
+    const first = await repositoryState(tmp);
+    assert.ok(first.fetchMtimeMs !== null && first.fetchMtimeMs < Date.now() - 100_000);
+    fs.utimesSync(fh, new Date(), new Date());
+    const second = await repositoryState(tmp);
+    assert.equal(second.fp, first.fp, 'the content fingerprint does not move');
+    assert.ok(second.fetchMtimeMs! > first.fetchMtimeMs!, 'the fetch time does');
+    assert.ok((await repositoryFingerprint(tmp)).endsWith(String(second.fetchMtimeMs)), 'the combined fingerprint still ends with the fetch time');
+    commit('a.md', 'moved\n', 'new content');
+    assert.notEqual((await repositoryState(tmp)).fp, second.fp, 'new content does move it');
+    assert.equal(before.fetchMtimeMs, null, 'no fetch recorded before the first one');
+    fs.rmSync(fh);
   });
 
   it('never serves stale content: the cache is keyed by object id, so a changed file reads as changed', () => {

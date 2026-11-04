@@ -85,6 +85,16 @@ function spawnGit(root: string, args: string[], input?: Buffer | string): Buffer
  * ref point, how many files are uncommitted, and when the last fetch happened. Three git calls instead of a full rebuild.
  */
 export async function repositoryFingerprint(root: string): Promise<string> {
+  const s = await repositoryState(root);
+  return [s.fp, s.fetchMtimeMs === null ? 'none' : String(s.fetchMtimeMs)].join('\n--\n');
+}
+
+/**
+ * What the repository looks like, split in two: `fp` changes when the content a model would be built from changes (HEAD, any branch or remote
+ * ref, any uncommitted file), and `fetchMtimeMs` is when the clone last fetched. The fetch time changes every sync interval even when GitHub
+ * had nothing new, so it is kept apart: a cache keyed on `fp` is not rebuilt for it.
+ */
+export async function repositoryState(root: string): Promise<{ fp: string; fetchMtimeMs: number | null }> {
   // Fixed, read-only commands run concurrently and without blocking the event loop. Nothing here takes user input.
   const run = (args: string[]) =>
     new Promise<string>((resolve, reject) => {
@@ -96,13 +106,13 @@ export async function repositoryFingerprint(root: string): Promise<string> {
     run(['status', '--porcelain']),
     run(['rev-parse', '--git-common-dir']),
   ]);
-  let fetch = 'none';
+  let fetchMtimeMs: number | null = null;
   try {
-    fetch = String(fs.statSync(path.resolve(root, dir.trim(), 'FETCH_HEAD')).mtimeMs);
+    fetchMtimeMs = fs.statSync(path.resolve(root, dir.trim(), 'FETCH_HEAD')).mtimeMs;
   } catch {
     // No fetch has happened yet.
   }
-  return [head.trim(), refs, status, fetch].join('\n--\n');
+  return { fp: [head.trim(), refs, status].join('\n--\n'), fetchMtimeMs };
 }
 
 export class GitRepositoryAdapter {
