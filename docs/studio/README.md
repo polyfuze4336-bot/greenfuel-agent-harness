@@ -17,6 +17,8 @@ The Studio is a web application in [`apps/architecture-studio/`](../../apps/arch
 | Approve a decision | [APPROVAL-WORKFLOW-GUIDE](../studio-acceptance/APPROVAL-WORKFLOW-GUIDE.md) |
 | See how an approval reaches GitHub, how it is checked against GitHub, and what proves it | [APPROVAL-WRITEBACK](APPROVAL-WRITEBACK.md) |
 | See how the next best action, work queue, readiness and freshness are decided | [NEXT-BEST-ACTION](NEXT-BEST-ACTION.md) |
+| Use the Studio | [USER-GUIDE](final-review/USER-GUIDE.md) |
+| Read the final independent review: verdict, performance, security, architecture, limitations | [FINAL-REVIEW](final-review/FINAL-REVIEW.md), [PERFORMANCE-REPORT](final-review/PERFORMANCE-REPORT.md), [SECURITY-REVIEW](final-review/SECURITY-REVIEW.md), [ARCHITECTURE-SUMMARY](final-review/ARCHITECTURE-SUMMARY.md), [KNOWN-LIMITATIONS](final-review/KNOWN-LIMITATIONS.md) |
 
 ## Reference, by topic
 
@@ -36,4 +38,4 @@ The reports live in two older folders, `docs/architecture-studio/` and `docs/stu
 
 ## Status in one paragraph
 
-Acceptance-tested locally with synthetic data; **not deployed**; its approval workflow has **not yet been used for a real approval** (no approver key is enrolled). Phase A (performance, CI, console errors, documentation, ruleset) is in [PHASE-A-RESULTS](PHASE-A-RESULTS.md); Phase B (design-gate equivalence, harness bridge, smaller pages) is in [PHASE-B-RESULTS](PHASE-B-RESULTS.md). The Azure deployment is in [AZURE-DEPLOYMENT](../studio-acceptance/AZURE-DEPLOYMENT.md).
+Acceptance-tested with synthetic data and **deployed to Azure as a public read-only site** (`ca-gfstudio` in `rg-greenfuel-studio-sea`; see [ARCHITECTURE-SUMMARY](final-review/ARCHITECTURE-SUMMARY.md)). Its approval workflow has **not yet been used for a real approval**: the policy accepts approvals only from Microsoft Entra ID, the tenant still requires an administrator's consent for the Entra app, and no signing key or GitHub App credential is configured on any running Studio ([KNOWN-LIMITATIONS](final-review/KNOWN-LIMITATIONS.md) L1). Phase A (performance, CI, console errors, documentation, ruleset) is in [PHASE-A-RESULTS](PHASE-A-RESULTS.md); Phase B (design-gate equivalence, harness bridge, smaller pages) is in [PHASE-B-RESULTS](PHASE-B-RESULTS.md). The Azure deployment is in [AZURE-DEPLOYMENT](../studio-acceptance/AZURE-DEPLOYMENT.md).
