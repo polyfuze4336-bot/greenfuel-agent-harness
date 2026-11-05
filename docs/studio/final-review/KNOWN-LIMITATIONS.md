@@ -56,7 +56,9 @@ No new features were added. The only Azure change after the review was the owner
 
 ## For the owner to complete L1 (a real approval)
 
-1. Grant administrator consent for the Entra app registration `greenfuel-architecture-studio` (or sign in with an administrator account on the consent prompt).
-2. Provide an Ed25519 signing key and the GitHub App credentials to a **local** Studio (see [USER-GUIDE](USER-GUIDE.md) and `docs/architecture-studio/`); the Azure site stays read-only.
-3. Sign in, open ADR-0020, compare the options, and approve or reject it yourself. I will not do this for you.
-4. Then ask for the baseline authorization and the deck from the approved baseline.
+Status on 2026-11-05 (see TODO T70):
+
+1. **Administrator consent: attempted, refused.** The account available to the assistant is Global Reader; creating the tenant-wide grant returned `Authorization_RequestDenied`. It was not worked around. A Global Administrator or Cloud Application Administrator must grant it, for example at `https://login.microsoftonline.com/08cef5cb-15fe-4756-9dd1-598a659ff06a/adminconsent?client_id=0f1982fa-032c-47f5-a2da-ae6cd319708a`.
+2. **Server signing key and GitHub App credentials: prepared.** A new Ed25519 server signing key, a second Entra client secret for local use and the `localhost:3100` redirect URI were created; the GitHub App (id 5576378) was re-verified against GitHub with exactly five permissions on one repository. All secrets are in `%USERPROFILE%\.greenfuel-studio` (not in the repository or OneDrive) and are started by `start-studio-approvals.ps1`. The Studio sign-in redirect was checked; no sign-in was attempted. The Azure site stays read-only.
+3. **Your approver key (`harness/policy/approvers.json`) is not enrolled, on purpose.** Enrollment needs an interactive terminal, your passphrase and retyping the fingerprint; the assistant must not do it. Until you do, the readiness gate `no-approver` stays raised.
+4. **Deferred by the owner:** sign in, compare the options and approve or reject ADR-0020 yourself; then authorize the baseline and generate the deck from it.
